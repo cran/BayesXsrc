@@ -745,6 +745,7 @@ class __EXPORT_TYPE DISTRIBUTION
   bool set_iwlsweights_notchanged(bool change)
     {
     iwlsweights_notchanged_df = change;
+    return change;
     }
 
   // FUNCTION: compute_IWLS

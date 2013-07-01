@@ -29,6 +29,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <float.h>
 #include "tmatrix.h"
 #include <vector>
 
@@ -51,6 +52,8 @@ namespace randnumbers
 // Erzeugen von auf (0,1) gleichverteilten Zufallszahlen
 
 double __EXPORT_TYPE uniform(void);
+
+double __EXPORT_TYPE uniform_ab(double a, double b);
 
 
 inline double __EXPORT_TYPE phi(const double & x)
@@ -233,6 +236,28 @@ double __EXPORT_TYPE rand_binom(double nin, double prob);
 double __EXPORT_TYPE rand_pois(double mu);
 
 // END: DSB //
+
+
+// returns an approximation of the digamma function at x
+double __EXPORT_TYPE digamma_exact (double & x);
+
+// returns an approximation of the trigamma function at x
+double __EXPORT_TYPE trigamma_exact (double & x);
+
+// returns an approximation of the logarithm of the gamma function at x
+double __EXPORT_TYPE lngamma_exact(double & x);
+
+// returns an approximation of the gamma function at x
+double __EXPORT_TYPE gamma_exact(double & x);
+
+// returns n choose k
+double __EXPORT_TYPE n_choose_k(int n, double k);
+
+// returns incomplete beta function
+double __EXPORT_TYPE incomplete_beta(double a, double b, double x);
+
+// returns incomplete gamma function
+double __EXPORT_TYPE incomplete_gamma(double a, double x);
 
 }
 

@@ -798,7 +798,6 @@ class __EXPORT_TYPE FULLCOND
 
   virtual bool is_missing(const ST::string & na)
     {
-
     }
 
   virtual void update_missings(datamatrix & x,const datamatrix & linpred,
@@ -912,7 +911,7 @@ class __EXPORT_TYPE FULLCOND
 
   virtual double compute_df(void)
     {
-    return 0;
+    return 0.;
     }
 
   virtual void set_dfunstruct(const double & df_unstr)  // für spatialtotal

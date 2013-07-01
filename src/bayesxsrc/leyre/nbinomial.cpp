@@ -1078,7 +1078,7 @@ double DISTRIBUTION_nbinomial::proposal_scale(void) const
             b = *scalework/(*pwork);
             *scalework=randnumbers::rand_gamma(a, b);
             a_neu = *scalework*(*scalework)/(*pwork);
-            while(a_neu < exp(-16*log(10)))
+            while(a_neu < exp(-16*log(10.)))
             {
                 *scalework=randnumbers::rand_gamma(a, b);
                 a_neu = *scalework*(*scalework)/(*pwork);
@@ -1204,7 +1204,7 @@ double DISTRIBUTION_nbinomial::log_nbin(const double & s_neu,
     double *respwork = response.getV();
     double *linwork = (*linpred_current).getV();
     double sum = 0.0;
-    double hilfe = exp(-300*log(10));
+    double hilfe = exp(-300*log(10.));
     if((s > hilfe) & (s_neu > hilfe))
     {
         for(i=0; i<nrobs; i++, respwork++, linwork++)

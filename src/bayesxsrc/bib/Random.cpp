@@ -30,30 +30,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 // define what is NAN, and how we determine whether a double is infinite.
 #if defined(MICROSOFT_VISUAL)
 #include <limits>
-    const double NAN = DBL_MAX;
-
     bool
     infinite(double x)
     {
         return ABS(x) > DBL_MAX;
     }
 #elif defined(__BUILDING_GNU)
-#include <limits.h>
     bool
     infinite(double x)
     {
-//        return finite(x) != 0;
-    return !isfinite(x);
+        return ABS(x) > DBL_MAX;
     }
 #else
 #include"../values.h"
-    const double NAN = MAXDOUBLE;
-
     bool
     infinite(double x)
     {
-        return ABS(x) > MAXDOUBLE;
+        return ABS(x) > DBL_MAX;
     }
+#endif
+
+#ifndef NAN
+  #define NAN DBL_MAX
 #endif
 
 // define a "repeat" syntax (for the new generators adapted from R)
@@ -197,6 +195,13 @@ double uniform(void)
   return double(zufall)/double(RAND_MAX);
 
   }
+
+double uniform_ab(double a, double b)
+{
+    double zufall = 0;
+    zufall = a+uniform()*(b-a);
+    return(zufall);
+}
 
 
 
@@ -662,6 +667,95 @@ double GIG(double chi)
   }
 
 
+double GIG(double lambda, double psi, double chi)
+  {
+
+  double out;
+
+  if (chi == 0)
+    return rand_gamma(lambda,psi/2);
+  else if (psi == 0)
+    return rand_invgamma(-lambda,chi/2);
+  else
+    {
+
+    double h = lambda;
+    double b = sqrt(chi * psi);
+    double m = ( h-1+sqrt( pow(h-1,2)+ pow(b,2)) ) / b;
+    double m2 = pow(m,2);
+    double log_1_over_pm = -(h-1)/2*log(m) + b/4*(m + (1/m));
+    double r = (6*m + 2*h*m - b* m2 + b)/(4* m2);
+    double s = (1 + h - b*m)/(2*m2);
+    double p = (3*s - pow(r,2))/3;
+    double q = (2* pow(r,3))/27 - (r*s)/27 + b/(-4*m2);
+    double eta = sqrt(-(pow(p,3))/27);
+    double y1  = 2*exp(log(eta)/3) * cos(acos(-q/(2*eta))/3) - r/3;
+    double y2  = 2*exp(log(eta)/3) * cos(acos(-q/(2*eta))/3 + 2/3* 3.1415) - r/3;
+
+    double ym;
+
+    if ( ((h<=1.0) && (b<=1.0)) || (fabs(q/eta)>2.0) || (y1<0.0) || (y2>0.0) )
+      {
+      ym = (-h-1 + sqrt( pow(h+1,2) + pow(b,2)))/b;
+
+      double a = exp(-0.5*h*log(m*ym) + 0.5*log(m/ym) + b/4*(m + 1/m - ym - 1.0/ym));
+
+      double u = uniform();
+      double v = uniform();
+      double out = a * (v/u);
+      while ( log(u) > (h-1)/2*log(out) - b/4*(out + 1/out) + log_1_over_pm  )
+        {
+        u = uniform();
+        v = uniform();
+        out = a * (v/u);
+        }
+      }
+    else
+      {
+
+      double vplus = exp(log_1_over_pm + log(1/y1) + (h-1)/2*log(1/y1 + m) -
+                           b/4*(1/y1 + m + 1/(1/y1 + m)) );
+      double vminus = -exp(log_1_over_pm + log(-1/y2) + (h-1)/2*log(1/y2 + m) -
+                           b/4*(1/y2 + m + 1/(1/y2 + m)) );
+
+      double u = uniform();
+      double v = vminus + (vplus - vminus) * uniform();
+      double z = v/u;
+
+      while (z < -m )
+        {
+        u = uniform();
+        v = vminus + (vplus - vminus) * uniform();
+        z = v/u;
+        }
+      out = z + m;
+
+      while (log(u) > (log_1_over_pm + (h-1)/2*log(out) - b/4*(out + 1/out)) )
+        {
+        u = uniform();
+        v = vminus + (vplus - vminus) * uniform();
+        z = v /u;
+
+        while (z < -m)
+          {
+          u = uniform();
+          v = vminus + (vplus - vminus) * uniform();
+          z = v/u;
+          }
+
+          out = z + m;
+
+        }
+
+       }
+
+     }
+
+  return sqrt( chi / psi ) * out;
+
+  }
+
+
 double f1old(double x, int j)
   {
   // first series approximation, guranteed to be monotone for x > 1.333
@@ -870,7 +964,7 @@ double rand_binom(double nin, double prob)
 //    p = prob;
 //    if((1. - prob) < prob)
 //      p = 1. - prob;
-      
+
     q = 1. - p;
     np = n * p;
     r = p / q;
@@ -1223,5 +1317,288 @@ double rand_pois(double mu)
 }
 
 // END: DSB //
+
+
+double digamma_exact ( double & x)
+{
+  double c = 8.5;
+  double d1 = -0.5772156649;
+  double r;
+  double s = 0.00001;
+  double s3 = 0.08333333333;
+  double s4 = 0.0083333333333;
+  double s5 = 0.003968253968;
+  double value;
+  double y;
+
+//
+//  Initialize.
+//
+  y = x;
+  value = 0.0;
+//
+//  Use approximation if argument <= S.
+//
+  if ( y <= s )
+  {
+    value = d1 - 1.0 / y;
+    return value;
+  }
+//
+//  Reduce to DIGAMA(X + N) where (X + N) >= C.
+//
+  while ( y < c )
+  {
+    value = value - 1.0 / y;
+    y = y + 1.0;
+  }
+//
+//  Use Stirling's (actually de Moivre's) expansion if argument > C.
+//
+  r = 1.0 / y;
+  value = value + log ( y ) - 0.5 * r;
+  r = r * r;
+  value = value - r * ( s3 - r * ( s4 - r * s5 ) );
+
+  return value;
+}
+
+
+double trigamma_exact (double & x)
+  {
+  double a = 0.0001;
+  double b = 5.0;
+  double b2 =  0.1666666667;
+  double b4 = -0.03333333333;
+  double b6 =  0.02380952381;
+  double b8 = -0.03333333333;
+  double value;
+  double y;
+  double z;
+
+  z = x;
+//
+//  Use small value approximation if X <= A.
+//
+  if ( x <= a )
+  {
+    value = 1.0 / x / x;
+    return value;
+  }
+//
+//  Increase argument to ( X + I ) >= B.
+//
+  value = 0.0;
+
+  while ( z < b )
+  {
+    value = value + 1.0 / z / z;
+    z = z + 1.0;
+  }
+//
+//  Apply asymptotic formula if argument is B or greater.
+//
+  y = 1.0 / z / z;
+
+  value = value + 0.5 *
+      y + ( 1.0
+    + y * ( b2
+    + y * ( b4
+    + y * ( b6
+    + y *   b8 )))) / z;
+
+  return value;
+}
+
+
+double gamma_exact(double & x)
+{
+    // Split the function domain into three intervals:
+    // (0, 0.001), [0.001, 12), and (12, infinity)
+
+    ///////////////////////////////////////////////////////////////////////////
+    // First interval: (0, 0.001)
+	//
+	// For small x, 1/Gamma(x) has power series x + gamma x^2  - ...
+	// So in this range, 1/Gamma(x) = x + gamma x^2 with error on the order of x^3.
+	// The relative error over this interval is less than 6e-7.
+
+	const double gamma = 0.577215664901532860606512090; // Euler's gamma constant
+
+    if (x < 0.001)
+        return 1.0/(x*(1.0 + gamma*x));
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Second interval: [0.001, 12)
+
+	if (x < 12.0)
+    {
+        // The algorithm directly approximates gamma over (1,2) and uses
+        // reduction identities to reduce other arguments to this interval.
+
+		double y = x;
+        int n = 0;
+        bool arg_was_less_than_one = (y < 1.0);
+
+        // Add or subtract integers as necessary to bring y into (1,2)
+        // Will correct for this below
+        if (arg_was_less_than_one)
+        {
+            y += 1.0;
+        }
+        else
+        {
+            n = static_cast<int> (floor(y)) - 1;  // will use n later
+            y -= n;
+        }
+
+        // numerator coefficients for approximation over the interval (1,2)
+        static const double p[] =
+        {
+            -1.71618513886549492533811E+0,
+             2.47656508055759199108314E+1,
+            -3.79804256470945635097577E+2,
+             6.29331155312818442661052E+2,
+             8.66966202790413211295064E+2,
+            -3.14512729688483675254357E+4,
+            -3.61444134186911729807069E+4,
+             6.64561438202405440627855E+4
+        };
+
+        // denominator coefficients for approximation over the interval (1,2)
+        static const double q[] =
+        {
+            -3.08402300119738975254353E+1,
+             3.15350626979604161529144E+2,
+            -1.01515636749021914166146E+3,
+            -3.10777167157231109440444E+3,
+             2.25381184209801510330112E+4,
+             4.75584627752788110767815E+3,
+            -1.34659959864969306392456E+5,
+            -1.15132259675553483497211E+5
+        };
+
+        double num = 0.0;
+        double den = 1.0;
+        int i;
+
+        double z = y - 1;
+        for (i = 0; i < 8; i++)
+        {
+            num = (num + p[i])*z;
+            den = den*z + q[i];
+        }
+        double result = num/den + 1.0;
+
+        // Apply correction if argument was not initially in (1,2)
+        if (arg_was_less_than_one)
+        {
+            // Use identity gamma(z) = gamma(z+1)/z
+            // The variable "result" now holds gamma of the original y + 1
+            // Thus we use y-1 to get back the orginal y.
+            result /= (y-1.0);
+        }
+        else
+        {
+            // Use the identity gamma(z+n) = z*(z+1)* ... *(z+n-1)*gamma(z)
+            for (i = 0; i < n; i++)
+                result *= y++;
+        }
+
+		return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Third interval: [12, infinity)
+
+    if (x > 171.624)
+    {
+		// Correct answer too large to display. Force +infinity.
+		double temp = DBL_MAX;
+		return temp*2.0;
+    }
+
+    return exp(lngamma_exact(x));
+}
+
+
+double lngamma_exact (double & x)
+{
+
+    if (x < 12.0)
+    {
+        return log(fabs(gamma_exact(x)));
+    }
+
+	// Abramowitz and Stegun 6.1.41
+    // Asymptotic series should be good to at least 11 or 12 figures
+    // For error analysis, see Whittiker and Watson
+    // A Course in Modern Analysis (1927), page 252
+
+    static const double c[8] =
+    {
+		 1.0/12.0,
+		-1.0/360.0,
+		1.0/1260.0,
+		-1.0/1680.0,
+		1.0/1188.0,
+		-691.0/360360.0,
+		1.0/156.0,
+		-3617.0/122400.0
+    };
+    double z = 1.0/(x*x);
+    double sum = c[7];
+    for (int i=6; i >= 0; i--)
+    {
+        sum *= z;
+        sum += c[i];
+    }
+    double series = sum/x;
+
+    static const double halfLogTwoPi = 0.91893853320467274178032973640562;
+    double logGamma = (x - 0.5)*log(x) - x + halfLogTwoPi + series;
+	return logGamma;
+}
+
+double n_choose_k (int n, double k)
+{
+    if ( n >= 0 && k == 0)
+        return 1;
+    else if(n == 0 && k >= 0)
+        return 0;
+    else
+        return n_choose_k(n-1, k) + n_choose_k(n-1,k-1);
+}
+
+double incomplete_beta (double a, double b, double x)
+{
+    double Ix = 0;
+    for (int i=a; i<(a+b); i++) {
+        Ix += n_choose_k(a+b-1,i)*pow(x,i)*pow(1-x,a+b-1-i);
+    }
+    return Ix;
+}
+
+double incomplete_gamma (double a, double x)
+{
+    const int ITMAX = 100;
+    const double EPS = 2.22045e-016;
+    int n;
+    double sum;
+    double gamser;
+    double gln = randnumbers::lngamma_exact(a);
+    double ap = a;
+    double del = sum = 1.0/a;
+    for (n=0; n<ITMAX; n++) {
+        ++ap;
+        del *= x/ap;
+        sum += del;
+        if(fabs(del)<fabs(sum)*EPS) {
+            gamser = sum*exp(-x+log(x)-gln);
+        }
+    }
+    return gamser;
+}
+
 
 } // end: namespace randnumbers

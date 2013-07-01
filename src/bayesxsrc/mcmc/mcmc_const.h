@@ -171,6 +171,7 @@ class __EXPORT_TYPE FULLCOND_const : public FULLCOND
   bool set_negbin(void)
     {
     negbin=true;
+    return negbin;
     }
 
   virtual void update_fix_effect(const unsigned & pos, double & value, datamatrix fix)

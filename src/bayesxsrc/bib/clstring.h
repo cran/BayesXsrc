@@ -144,7 +144,7 @@ class __EXPORT_TYPE string
   //       the resulting string is stored in 's'
 
   friend istream & __EXPORT_TYPE getline(istream & i,unsigned int maxlen,
-									string & s, char delim = '\n');
+									string & s, char delim);
 
   // FRIEND FUNCTION: getline
   // TASK: see function above
@@ -152,7 +152,7 @@ class __EXPORT_TYPE string
   // - maxlen = 256 Bytes
 
   friend istream & __EXPORT_TYPE getline(
-  istream & i, string & s, char delim = '\n');
+  istream & i, string & s, char delim);
 
   // FRIEND FUNCTION: open
   // TASk:
@@ -160,11 +160,11 @@ class __EXPORT_TYPE string
 //friend void open(std::ifstream & fin,string & s, int mode);
 
   friend void __EXPORT_TYPE open(
-  std::ifstream & fin,string & s,int mode = std::ios::in);
+  std::ifstream & fin,string & s,int mode);
 
 //MICRO  friend void open(ofstream & out,string & s,ios_base::openmode mode = ios_base::out);
   friend void __EXPORT_TYPE open(
-  std::ofstream & out,string & s,int mode = std::ios::out);
+  std::ofstream & out,string & s,int mode);
 
 
   // OVERLOADED [] OPERATOR
@@ -519,11 +519,11 @@ string __EXPORT_TYPE outresults(const unsigned & l,const string & name,
 string __EXPORT_TYPE make_latextable(vector<string> & v);
 
 //------------ forward declarations of friends ---------------------------------
-istream & getline(istream & i,string & s, char delim);
-istream & getline(istream & i,unsigned int maxlen,string & s,char delim);
+istream & getline(istream & i,string & s, char delim = '\n');
+istream & getline(istream & i,unsigned int maxlen,string & s,char delim = '\n');
 
-void __EXPORT_TYPE open(std::ifstream & fin,string & s,int mode);
-void __EXPORT_TYPE open(std::ofstream & out,string & s,int mode);
+void __EXPORT_TYPE open (std::ifstream & fin, string & s, int mode = std::ios::in);
+void __EXPORT_TYPE open(std::ofstream & out,string & s,int mode = std::ios::out);
 
 //------------ functions, that convert a number into a string ------------------
 
