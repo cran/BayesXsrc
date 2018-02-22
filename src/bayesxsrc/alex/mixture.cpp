@@ -501,7 +501,7 @@ void FULLCOND_mixture::update(void)
     temp=(1.0/cwtempsum)*temp;
     compweight.assign(temp);
     }
-    
+
 
 
   double m = centerbeta();
@@ -550,7 +550,7 @@ void FULLCOND_mixture::outresults(void)
   {
   FULLCOND::outresults();
   cpar_fc.outresults();
-  cind_fc.outresults();  
+  cind_fc.outresults();
 
   unsigned i,k;
 
@@ -590,7 +590,7 @@ void FULLCOND_mixture::outresults(void)
     }
   datamatrix cdmat(2,acmat.cols(),1.0);
 
-  double siftemp,cv=2.0/sqrt(optionsp->get_samplesize());
+  double siftemp,cv=2.0/sqrt(static_cast<double>(optionsp->get_samplesize()));
   for(i=0;i<acmat.cols();i++)
     {
     acsig=0;

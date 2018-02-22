@@ -1415,7 +1415,7 @@ double FULLCOND_kriging::outresultsreml(datamatrix & X,datamatrix & Z,
       betaqu_l2_upper(j,0) = betamean(j,0)+randnumbers::invPhi2(upper1/100)*betastd(j,0);
       }
 
-      
+
     outest = outest.substr(0,outest.length()-4) + "_grid.res";
     ofstream outgrid(outest.strtochar());
 

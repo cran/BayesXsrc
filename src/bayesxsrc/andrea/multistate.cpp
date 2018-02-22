@@ -208,7 +208,7 @@ void  DISTRIBUTION_multistatemodel::tilde_y(datamatrix & tildey,datamatrix & m,c
   double * workweight = w.getV();
   double * ywork = tildey.getV();
 
-  for (i=0;i<nrobs;i++,workspline++,ywork++,workresponse+nrtransition,workweight++)
+  for (i=0;i<nrobs;i++,workspline++,ywork++,workresponse+=nrtransition,workweight++)
     {
     if(*workweight == 0.0)
       *ywork = 0.0;

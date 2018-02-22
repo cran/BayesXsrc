@@ -58,7 +58,25 @@ enum effecttype2 {
                 Varcoefftotal
    };
 
-enum centerm {cmean,nullspace,meansimple,cmeanintegral,cmeaninvvar,cmeanf,meansum2};
+
+// Centermethods
+// 1. Without sampling
+// a) meansimple
+//    center parameters around zero
+// b) integralsimple
+//    integral f = 0
+// 2. Within sampling
+// a) meancoeff
+//    center parameters around zero
+// b) meanf
+//    sum_i f(x_i) = 0 (over all observations)
+// c) meanfd
+//    sum_j f(x_(j)) = 0 (over the different observations)
+// d) userdefined
+//    use constraint matrix provided by the user (only available for userdefined and tensor)
+
+enum centerm {meancoeff,nullspace,meansimple,integralsimple,
+              cmeanintegral,cmeaninvvar,meanf,meanfd,meansum2,meansimplevar,userdefined};
 
 //------------------------------------------------------------------------------
 //--------------------------- CLASS: DESIGN ------------------------------------
@@ -99,6 +117,7 @@ class __EXPORT_TYPE DESIGN
 
   // Variables determined by function init_data
 
+  bool discrete;                             // data discrete or continuous
   datamatrix data;                           // data matrix
   datamatrix intvar;                         // interaction variable for
                                              // varying coefficients
@@ -139,7 +158,21 @@ class __EXPORT_TYPE DESIGN
   bool identity;                             // true if Zout identity matrix
   bool full;                                 // true if Zout full matrix
 
+  void test(ST::string path);
+
   bool check_Zout_consecutive(void);
+
+  // --------------------------- check intvar ----------------------------------
+
+  // FUNCTION: compute_kernel_intvar
+  // TASK: computes integral |intvar| g(intvar) dintvar where g is the epanechnikov
+  //       kernel density estimator with AMISE optimal bandwidth
+
+  double compute_kernel_intvar(bool absolute);
+
+  double compute_epanechnikov(double & x, statmatrix<int> & intindex, vector<int> & posb, vector<int> & pose);
+
+  // ---------------------------------------------------------------------------
 
   //---------------------------- Zout_derivative -------------------------------
 
@@ -177,6 +210,7 @@ class __EXPORT_TYPE DESIGN
   // --------------------------- for center ------------------------------------
 
   double compute_sumBk(unsigned & k);
+  double compute_sumBk_different(unsigned & k);
 
   bool center;
   centerm centermethod;
@@ -218,6 +252,8 @@ class __EXPORT_TYPE DESIGN
   datamatrix Wsum;
 
   envmatdouble XWX;                          // X'WX
+  envmatdouble * XWX_p;                      // Pointer to the current
+                                             // XWX object
 
   datamatrix XWres;                          // X'W(y-eta)
   datamatrix * XWres_p;                      // Pointer to the current
@@ -266,7 +302,7 @@ class __EXPORT_TYPE DESIGN
   // TASK: compute Zout*beta, i.e. the estimated/current function evaluated at
   //       the different observations in data
 
-  void compute_f(datamatrix & beta,datamatrix & betalin,
+  virtual void compute_f(datamatrix & beta,datamatrix & betalin,
                        datamatrix & f, datamatrix & ftot);
 
   // FUNCTION: compute_effect
@@ -275,12 +311,19 @@ class __EXPORT_TYPE DESIGN
   void compute_effect(datamatrix & effect,datamatrix & f,
                       effecttype2 et = Function);
 
+
+  // FUNCTION: set_intvar
+  // TASK:
+
+
   void set_intvar(datamatrix & iv, double add=0);
 
   // FUNCTION: update_linpred
   // TASK: updates the predictor based on the current function f
 
   void update_linpred(datamatrix & f);
+
+  bool update_linpred_save(datamatrix & f);
 
   // FUNCTION: compute_partres
   // TASK: computes
@@ -319,8 +362,9 @@ class __EXPORT_TYPE DESIGN
 
   // FUNCTION: computes XWres
   // TASK: computes XWres, res is the partial residual
+  // l is the smoothing parameter (lambda), t2 is the smoothing variance (tau2)
 
-  virtual void compute_XtransposedWres(datamatrix & partres, double l);
+  virtual void compute_XtransposedWres(datamatrix & partres, double l, double t2);
 
   // FUNCTION: compute_XtransposedWX_XtransposedWres
   // TASK: computes XWX and XWres, res is the partial residual
@@ -343,6 +387,8 @@ class __EXPORT_TYPE DESIGN
   virtual void read_options(vector<ST::string> & op,vector<ST::string> & vn);
 
   virtual void outoptions(GENERAL_OPTIONS * op);
+
+  virtual void outbasis_R(ofstream & out);
 
   virtual void compute_orthogonaldecomp(void);
 

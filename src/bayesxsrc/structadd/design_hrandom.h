@@ -56,10 +56,13 @@ class __EXPORT_TYPE DESIGN_hrandom : public DESIGN
 
   protected:
 
-  DISTR * likep_RE;
 
   public:
 
+  DISTR * likep_RE;
+
+  bool simplerandom;
+  datamatrix simplerandom_linpred;
 
 //----------------------- CONSTRUCTORS, DESTRUCTOR -----------------------------
 
@@ -74,6 +77,12 @@ class __EXPORT_TYPE DESIGN_hrandom : public DESIGN
              GENERAL_OPTIONS * o,DISTR * dp,FC_linear * fcl, DISTR * dp_RE,
              vector<ST::string> & op,
              vector<ST::string> & vn);
+
+  DESIGN_hrandom(const datamatrix & dm, const datamatrix & iv,
+                                 GENERAL_OPTIONS * o,DISTR * dp, FC_linear * fcl,
+                                 vector<ST::string> & op,
+                                 vector<ST::string> & vn);
+
 
   // COPY CONSTRUCTOR
 
@@ -91,7 +100,7 @@ class __EXPORT_TYPE DESIGN_hrandom : public DESIGN
 
   void compute_penalty2(const datamatrix & pen);
 
-  void compute_XtransposedWres(datamatrix & partres, double l);
+  void compute_XtransposedWres(datamatrix & partres, double l, double t2);
 
   void compute_precision(double l);
 
@@ -101,7 +110,11 @@ class __EXPORT_TYPE DESIGN_hrandom : public DESIGN
 
   void read_options(vector<ST::string> & op,vector<ST::string> & vn);
 
+  void compute_basisNull(void);
+
   void outoptions(GENERAL_OPTIONS * op);
+
+  void outbasis_R(ofstream & out);
 
   // DESTRUCTOR
 

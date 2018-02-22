@@ -1533,7 +1533,7 @@ FULLCOND_nonp_gaussian::FULLCOND_nonp_gaussian(MCMCoptions * o,
     if (ce==false)
       identifiable = true;
     else
-      identifiable = false;  
+      identifiable = false;
 
     varcoeff = true;
 
@@ -1613,7 +1613,7 @@ FULLCOND_nonp_gaussian::FULLCOND_nonp_gaussian(MCMCoptions * o,
     *workX = *workx;
     workX++;
     *workX = *worky;
-    *workX++;
+    workX++;
     }
 
   MAP::map m(
@@ -2768,7 +2768,7 @@ void FULLCOND_nonp_gaussian::update_IWLS_mode(void)
   if (notransform==false)
     transform = likep->get_trmult(column);
   else
-    transform = 1;  
+    transform = 1;
 
 
   FULLCOND::update();

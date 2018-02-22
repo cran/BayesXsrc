@@ -82,16 +82,16 @@ FULLCOND_rj_int::FULLCOND_rj_int (vector < FULLCOND_dag_ia_mixed * > dagp,
 
 //constructor_2
 FULLCOND_rj_int::FULLCOND_rj_int (ST::string fix, const ST::string & rp, unsigned int lim, double alph ,
-								  ST::string switch_t, ST::string print_mod, 
+								  ST::string switch_t, ST::string print_mod,
 								  unsigned & ty, vector < FULLCOND_dag_ia* > dagp,
 								  MCMCoptions * o, const datamatrix & d, const ST::string & t,
 								  const unsigned & r, const unsigned & c, const ST::string & fp)
 									: FULLCOND_rj(o,d,t,r,c,fp)
 {
-	//		comment: the following should be done by 
+	//		comment: the following should be done by
 	//		: FULLCOND_rj(lim, alpha, switch_t, print_mod, type,dagp, o,d,t,r,c,fp)
-	//		but this is not possible as dagp is of type FULLCOND_dag_d_ia* whereas 
-	//		FULLCOND_dag* would be demanded		
+	//		but this is not possible as dagp is of type FULLCOND_dag_d_ia* whereas
+	//		FULLCOND_dag* would be demanded
 
 
 	unsigned i;
@@ -132,16 +132,16 @@ FULLCOND_rj_int::FULLCOND_rj_int (ST::string fix, const ST::string & rp, unsigne
 
 //constructor_2a
 FULLCOND_rj_int::FULLCOND_rj_int (ST::string fix, const ST::string & rp, unsigned int lim, double alph,
-								  ST::string switch_t,  ST::string print_mod, 
+								  ST::string switch_t,  ST::string print_mod,
 								  unsigned & ty, vector < FULLCOND_dag_ia_mixed* > dagp,
 								  MCMCoptions * o, const datamatrix & d, const ST::string & t,
 								  const unsigned & r, const unsigned & c, const ST::string & fp)
 									: FULLCOND_rj(o,d,t,r,c,fp)
 {
-	//		comment: the following should be done by 
+	//		comment: the following should be done by
 	//		: FULLCOND_rj(lim, alpha, switch_t, print_mod, type,dagp, o,d,t,r,c,fp)
-	//		but this is not possible as dagp is of type FULLCOND_dag_d_ia* whereas 
-	//		FULLCOND_dag* would be demanded		
+	//		but this is not possible as dagp is of type FULLCOND_dag_d_ia* whereas
+	//		FULLCOND_dag* would be demanded
 
 
 	unsigned i;
@@ -191,7 +191,7 @@ FULLCOND_rj_int::FULLCOND_rj_int (ST::string fix, const ST::string & rp, unsigne
 
   FULLCOND_rj_int::FULLCOND_rj_int(const FULLCOND_rj_int & fc) : FULLCOND_rj(FULLCOND_rj(fc))
   {
-	  
+
   }
 
 
@@ -204,14 +204,14 @@ FULLCOND_rj_int::FULLCOND_rj_int (ST::string fix, const ST::string & rp, unsigne
 		  return *this;
 
      FULLCOND_rj::operator=(FULLCOND_rj(fc));
-	  
+
 	  return *this;
   }
 
 
 
 
-  
+
 
 
 
@@ -246,12 +246,12 @@ void FULLCOND_rj_int::death_step(unsigned int i, unsigned int j)
 	unsigned ncoef_old = preg_mods[j]->get_ncoef();
 	unsigned num_ia_del = preg_mods[j]->ia_of_i(i);		 //number of to deletig interactions
 	unsigned ncoef_new = ncoef_old - 1 - num_ia_del;
-	
+
 	if(num_ia_del==0)
 	{
 		FULLCOND_rj::death_step(i,j);
 	}
-	else 
+	else
 	{
 		if(mixed_case==true)
 				preg_mods[j]->create_matrices("d", ncoef_new);
@@ -262,7 +262,7 @@ void FULLCOND_rj_int::death_step(unsigned int i, unsigned int j)
 		datamatrix & x_new = preg_mods[j]->get_x_new_d();
 		// instead of: datamatrix xx_new (ncoef_new,ncoef_new);
 		datamatrix & xx_new = preg_mods[j]->get_xx_new_d();
-		
+
 
 		// vector of interactions that will vanish
 		vector <vector <unsigned > > ias_del;
@@ -271,13 +271,13 @@ void FULLCOND_rj_int::death_step(unsigned int i, unsigned int j)
 
 		// vector of coefficients which will vanish
 		datamatrix beta_old (1+num_ia_del,1);
-		
+
 		// current_ia of model j, after successful death-step
 		vector <vector <unsigned > > current_ia_n;
 
 
 		// computing of the new values
-		preg_mods[j]->make_new_d_int("d", i, j, num_ia_del, beta_old, 
+		preg_mods[j]->make_new_d_int("d", i, j, num_ia_del, beta_old,
 			current_ia_n, xx_new, b_new, x_new);
 
 
@@ -294,10 +294,10 @@ void FULLCOND_rj_int::death_step(unsigned int i, unsigned int j)
 		double prop = preg_mods[j]->get_ln_prop_beta();
 
 
-		ratio = -1/(2*preg_mods[j]->get_sigma_i()) 
+		ratio = -1/(2*preg_mods[j]->get_sigma_i())
 				*(log_num - log_denom) +prop ;
 
-                
+
 		// accept proposal and change the corresponding values
 
 		if(func::accept(ratio) == true)
@@ -348,15 +348,15 @@ void FULLCOND_rj_int::birth_step(unsigned int v_i, unsigned int v_j)
 		FULLCOND_rj::birth_step(v_i,v_j);
 	}
 	else
-	{	
+	{
 		if(zeta.azy_test(v_i,v_j)== true)
 		{
 			unsigned k;
 
 			unsigned int ncoef_old = preg_mods[v_j]->get_ncoef();
 			unsigned int num_ia_new = preg_mods[v_j]->num_ia_new(v_i);
-			unsigned int ncoef_new = ncoef_old + num_ia_new +1; 
-			
+			unsigned int ncoef_new = ncoef_old + num_ia_new +1;
+
 			/*
 			datamatrix b_new (ncoef_new,1);
 			datamatrix x_new (nobs,ncoef_new);
@@ -365,7 +365,7 @@ void FULLCOND_rj_int::birth_step(unsigned int v_i, unsigned int v_j)
 
 			if(mixed_case==true)
 				preg_mods[v_j]->create_matrices("b", ncoef_new);
-			
+
 			// instead of: datamatrix b_new (ncoef_new,1);
 // Vorschlag:
 //			datamatrix & b_new = preg_mods[v_j]->get_b_new_b();
@@ -380,12 +380,12 @@ void FULLCOND_rj_int::birth_step(unsigned int v_i, unsigned int v_j)
 			datamatrix xx_new = preg_mods[v_j]->get_xx_new_b() ;
 
 			datamatrix beta_new (num_ia_new+1,1);
-				
+
 			for(k=0; k<num_ia_new+1; k++)
 				beta_new(k,0)= 3*rand_normal(); //coefficient which will be added
 
-			
-			vector <vector <unsigned > > ia_new; 
+
+			vector <vector <unsigned > > ia_new;
 			preg_mods[v_j]->new_ia_of_i(v_i, ia_new);
 
 
@@ -396,8 +396,8 @@ void FULLCOND_rj_int::birth_step(unsigned int v_i, unsigned int v_j)
 
 			double log_denom;
 			double log_num;
-			double prop; 
-			double ratio; 
+			double prop;
+			double ratio;
 
 			log_num = preg_mods[v_j]->calc_SQT_x(x_new, b_new)
 						+ preg_mods[v_j]->calc_SQT_b(b_new);
@@ -437,17 +437,17 @@ void FULLCOND_rj_int::birth_step(unsigned int v_i, unsigned int v_j)
 				}
 				cout<<endl
 					<<endl;;
-				/*********************/
+				*********************/
 			}
 
 			nrtrials_b ++;
 			step_aborted = false;
 
 		} // end of "if(azy_test(i,j)== true) ...."
-	
+
     }
 
-} 
+}
 
 
 
@@ -533,7 +533,7 @@ void FULLCOND_rj_int::switch_version_1(unsigned v_i, unsigned j)
 		//datamatrix b_new (ncoef_new,1);
 		//datamatrix x_new (nobs,ncoef_new);
 		//datamatrix xx_new (ncoef_new,ncoef_new);
-		
+
 
 		if(mixed_case==true)
 				preg_mods[j]->create_matrices("b", ncoef_new_j);
@@ -628,7 +628,7 @@ void FULLCOND_rj_int::switch_version_1(unsigned v_i, unsigned j)
 		}
 
 
-			
+
 
         // ***** properties for DEATH-STEP j->i **********
 	    unsigned ncoef_old_i = preg_mods[v_i]->get_ncoef();
@@ -646,7 +646,7 @@ void FULLCOND_rj_int::switch_version_1(unsigned v_i, unsigned j)
 	 	    FULLCOND_rj::switch_version_2(v_i,v_j) ;
         }
 
-		
+
 		// eigentlich else ohne bedingung!!!
 
      	else
@@ -726,7 +726,7 @@ void FULLCOND_rj_int::switch_version_1(unsigned v_i, unsigned j)
 			acceptance_s ++;
 		}
     }
-	
+
 	step_aborted = false;
 }
 
@@ -736,24 +736,24 @@ void FULLCOND_rj_int::switch_version_1(unsigned v_i, unsigned j)
 
 // FUNCTION: ratio_s
  // TARGET: computes acceptance ratio in the switch step
- double FULLCOND_rj_int::ratio_s_int(unsigned int i,unsigned int j, 
-							const datamatrix & b_new_i, const datamatrix & b_new_j, 
+ double FULLCOND_rj_int::ratio_s_int(unsigned int i,unsigned int j,
+							const datamatrix & b_new_i, const datamatrix & b_new_j,
 							const datamatrix & x_new_i, const datamatrix & x_new_j)
  {
 	 double log_num_j, log_num_i, log_denom_j, log_denom_i;
 	 double	prop_j, prop_i;
 
 
-	 log_num_j = preg_mods[j]->calc_SQT_x(x_new_j, b_new_j) 
+	 log_num_j = preg_mods[j]->calc_SQT_x(x_new_j, b_new_j)
 					+ preg_mods[j]->calc_SQT_b(b_new_j);
 
 	 log_denom_j = preg_mods[j]->calc_SQT_x()
 					+  preg_mods[j]->calc_SQT_b();
 
-	 log_num_i = preg_mods[i]->calc_SQT_x(x_new_i, b_new_i) 
+	 log_num_i = preg_mods[i]->calc_SQT_x(x_new_i, b_new_i)
 				+ preg_mods[i]->calc_SQT_b(b_new_i);
 
-	 log_denom_i = preg_mods[i]->calc_SQT_x() 
+	 log_denom_i = preg_mods[i]->calc_SQT_x()
 				+ preg_mods[i]->calc_SQT_b();
 
 	prop_j = preg_mods[j]->get_ln_prop_beta();
@@ -761,9 +761,9 @@ void FULLCOND_rj_int::switch_version_1(unsigned v_i, unsigned j)
 
 
 
-	double log_ratio = -1/(2*preg_mods[i]->get_sigma_i()) 
+	double log_ratio = -1/(2*preg_mods[i]->get_sigma_i())
 						*(log_num_i - log_denom_i )
-					   - 1/(2*preg_mods[j]->get_sigma_i()) 
+					   - 1/(2*preg_mods[j]->get_sigma_i())
 					    *(log_num_j - log_denom_j)
 						+ prop_i - prop_j ;
 
@@ -772,13 +772,13 @@ void FULLCOND_rj_int::switch_version_1(unsigned v_i, unsigned j)
 
 
 
- // FUNCTION: make_new_b 
+ // FUNCTION: make_new_b
   // TASK: computes the new values for a birth-step
   void FULLCOND_rj_int::make_new_b (ST::string step, unsigned int i, unsigned int j, unsigned ia_new,
-						datamatrix & beta_new, datamatrix & xx_new, datamatrix & b_new, 
+						datamatrix & beta_new, datamatrix & xx_new, datamatrix & b_new,
 						datamatrix & x_new)
   {
-	  void make_new_b(vector<unsigned> ia_new, double beta_new, 
+	  void make_new_b(vector<unsigned> ia_new, double beta_new,
 				datamatrix & xx_new, datamatrix & b_new, datamatrix & x_new);
   }
 
@@ -794,9 +794,9 @@ void FULLCOND_rj_int::switch_step(unsigned int v_i, unsigned int v_j)
 
 	if(zeta.azy_test(v_i,v_j)==true)
 	{
-		
+
 		zeta(v_j,v_i)=1;
-		zeta.change_list(v_j,v_i,0); 
+		zeta.change_list(v_j,v_i,0);
 
 		if(switch_type=="equi"
 			&& zeta.equi_test(v_j,v_i)==true)
@@ -819,16 +819,16 @@ void FULLCOND_rj_int::switch_step(unsigned int v_i, unsigned int v_j)
 			}
 		}
 
-		
+
 	} // end of "if(azy_test(i,j)==true)"
-	
+
 	else // azy_test(i,j)==false"
 	{
 		zeta(v_j,v_i)=1;
 		zeta.change_list(v_j,v_i,0);
 	}
 
-	nrtrials_s ++;		
+	nrtrials_s ++;
 }
 
 

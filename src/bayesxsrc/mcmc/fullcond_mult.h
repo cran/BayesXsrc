@@ -114,7 +114,7 @@ class __EXPORT_TYPE FULLCOND_mult : public FULLCOND
                         unsigned be, unsigned en,effecttype t);
 
 
-  unsigned get_nreffects(effecttype t);
+//  unsigned get_nreffects(effecttype t);
 
 
   void outoptions(void);

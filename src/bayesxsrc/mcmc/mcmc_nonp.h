@@ -370,18 +370,23 @@ double compute_quadform_prec(const datamatrix & beta,const datamatrix & prop,
 
  ST::string get_typeasstring(void)
    {
+   ST::string help;
    if (type==RW1)
-     return "first order random walk";
+     help = "first order random walk";
    else if (type==RW2)
-     return "second order random walk";
+     help = "second order random walk";
    else if (type==mrf)
-     return "spatial Markov random field";
+     help = "spatial Markov random field";
    else if (type==seasonal)
-     return ("seasonal component");
+     help = ("seasonal component");
    else if (type==mrflinear)
-     return "2 dimensional first order random walk";
+     help = "2 dimensional first order random walk";
    else if (type==mrfkronecker)
-     return "Kronecker product interaction";
+     help = "Kronecker product interaction";
+   else
+     help = "";
+
+   return help;
    }
 
 
@@ -399,6 +404,7 @@ double compute_quadform_prec(const datamatrix & beta,const datamatrix & prop,
      return "2dimrw1";
    else if (type==mrfkronecker)
      return "kronecker";
+   else return "";
    }
 
   bool get_polex(void)

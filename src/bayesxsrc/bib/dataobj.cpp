@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 void dataobject::create(void)
   {
 
-  srand((unsigned)time(0));
+//  srand((unsigned)time(NULL));
 //  randomize();
 
   m = modelStandard();
@@ -264,7 +264,6 @@ int dataobject::parse(const ST::string & c)
 	 (*functions[pos])(*this);
 
   return(pos);
-
   }
 
 
@@ -782,7 +781,7 @@ void dataobject::describe(const optionlist & globaloptions)
     jmethodID javashowdata = adminb_p->Java->GetMethodID(
     adminb_p->BayesX_cls, "JavaShowData", "()V");
     adminb_p->Java->CallVoidMethod(adminb_p->BayesX_obj, javashowdata);
-#elif(__BUILDING_GNU)
+#else
     out("ERROR: method describe is not available in this version\n");
 #endif
   }

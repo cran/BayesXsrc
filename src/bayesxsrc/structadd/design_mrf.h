@@ -67,7 +67,7 @@ class __EXPORT_TYPE DESIGN_mrf : public DESIGN
   // CONSTRUCTOR 1
   // Spatial covariates
 
-  DESIGN_mrf(const datamatrix & dm, const datamatrix & iv,
+  DESIGN_mrf(datamatrix & dm,datamatrix & iv,
              GENERAL_OPTIONS * o,DISTR * dp,FC_linear * fcl,
              const MAP::map & m,vector<ST::string> & op,
              vector<ST::string> & vn);
@@ -88,11 +88,13 @@ class __EXPORT_TYPE DESIGN_mrf : public DESIGN
 
   void compute_basisNull(void);
 
-  void compute_XtransposedWres(datamatrix & partres, double l);
+  void compute_XtransposedWres(datamatrix & partres, double l, double t2);
 
   void compute_precision(double l);
 
   void outoptions(GENERAL_OPTIONS * op);
+
+  void outbasis_R(ofstream & out);
 
   // DESTRUCTOR
 

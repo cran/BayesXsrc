@@ -40,7 +40,7 @@ FULLCOND_tvariance2dim::FULLCOND_tvariance2dim(MCMCoptions * o,
 
   if (!rowwise)
     {
-    m = sqrt(p->get_nrpar());
+    m = sqrt(static_cast<double>(p->get_nrpar()));
     nrpar = (m-1)*(m-1)*2+2*(m-1);
 
     SparseMatrix Ksp = Kmrflinear(m,m);
@@ -67,7 +67,7 @@ FULLCOND_tvariance2dim::FULLCOND_tvariance2dim(MCMCoptions * o,
     }
   else
     {
-    m = sqrt(p->get_nrpar());
+    m = sqrt(static_cast<double>(p->get_nrpar()));
     nrpar = m*m;
     u = datamatrix (nrpar,1,0);
     }
@@ -177,8 +177,8 @@ FULLCOND_tvariance2dim::operator=(const FULLCOND_tvariance2dim & t)
   Kp = t.Kp;
   Kp_spat = t.Kp_spat;
   spatial = t.spatial;
-  Laplace = t.Laplace;  
-  indexmat = t.indexmat;  
+  Laplace = t.Laplace;
+  indexmat = t.indexmat;
   pathresults = t.pathresults;
   nu = t.nu;
   m = t.m;
@@ -954,7 +954,7 @@ void FULLCOND_tvariance2dim::outresults(void)
     outres << endl;
     }
 
-  }                                         
+  }
 
 
 void FULLCOND_tvariance2dim::outoptions(void)

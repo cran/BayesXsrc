@@ -54,6 +54,10 @@ class __EXPORT_TYPE FC_predict   : public FC
   protected:
 
   FC FC_deviance;
+  FC FC_p;
+  FC FC_logp;
+  FC FC_logp2;
+
 
   DISTR * likep;
   datamatrix designmatrix;
@@ -63,7 +67,6 @@ class __EXPORT_TYPE FC_predict   : public FC
   double deviance;
   double deviancesat;
 
-
   void get_predictor(void);
 
   void compute_MSE(const ST::string & pathresults);
@@ -72,6 +75,8 @@ class __EXPORT_TYPE FC_predict   : public FC
 
   msetype MSE;
   double MSEparam;
+
+  bool WAICoff;
 
   ST::string getloss(void);
 
@@ -83,7 +88,7 @@ class __EXPORT_TYPE FC_predict   : public FC
 
   FC_predict(GENERAL_OPTIONS * o,DISTR * lp,const ST::string & t,
      const ST::string & fp,const ST::string & fpd, datamatrix & dm,
-     vector<ST::string> & dn);
+     vector<ST::string> & dn,bool wa);
 
   // COPY CONSTRUCTOR
 
@@ -107,8 +112,13 @@ class __EXPORT_TYPE FC_predict   : public FC
   void outoptions(void);
 
   void outresults_deviance(void);
-  void outresults_DIC(const ST::string & pathresults);
-  void outresults(ofstream & out_stata, ofstream & out_R,
+  void outresults_DIC(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                      const ST::string & pathresults);
+
+  void outresults_WAIC(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                      const ST::string & pathresults);
+
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                   const ST::string & pathresults);
 
   void compute_autocorr_all(const ST::string & path, unsigned lag,

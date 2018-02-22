@@ -43,12 +43,19 @@ GENERAL_OPTIONS::GENERAL_OPTIONS(void)
   burnin = 2000;
   step = 20;
   nrbetween = 1000;
-  nrout = 1000;
+  nrout = 100;
   nriter = 0;
   samplesize = 0;
   logout = &cout;
   set_level1(95);
   set_level2(80);
+  saveestimation = false;
+  copula = false;
+  rotation = 0;
+  samplesel = false;
+  sampleselval = 0.0;
+  IWLSlineff=false;
+  forceIWLS=false;
   }
 
 
@@ -57,7 +64,10 @@ GENERAL_OPTIONS::GENERAL_OPTIONS(
 administrator_basic * abp,
 #endif
 const unsigned & it,const unsigned & bu,
-                         const unsigned & st, ostream * lo,
+                         const unsigned & st, const bool & sa,
+                         const bool & cop, const unsigned & rot,
+                         const bool & samsel, const double & samselval, const bool & fiwls,
+                         ostream * lo,
                          const double & l1,const double & l2)
   {
   iterations = it;
@@ -73,6 +83,12 @@ const unsigned & it,const unsigned & bu,
   nriter = 0;
   samplesize = 0;
   logout = lo;
+  saveestimation = sa;
+  copula = cop;
+  rotation = rot;
+  samplesel = samsel;
+  sampleselval = samselval;
+  forceIWLS = fiwls;
 
   (*logout) << flush;
 #if defined(BORLAND_OUTPUT_WINDOW)
@@ -80,8 +96,8 @@ const unsigned & it,const unsigned & bu,
 #elif defined(JAVA_OUTPUT_WINDOW)
 adminb_p = abp;
 #else
-  if (logout->fail())
-    logout = &cout;
+//  if (logout->fail())
+//    logout = &cout;
 #endif
   }
 
@@ -105,7 +121,13 @@ GENERAL_OPTIONS::GENERAL_OPTIONS(const GENERAL_OPTIONS & o)
   lower2 = o.lower2;
   upper1 = o.upper1;
   upper2 = o.upper2;
-
+  saveestimation = o.saveestimation;
+  copula = o.copula;
+  rotation = o.rotation;
+  samplesel = o.samplesel;
+  sampleselval = o.sampleselval;
+  IWLSlineff = o.IWLSlineff;
+  forceIWLS = o.forceIWLS;
   }
 
 
@@ -130,6 +152,13 @@ const GENERAL_OPTIONS & GENERAL_OPTIONS::operator=(const GENERAL_OPTIONS & o)
   lower2 = o.lower2;
   upper1 = o.upper1;
   upper2 = o.upper2;
+  saveestimation = o.saveestimation;
+  copula = o.copula;
+  rotation = o.rotation;
+  samplesel = o.samplesel;
+  sampleselval = o.sampleselval;
+  IWLSlineff = o.IWLSlineff;
+  forceIWLS = o.forceIWLS;
   return *this;
   }
 
@@ -158,7 +187,7 @@ void GENERAL_OPTIONS::out(const ST::string & s,bool thick,bool italic,
   if (!(logout->fail()))
     (*logout) << s << flush;
 #else
-  cout << s << flush;
+  cout << s;
   if (!(logout->fail()))
     (*logout) << s << flush;
 #endif
@@ -173,6 +202,22 @@ void GENERAL_OPTIONS::outoptions(void)
   out("  Number of iterations:  " + ST::inttostring(iterations) + "\n");
   out("  Burn-in period:        " + ST::inttostring(burnin)+ "\n");
   out("  Thinning parameter:    " + ST::inttostring(step)+ "\n");
+  if (saveestimation)
+    out("  Saveestimation:        enabled\n");
+  else
+    out("  Saveestimation:        disabled\n");
+  out("\n");
+  if (copula)
+    {
+    out(" Copula Model specified\n");
+    out("\n");
+    if((rotation==0)||(rotation==90)||(rotation==180)||(rotation==270))
+      out("  Copula is rotated by "+ ST::inttostring(rotation) + "\n");
+    else
+      out("  Invalid angle of rotation specified. Copula will not be rotated\n");
+    }
+  else {}
+
   out("\n");
   }
 

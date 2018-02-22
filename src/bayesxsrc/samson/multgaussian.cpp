@@ -389,7 +389,9 @@ bool DISTRIBUTION_multgaussian::posteriormode(void)
     sigma_rmr(j,0) = scale(j,j);
     }
 
-  return true;
+  bool res = true;
+
+  return res;
 
   }
 

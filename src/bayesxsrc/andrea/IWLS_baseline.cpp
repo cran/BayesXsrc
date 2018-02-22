@@ -1929,7 +1929,7 @@ void IWLS_baseline::compute_int_H(const datamatrix & b)
   double * spline_knots_help;
   double * spline_knots_help2;
   double * int_D_help;
-  double * int_D_help2;
+  //double * int_D_help2;
   double * betap;
 
   unsigned i,j,n;
@@ -1951,7 +1951,7 @@ void IWLS_baseline::compute_int_H(const datamatrix & b)
   for(n=0;n<nrpar;n++)
     {
     int_D_help = int_D.getV();
-    int_D_help2 = int_D.getV()+nrpar;
+    //int_D_help2 = int_D.getV()+nrpar;
     spline_knots_help=spline_knots.getV();
     spline_knots_help2=spline_knots.getV()+1;
     k=0;

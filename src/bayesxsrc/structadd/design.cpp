@@ -119,6 +119,20 @@ double DESIGN::compute_sumBk(unsigned & k)
   }
 
 
+double DESIGN::compute_sumBk_different(unsigned & k)
+  {
+
+  double sum=0;
+
+  unsigned j;
+  for (j=0;j<ZoutT[k].size();j++)
+    sum += ZoutT[k][j];
+
+  return sum;
+  }
+
+
+
 void DESIGN::init_data(const datamatrix & dm,const datamatrix & iv)
   {
 
@@ -295,7 +309,11 @@ DESIGN::DESIGN(void)
 DESIGN::DESIGN(GENERAL_OPTIONS * o,DISTR * lp,FC_linear * fcp)
   {
 
+  center = true;
+
   changingdesign = false;
+
+  discrete = false;
 
   optionsp = o;
   likep = lp;
@@ -321,6 +339,8 @@ DESIGN::DESIGN(GENERAL_OPTIONS * o,DISTR * lp,FC_linear * fcp)
 DESIGN::DESIGN(const DESIGN & m)
   {
   changingdesign = m.changingdesign;
+
+  discrete = m.discrete;
 
   optionsp = m.optionsp;
   likep = m.likep;
@@ -369,6 +389,7 @@ DESIGN::DESIGN(const DESIGN & m)
   rankK = m.rankK;
 
   XWX = m.XWX;
+  XWX_p = m.XWX_p;
   precision = m.precision;
   precisiondeclared = m.precisiondeclared;
   Wsum = m.Wsum;
@@ -400,6 +421,8 @@ const DESIGN & DESIGN::operator=(const DESIGN & m)
     return *this;
 
   changingdesign = m.changingdesign;
+
+  discrete = m.discrete;
 
   optionsp = m.optionsp;
   likep = m.likep;
@@ -448,6 +471,7 @@ const DESIGN & DESIGN::operator=(const DESIGN & m)
   rankK = m.rankK;
 
   XWX = m.XWX;
+  XWX_p = m.XWX_p;
   precision = m.precision;
   precisiondeclared = m.precisiondeclared;
   Wsum = m.Wsum;
@@ -484,8 +508,9 @@ void DESIGN::compute_penalty2(const datamatrix & pen)
   }
 
 
-double  DESIGN::penalty_compute_quadform(datamatrix & beta)
+double DESIGN::penalty_compute_quadform(datamatrix & beta)
   {
+//  beta.prettyPrint(cout);
   return K.compute_quadform(beta,0);
   }
 
@@ -558,9 +583,8 @@ void DESIGN::compute_XtransposedWX(void)
   // TEST
 
 
-  if (XWX.getBandwidth() == 0)
+  if (XWX.getBandwidth() == 0 && XWX.getDim()>1)
     {
-
     unsigned i;
 
     double * Wsump = Wsum.getV();
@@ -574,14 +598,14 @@ void DESIGN::compute_XtransposedWX(void)
     }
   else
     {
-
-    unsigned int i,j;
+    int i;
 
     if (ZoutTZout_d.size() <= 1)
       {
 
       for (i=0;i<int(nrpar);i++)
         {
+        unsigned j;
         for (j=0;j<ZoutT[i].size();j++)
           {
           ZoutTZout_d.push_back(pow(ZoutT[i][j],2));
@@ -595,6 +619,7 @@ void DESIGN::compute_XtransposedWX(void)
     vector<int>::iterator Wsump_d_p = Wsump_d.begin();
     int s;
 
+    int j;
     for (i=0;i<int(nrpar);i++,++diag)
       {
       *diag=0;
@@ -620,7 +645,7 @@ void DESIGN::compute_XtransposedWX(void)
     vector<double>::iterator ZoutTZoutp = ZoutTZout.begin();
     vector<int>::iterator beg_ZoutTZoutp = beg_ZoutTZout.begin();
     vector<int>::iterator Wsumpp = Wsump.begin();
-    int nr=0;
+    unsigned  nr=0;
 
     unsigned k;
     int beg, end;
@@ -659,7 +684,7 @@ void DESIGN::compute_XtransposedWX(void)
     }
 
   // TEST
-  // ofstream out("c:\\bayesx\\testh\\results\\XWX.res");
+  // ofstream out("c:\\temp\\XWX.res");
   // XWX.print1(out);
   // TEST
 
@@ -786,7 +811,7 @@ double DESIGN::compute_ZtZ(unsigned & i, unsigned & j)
   }
 
 
-void DESIGN::compute_XtransposedWres(datamatrix & partres, double l)
+void DESIGN::compute_XtransposedWres(datamatrix & partres, double l, double t2)
   {
 
   unsigned i,j;
@@ -835,13 +860,16 @@ void DESIGN::compute_XtransposedWres(datamatrix & partres, double l)
     for(i=0;i<nrpar;i++,workXWres++)
       {
       *workXWres=0;
-      wZoutT = ZoutT[i].begin();
-      wZoutT_index = index_ZoutT[i].begin();
       size = ZoutT[i].size();
-      for (j=0;j<size;j++,++wZoutT,++wZoutT_index)
+      if(size>0)
         {
-//      *workXWres += ZoutT[i][j]* partres(index_ZoutT[i][j],0);
-        *workXWres+= (*wZoutT)* partres(*wZoutT_index,0);
+        wZoutT = ZoutT[i].begin();
+        wZoutT_index = index_ZoutT[i].begin();
+        for (j=0;j<size;j++,++wZoutT,++wZoutT_index)
+          {
+  //      *workXWres += ZoutT[i][j]* partres(index_ZoutT[i][j],0);
+          *workXWres+= (*wZoutT)* partres(*wZoutT_index,0);
+          }
         }
       }
     }
@@ -849,34 +877,156 @@ void DESIGN::compute_XtransposedWres(datamatrix & partres, double l)
     {
     double * wpartres;
 
+//    cout << "ZoutT.size():" << ZoutT.size() << "\n";
     for(i=0;i<nrpar;i++,workXWres++)
       {
+//      cout << "i: " << i << endl;
+//      cout << "size: " << ZoutT[i].size() << "\n";
       *workXWres=0;
-      wZoutT = ZoutT[i].begin();
       size = ZoutT[i].size();
-      wpartres = partres.getV()+index_ZoutT[i][0];
-      for (j=0;j<size;j++,++wZoutT,wpartres++)
+      if(size>0)
         {
-//      *workXWres += ZoutT[i][j]* partres(index_ZoutT[i][j],0);
-        *workXWres+= (*wZoutT)* (*wpartres);
+        wZoutT = ZoutT[i].begin();
+        wpartres = partres.getV()+index_ZoutT[i][0];
+        for (j=0;j<size;j++,++wZoutT,wpartres++)
+          {
+//        *workXWres += ZoutT[i][j]* partres(index_ZoutT[i][j],0);
+          *workXWres+= (*wZoutT)* (*wpartres);
+          }
         }
       }
 
     }
 
   XWres_p = &XWres;
+  XWX_p = &XWX;
 
   // TEST
-//  ofstream out("c:\\bayesx\\test\\results\\XWres.res");
-//  XWres.prettyPrint(out);
+  //ofstream out("c:\\temp\\XWres.res");
+  //XWres.prettyPrint(out);
   // TEST
 
 
   }
 
 
+double DESIGN::compute_epanechnikov(double & x, statmatrix<int> & intindex, vector<int> & posb, vector<int> & pose)
+  {
+
+  double sum=0;
+  unsigned j;
+
+  double n = intvar.rows();
+  double si=sqrt(intvar.var(0));
+  double R = (intvar.quantile(75,0) - intvar.quantile(25,0))/1.34;
+
+  double h;
+  if (si < R)
+    h = 0.9*si*pow(n,-0.2);
+  else
+    h = 0.9*R*pow(n,-0.2);
+
+  double n_j;
+  double Kd;
+  double x_j;
+  double u;
+
+  for (j=0;j<posb.size();j++)
+    {
+    x_j = intvar(intindex(posb[j],0),0);
+    u = (x-x_j)/h;
+    if ( (u <= 1) && (u >= -1) )
+      {
+      n_j = pose[j]-posb[j]+1;
+      Kd = 0.75*(1.0-u*u);
+      sum += n_j * Kd;
+      }
+    }
+
+  sum = sum/(n*h);
+
+  return sum;
+  }
+
+
+double DESIGN::compute_kernel_intvar(bool absolute)
+  {
+  unsigned j;
+
+  double n =intvar.rows();
+
+  statmatrix<int> intindex = statmatrix<int>(intvar.rows(),1);
+  intindex.indexinit();
+  intvar.indexsort(intindex,0,intvar.rows()-1,0,0);
+
+  vector<int> posb;
+  vector<int> pose;
+
+  posb.push_back(0);
+  double * workint = intvar.getV()+1;
+  double help = intvar(0,0);
+  for(j=1;j<intvar.rows();j++,workint++)
+    {
+    if (  *workint != help)
+      {
+      pose.push_back(j-1);
+      if (j < intvar.rows())
+        posb.push_back(j);
+      }
+
+    help = *workint;
+
+    }
+
+  if (pose.size() < posb.size())
+    pose.push_back(intvar.rows()-1);
+
+  double sum=0;
+  if (posb.size() <= 10)
+    {
+    double pr = 0;
+    for (j=0;j<posb.size();j++)
+      {
+      pr = (pose[j]-posb[j]+1)/n;
+      sum += pr*fabs(intvar(intindex(posb[j],0),0));
+      }
+    }
+  else
+    {
+    double diff;
+    double xjm1 = intvar(intindex(posb[0],0),0);
+    double xj;
+
+    if (absolute)
+      {
+      for (j=1;j<posb.size();j++)
+        {
+        xj = intvar(intindex(posb[j],0),0);
+        diff = xj - xjm1;
+        sum += 0.5*diff*(fabs(xjm1)*compute_epanechnikov(xjm1,intindex, posb, pose)
+               +fabs(xj)*compute_epanechnikov(xj,intindex, posb, pose));
+        xjm1 = xj;
+        }
+      }
+    else
+      {
+      for (j=1;j<posb.size();j++)
+        {
+        xj = intvar(intindex(posb[j],0),0);
+        diff = xj - xjm1;
+        sum += 0.5*diff*(pow(xjm1,2)*compute_epanechnikov(xjm1,intindex, posb, pose)
+               +pow(xj,2)*compute_epanechnikov(xj,intindex, posb, pose));
+        xjm1 = xj;
+        }
+      }
+    }
+
+  return sum;
+  }
+
+
 void DESIGN::compute_effect(datamatrix & effect,datamatrix & f,
-                      effecttype2 et)
+                            effecttype2 et)
   {
 
   // TEST
@@ -1192,7 +1342,7 @@ void DESIGN::compute_partres(datamatrix & res, datamatrix & f,bool cwsum)
   double * workingweightp = likep->workingweight.getV();
   unsigned * indp = ind.getV();
 
-  int i;
+  unsigned i;
   double * resp = res.getV();
   for (i=0;i<res.rows();i++,resp++)
     *resp =  0;
@@ -1236,12 +1386,19 @@ void DESIGN::compute_partres(datamatrix & res, datamatrix & f,bool cwsum)
         for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++,
                                 workingweightp++,workintvar++,workintvar2++)
           {
+
           res(*indp,0) +=  (*workingweightp) * (*workintvar) *
                             (*workingresponsep - *worklinp +
                             (*workintvar) * f(*indp,0));
 
           Wsum(*indp,0) += *workingweightp * (*workintvar2);
           }
+
+
+/*        ofstream out("c:\\bayesx\\trunk\\testh\\results\\wresp_one.res");
+        likep->workingresponse.prettyPrint(out);
+        out.close();
+*/
 
         }
 
@@ -1252,6 +1409,7 @@ void DESIGN::compute_partres(datamatrix & res, datamatrix & f,bool cwsum)
     {
     if ((likep->wtype==wweightsnochange_one) && (cwsum==false) && (changingdesign==false))
       {
+
 
       for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++)
         res(*indp,0) += *workingresponsep - *worklinp + f(*indp,0);
@@ -1286,6 +1444,12 @@ void DESIGN::compute_partres(datamatrix & res, datamatrix & f,bool cwsum)
           Wsum(*indp,0) += *workingweightp;
           }
 
+
+/*        ofstream out("c:\\bayesx\\trunk\\testh\\results\\wresp.res");
+        likep->workingresponse.prettyPrint(out);
+        out.close();
+*/
+
         }
 
       }
@@ -1294,8 +1458,8 @@ void DESIGN::compute_partres(datamatrix & res, datamatrix & f,bool cwsum)
 
   // TEST
 
-  // ofstream out0("c:\\bayesx\\testh\\results\\residuum.res");
-  // res.prettyPrint(out0);
+  // ofstream out0("c:\\temp\\f_user.res");
+  // f.prettyPrint(out0);
 
   // ofstream out("c:\\bayesx\\test\\results\\tildey.res");
   // (likep->workingresponse).prettyPrint(out);
@@ -1358,93 +1522,12 @@ void DESIGN::compute_meaneffect(DISTR * level1_likep,double & meaneffect,
 
 void DESIGN::update_linpred(datamatrix & f)
   {
+  likep->update_linpred(f, intvar, ind);
+  }
 
-
-  double * worklinp;
-  if (likep->linpred_current==1)
-    worklinp = likep->linearpred1.getV();
-  else
-    worklinp = likep->linearpred2.getV();
-
-  double * workintvar = intvar.getV();
-
-  unsigned * indp = ind.getV();
-
-  int i;
-
-  if (intvar.rows()==data.rows())   // varying coefficient
-    {
-
-    for (i=0;i<data.rows();i++,worklinp++,workintvar++,indp++)
-      {
-      *worklinp += (*workintvar) *  f(*indp,0);
-      }
-
-    }
-  else                              // additive
-    {
-
-    for (i=0;i<data.rows();i++,worklinp++,indp++)
-      {
-      *worklinp += f(*indp,0);
-      }
-
-    }
-
-
-
-  /*
-  int i,j;
-
-  vector<int>::iterator itbeg = posbeg.begin();
-  vector<int>::iterator itend = posend.begin();
-
-  double * workf = f.getV();
-  double * workintvar = intvar.getV();
-
-  double * * linpredp;
-  if (likep->linpred_current==1)
-    linpredp = linpredp1.getV();
-  else
-    linpredp = linpredp2.getV();
-
-  int size = posbeg.size();
-
-
-  if (intvar.rows()==data.rows())   // varying coefficient
-    {
-
-    for (i=0;i<size;i++,++itbeg,++itend,workf++)
-      {
-      if (*itbeg != -1)
-        {
-        for (j=*itbeg;j<=*itend;j++,workintvar++,linpredp++)
-          *(*linpredp) += (*workintvar) * (*workf);
-        }
-      }
-
-    }
-  else                              // additive
-    {
-    for (i=0;i<size;i++,++itbeg,++itend,workf++)
-      {
-      if (*itbeg != -1)
-        {
-        for (j=*itbeg;j<=*itend;j++,linpredp++)
-          *(*linpredp) += *workf;
-        }
-      }
-    }
-  */
-
-  // TEST
-  /*
-  ofstream out3("c:\\bayesx\\test\\results\\lin.res");
-  likep->linearpred1.prettyPrint(out3);
-  */
-  // TEST
-
-
+bool DESIGN::update_linpred_save(datamatrix & f)
+  {
+  return likep->update_linpred_save(f, intvar, ind);
   }
 
 
@@ -1474,8 +1557,80 @@ void DESIGN::outoptions(GENERAL_OPTIONS * op)
   }
 
 
+void DESIGN::outbasis_R(ofstream & out)
+  {
+
+  }
+
+void DESIGN::test(ST::string path)
+  {
+  ST::string pathposbeg = path + "_posbeg.res";
+  ofstream out(pathposbeg.strtochar());
+
+  unsigned i,j;
+  for(j=0;j<posbeg.size();j++)
+    out << posbeg[j] << "  " << posend[j] << endl;
+  out.close();
+
+  ST::string pathZoutT = path + "_ZoutT.res";
+  ofstream out2(pathZoutT.strtochar());
+  for (i=0;i<ZoutT.size();i++)
+    {
+    for(j=0;j<ZoutT[i].size();j++)
+      out2 <<  ZoutT[i][j] << "  ";
+    out2 << endl;
+    }
+  out2.close();
+
+  ST::string pathZoutT_index = path + "_ZoutT_index.res";
+  ofstream out3(pathZoutT_index.strtochar());
+  for (i=0;i<index_ZoutT.size();i++)
+    {
+    for(j=0;j<index_ZoutT[i].size();j++)
+      out3 <<  index_ZoutT[i][j] << "  ";
+    out3 << endl;
+    }
+  out3.close();
+
+  ST::string pathZout = path + "_Zout.res";
+  ofstream out4(pathZout.strtochar());
+  datamatrix Z(Zout.rows(),ZoutT.size(),0);
+  for (i=0;i<ZoutT.size();i++)
+    {
+    for(j=0;j<ZoutT[i].size();j++)
+      Z(index_ZoutT[i][j],i) = ZoutT[i][j];
+    }
+  Z.prettyPrint(out4);
+  out4.close();
+
+  ST::string pathind = path + "_ind.res";
+  ofstream out5(pathind.strtochar());
+  ind.prettyPrint(out5);
+  out5.close();
+
+  ST::string pathindex_data = path + "_index_data.res";
+  ofstream out6(pathindex_data.strtochar());
+  index_data.prettyPrint(out6);
+  out6.close();
+
+  datamatrix Zoutm(data.rows(),nrpar,0);
+  unsigned k;
+  for (i=0;i<posbeg.size();i++)
+    {
+    if(posbeg[i]!=-1)
+      {
+      for (j=posbeg[i];j<=posend[i];j++)
+        {
+        for(k=0;k<Zout.cols();k++)
+          Zoutm(j,index_Zout(i,k)) = Zout(i,k);
+        }
+      }
+    }
+  ST::string pathZ = path + "_Z.res";
+  ofstream out7(pathZ.strtochar());
+  Zoutm.prettyPrint(out7);
+  out7.close();
+
+  }
+
 } // end: namespace MCMC
-
-
-
-

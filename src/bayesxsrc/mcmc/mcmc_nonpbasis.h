@@ -147,7 +147,7 @@ class __EXPORT_TYPE FULLCOND_nonp_basis : public FULLCOND
 
   // CONSTRUCTOR für REML
 
-  FULLCOND_nonp_basis(MCMCoptions * o, const ST::string & ti) : FULLCOND(o,ti){}
+  FULLCOND_nonp_basis(MCMCoptions * o, const ST::string & ti);
 
   // COPY CONSTRUCTOR
 

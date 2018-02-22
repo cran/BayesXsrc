@@ -290,20 +290,7 @@ bool MCMCsimulate::simulate(const vector<ST::string> & header, const int & seed,
   //-------------- end: Compute posterior mode as starting value ---------------
 
 
-  #if defined(MICROSOFT_VISUAL)
-    {
-
-    }
-  #elif!defined(__BUILDING_GNU)
-    {
-    srand((unsigned)time(0));
-
-    }
-  #else
-    {
-    srand((unsigned)time(0));
-    }
-  #endif
+//    srand((unsigned)time(0));
 
   if(seed >= 0)
     srand(seed);
@@ -545,7 +532,6 @@ bool MCMCsimulate::posteriormode(const vector<ST::string> & header,
                                  const bool & presim)
   {
 
-
   unsigned i,j;
 
   unsigned nrmodels = genoptions_mult.size();
@@ -611,7 +597,6 @@ bool MCMCsimulate::posteriormode(const vector<ST::string> & header,
       {
 
       k++;
-
       likep_mult[nrmodels-1-i]->compute_iwls();
 
       converged=false;
@@ -629,10 +614,11 @@ bool MCMCsimulate::posteriormode(const vector<ST::string> & header,
 
         for(j=begin[nrmodels-1-i];j<=end[nrmodels-1-i];j++)
           {
+
           if (fullcondp[j]->posteriormode() == false)
             allconverged = false;
-          } // end: for(j=begin[nrmodels-1-i];j<=end[nrmodels-1-i];j++)
 
+          } // end: for(j=begin[nrmodels-1-i];j<=end[nrmodels-1-i];j++)
 
         if (allconverged)
           converged = true;

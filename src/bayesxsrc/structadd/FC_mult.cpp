@@ -22,13 +22,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include "FC_mult.h"
 
 
-//------------------------------------------------------------------------------
-//----------------- CLASS: FC_mult implementation of member functions ----------
-//------------------------------------------------------------------------------
-
 
 namespace MCMC
 {
+
+//------------------------------------------------------------------------------
+//----------------- CLASS: FC_mult implementation of member functions ----------
+//------------------------------------------------------------------------------
 
 void FC_mult::set_effectp(DESIGN * d,FC_nonp * fp)
   {
@@ -43,12 +43,13 @@ void FC_mult::set_intp(DESIGN * d,FC_nonp * fp)
   }
 
 
-void FC_mult::set_multeffects(MASTER_OBJ * mp,GENERAL_OPTIONS * o,
+void FC_mult::set_multeffects(MASTER_OBJ * mp,unsigned & enr, GENERAL_OPTIONS * o,
                               const ST::string & t, const ST::string & fp,
                               bool sm,bool meane, double meanec)
   {
 
   masterp = mp;
+  equationnr = enr;
 
   unsigned rows = dp1->Zout.rows()*dp2->Zout.rows();
 
@@ -98,6 +99,7 @@ FC_mult::FC_mult(bool reu,bool mexp)
 FC_mult::FC_mult(const FC_mult & m)
   : FC(FC(m))
   {
+  equationnr = m.equationnr;
   masterp = m.masterp;
   multexp = m.multexp;
   FCmulteffect = m.FCmulteffect;
@@ -121,6 +123,7 @@ const FC_mult & FC_mult::operator=(const FC_mult & m)
   if (this==&m)
 	 return *this;
   FC::operator=(FC(m));
+  equationnr = m.equationnr;
   masterp = m.masterp;
   multexp = m.multexp;
   FCmulteffect = m.FCmulteffect;
@@ -198,7 +201,7 @@ void FC_mult::update_multeffect(void)
     {
     double meanlin;
     if (meaneffectconstant==0)
-      meanlin = masterp->level1_likep->meaneffect-FCnp2->meaneffect;
+      meanlin = masterp->level1_likep[equationnr]->meaneffect-FCnp2->meaneffect;
     else
       meanlin = meaneffectconstant;
 
@@ -211,7 +214,7 @@ void FC_mult::update_multeffect(void)
         {
         *mebetap = (*FCnpbetap+1)*(*FCnp2betap);
         lin = meanlin + *mebetap;
-        masterp->level1_likep->compute_mu(&lin,FCmp);
+        masterp->level1_likep[equationnr]->compute_mu(&lin,FCmp);
         }
       }
     }
@@ -309,7 +312,7 @@ bool FC_mult::posteriormode(void)
   }
 
 
-void FC_mult::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string & path)
+void FC_mult::outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,const ST::string & path)
   {
 
   ST::string pathps = path.substr(0,path.length()-4) + "_statagraph";
@@ -359,28 +362,33 @@ void FC_mult::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
             << path << endl
             << "drop in 1" << endl;
 
+  char hchar = '\\';
+  ST::string hstring = "/";
+  ST::string pathR = path.insert_string_char(hchar,hstring);
+  out_R << "dat <- read.table(\"" << pathR << "\", header=TRUE)\n";
+
   out_stata << "scatter pmean " << xvar2 <<  endl << endl;
 
-
+  out_R << "with(dat, plot(" << xvar2 << ",pmean)\n";
   }
 
 
 
 
-void FC_mult::outresults(ofstream & out_stata, ofstream & out_R,
+void FC_mult::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                          const ST::string & pathresults)
   {
   if ((RE_update==false) && (samplemult))
     {
-    FCmulteffect.outresults(out_stata,out_R,"");
+    FCmulteffect.outresults(out_stata,out_R,out_R2BayesX,"");
 
     if (compmeaneffect)
-      FCmulteffect_mean.outresults(out_stata,out_R,"");
+      FCmulteffect_mean.outresults(out_stata,out_R,out_R2BayesX,"");
 
     if (pathresults.isvalidfile() != 1)
       {
 
-      outgraphs(out_stata,out_R,pathresults);
+      outgraphs(out_stata,out_R,out_R2BayesX,pathresults);
 
       FCmulteffect.optionsp->out("    Results are stored in file\n");
       FCmulteffect.optionsp->out("    " +  pathresults + "\n");
@@ -546,6 +554,105 @@ void FC_mult::reset(void)
 
   }
 
+//------------------------------------------------------------------------------
+//------------ CLASS: FC_mult_pred implementation of member functions ----------
+//------------------------------------------------------------------------------
+
+void FC_mult_pred::set_effectp(DESIGN * d, FC_nonp * fp)
+  {
+  FCnp = fp;
+  dp = d;
+  }
+
+void FC_mult_pred::set_distrp(DISTR * d)
+  {
+  distrp = d;
+  distrp->multintvar = datamatrix(distrp->nrobs, 1, 1.0);
+  effect = datamatrix(distrp->nrobs, 1, 0.0);
+  }
+
+FC_mult_pred::FC_mult_pred(void)
+  {
+  nosamples = true;
+  }
+
+FC_mult_pred::FC_mult_pred(bool splupd)
+  : FC()
+  {
+  nosamples = true;
+  splineupdate = splupd;
+  }
+
+FC_mult_pred::FC_mult_pred(const FC_mult_pred & m)
+  : FC(FC(m))
+  {
+  equationnr = m.equationnr;
+  masterp = m.masterp;
+  dp = m.dp;
+  distrp = m.distrp;
+  FCnp = m.FCnp;
+  effect = m.effect;
+  splineupdate = m.splineupdate;
+  }
+
+const FC_mult_pred & FC_mult_pred::operator=(const FC_mult_pred & m)
+  {
+  if (this==&m)
+	 return *this;
+  FC::operator=(FC(m));
+  equationnr = m.equationnr;
+  masterp = m.masterp;
+  dp = m.dp;
+  distrp = m.distrp;
+  FCnp = m.FCnp;
+  effect = m.effect;
+  splineupdate = m.splineupdate;
+  return *this;
+  }
+
+
+void FC_mult_pred::update(void)
+  {
+  if(splineupdate)
+    {
+    dp->compute_effect(effect, FCnp->beta,MCMC::Function);
+    double * effp = effect.getV();
+    double * multintvarp = (distrp->multintvar).getV();
+
+    double * worklin;
+    if(distrp->linpred_current==1)
+      worklin = distrp->linearpred1.getV();
+    else
+      worklin = distrp->linearpred2.getV();
+
+    unsigned i;
+    for(i=0; i<effect.rows(); i++, effp++, worklin++, multintvarp++)
+      *multintvarp = exp(*worklin) * (*effp);
+    }
+  else
+    {
+    double * effp;
+    double * worklin;
+    if(distrp->linpred_current==1)
+      worklin = distrp->linearpred1.getV();
+    else
+      worklin = distrp->linearpred2.getV();
+    unsigned i;
+    for(i=0; i<effect.rows(); i++, effp++, worklin++)
+      *effp = exp(*worklin);
+    dp->set_intvar(effect, 0.0);
+    }
+  }
+
+bool FC_mult_pred::posteriormode(void)
+  {
+  update();
+  return true;
+  }
+
+void FC_mult_pred::reset(void)
+  {
+  }
 
 } // end: namespace MCMC
 

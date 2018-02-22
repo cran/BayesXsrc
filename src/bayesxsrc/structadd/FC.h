@@ -64,7 +64,10 @@ class __EXPORT_TYPE FC
   GENERAL_OPTIONS * optionsp;    // Pointer to general MCMC options
 
 
-  bool nosamples;
+  bool nosamples;                // no samples, only means,
+                                 // and stds will be reported
+  bool nosamplessave;            // full samples, but samples will not be stored
+                                 // on disk using getsample
 
   ST::string title;              // Title/name of the full conditional
 
@@ -97,18 +100,17 @@ class __EXPORT_TYPE FC
                                  // the number of columns correspond to the
                                  // number of parameters
 
-//  datamatrix transform;        // The factor with which all beta's will be
-                                 // multiplied before storing them and computing
-                                 // means, std, etc.
-                                 // DEFAULT: transform = 1
   double addon;                  // An additive constant that will be added
                                  // on each component of beta before storing
                                  // DEFAULT: addon = 0;
 
 
 
-  unsigned long acceptance;      // number of accepted iterations
-  unsigned long nrtrials;        // number of trials
+  unsigned long acceptance;            // number of accepted iterations
+  unsigned long nrtrials;              // number of trials
+  unsigned long outsidelinpredlimits;  // number of iterations outside
+                                       // linpredlimits
+
 
 
   unsigned column;               // the response category the fc belongs to
@@ -267,7 +269,7 @@ class __EXPORT_TYPE FC
   // FUNCTION: outresults
   // TASK: writes estimation results to logout or into a file
 
-  virtual void outresults(ofstream & out_stata, ofstream & out_R,
+  virtual void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                const ST::string & pathresults);
 
   // FUNCTION: outresults_help
@@ -275,7 +277,15 @@ class __EXPORT_TYPE FC
 
   void outresults_help(ofstream & out_stata, ofstream & out_R,
                     const ST::string & pathresults,
-                    const vector<ST::string> & datanames);
+                    const vector<ST::string> & datanames,
+                    unsigned col=0);
+
+
+  // FUNCTION: outresults_singleparam
+  // TASK: writes results for FC's ewith just one parameter
+
+  void outresults_singleparam(ofstream & out_stata,ofstream & out_R,
+                                  const ST::string & pathresults);
 
 
   void outresults_acceptance(void);

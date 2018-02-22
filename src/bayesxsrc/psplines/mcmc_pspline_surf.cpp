@@ -140,8 +140,8 @@ FULLCOND_pspline_surf::FULLCOND_pspline_surf(MCMCoptions * o,DISTRIBUTION * dp,
       else
         max = maxb;
 
-      minauto = int(sqrt(nrpar/5));
-      maxauto = int(sqrt(nrpar/3));
+      minauto = int(sqrt(static_cast<double>(nrpar)/5.0));
+      maxauto = int(sqrt(static_cast<double>(nrpar)/3.0));
       if(minauto < 1)
         minauto = 1;
       }
@@ -304,8 +304,8 @@ FULLCOND_pspline_surf::FULLCOND_pspline_surf(MCMCoptions * o,DISTRIBUTION * dp,
       else
         max = maxb;
 
-      minauto = int(sqrt(nrpar/5));
-      maxauto = int(sqrt(nrpar/3));
+      minauto = int(sqrt(static_cast<double>(nrpar)/5.0));
+      maxauto = int(sqrt(static_cast<double>(nrpar)/3.0));
       if(minauto < 1)
         minauto = 1;
       }
@@ -461,8 +461,8 @@ FULLCOND_pspline_surf::FULLCOND_pspline_surf(MCMCoptions * o,DISTRIBUTION * dp,
       else
         max = maxb;
 
-      minauto = int(sqrt(nrpar/5));
-      maxauto = int(sqrt(nrpar/3));
+      minauto = int(sqrt(static_cast<double>(nrpar)/5.0));
+      maxauto = int(sqrt(static_cast<double>(nrpar)/3.0));
       if(minauto < 1)
         minauto = 1;
       }
@@ -626,8 +626,8 @@ FULLCOND_pspline_surf::FULLCOND_pspline_surf(MCMCoptions * o,DISTRIBUTION * dp,
       else
         max = maxb;
 
-      minauto = int(sqrt(nrpar/5));
-      maxauto = int(sqrt(nrpar/3));
+      minauto = int(sqrt(static_cast<double>(nrpar)/5.0));
+      maxauto = int(sqrt(static_cast<double>(nrpar)/3.0));
       if(minauto < 1)
         minauto = 1;
       }
@@ -972,7 +972,7 @@ void FULLCOND_pspline_surf::update(void)
     blocksize = min + int((max-min+1)*rand()/(RAND_MAX + 1.0));
 #endif
     }
-    
+
   double u;
   unsigned an = 1;
   unsigned en = blocksize;
@@ -1198,7 +1198,7 @@ void FULLCOND_pspline_surf::adjust_blocksize(const unsigned & alphamin,const uns
   oldnrtrials = nrtrials;
 
   int limit = 1;
-  int span = sqrt((nrpar/10)>1?(nrpar/10):2);
+  int span = sqrt((static_cast<double>(nrpar)/10.0)>1?(static_cast<double>(nrpar)/10.0):2.0);
 
   if(rate<alphamin)
     {

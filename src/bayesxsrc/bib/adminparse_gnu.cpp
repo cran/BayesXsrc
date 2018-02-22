@@ -65,9 +65,9 @@ void admin_gnu::out(const ST::string & c,
   sh = sh.replaceallsigns('\n',' ');
   sh = sh+"\n";
 
-  std::cout << c << flush;
+  std::cout << c << endl;
   if (logfileopen)
-    logout << c << flush;
+    logout << c << endl;
   }
 
 
@@ -470,7 +470,7 @@ bool admin_gnu::parse(ST::string & in)
 
                   }
                 else
-                  ST::getline(infile,10000,in,'\n');
+                  ST::getline(infile,100000,in,'\n');
 
 	            in = in.eatwhitespace();
 	            in = in.eatallcarriagereturns();
@@ -635,7 +635,7 @@ bool admin_gnu::parse(ST::string & in)
              #else
                ST::string tempstring = defaultpath + "\\temp";
              #endif
-               char* pathtemp = tempstring.strtochar();
+               const char* pathtemp = tempstring.strtochar();
                int testtemp = access(pathtemp, 06);
                if(testtemp==-1)
                  {
@@ -661,7 +661,7 @@ bool admin_gnu::parse(ST::string & in)
              #else
                ST::string outputstring = defaultpath + "\\output";
              #endif
-               char* pathoutput = outputstring.strtochar();
+               const char* pathoutput = outputstring.strtochar();
                int testoutput = access(pathoutput, 00);
                if(testoutput==-1)
                  {

@@ -147,14 +147,14 @@ bool FC_predict_predictor::posteriormode(void)
   }
 
 
-void FC_predict_predictor::outresults(ofstream & out_stata, ofstream & out_R,
+void FC_predict_predictor::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                             const ST::string & pathresults)
   {
 
   if (pathresults.isvalidfile() != 1)
     {
 
-    FC::outresults(out_stata,out_R,"");
+    FC::outresults(out_stata,out_R,out_R2BayesX,"");
 
     optionsp->out("  PREDICTED VALUES: \n",true);
     optionsp->out("\n");
@@ -162,6 +162,7 @@ void FC_predict_predictor::outresults(ofstream & out_stata, ofstream & out_R,
     optionsp->out("    Results for the predictor are stored in file\n");
     optionsp->out("    " +  pathresults + "\n");
     optionsp->out("\n");
+    out_R2BayesX << "predict=" << pathresults << ";" <<  endl;
 
     ofstream outres(pathresults.strtochar());
 

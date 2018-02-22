@@ -97,6 +97,38 @@ envmatrix<double> Krw1env(const vector<double> & weight)
   return envmatrix<double>(env, diag, xenv, 1);
   }
 
+
+envmatrix<double> Krw1env(const datamatrix & weight)
+  {
+  unsigned d = weight.rows();
+  vector<double> diag(d,0);
+  vector<double> env(d-1,0);
+  vector<unsigned> xenv(d+1,0);
+
+  vector<double>::iterator e = env.begin();
+  vector<double>::iterator di = diag.begin();
+  vector<unsigned>::iterator x = xenv.begin()+2;
+
+  unsigned i;
+
+  *di = 1.0/weight(1,0);
+  ++di;
+  *e=-1.0/weight(1,0);
+  ++e;
+  for(i=1; i<d-1; i++, ++di, ++e, ++x)
+    {
+    *di = 1.0/weight(i,0)+1.0/weight(i+1,0);
+    *e = -1.0/weight(i+1,0);
+    *x = i;
+    }
+
+  *di = 1.0/weight(d-1,0);
+  *x = d-1;
+
+  return envmatrix<double>(env, diag, xenv, 1);
+  }
+
+
 envmatrix<double> Krw2env(const vector<double> & weight)
   {
   unsigned d = weight.size();

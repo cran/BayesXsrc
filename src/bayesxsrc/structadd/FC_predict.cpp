@@ -58,7 +58,6 @@ void FC_predict::read_options(vector<ST::string> & op,vector<ST::string> & vn)
   */
 
 
-
   }
 
 FC_predict::FC_predict(void)
@@ -68,10 +67,11 @@ FC_predict::FC_predict(void)
 
 FC_predict::FC_predict(GENERAL_OPTIONS * o,DISTR * lp,const ST::string & t,
      const ST::string & fp, const ST::string & fpd, datamatrix & dm,
-      vector<ST::string> & dn)
+      vector<ST::string> & dn,bool wa)
   : FC(o,t,1,1,fp)
   {
-//  nosamples = true;
+  WAICoff=wa;
+  nosamples = true;
   MSE = noMSE;
   MSEparam = 0.5;
   likep = lp;
@@ -79,19 +79,29 @@ FC_predict::FC_predict(GENERAL_OPTIONS * o,DISTR * lp,const ST::string & t,
   varnames = dn;
   if (likep->maindistribution == true)
     {
-    setbeta(lp->nrobs,2,0);
+    setbeta(lp->nrobs,3,0);
     }
   else
     {
-    setbeta(lp->nrobs,2,0);
+    setbeta(lp->nrobs,3,0);
     }
 
   if (likep->maindistribution == true)
     {
-    FC_deviance = FC(o,"",2,1,fpd);
-    }
+    FC_deviance = FC(o,"",1,1,fpd);
 
-  int d = betamean.rows();
+    if (WAICoff ==false)
+      {
+      FC_p = FC(o,"",lp->nrobs,1,"");
+      FC_p.nosamples = true;
+
+      FC_logp = FC(o,"",lp->nrobs,1,"");
+      FC_logp.nosamples = true;
+
+      FC_logp2 = FC(o,"",lp->nrobs,1,"");
+      FC_logp2.nosamples = true;
+      }
+    }
 
   }
 
@@ -105,9 +115,14 @@ FC_predict::FC_predict(const FC_predict & m)
   designmatrix = m.designmatrix;
   varnames = m.varnames;
   FC_deviance = m.FC_deviance;
+  FC_p = m.FC_p;
+  FC_logp = m.FC_logp;
+  FC_logp2 = m.FC_logp2;
+  WAICoff = m.WAICoff;
   deviance = m.deviance;
   deviancesat = m.deviancesat;
   }
+
 
 
 const FC_predict & FC_predict::operator=(const FC_predict & m)
@@ -121,6 +136,10 @@ const FC_predict & FC_predict::operator=(const FC_predict & m)
   designmatrix = m.designmatrix;
   varnames = m.varnames;
   FC_deviance = m.FC_deviance;
+  FC_p = m.FC_p;
+  FC_logp = m.FC_logp;
+  FC_logp2 = m.FC_logp2;
+  WAICoff = m.WAICoff;
   deviance = m.deviance;
   deviancesat = m.deviancesat;
   return *this;
@@ -130,20 +149,40 @@ const FC_predict & FC_predict::operator=(const FC_predict & m)
 void  FC_predict::update(void)
   {
 
+
   likep->FCpredict_betamean = &betamean;
 
-  get_predictor();
+  if(
+     (optionsp->nriter > optionsp->burnin)
+     &&
+     ((optionsp->nriter-optionsp->burnin-1) % (optionsp->step) == 0)
+    )
+    get_predictor();
 
   acceptance++;
 
   FC::update();
 
+
+
   if (likep->maindistribution == true)
     {
     FC_deviance.beta(0,0) = deviance;
-    FC_deviance.beta(1,0) = deviancesat;
     FC_deviance.acceptance++;
     FC_deviance.update();
+
+    if (WAICoff==false)
+      {
+      FC_p.acceptance++;
+      FC_p.update();
+
+      FC_logp.acceptance++;
+      FC_logp.update();
+
+      FC_logp2.acceptance++;
+      FC_logp2.update();
+      }
+
     }
 
   }
@@ -162,46 +201,49 @@ void FC_predict::get_predictor(void)
     worklinp = likep->linearpred2.getV();
 
   deviance=0;
-  deviancesat=0;
   double deviancehelp;
-  double deviancesathelp;
 
-  double * workresponse = likep->response_untransformed.getV();
+
+  double * workresponse = likep->response.getV();
   double * workweight = likep->weight.getV();
   double muhelp;
+  double paramhelp;
   double scalehelp=likep->get_scale();
-  double weightone = 1;
 
-  double predlik;
+  double logp;
+
+//  cout << beta.rows() << endl;
+//  cout << beta.cols() << endl;
 
   for(i=0;i<likep->nrobs;i++,worklinp++,workresponse++,workweight++,betap++)
     {
+
+    likep->compute_param(worklinp,&paramhelp);
 
     likep->compute_mu(worklinp,&muhelp);
 
     if (likep->maindistribution == true)
       {
       likep->compute_deviance(workresponse,workweight,&muhelp,&deviancehelp,
-      &deviancesathelp,&scalehelp);
+      &scalehelp);
 
       deviance+=deviancehelp;
-      deviancesat+=deviancesathelp;
 
-//      if (*workweight==0)
-//        predlik = likep->loglikelihood(workresponse,worklinp,&weightone);
-//      else
-//        predlik = likep->loglikelihood(workresponse,worklinp,workweight);
+      if (WAICoff==false)
+        {
+        logp = -0.5*deviancehelp;
+        FC_logp.beta(i,0) = logp;
+        FC_p.beta(i,0) = exp(logp);
+        FC_logp2.beta(i,0) = pow(logp,2);
+        }
 
       }
 
     *betap = *worklinp;
     betap++;
     *betap = muhelp;
-//    if (likep->maindistribution == true)
-//      {
-//      betap++;
-//      *betap = predlik;
-//      }
+    betap++;
+    *betap = paramhelp;
 
     }
 
@@ -226,25 +268,29 @@ void FC_predict::outoptions(void)
 
 
 
-void FC_predict::outresults_DIC(const ST::string & pathresults)
+void FC_predict::outresults_DIC(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                                const ST::string & pathresults)
   {
 
   ST::string pathresultsdic = pathresults.substr(0,pathresults.length()-4) + "_DIC.res";
   ofstream out(pathresultsdic.strtochar());
 
-  double deviance2=0;
-  double deviance2_sat=0;
+  out_R2BayesX << "DIC=" << pathresultsdic << ";" <<  endl;
 
+  optionsp->out("    Results for the DIC are stored in file\n");
+  optionsp->out("    " +  pathresultsdic + "\n");
+  optionsp->out("\n");
+
+  double deviance2=0;
 
   double scalehelp = likep->get_scalemean();
 
 
   double devhelp;
-  double devhelp_sat;
 
   double mu_meanlin;
   double * workmeanlin = betamean.getV();
-  double * workresponse = likep->response_untransformed.getV();
+  double * workresponse = likep->response.getV();
   double * workweight = likep->weight.getV();
 
   unsigned i;
@@ -253,11 +299,11 @@ void FC_predict::outresults_DIC(const ST::string & pathresults)
 
     likep->compute_mu(workmeanlin,&mu_meanlin);
 
-    likep->compute_deviance(workresponse,workweight,&mu_meanlin,
-    &devhelp,&devhelp_sat,&scalehelp);
+    likep->compute_deviance(workresponse,workweight,&mu_meanlin,&devhelp,
+                            &scalehelp);
 
     deviance2 += devhelp;
-    deviance2_sat += devhelp_sat;
+
     }
 
 
@@ -276,9 +322,6 @@ void FC_predict::outresults_DIC(const ST::string & pathresults)
   optionsp->out("  ESTIMATION RESULTS FOR THE DIC: \n",true);
   optionsp->out("\n");
 
-  optionsp->out("    DIC based on the unstandardized deviance\n");
-  optionsp->out("\n");
-
   optionsp->out("    Deviance(bar_mu):           " +
   ST::doubletostring(deviance2,d) + "\n");
   out << deviance2 << "   ";
@@ -292,24 +335,68 @@ void FC_predict::outresults_DIC(const ST::string & pathresults)
   optionsp->out("\n");
   out << (2*devhelpm-deviance2) << "   " << endl;
 
-  optionsp->out("    DIC based on the saturated deviance\n");
   optionsp->out("\n");
 
+  }
 
-  double devhelpm_sat = FC_deviance.betamean(1,0);
 
-  optionsp->out("    Deviance(bar_mu):           " +
-  ST::doubletostring(deviance2_sat,d) + "\n");
 
-  optionsp->out("    pD:                         " +
-  ST::doubletostring(devhelpm_sat-deviance2_sat,d) + "\n");
+void FC_predict::outresults_WAIC(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                                const ST::string & pathresults)
+  {
 
-  optionsp->out("    DIC:                        " +
-  ST::doubletostring(2*devhelpm_sat-deviance2_sat,d) + "\n");
+  ST::string pathresultswaic = pathresults.substr(0,pathresults.length()-4) + "_WAIC.res";
+  ofstream out(pathresultswaic.strtochar());
+
+  out_R2BayesX << "WAIC=" << pathresultswaic << ";" <<  endl;
+
+  optionsp->out("    Results for the WAIC are stored in file\n");
+  optionsp->out("    " +  pathresultswaic + "\n");
+  optionsp->out("\n");
+
+  double l_pd=0;
+  double p_d=0;
+
+  double r = ((double)optionsp->samplesize)/((double)(optionsp->samplesize-1));
+
+  unsigned i;
+  for (i=0;i<likep->nrobs;i++)
+    {
+    l_pd += log(FC_p.betamean(i,0));
+    p_d += (FC_logp2.betamean(i,0) - FC_logp.betamean(i,0)*FC_logp.betamean(i,0))*r;
+    }
+  l_pd *= -2.0;
+
+  unsigned d;
+  if (l_pd > 1000000000)
+    d = 14;
+  else if (l_pd > 1000000)
+    d = 11;
+  else
+    d = 8;
+
+  out << "l_pd  p_d  waic" << endl;
+
+  optionsp->out("  ESTIMATION RESULTS FOR THE WAIC: \n",true);
+  optionsp->out("\n");
+
+  optionsp->out("    l_pd:                       " +
+  ST::doubletostring(l_pd,d) + "\n");
+  out << l_pd << "   ";
+
+  optionsp->out("    p_d:                        " +
+  ST::doubletostring(p_d,d) + "\n");
+  out << p_d << "   ";
+
+  optionsp->out("    WAIC:                       " +
+  ST::doubletostring((l_pd+2*p_d),d) + "\n");
+  optionsp->out("\n");
+  out << ((l_pd+2*p_d)) << "   " << endl;
 
   optionsp->out("\n");
 
   }
+
 
 
 void FC_predict::outresults_deviance(void)
@@ -350,9 +437,6 @@ void FC_predict::outresults_deviance(void)
     optionsp->out("  ESTIMATION RESULT FOR THE DEVIANCE: \n",true);
     optionsp->out("\n");
 
-    optionsp->out("    Unstandardized Deviance (-2*Loglikelihood(y|mu))\n");
-    optionsp->out("\n");
-
     double devhelpm = FC_deviance.betamean(0,0);
     double devhelp;
 
@@ -391,41 +475,6 @@ void FC_predict::outresults_deviance(void)
 
 
     devhelp = FC_deviance.betaqu_l1_upper(0,0);
-    optionsp->out(u2str +  ST::string(' ',20-l_u2str) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    optionsp->out("\n");
-
-
-    optionsp->out("  Saturated Deviance (-2*Loglikelihood(y|mu) + 2*Loglikelihood(y|mu=y))\n");
-    optionsp->out("\n");
-
-    devhelpm = FC_deviance.betamean(1,0);
-
-    optionsp->out(meanstr + ST::string(' ',20-l_meanstr) +
-    ST::doubletostring(devhelpm,d) + "\n");
-
-    devhelp = sqrt(FC_deviance.betavar(1,0));
-    optionsp->out(stdstr + ST::string(' ',20-l_stdstr) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    devhelp = FC_deviance.betaqu_l1_lower(1,0);;
-    optionsp->out(l1str +  ST::string(' ',20-l_l1str) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    devhelp = FC_deviance.betaqu_l2_lower(1,0);
-    optionsp->out(l2str +  ST::string(' ',20-l_l2str) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    devhelp = FC_deviance.betaqu50(1,0);
-    optionsp->out(medianstr +  ST::string(' ',20-l_medianstr) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    devhelp = FC_deviance.betaqu_l2_upper(1,0);
-    optionsp->out(u1str +  ST::string(' ',20-l_u1str) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    devhelp = FC_deviance.betaqu_l1_upper(1,0);
     optionsp->out(u2str +  ST::string(' ',20-l_u2str) +
     ST::doubletostring(devhelp,d) +  "\n");
 
@@ -487,34 +536,26 @@ void FC_predict::compute_MSE(const ST::string & pathresults)
 
   }
 
-/*
-  for(i=0;i<nrobs;i++,responsep++,weightp++,linpredp+=2)
-    if (*weightp==0)
-      {
-      meanmse_zeroweight += likep->compute_MSE(responsep,weightp,linpredp,MSE,MSEparam);
-      nrzeroweights++;
-      }
-    else
-      meanmse += likep->compute_MSE(responsep,weightp,linpredp,MSE,MSEparam);
-*/
 
-//void FC_predict::get_samples(const ST::string & filename,ofstream & outg) const
-//  {
-//  double f=0;
-//  }
-
-void FC_predict::outresults(ofstream & out_stata, ofstream & out_R,
+void FC_predict::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                             const ST::string & pathresults)
   {
 
   if (pathresults.isvalidfile() != 1)
     {
 
-    FC::outresults(out_stata,out_R,"");
+    FC::outresults(out_stata,out_R,out_R2BayesX,"");
 
     if (likep->maindistribution == true)
       {
-      FC_deviance.outresults(out_stata,out_R,"");
+      FC_deviance.outresults(out_stata,out_R,out_R2BayesX,"");
+
+      if (WAICoff==false)
+        {
+        FC_p.outresults(out_stata,out_R,out_R2BayesX,"");
+        FC_logp.outresults(out_stata,out_R,out_R2BayesX,"");
+        FC_logp2.outresults(out_stata,out_R,out_R2BayesX,"");
+        }
       }
 
     optionsp->out("  PREDICTED VALUES: \n",true);
@@ -523,6 +564,9 @@ void FC_predict::outresults(ofstream & out_stata, ofstream & out_R,
     optionsp->out("    Results for the predictor, mean are stored in file\n");
     optionsp->out("    " +  pathresults + "\n");
     optionsp->out("\n");
+
+    out_R2BayesX << "predict=" << pathresults << ";" <<  endl;
+
 
     if ((likep->maindistribution == true) && (MSE != noMSE))
       {
@@ -551,7 +595,8 @@ void FC_predict::outresults(ofstream & out_stata, ofstream & out_R,
 
     outres << "pmean_pred   ";
 
-    if (optionsp->samplesize > 1)
+
+    if ((optionsp->samplesize > 1) && (nosamplessave==false))
       {
       outres << "pqu"  << l1  << "_pred   ";
       outres << "pqu"  << l2  << "_pred   ";
@@ -562,7 +607,7 @@ void FC_predict::outresults(ofstream & out_stata, ofstream & out_R,
 
     outres << "pmean_mu   ";
 
-    if (optionsp->samplesize > 1)
+    if ((optionsp->samplesize > 1) && (nosamplessave==false))
       {
       outres << "pqu"  << l1  << "_mu   ";
       outres << "pqu"  << l2  << "_mu   ";
@@ -571,23 +616,18 @@ void FC_predict::outresults(ofstream & out_stata, ofstream & out_R,
       outres << "pqu"  << u2  << "_mu   ";
       }
 
-/*
-    if (likep->maindistribution == true)
+    outres << "pmean_param   ";
+
+    if ((optionsp->samplesize > 1) && (nosamplessave==false))
       {
-
-      outres << "pmean_predl   ";
-
-      if (optionsp->samplesize > 1)
-        {
-        outres << "pqu"  << l1  << "_predl   ";
-        outres << "pqu"  << l2  << "_predl   ";
-        outres << "pmed_predl   ";
-        outres << "pqu"  << u1  << "_predl   ";
-        outres << "pqu"  << u2  << "_predl   ";
-        }
-
+      outres << "pqu"  << l1  << "_param   ";
+      outres << "pqu"  << l2  << "_param   ";
+      outres << "pmed_param   ";
+      outres << "pqu"  << u1  << "_param   ";
+      outres << "pqu"  << u2  << "_param   ";
       }
-*/
+
+//    outres << "quantile_res quadratic_score logarithmic_score spherical_score CRPS";
 
     outres << endl;
 
@@ -598,56 +638,39 @@ void FC_predict::outresults(ofstream & out_stata, ofstream & out_R,
     double * workbetaqu_l2_upper_p = betaqu_l2_upper.getV();
     double * workbetaqu50 = betaqu50.getV();
 
+    double * responsep = likep->response.getV();
+    double * weightp = likep->weight.getV();
 
-    for(i=0;i<designmatrix.rows();i++,
-          workmean++,
-          workbetaqu_l1_lower_p++,
-          workbetaqu_l2_lower_p++,
-          workbetaqu50++,
-          workbetaqu_l1_upper_p++,
-          workbetaqu_l2_upper_p++)
+    double scalehelp = likep->get_scalemean();
+
+    if (nosamplessave==false)
       {
-
-      outres << (i+1) << "   ";
-
-      for (j=0;j<designmatrix.cols();j++)
-        outres << designmatrix(i,j) << "   ";
-
-      outres << *workmean << "   ";
-
-      if (optionsp->samplesize > 1)
+      for(i=0;i<designmatrix.rows();i++,responsep++,weightp++,
+            workmean++,
+            workbetaqu_l1_lower_p++,
+            workbetaqu_l2_lower_p++,
+            workbetaqu50++,
+            workbetaqu_l1_upper_p++,
+            workbetaqu_l2_upper_p++)
         {
-        outres << *workbetaqu_l1_lower_p << "   ";
-        outres << *workbetaqu_l2_lower_p << "   ";
-        outres << *workbetaqu50 << "   ";
-        outres << *workbetaqu_l2_upper_p << "   ";
-        outres << *workbetaqu_l1_upper_p << "   ";
-        }
 
-      // mu
-      workmean++;
-      workbetaqu_l1_lower_p++;
-      workbetaqu_l2_lower_p++;
-      workbetaqu50++;
-      workbetaqu_l1_upper_p++;
-      workbetaqu_l2_upper_p++;
+        outres << (i+1) << "   ";
 
-      outres << *workmean << "   ";
+        for (j=0;j<designmatrix.cols();j++)
+          outres << designmatrix(i,j) << "   ";
 
-      if (optionsp->samplesize > 1)
-        {
-        outres << *workbetaqu_l1_lower_p << "   ";
-        outres << *workbetaqu_l2_lower_p << "   ";
-        outres << *workbetaqu50 << "   ";
-        outres << *workbetaqu_l2_upper_p << "   ";
-        outres << *workbetaqu_l1_upper_p << "   ";
-        }
-      // end mu
+        outres << *workmean << "   ";
 
-/*
-      // predictive likelihood
-      if (likep->maindistribution == true)
-        {
+        if (optionsp->samplesize > 1)
+          {
+          outres << *workbetaqu_l1_lower_p << "   ";
+          outres << *workbetaqu_l2_lower_p << "   ";
+          outres << *workbetaqu50 << "   ";
+          outres << *workbetaqu_l2_upper_p << "   ";
+          outres << *workbetaqu_l1_upper_p << "   ";
+          }
+
+        // mu
         workmean++;
         workbetaqu_l1_lower_p++;
         workbetaqu_l2_lower_p++;
@@ -665,17 +688,86 @@ void FC_predict::outresults(ofstream & out_stata, ofstream & out_R,
           outres << *workbetaqu_l2_upper_p << "   ";
           outres << *workbetaqu_l1_upper_p << "   ";
           }
-        }
-      // end predictive likelihood
-*/
-      outres << endl;
+        // end mu
 
-     }
+
+        // parameter
+        workmean++;
+        workbetaqu_l1_lower_p++;
+        workbetaqu_l2_lower_p++;
+        workbetaqu50++;
+        workbetaqu_l1_upper_p++;
+        workbetaqu_l2_upper_p++;
+
+        outres << *workmean << "   ";
+
+        if (optionsp->samplesize > 1)
+          {
+          outres << *workbetaqu_l1_lower_p << "   ";
+          outres << *workbetaqu_l2_lower_p << "   ";
+          outres << *workbetaqu50 << "   ";
+          outres << *workbetaqu_l2_upper_p << "   ";
+          outres << *workbetaqu_l1_upper_p << "   ";
+          }
+        // end parameter
+
+/*
+        outres << likep->compute_quantile_residual(responsep,workmean,weightp,&scalehelp) << "   ";
+        outres << likep->compute_quadr()    << "   ";
+        outres << likep->compute_log(responsep,workmean,weightp,&scalehelp)    << "   ";
+        outres << likep->compute_spherical()    << "   ";
+        outres << likep->compute_CRPS()    << "   ";
+*/
+        outres << endl;
+        }
+      }
+    else
+      {
+
+      for(i=0;i<designmatrix.rows();i++,responsep++,weightp++,
+            workmean++)
+        {
+
+        outres << (i+1) << "   ";
+
+        for (j=0;j<designmatrix.cols();j++)
+          outres << designmatrix(i,j) << "   ";
+
+        outres << *workmean << "   ";
+
+        workmean++;
+
+        outres << *workmean << "   ";
+
+        workmean++;
+
+        outres << *workmean << "   ";
+/*
+        outres << likep->compute_quantile_residual(responsep,workmean,weightp,&scalehelp) << "   ";
+        outres << likep->compute_quadr()    << "   ";
+        outres << likep->compute_log(responsep,workmean,weightp,&scalehelp)    << "   ";
+        outres << likep->compute_spherical()    << "   ";
+        outres << likep->compute_CRPS()    << "   ";
+*/
+        outres << endl;
+
+//            std::ofstream out;
+////  // helpmat1.prettyPrint(out);
+//    out.open ("C:\\tmp\\resp.raw", std::ofstream::out | std::ofstream::app);
+//    out << " " ;
+//    out << *responsep ;
+//    out << " " ;
+//    out << *workmean << endl;
+        }
+
+      }
 
     if (likep->maindistribution == true)
       {
       outresults_deviance();
-      outresults_DIC(pathresults);
+      outresults_DIC(out_stata,out_R,out_R2BayesX,pathresults);
+      if (WAICoff==false)
+        outresults_WAIC(out_stata,out_R,out_R2BayesX,pathresults);
       }
 
     }   // end if (pathresults.isvalidfile() != 1)

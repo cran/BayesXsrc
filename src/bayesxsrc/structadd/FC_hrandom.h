@@ -47,9 +47,15 @@ class __EXPORT_TYPE FC_hrandom  : public FC_nonp
 
   protected:
 
+  datamatrix pmodemat;
+  datamatrix varmat;
+
   datamatrix beta_prior;                            // sampled re's from prior
 
   datamatrix likelihoodc,likelihoodn;
+
+  bool simplerandom;
+  datamatrix simplerandom_linpred;
 
   DISTR * likep_RE;
 
@@ -78,10 +84,16 @@ class __EXPORT_TYPE FC_hrandom  : public FC_nonp
 
   // CONSTRUCTOR
 
-  FC_hrandom(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp, DISTR * lp_RE,
+  FC_hrandom(MASTER_OBJ * mp, unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp, DISTR * lp_RE,
              const ST::string & t,
            const ST::string & fp, const ST::string & fp2, DESIGN * dp,
            vector<ST::string> & op,vector<ST::string> & vn);
+
+  FC_hrandom(MASTER_OBJ * mp, unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,
+             const ST::string & t,
+           const ST::string & fp, const ST::string & fp2, DESIGN * dp,
+           vector<ST::string> & op,vector<ST::string> & vn);
+
 
   // COPY CONSTRUCTOR
 
@@ -122,10 +134,10 @@ class __EXPORT_TYPE FC_hrandom  : public FC_nonp
     // FUNCTION: outresults
   // TASK: writes estimation results to logout or into a file
 
-  void outresults(ofstream & out_stata,ofstream & out_R,
+  void outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
                  const ST::string & pathresults);
 
-  void outgraphs(ofstream & out_stata, ofstream & out_R,
+  void outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                          const ST::string & path);
 
   void read_options(vector<ST::string> & op,vector<ST::string> & vn);
@@ -147,7 +159,75 @@ class __EXPORT_TYPE FC_hrandom  : public FC_nonp
 
   };
 
+// -----------------------------------------------------------------//
+// class: FC_hrandom_distributional (for non-normal random effects)
+// -----------------------------------------------------------------//
 
+class __EXPORT_TYPE FC_hrandom_distributional  : public FC_hrandom
+  {
+
+  protected:
+
+  datamatrix offset_RE;
+  datamatrix offsetold_RE;
+
+  // FCs für Hyperparameter
+
+  public:
+
+//----------------------- CONSTRUCTORS, DESTRUCTOR -----------------------------
+
+  // DEFAULT CONSTRUCTOR
+
+  FC_hrandom_distributional(void);
+
+  // CONSTRUCTOR
+
+  FC_hrandom_distributional(MASTER_OBJ * mp, unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,
+             DISTR * lp_RE, const ST::string & t,
+           const ST::string & fp, const ST::string & fp2, DESIGN * dp,
+           vector<ST::string> & op,vector<ST::string> & vn);
+
+  FC_hrandom_distributional(MASTER_OBJ * mp, unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,
+             const ST::string & t,
+           const ST::string & fp, const ST::string & fp2, DESIGN * dp,
+           vector<ST::string> & op,vector<ST::string> & vn);
+
+  // COPY CONSTRUCTOR
+
+  FC_hrandom_distributional(const FC_hrandom_distributional & m);
+
+  // OVERLOADED ASSIGNMENT OPERATOR
+
+  const FC_hrandom_distributional & operator=(const FC_hrandom_distributional & m);
+
+  // DESTRUCTOR
+
+  ~FC_hrandom_distributional()
+    {
+    }
+
+  // FUNCTION: update
+
+  void update(void);
+
+  void compute_autocorr_all(const ST::string & path, unsigned lag,
+                            ofstream & outg) const;
+
+  void get_samples(const ST::string & filename,ofstream & outg) const;
+
+    // FUNCTION: outresults
+  // TASK: writes estimation results to logout or into a file
+
+  void outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
+                 const ST::string & pathresults);
+
+  void outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                         const ST::string & path);
+
+  void read_options(vector<ST::string> & op,vector<ST::string> & vn);
+
+  };
 
 } // end: namespace MCMC
 

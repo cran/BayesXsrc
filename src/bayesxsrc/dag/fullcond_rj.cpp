@@ -1515,7 +1515,7 @@ void FULLCOND_rj::switch_version_2(unsigned v_i, unsigned v_j)
 			print_mod="limit";
 		}
 		else if ((print_models=="prob")
-			||   (print_models=="normal") && (1-alpha < prob_of_limit))
+			||  ((print_models=="normal") && (1-alpha < prob_of_limit)))
 		{
 			print_mod="prob";
 		}
@@ -1690,7 +1690,7 @@ void FULLCOND_rj::switch_version_2(unsigned v_i, unsigned v_j)
 			print_mod="limit";
 		}
 		else if ((print_models=="prob")
-			||   (print_models=="normal") && (1-alpha < prob_of_limit))
+			||  ((print_models=="normal") && (1-alpha < prob_of_limit)))
 		{
 			print_mod="prob";
 		}
@@ -1919,7 +1919,7 @@ void FULLCOND_rj::switch_version_2(unsigned v_i, unsigned v_j)
 			cout<<endl;
 		}
 		cout<<endl;
-		/*********************/
+		*********************/
 
 		  rj_step ();
 

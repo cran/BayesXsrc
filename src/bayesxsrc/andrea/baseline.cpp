@@ -49,7 +49,7 @@ pspline_baseline::pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_co
 
   {
 
-  unsigned i;
+  int i;
   gauss_n=9;
   vc_dummy1 = false;
   baselinep = vector<pspline_baseline*>(0);
@@ -295,7 +295,7 @@ pspline_baseline::pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_co
                     const bool & partlik)    // NEW FOR PARTIALLIKELIHOOD
   : FULLCOND_pspline(o,dp,fcc,ft,ti,nrk,degr,kp,fp,pres,false,gs,c)
   {
-  unsigned i,j;
+  int i,j;
   gauss_n = 9;
   vc_dummy1 = false;
   baseline = true;
@@ -1380,7 +1380,7 @@ if(!Weibull && !PartialLikelihood)
   double logold;
   double logprop;
   double * workbeta;
-  unsigned i,j,k;
+  int i,j,k;
 
 
 

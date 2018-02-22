@@ -201,15 +201,16 @@ double DISTRIBUTION_gaussianh::compute_weight(double * linpred, double * weight,
   worklinpred++; //zeigt jetzt auf eta
   double s = exp((*worklinpred));
 
+  double help;
   if(col == 0) //Berechnung für den Prädiktor des Mittelwertes
     {
-    return   1.0/s;//1/exp(eta)
+    help= 1.0/s;//1/exp(eta)
     }
-  else if(col == 1) //Berechnung für den Prädiktor der Varianz
+  else  //Berechnung für den Prädiktor der Varianz if(col == 1)
     {
-    return 0.5;
+    help = 0.5;
     }
-
+  return help;
   }
 
 

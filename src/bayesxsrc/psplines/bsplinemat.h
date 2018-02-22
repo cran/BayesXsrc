@@ -79,9 +79,7 @@ class __EXPORT_TYPE bsplinemat
 
   // DEFAULT CONSTRUCTOR
 
-  bsplinemat(void)
-    {
-    }
+  bsplinemat(void);
 
   // CONSTRUCTOR
 

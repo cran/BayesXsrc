@@ -424,12 +424,17 @@ class region
 
   int operator<(const region & p2) const
     {
+    int help;
     if(orderrelation == names)
-      return name < p2.name;
+      help = (name < p2.name);
     else if(orderrelation == xvalues)
-      return xcenter < p2.xcenter;
+      help = (xcenter < p2.xcenter);
     else if(orderrelation == yvalues)
-      return ycenter < p2.ycenter;
+      help = (ycenter < p2.ycenter);
+    else
+      help = 0;
+
+    return help;
     }
 
 

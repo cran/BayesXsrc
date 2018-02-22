@@ -337,7 +337,7 @@ essfreq::essfreq(Matrix <unsigned> scel, vector< vector <unsigned> >  & imm, uns
 			// so if i is a parent of j, it should be the (t+1)-th place of the list ladja[j]
 			for(k=0; k<i; k++)
 			{
-				if((k,j)==1)
+				if(get(k,j)==1)
 					t++;
 			}
 
@@ -362,7 +362,7 @@ essfreq::essfreq(Matrix <unsigned> scel, vector< vector <unsigned> >  & imm, uns
 
 			for(k=0; k<i; k++)
 			{
-				 if((k,j)==1)
+				 if(get(k,j)==1)
 					 t++;
 			}
 

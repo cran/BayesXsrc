@@ -1,5 +1,5 @@
 # Project: BayesX
-# Hybrid GNU/BSD makefile for R package 'bayesxsrc'
+# Hybrid GNU/BSD/SUN makefile for R package 'bayesxsrc'
 # author: Daniel Adler <dadler@uni-goettingen.de>
 
 all: BayesX
@@ -104,12 +104,15 @@ STRUCTADD_OBJS = \
 	bayesxsrc/structadd/FC_hrandom.o\
 	bayesxsrc/structadd/FC_hrandom_variance.o\
 	bayesxsrc/structadd/FC_hrandom_variance_vec.o\
+	bayesxsrc/structadd/FC_hrandom_variance_vec_nmig.o\
 	bayesxsrc/structadd/FC_linear.o\
 	bayesxsrc/structadd/FC_mult.o\
+	bayesxsrc/structadd/FC_shared.o\
 	bayesxsrc/structadd/FC_nonp.o\
 	bayesxsrc/structadd/FC_nonp_variance.o\
 	bayesxsrc/structadd/FC_nonp_variance_vec.o\
 	bayesxsrc/structadd/FC_predict.o\
+	bayesxsrc/structadd/FC_predict_mult.o\
 	bayesxsrc/structadd/FC_cv.o\
 	bayesxsrc/structadd/FC_variance_pen_vector.o\
 	bayesxsrc/structadd/GENERAL_OPTIONS.o\
@@ -122,12 +125,18 @@ STRUCTADD_OBJS = \
 	bayesxsrc/structadd/distr_categorical.o\
 	bayesxsrc/structadd/distr_categorical_mult.o\
 	bayesxsrc/structadd/distr_mixture.o\
+	bayesxsrc/structadd/distr_gamlss.o\
+        bayesxsrc/structadd/distr_gamlss_nadja.o\
+        bayesxsrc/structadd/distr_gamlss_copula.o\
+        bayesxsrc/structadd/distr_zeroadjusted.o\
 	bayesxsrc/structadd/mcmcsim.o\
 	bayesxsrc/structadd/model_parameters.o\
 	bayesxsrc/structadd/superbayesreg.o\
 	bayesxsrc/structadd/design_kriging.o\
+	bayesxsrc/structadd/design_userdefined.o\
 	bayesxsrc/structadd/FC_predictive_check.o\
-	bayesxsrc/structadd/FC_predict_predictor.o
+	bayesxsrc/structadd/FC_predict_predictor.o\
+        bayesxsrc/structadd/FC_merror.o
 OBJS = \
 	${ANDREA_OBJS}\
 	${BIB_OBJS}\
@@ -141,13 +150,14 @@ OBJS = \
 	bayesxsrc/adaptiv/fullcond_adaptiv.o\
 	bayesxsrc/alex/mixture.o
 
-LDFLAGS  += -L${R_HOME}/lib -lreadline -lcurses
-CPPFLAGS +=  -Ibayesxsrc/. -I"bayesxsrc/bib"  -I"bayesxsrc/alex"  -I"bayesxsrc/adaptiv"  -I"bayesxsrc/andrea"  -I"bayesxsrc/dag"  -I"bayesxsrc/graph"  -I"bayesxsrc/mcmc"  -I"bayesxsrc/psplines"  -I"bayesxsrc/samson"  -I"bayesxsrc/leyre"  -I"bayesxsrc/structadd"
+LDFLAGS  += -L${R_HOME}/lib -lreadline -lcurses $(shell pkg-config --libs gsl)
+CPPFLAGS +=  -Ibayesxsrc/. -I"bayesxsrc/bib"  -I"bayesxsrc/alex"  -I"bayesxsrc/adaptiv"  -I"bayesxsrc/andrea"  -I"bayesxsrc/dag"  -I"bayesxsrc/graph"  -I"bayesxsrc/mcmc"  -I"bayesxsrc/psplines"  -I"bayesxsrc/samson"  -I"bayesxsrc/leyre"  -I"bayesxsrc/structadd"  -I"/usr/include/gsl"
 CPPFLAGS += -D__BUILDING_GNU -D__BUILDING_LINUX -DTEMPL_INCL_DEF -D_MSC_VER2 -DNO_TEMPLATE_FRIENDS -DINCLUDE_REML -DINCLUDE_MCMC
 # CXXFLAGS += -O3 -ansi
 
 BayesX: ${OBJS}
 	${CXX} ${OBJS} ${LDFLAGS} -o BayesX
+#	${CXX} ${OBJS} ${LDFLAGS} ${TARGET_ARCH} -o BayesX
 
 clean:
 	rm -f ${OBJS}

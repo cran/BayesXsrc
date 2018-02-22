@@ -152,7 +152,7 @@ Kyenv.print4(out3); */
 
   }
 
- 
+
 void FULLCOND_pspline_surf_stepwise::create(const datamatrix & v1, const datamatrix & v2, const datamatrix & intact)
   {
 
@@ -307,7 +307,7 @@ FULLCOND_pspline_surf_stepwise::FULLCOND_pspline_surf_stepwise(
   : FULLCOND_pspline_surf_gaussian(o,dp,fcc,intact,region,mp,mn,ti,nrk,degr,kp,l,gs,ft,fp,pres,true,c)
   {
 
-  fctype = nonparametric;  
+  fctype = nonparametric;
 
   if(gauss==false)
     utype = iwls;
@@ -333,7 +333,7 @@ FULLCOND_pspline_surf_stepwise::FULLCOND_pspline_surf_stepwise(
     *v1z -= mean1;
     *v2z -= mean2;
     }
-    
+
   centertotal = true;
   //VCM_neu
   if(vccent == true)
@@ -358,7 +358,7 @@ FULLCOND_pspline_surf_stepwise::FULLCOND_pspline_surf_stepwise(
   centervalue = (v1.max(0) + v1.min(0)) * (v2.max(0) + v2.min(0));
   XVX = datamatrix(2,2,0);
 
-  lambdaold = -1;    
+  lambdaold = -1;
   }
 
 
@@ -404,7 +404,7 @@ const FULLCOND_pspline_surf_stepwise & FULLCOND_pspline_surf_stepwise::operator=
   if (this == &fc)
     return *this;
   FULLCOND_pspline_surf_gaussian::operator=(FULLCOND_pspline_surf_gaussian(fc));
-  
+
   mainpoi1 = fc.mainpoi1;
   mainpoi2 = fc.mainpoi2;
   maineffectsexisting = fc.maineffectsexisting;
@@ -429,13 +429,13 @@ const FULLCOND_pspline_surf_stepwise & FULLCOND_pspline_surf_stepwise::operator=
   data_varcoeff_fix = fc.data_varcoeff_fix;
   effmodi = fc.effmodi;
   XVX = fc.XVX;
-  centervalue = fc.centervalue;  
+  centervalue = fc.centervalue;
   fc_df = fc.fc_df;
   betaold = fc.betaold;
 
   splineo1 = fc.splineo1;
   splineo2 = fc.splineo2;
-  
+
   return *this;
   }
 
@@ -621,7 +621,7 @@ bool FULLCOND_pspline_surf_stepwise::posteriormode(void)
         if(utype != gaussian)
           {
           beta_uncentered = beta;
-          }        
+          }
         compute_beta();
         if(center)
           update_fix_effect();
@@ -926,7 +926,7 @@ vector<double> & lvec, int & number)
   if(spfromdf=="automatic")
     {
     df_equidist = true;
-    double maxi = floor(nrpar/4*3);
+    double maxi = floor(nrpar/4.0*3.0);
 
     if(maxi<=60)
       {
@@ -937,7 +937,7 @@ vector<double> & lvec, int & number)
     else if(maxi > 60 && maxi<=100)
       {
       df_for_lambdamax = 4;
-      number = floor(maxi/3); 
+      number = floor(maxi/3);
       df_for_lambdamin = number*3+1;
       }
     else if(maxi > 100 && maxi<=180)
@@ -953,7 +953,7 @@ vector<double> & lvec, int & number)
       df_for_lambdamin = number*10;
       }
     }
-  
+
   if(number>0)
     {
     if (df_equidist==true && spfromdf!="direct" && number>1)
@@ -993,10 +993,10 @@ vector<double> & lvec, int & number)
       else
         hierarchie_rw1(lvec,1);
       }
-    else if(!nofixed)  
+    else if(!nofixed)
       {
       lvec.push_back(-2);
-      if(identifiable)    
+      if(identifiable)
         lvec.push_back(-1);
       }
     }
@@ -1021,7 +1021,7 @@ vector<double> & lvec, int & number)
       {
       if(!nofixed && dfstart==1 && identifiable)
         lambdastart = -1;
-      else if(!nofixed && (dfstart==2 && identifiable) || (dfstart==1 && !identifiable))
+      else if(!nofixed && ((dfstart==2 && identifiable) || (dfstart==1 && !identifiable)))
         lambdastart = -2;
       else if(dfstart==0)
         lambdastart = 0;
@@ -1031,7 +1031,7 @@ vector<double> & lvec, int & number)
     if(lambdastart==-9 || lambdastart==1000000000)    // falls dfstart nicht erreicht werden kann
       lambdastart = 0;
     }
-     
+
   }
 
 
@@ -1075,7 +1075,7 @@ double FULLCOND_pspline_surf_stepwise::compute_df(void)
       else
         df = df + 1;
       }
-    else if(type == mrfkr1 && rankK==(nrpar1dim-1)*(nrpar1dim-1))   // d.h. Typ und Rang passen zusammen --> kein Spezialfall für Bootstrap 
+    else if(type == mrfkr1 && rankK==(nrpar1dim-1)*(nrpar1dim-1))   // d.h. Typ und Rang passen zusammen --> kein Spezialfall für Bootstrap
       {
       double lambdax = 0;
       double lambday = 0;
@@ -1193,7 +1193,7 @@ ST::string FULLCOND_pspline_surf_stepwise::get_effect(void)
       if(type==mrflinear)
         h = datanames[1] + "*" + datanames[0] + "(geosplinerw1";
       else if(type==mrfquadratic8)
-        h = datanames[1] + "*" + datanames[0] + "(geosplinerw2";             
+        h = datanames[1] + "*" + datanames[0] + "(geosplinerw2";
       }
     }
   else
@@ -1238,7 +1238,7 @@ void FULLCOND_pspline_surf_stepwise::update_fix_effect(void)
      if(fcconst->get_datanames()[j] == (datanames[1]+"_1"))
         {
         raus = true;
-        name_richtig = datanames[1] + "_1";        
+        name_richtig = datanames[1] + "_1";
         }
      j = j + 1;
      }
@@ -1399,7 +1399,7 @@ void FULLCOND_pspline_surf_stepwise::save_betamean(void)
     if(!varcoeff)
       name_richtig = datanames[datanames.size()-1];
     else
-      name_richtig = datanames[1]; 
+      name_richtig = datanames[1];
     while(j<fcconst->get_datanames().size() && raus==false)
       {
       if(fcconst->get_datanames()[j] == name_richtig)
@@ -1513,7 +1513,7 @@ void FULLCOND_pspline_surf_stepwise::outresults_df(unsigned & size)
         {
         anz = anz+1;
         j++;
-        p++;  
+        p++;
         }
      if(sample.get(*q,0) <= 0)
        number1.push_back(anz);
@@ -1627,7 +1627,7 @@ void FULLCOND_pspline_surf_stepwise::update(void)
       fctotal.update();
       }
     }
-  else if((lambda-1000000000)==0)     // lineare Interaktion wird erreicht durch Grenzfall (lambda = 1000000000 und "rw2") 
+  else if((lambda-1000000000)==0)     // lineare Interaktion wird erreicht durch Grenzfall (lambda = 1000000000 und "rw2")
     {
     update_linear_function();
     }
@@ -1996,7 +1996,7 @@ void FULLCOND_pspline_surf_stepwise::update_vc_anova(void)
   fchelp.update();
   FULLCOND::update();
   }
-  
+
 
 void FULLCOND_pspline_surf_stepwise::update_vc_anova_nongauss(void)
   {
@@ -2235,7 +2235,7 @@ void FULLCOND_pspline_surf_stepwise::update_linear_function(void)
     compute_XWtildey(likep->get_weight(),scaleinv);
     prec.solve(muy,betahelp,0,0);
     beta.plus(beta,betahelp);
-     
+
     // hier bezüglich Haupteffekten zentrieren und diese "wegschmeißen"!
     compute_intercept();
     compute_beta();

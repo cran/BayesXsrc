@@ -26,10 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include <iterator>
 
 
-namespace MCMC                                              
+namespace MCMC
 {
 
-	
+
 
 
 // constructor 3;  used in mixed case, corresponds to constructor1 in discrete case
@@ -44,21 +44,21 @@ namespace MCMC
 		unsigned i;
 
 
-		
+
 		// *********** check, if which ias are allowed **************
 		for(i=0; i<occurrence.size(); i++)
 		{
 			if(pia->ia_okay(i)==false)
-				occurrence[i] =-1;	
+				occurrence[i] =-1;
 		}
 
 
-		num_continuous_pa = 0;			
+		num_continuous_pa = 0;
 	    num_discrete_pa = 0;
 
-		
+
 		pia->give_var_kind (adcol,num_continuous_pa, num_discrete_pa);
-  
+
 	}
 
 
@@ -66,23 +66,23 @@ namespace MCMC
 	// constructor 4;  used in mixed case, corresponds to constructor2 in discrete case
 
 	FULLCOND_dag_ia_mixed::FULLCOND_dag_ia_mixed ( bool detail_ia, IA * iap, double v_a, double v_b,
-							ST::string prio_s, 
-							bool d_all, const datamatrix & res, double s_i, unsigned int num, 
+							ST::string prio_s,
+							bool d_all, const datamatrix & res, double s_i, unsigned int num,
 							MCMCoptions * o, const datamatrix & d, const ST::string & t,
 							const unsigned & r, const unsigned & c, const ST::string & fp)
 							: FULLCOND_dag_ia(detail_ia, iap, v_a, v_b, prio_s, d_all, res, s_i,num,
 											o,d,t,r,c,fp)
 	{
         unsigned i;
-        
+
 		// *********** check, if which ias are allowed **************
 		for(i=0; i<occurrence.size(); i++)
 		{
 			if(pia->ia_okay(i)==false)
-				occurrence[i] = -1;	
+				occurrence[i] = -1;
 		}
 
-		num_continuous_pa = 0;			
+		num_continuous_pa = 0;
 	    num_discrete_pa = 0;
 
 
@@ -131,7 +131,7 @@ namespace MCMC
 		ncoef=ncoef_m+ncoef_ia;
 
 		for(k=0; k<nvar; k++)
-		{	
+		{
 			if(zeta(k,j)==1)
 			{
 				for(l=k+1; l<nvar; l++)
@@ -161,12 +161,12 @@ namespace MCMC
 
 
 
-	 
 
 
 
-	
-	
+
+
+
 	// FUNCTION: ia_of_i
 	// TASK: counts the number of interactions containing variable i
 	unsigned FULLCOND_dag_ia_mixed::ia_of_i(unsigned i)
@@ -207,9 +207,9 @@ namespace MCMC
         }
         else
             count=0;
-            
 
-		return count; 
+
+		return count;
 	}
 
 
@@ -233,8 +233,8 @@ namespace MCMC
 		l=0;
 		if(var_type == 'd')
 		{
-			for(k=0; k<nvar, l<ncoef_m-1; k++)
-			{		
+			for(k=0; (k<nvar) && (l<ncoef_m-1); k++)
+			{
 				if(adcol(k,0)==1)
 				{
 					vector <unsigned> ia;
@@ -248,16 +248,16 @@ namespace MCMC
 						ia.push_back(i);
 						ia.push_back(k);
 					}
-					
+
 					if (pia->ia_okay(ia) == true)
 						v.push_back(ia);
-				
+
 					l++;
 				}
 			}
 		}
 	}
- 
+
 
 
 
@@ -265,7 +265,7 @@ namespace MCMC
   // FUNCTION: num_ia_of_i
   // TASK: returns the number of allowed interactions of the existing main effect i
   unsigned FULLCOND_dag_ia_mixed::num_ia_of_i(unsigned i)
-  { 
+  {
 
 	  if(var_type == 'd')
 	  {
@@ -284,7 +284,7 @@ namespace MCMC
    // TASK: returns the number of allowed new interactions of the new main effect i
    unsigned FULLCOND_dag_ia_mixed::num_ia_new(unsigned i)
    {
-	  
+
 	   if(var_type=='d')
 	   {
 		   if(pia->tell_var_type(i) == 'd')
@@ -300,11 +300,11 @@ namespace MCMC
 
 
 
-   void FULLCOND_dag_ia_mixed::change(unsigned i, const datamatrix & beta_help_new, const datamatrix & x_new, 
+   void FULLCOND_dag_ia_mixed::change(unsigned i, const datamatrix & beta_help_new, const datamatrix & x_new,
 								const datamatrix & xx_new, unsigned int ncoef_new)
    {
 
-	   
+
 	   if(ncoef_new<ncoef) //death
 	   {
 		   if(pia->tell_var_type(i) == 'd')
@@ -319,13 +319,13 @@ namespace MCMC
 		   else
 			   num_continuous_pa++;
 	   }
-		  
+
 
 
 	   FULLCOND_dag::change(i, beta_help_new, x_new, xx_new, ncoef_new);
    }
 
-   
+
 
 
 

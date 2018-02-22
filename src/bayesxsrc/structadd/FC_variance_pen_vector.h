@@ -28,11 +28,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 namespace MCMC
 {
 
+enum shrinktype {ridge,lasso,ssvs};
+
 
 class __EXPORT_TYPE FC_variance_pen_vector : public FC
   {
 
   protected:
+
+  MASTER_OBJ * masterp;
 
   vector<double> tau2;                 //  tau^2
 
@@ -55,6 +59,7 @@ class __EXPORT_TYPE FC_variance_pen_vector : public FC
   double pensum;                    //  sum(beta^2/tau^2)
   int nrpen;
 
+  shrinktype shtype;
   bool is_ridge;          //  indicates if "true" the L2-penalty
                           //  and if "false" the L1-penalty is used
   bool is_fix;            //  indicates if "true" that the Shrinkageparameter is fixed
@@ -84,7 +89,7 @@ class __EXPORT_TYPE FC_variance_pen_vector : public FC
 
   FC_variance_pen_vector(MASTER_OBJ * mp,GENERAL_OPTIONS * o, FC_linear_pen * p,
                          DISTR * d,const ST::string & ti,
-                         const ST::string & fp, bool isr);
+                         const ST::string & fp, shrinktype sh);
 
   //____________________________________________________________________________
   //
@@ -137,7 +142,7 @@ class __EXPORT_TYPE FC_variance_pen_vector : public FC
   // TASK: - write results to output window and files
   //____________________________________________________________________________
 
-  void outresults(ofstream & out_stata, ofstream & out_R,
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                   const ST::string & pathresults);
 
   //____________________________________________________________________________
@@ -170,6 +175,73 @@ class __EXPORT_TYPE FC_variance_pen_vector : public FC
   //____________________________________________________________________________
 
   ~FC_variance_pen_vector() {}
+
+  }; // end: class FC_variance_pen_vector
+
+
+
+class __EXPORT_TYPE FC_variance_pen_vector_ssvs : public FC
+  {
+
+  protected:
+
+  MASTER_OBJ * masterp;
+  unsigned equationnr;
+
+  vector<bool> cprior;
+  FC_linear_pen * Cp;
+  DISTR * distrp;
+
+  FC delta;                           //  delta
+  vector<double> atau2;               //  a_tau2
+  vector<double> btau2;               //  b_tau2
+  vector<double> btau2_orig;          //  b_tau2
+  FC theta;
+  double atheta;
+  double btheta;
+
+  unsigned nrpen;
+
+  vector<double> r;
+
+  FC FC_psi2;
+  FC FC_omega;
+  FC FC_delta;
+
+  bool NBPSS;
+
+  public:
+
+
+  FC_variance_pen_vector_ssvs(void) : FC()
+    {
+    }
+
+
+  FC_variance_pen_vector_ssvs(MASTER_OBJ * mp,
+                         unsigned & enr,
+                         GENERAL_OPTIONS * o, FC_linear_pen * p,
+                         DISTR * d,const ST::string & ti,
+                         const ST::string & fp);
+
+
+  FC_variance_pen_vector_ssvs(const FC_variance_pen_vector_ssvs & t);
+
+  const FC_variance_pen_vector_ssvs & operator=(const FC_variance_pen_vector_ssvs & t);
+
+
+  void add_variable(datamatrix & x,vector<ST::string> & op, vector<ST::string> & vn);
+
+  void get_samples(const ST::string & filename,ofstream & outg) const;
+
+  void update(void);
+
+  bool posteriormode(void);
+
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                  const ST::string & pathresults);
+
+  void outoptions(void);
 
   }; // end: class FC_variance_pen_vector
 

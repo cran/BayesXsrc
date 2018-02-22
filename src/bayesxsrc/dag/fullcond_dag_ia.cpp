@@ -27,12 +27,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 
 
-namespace MCMC                                              
+namespace MCMC
 {
 
 	// constructor 1;  used in discrete case
 
-	FULLCOND_dag_ia::FULLCOND_dag_ia (IA * iap, double s_i, unsigned int num, 
+	FULLCOND_dag_ia::FULLCOND_dag_ia (IA * iap, double s_i, unsigned int num,
 							MCMCoptions * o,
 							const datamatrix & d, const ST::string & t,
 							const unsigned & r, const unsigned & c,
@@ -40,26 +40,26 @@ namespace MCMC
 							: FULLCOND_dag_d(s_i, num, o,d,t,r,c,fp)
 	{
 
-		
+
 		unsigned i,j;
 		detail=false;
 
 		pia = iap;
 
-		var_type = pia->tell_var_type(self);		 
-		mixed_case = pia->tell_mixed_case();  
+		var_type = pia->tell_var_type(self);
+		mixed_case = pia->tell_mixed_case();
 		max_ia_order = pia->get_max_order();
 
 		all_possible_ia = nvar*(nvar-1)/2;
 
-	
+
 		if(detail==true)
 		{
-			nrpar = nvar+all_possible_ia; 
+			nrpar = nvar+all_possible_ia;
 		}
 
 
-		
+
 		occurrence = vector <int> (all_possible_ia,0);
 		occmean = datamatrix(all_possible_ia,1,0);
 
@@ -91,37 +91,37 @@ namespace MCMC
 
 	// constructor 2;  used in dicrete case
 	FULLCOND_dag_ia::FULLCOND_dag_ia (bool detail_ia, IA * iap, double v_a, double v_b, ST::string prio_s,
-							bool d_all, const datamatrix & res, double s_i, unsigned int num, 
+							bool d_all, const datamatrix & res, double s_i, unsigned int num,
 							MCMCoptions * o, const datamatrix & d, const ST::string & t,
 							const unsigned & r, const unsigned & c, const ST::string & fp)
-							: FULLCOND_dag_d(v_a, v_b, prio_s, d_all, res, s_i,num, 
+							: FULLCOND_dag_d(v_a, v_b, prio_s, d_all, res, s_i,num,
 											o,d,t,r,c,fp)
 	{
 		unsigned i,j;
-		   
+
 
 		detail=detail_ia;
 		pia = iap;
 
-		var_type = pia->tell_var_type(self);		 
-		mixed_case = pia->tell_mixed_case();  
+		var_type = pia->tell_var_type(self);
+		mixed_case = pia->tell_mixed_case();
 		max_ia_order = pia->get_max_order();
 
 		all_possible_ia = nvar*(nvar-1)/2;
 
-		
+
 		if(detail==true)
 		{
-			nrpar = nvar+all_possible_ia; 
+			nrpar = nvar+all_possible_ia;
 			setbeta(nvar+all_possible_ia,1,1);
 		}
 
 
-		
+
 		occurrence = vector <int> (all_possible_ia,0);
 		occmean = datamatrix(all_possible_ia,1,0);
 
-		
+
 		y_ia = datamatrix(nobs,1);
 		x_ia_b = datamatrix(1, 1);
 		xx_ia_b= datamatrix(1, 1);
@@ -131,7 +131,7 @@ namespace MCMC
 		ia_b_there =false;
 		ia_d_there = false;
 
-        proposal_version=2; 
+        proposal_version=2;
 
 		// *********** compute all_ia ******************************************************
 		vector <unsigned> help (2);
@@ -169,15 +169,15 @@ namespace MCMC
 		max_ia_order = pia->get_max_order();
 
 		all_possible_ia = nvar*(nvar-1)/2;
-		
+
 		if(detail==true)
 		{
-			nrpar = nvar+all_possible_ia; 
+			nrpar = nvar+all_possible_ia;
 			setbeta(nvar+all_possible_ia,1,0);
 		}
 
 
-		
+
 		occurrence = vector <int> (all_possible_ia,0);
 		occmean = datamatrix(all_possible_ia,1,0);
 
@@ -228,7 +228,7 @@ namespace MCMC
 
 		all_possible_ia = nvar*(nvar-1)/2;
 
-		
+
 		if(detail==true)
 		{
 			nrpar = nvar+all_possible_ia;
@@ -288,9 +288,9 @@ namespace MCMC
 
 		ncoef_ia = (ncoef_m-1)*(ncoef_m-2)/2;
 		ncoef=ncoef_m+ncoef_ia;
-		
+
 		for(k=0; k<nvar; k++)
-		{	
+		{
 			if(zeta(k,j)==1)
 			{
 				for(l=k+1; l<nvar; l++)
@@ -359,7 +359,7 @@ namespace MCMC
 	{
 		if(mixed_case==false)
 		{
-		
+
 				unsigned num;
 			// parameters for a birth-step (one dimension more)
 			// if(ncoef-ncoef_ia<nvar)
@@ -380,11 +380,11 @@ namespace MCMC
 			}
 		}
 	}
-	 
 
 
-	
-	
+
+
+
 	// FUNCTION: ia_of_i
 	// TASK: counts the number of interactions containing variable i
 	unsigned FULLCOND_dag_ia::ia_of_i(unsigned i)
@@ -397,12 +397,12 @@ namespace MCMC
 
 		for(k=0; k<ncoef_ia; k++, ++it_cur)
 		{
-			if(		(*it_cur)[0]==i 
+			if(		(*it_cur)[0]==i
 				||	(*it_cur)[1]==i)
 				count++;
 		}
 
-		return count; 
+		return count;
 	}
 
 
@@ -419,7 +419,7 @@ namespace MCMC
 
 		for(k=0; k<ncoef_ia; k++, ++it_cur)
 		{
-			if(		(*it_cur)[0]==i 
+			if(		(*it_cur)[0]==i
 				||	(*it_cur)[1]==i)
 				v.push_back(*it_cur);
 		}
@@ -436,7 +436,7 @@ namespace MCMC
 		unsigned k,l;
 
 		l=0;
-		for(k=0; k<nvar, l<ncoef_m-1; k++)
+		for(k=0; (k<nvar) && (l<ncoef_m-1); k++)
 		{
 			if(adcol(k,0)==1)
 			{
@@ -453,13 +453,13 @@ namespace MCMC
 					ia.push_back(i);
 					ia.push_back(k);
 				}
-				
+
 				v.push_back(ia);
 				l++;
 			}
 		}
 	}
- 
+
 
 
 
@@ -476,7 +476,7 @@ namespace MCMC
 
 
 
-  
+
 
 
 
@@ -489,15 +489,15 @@ namespace MCMC
 	{
 		if(var_type=='d')
 		{
-			FULLCOND_dag_d::update();	
+			FULLCOND_dag_d::update();
 		}
 		else
-			FULLCOND_dag::update();	
+			FULLCOND_dag::update();
 
 
 		if(detail==true)
 			write_to_beta_ia();
-		update_occ();	
+		update_occ();
 	}
 
 
@@ -539,16 +539,16 @@ namespace MCMC
 		make_new_b (ia_new, beta_new, xx_new,  b_new, x_new);
 
 
-		
+
 		// *****  calculate ratio ****************************************************
 		double log_denom;
 		double log_num;
-		double ratio; 
+		double ratio;
 
 		log_num = calc_SQT_x(x_new, b_new) + calc_SQT_b(b_new);
 		log_denom = calc_SQT_x() +  calc_SQT_b();
 
-		ratio = -1/(2* sigma_i) 
+		ratio = -1/(2* sigma_i)
 			*(log_num - log_denom)  - p_prop(beta_new) ;
 
 
@@ -557,9 +557,9 @@ namespace MCMC
 		{
 			change_current('b', ia_new);
 			change_occur('b', ia_new);
-			change(99, b_new, x_new, xx_new, ncoef_new);  
+			change(99, b_new, x_new, xx_new, ncoef_new);
 		}
- 
+
 
 // ************************************************************************************
 
@@ -571,7 +571,7 @@ namespace MCMC
 
 	// FUNCTION: make_new_b
 	// TASK: computes the new values for a birth-step
-	void FULLCOND_dag_ia::make_new_b (vector<unsigned> ia_new, double beta_new, 
+	void FULLCOND_dag_ia::make_new_b (vector<unsigned> ia_new, double beta_new,
 				datamatrix & xx_new, datamatrix & b_new, datamatrix & x_new)
 	{
 		unsigned ncoef_new = ncoef + 1;
@@ -579,24 +579,24 @@ namespace MCMC
 
 
 		// Definition of ttt:
-		// interaction ia_new would the ttt-th interaction in pia 
+		// interaction ia_new would the ttt-th interaction in pia
 		// starting with 0
 		//unsigned ttt= pia->get_pos(ia_new);
-	
-		
+
+
 		// Definition of tt:
-		// interaction ia_new would the tt-th interaction in ia_current 
+		// interaction ia_new would the tt-th interaction in ia_current
 		// starting with 0
 		unsigned tt;
 		tt=get_pos_cur(ia_new);
-		
+
 		// Definition of t:
-		// interaction ia_new is the t-th regression coefficient 
+		// interaction ia_new is the t-th regression coefficient
 		// without counting the intercept as coefficient
 		unsigned t;
 		t = ncoef-ncoef_ia+tt;
 
-	
+
 
 	   // ********** compute x_new *******************************************************
 		double * workx_new;
@@ -615,22 +615,22 @@ namespace MCMC
 				{
 					*workx_new = *workx;
 				}
-				else 
+				else
 				{
 					*workx_new = *workia;
-					workia++;	
+					workia++;
 					workx--;
 				}
 			}
 		}
-		
+
 
 		// *********** compute xx_new ********************************************
 
 		double * workxx_new;
 		double * workxx;
 		double * workx1;
-		double * workx2; 
+		double * workx2;
 
 		double value;
 
@@ -657,8 +657,8 @@ namespace MCMC
 							workx1 = workx1 + ncoef_new;
 							workx2 = workx2 + ncoef_new;
 						}
-									
-						*workxx_new = value;  
+
+						*workxx_new = value;
 
 						workxx--;
 					}
@@ -697,7 +697,7 @@ namespace MCMC
 		{
 			if(k!= t)
 				*workb_new = *workbeta;
-			else 
+			else
 			{
 				beta_new = rand_normal();		// the new coefficient (=u)
 				*workb_new = beta_new;
@@ -707,8 +707,8 @@ namespace MCMC
 
 
 		//*********** compute proposed linear predictor **********************************
-		calc_lin_prop( x_new, b_new); 
-		
+		calc_lin_prop( x_new, b_new);
+
 	}
 
 
@@ -728,9 +728,9 @@ namespace MCMC
 
 	// FUNCTION: make_new_d_int
    // TASK: computes the new values for a death-step
-   void FULLCOND_dag_ia::make_new_d_int (ST::string step, unsigned i, unsigned j, 
-						unsigned num_ia_del, datamatrix & beta_old, 
-						vector <vector <unsigned > > & current_ia_n, 
+   void FULLCOND_dag_ia::make_new_d_int (ST::string step, unsigned i, unsigned j,
+						unsigned num_ia_del, datamatrix & beta_old,
+						vector <vector <unsigned > > & current_ia_n,
 						datamatrix & xx_new, datamatrix & b_new, datamatrix & x_new)
 	{
 	    unsigned  k,l;
@@ -759,13 +759,13 @@ namespace MCMC
 		ia_of_i(i,ia);
 
 
-		
+
 
 		// Definition of pos_of_del
-		// contains positions of the main effect and the corresponding 
+		// contains positions of the main effect and the corresponding
 		// interactions in j-th regression model that are going to be deleted
 		// (position of intercept is 0)
-		vector <unsigned> pos_of_del;	
+		vector <unsigned> pos_of_del;
 		get_pos(i,pos_of_del);
 
 		//compute x_new
@@ -787,7 +787,7 @@ namespace MCMC
 			{
 				if ( l!=pos )
 					*workx_new = *workx;
-				else 
+				else
 				{
                      if(proposal_version==2 && step!="s")
                      {
@@ -918,7 +918,7 @@ namespace MCMC
 		// without counting the intercept as coefficient
 		unsigned t;
 		t=1;
-		for(k=0; k<nvar, k<i; k++)
+		for(k=0; (k<nvar) && (k<i); k++)
 		{
 			if(adcol(k,0)==1)
 				t++;
@@ -944,8 +944,8 @@ namespace MCMC
 		}
 
 
-		
-		
+
+
 
 
 	   // ********** compute x_new *******************************************************
@@ -954,7 +954,7 @@ namespace MCMC
 		double * workx;
 
 
-		// vec_workia contains pointers to the main effect resp. the interactions which are added 
+		// vec_workia contains pointers to the main effect resp. the interactions which are added
 		double * workia;
 		vector <double *> vec_workia;
 
@@ -997,7 +997,7 @@ namespace MCMC
 
 
 		for(k=0; k<nobs; k++)
-		{	
+		{
 			m = 0;
 			for(l=0; l<ncoef_new; l++, workx_new++, workx++)
 			{
@@ -1022,7 +1022,7 @@ namespace MCMC
 						workx_ia ++;
 					}
 
-					if(m==0)	
+					if(m==0)
 						vec_workia[m]= vec_workia[m]+nvar;
 					else
 						vec_workia[m]++;
@@ -1127,7 +1127,7 @@ namespace MCMC
 			}
 		}
 
- 
+
 
 		if(step !="s")
 		{
@@ -1164,7 +1164,7 @@ namespace MCMC
 			assert(current_ia.size()==ncoef_ia);
 
 			if(ia > current_ia[ncoef_ia-1])
-				t=ncoef_ia; 
+				t=ncoef_ia;
 			else
 			{
 				std::vector< vector< unsigned> > :: iterator it_k;
@@ -1176,7 +1176,7 @@ namespace MCMC
 					++it_k;
 				}
 			}
-		}	
+		}
 		return t;
 	}
 
@@ -1187,7 +1187,7 @@ namespace MCMC
 	// TASK: computes the proposed regression coefficient beta_new
 	// stores its new components in u
 	void FULLCOND_dag_ia::make_prop_beta (char step,  datamatrix & beta_new,
-			datamatrix & u, const datamatrix & x_new, const datamatrix & xx_new, 
+			datamatrix & u, const datamatrix & x_new, const datamatrix & xx_new,
 			unsigned ncoef_new, const vector <unsigned> vec_t)
 	{
 		unsigned k, t, m;
@@ -1218,7 +1218,7 @@ namespace MCMC
 			{
 				if(k!= t)
 					*workb_new = *workbeta;
-				else 
+				else
 				{
 					*worku= *workbeta;
 					worku++;
@@ -1245,7 +1245,7 @@ namespace MCMC
 			if(proposal_version==0) //just proposal with N(0,sigma)
 			{
 			}
-			else if (proposal_version==1) // all components are new 
+			else if (proposal_version==1) // all components are new
 										  // and correspond to the ls-estimator
 			{
 				calc_kq_est (beta_new, x_new, xx_new);
@@ -1256,7 +1256,7 @@ namespace MCMC
 
 				double * workbeta_new;
 				workbeta_new = beta_new.getV();
-                
+
 				sum=0;
 				for(k=0; k<ncoef_new; k++, workbeta_new++)
 				{
@@ -1266,7 +1266,7 @@ namespace MCMC
 					sum = sum + p_prop(help, mu,sigma);
 				}
 
-				ln_prop_beta = sum; 
+				ln_prop_beta = sum;
 
 			}
 			else if (proposal_version==2)	// only the added components are sampled
@@ -1311,7 +1311,7 @@ namespace MCMC
 						    t=vec_t[m];
 					}
 				}
-				ln_prop_beta = sum; 
+				ln_prop_beta = sum;
 			}
 		}
 	}
@@ -1319,7 +1319,7 @@ namespace MCMC
 
 
 	// FUNCTION: get_pos
-	// TASK: gives back the position of main effect i and the corresponding 
+	// TASK: gives back the position of main effect i and the corresponding
 	// ia in the regression model starting with 0 for the intercept
 	void FULLCOND_dag_ia::get_pos(unsigned i, vector <unsigned> & pos)
 	{
@@ -1329,10 +1329,10 @@ namespace MCMC
 		assert(pos.size()==0);
 
 		unsigned t=1;
-		for(k=0; k<nvar, k<i; k++)
+		for(k=0; (k<nvar) && (k<i); k++)
 		{
 			if(adcol(k,0)==1)
-				t++;	
+				t++;
 		}
 		pos.push_back(t);
 
@@ -1346,7 +1346,7 @@ namespace MCMC
 				position = ncoef-ncoef_ia+k;
 				pos.push_back(position);
 			}
-		}	
+		}
 	}
 
 
@@ -1368,7 +1368,7 @@ namespace MCMC
 			double * pbeta_help;
 			double * pbeta;
 			std::vector< unsigned> :: iterator  it_occ;
-			
+
 			k = ncoef-ncoef_ia;  // beginning of the interactions in the vector beta_help
 
 			it_occ = occurrence.begin();
@@ -1383,24 +1383,24 @@ namespace MCMC
 					pbeta_help++;
 				}
 				else
-					*pbeta  = 0;	
+					*pbeta  = 0;
 			}	*/
 
 
-			
+
 			unsigned i,k;
 
 			double * pbeta_help;
 			double * pbeta;
 			std::vector< int> :: iterator  it_occ;
-			
+
 			k = ncoef-ncoef_ia;  // beginning of the interactions in the vector beta_help
 
 			it_occ = occurrence.begin();
 			pbeta = beta.getV() + nvar;
 			pbeta_help = beta_help.getV() + k;
 
-			for(i=nvar; i<nvar+nvar*(nvar-1)/2;  pbeta++, ++it_occ, i++)   
+			for(i=nvar; i<nvar+nvar*(nvar-1)/2;  pbeta++, ++it_occ, i++)
 			{
 				if( *it_occ == 1 )
 				{
@@ -1408,8 +1408,8 @@ namespace MCMC
 					pbeta_help++;
 				}
 				else
-					*pbeta  = 0;	
-			}	
+					*pbeta  = 0;
+			}
 
 
 
@@ -1432,7 +1432,7 @@ namespace MCMC
 		if(step == 'b')
 			occurrence[pos] = 1;
 		else
-			occurrence[pos] = 0; 
+			occurrence[pos] = 0;
 	}
 
 
@@ -1445,12 +1445,12 @@ namespace MCMC
         assert(step=='b' || step=='d');
 
 		unsigned t;
-		unsigned pos; 
+		unsigned pos;
 		vector<unsigned> ia_new;
 
 		// strage but true: iterator decreases speed!!!
 
-		//std::vector<unsigned> :: iterator it_occ ; 
+		//std::vector<unsigned> :: iterator it_occ ;
 		//it_occ = occurrence.begin();
 
 		//k=0;
@@ -1461,7 +1461,7 @@ namespace MCMC
 
 			if(step == 'b')
 				occurrence[pos]=1;
-				//*it_occ=1;	
+				//*it_occ=1;
 			else
 				occurrence[pos]=0;
 				//*it_occ=0;
@@ -1484,7 +1484,7 @@ namespace MCMC
 				current_ia.push_back(term);
 			else
 			{
-				std::vector < vector <unsigned> > :: iterator pos; 
+				std::vector < vector <unsigned> > :: iterator pos;
 				pos = current_ia.begin();
 
 				while (*pos <term)
@@ -1492,11 +1492,11 @@ namespace MCMC
 
 				current_ia.insert(pos, term);
 			}
-			ncoef_ia++;					
+			ncoef_ia++;
 		}
 		else
 		{
-			std::vector < vector <unsigned> > :: iterator pos; 
+			std::vector < vector <unsigned> > :: iterator pos;
 			pos = current_ia.begin() + get_pos_cur(term);
 			current_ia.erase(pos);
 			ncoef_ia--;
@@ -1514,7 +1514,7 @@ namespace MCMC
 	void FULLCOND_dag_ia::change_current(char step, vector <vector <unsigned > > term)
 	{
          assert(step=='b' ||step=='d');
-         
+
 		unsigned t, size;
 		vector<unsigned> ia;
 
@@ -1533,7 +1533,7 @@ namespace MCMC
 				{
 					std::vector < vector <unsigned> > :: iterator pos;
 					pos = current_ia.begin();
-					
+
 					while(*pos <ia)
 						++pos;
 
@@ -1546,14 +1546,14 @@ namespace MCMC
 		{
 			std::vector < vector <unsigned> > :: iterator pos;
 			for(t=0; t<size; t++)
-			{	
+			{
 				ia = term[t];
-				
+
 				pos = current_ia.begin() + get_pos_cur(ia);
 
 				current_ia.erase(pos);
 				ncoef_ia--;
-			}	
+			}
 		}
 
 		ia_d_there=false;
@@ -1571,7 +1571,7 @@ namespace MCMC
 		unsigned int ncoef_new = ncoef - 1;
 
 		// instead of: datamatrix b_new (ncoef_new,1);
-		datamatrix & b_new = get_b_new_d(); 	
+		datamatrix & b_new = get_b_new_d();
 		// instead of: datamatrix x_new (nobs,ncoef_new);
 		datamatrix & x_new = get_x_new_d();
 		// instead of: datamatrix xx_new (ncoef_new,ncoef_new);
@@ -1579,10 +1579,10 @@ namespace MCMC
 
 
 		double beta_old; //coefficient which will vanish
-			
+
 		// computing of the new values
 		make_new_d(old_ia, xx_new, beta_old, b_new, x_new);
-		
+
 
 
 		// calculate ratio
@@ -1594,7 +1594,7 @@ namespace MCMC
 		log_num = calc_SQT_x(x_new, b_new) + calc_SQT_b(b_new);
 		log_denom = calc_SQT_x() + calc_SQT_b();
 
-		ratio = -1/(2*sigma_i) 
+		ratio = -1/(2*sigma_i)
 				*(log_num - log_denom) + p_prop(beta_old) ;
 
 
@@ -1619,15 +1619,15 @@ namespace MCMC
 	 // FUNCTION: make_new_d
    // TASK: computes the new values for a death-step
 
-   void FULLCOND_dag_ia::make_new_d ( vector<unsigned> ia_old, datamatrix & xx_new, 
+   void FULLCOND_dag_ia::make_new_d ( vector<unsigned> ia_old, datamatrix & xx_new,
 							double & beta_old, datamatrix & b_new, datamatrix & x_new)
-   {	
+   {
 	    unsigned int k,l;
 
-		
+
 
 		// Definition of t:
-		// the interaction ai_old i is the t-th regression coefficient 
+		// the interaction ai_old i is the t-th regression coefficient
 		// of j (without intercept)
 
 		unsigned t;
@@ -1647,7 +1647,7 @@ namespace MCMC
 			{
 				if(l != t)
 					*workx_new = *workx;
-				else 
+				else
 					workx_new--;
 			}
 		}
@@ -1678,20 +1678,20 @@ namespace MCMC
 
 
 		//save the t-th coefficient (which is going to be deleted)
-		beta_old = beta_help(t,0);	
+		beta_old = beta_help(t,0);
 
 		//compute proposed beta
 		double * workb_new;
 		double * workbeta;
 
-		workb_new = b_new.getV(); 
+		workb_new = b_new.getV();
 		workbeta = getV_beta_help();
 
 		for(k=0; k<ncoef; workb_new++, workbeta++, k++)
 		{
 			if(k!= t)
 				*workb_new = *workbeta;
-			else 
+			else
 				workb_new--;
 
 		}
@@ -1708,7 +1708,7 @@ namespace MCMC
 
  // FUNCTION: update_occ
  // TASK: updates occurrence and the auxiliary variables like oc_old, etc.
- 
+
  void FULLCOND_dag_ia::update_occ(void)
  {
 
@@ -1747,8 +1747,8 @@ namespace MCMC
 
 
 void FULLCOND_dag_ia::outresults(void)
-    {		
-	
+    {
+
 	FULLCOND_dag::outresults(); // this command should be included at the beginning
                             // of the function, because the outresults function
                             // of the base class automatically computes
@@ -1793,10 +1793,10 @@ void FULLCOND_dag_ia::outresults(void)
 			 {
 				 if(occmean(r,0)>0)
 				 {
-					 optionsp->out("rel. frequency of ia " 
-									+  ST::inttostring(first) 
-									+  ST::inttostring(second) 
-									+ ": " 
+					 optionsp->out("rel. frequency of ia "
+									+  ST::inttostring(first)
+									+  ST::inttostring(second)
+									+ ": "
 									+  ST::doubletostring(occmean(r,0),5) + "\n");
 					 optionsp->out("\n");
 
@@ -1805,26 +1805,26 @@ void FULLCOND_dag_ia::outresults(void)
 			}
 		 }
 	 }
-	 else 
+	 else
 	 {
 
-		 for(r=nvar; r<nvar+nvar*(nvar-1)/2; r++)				
+		 for(r=nvar; r<nvar+nvar*(nvar-1)/2; r++)
 		{
 			unsigned first = (all_ia[r-nvar])[0];    // all_ia.size = nvar(nvar-1)/2
-			unsigned second = (all_ia[r-nvar])[1];	
+			unsigned second = (all_ia[r-nvar])[1];
 
 			if(first!=self && second !=self)
 			{
 
 				if(occmean(r-nvar,0)>0)    //occmean.size()=nvar*(nvar-1)/2
 				{
-					
-					optionsp->out("Interaction  " 
-									+  ST::inttostring(first) 
-									+  ST::inttostring(second) 
+
+					optionsp->out("Interaction  "
+									+  ST::inttostring(first)
+									+  ST::inttostring(second)
 									+ " : \n");
 					optionsp->out("\n");
- 
+
 
 					optionsp->out("mean: "	   +  ST::doubletostring(betamean(r,0),5) + "\n");
 					if(flags[0] == 0)
@@ -1835,18 +1835,18 @@ void FULLCOND_dag_ia::outresults(void)
                     ST::string u1 = ST::doubletostring(upper1,4);
                     ST::string u2 = ST::doubletostring(upper2,4);
 
-                    optionsp->out(l1 + "% quantile: " 
+                    optionsp->out(l1 + "% quantile: "
 									 + ST::doubletostring(betaqu_l1_lower(r,0),5) + "\n");
 
-                    optionsp->out(l2 + "% quantile: " 
+                    optionsp->out(l2 + "% quantile: "
 									 + ST::doubletostring(betaqu_l2_lower(r,0),5) + "\n");
 
                     optionsp->out("50% quantile: " +  ST::doubletostring(betaqu50(r,0),5) + "\n");
 
-                    optionsp->out(u1 + "% quantile: " 
+                    optionsp->out(u1 + "% quantile: "
 									 + ST::doubletostring(betaqu_l2_upper(r,0),5) + "\n");
 
-                    optionsp->out(u2 + "% quantile: " 
+                    optionsp->out(u2 + "% quantile: "
 									 + ST::doubletostring(betaqu_l1_upper(r,0),5) + "\n");
 
 

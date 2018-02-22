@@ -328,7 +328,7 @@ void FULLCOND_random_stepwise::compute_lambdavec(vector<double> & lvec, int & nu
   if(spfromdf=="automatic")
     {
     df_equidist = true;
-    double maxi = floor(nrpar/4*3);
+    double maxi = floor(nrpar/4.0*3.0);
 
     if(maxi <= 30)
       {
@@ -353,7 +353,7 @@ void FULLCOND_random_stepwise::compute_lambdavec(vector<double> & lvec, int & nu
     else if(maxi > 60 && maxi<=100)
       {
       df_for_lambdamax = 3;
-      number = floor(maxi/3); 
+      number = floor(maxi/3);
       df_for_lambdamin = number*3;
       }
     else if(maxi > 100 && maxi<=180)
@@ -815,7 +815,7 @@ void FULLCOND_random_stepwise::outresults_df(unsigned & size)
         {
         anz = anz+1;
         j++;
-        p++;  
+        p++;
         }
      if(sample.get(*q,0) <= 0)
        number1.push_back(anz);
@@ -1070,7 +1070,7 @@ void FULLCOND_random_stepwise::update_nongauss(void)  // entspricht "update_rand
 
     if(randomslope && includefixed)
       sumy += ms/sigma2;
-      
+
     // compute proposal
     var = 1.0/(sumw + 1.0/sigma2);
     mode = var*sumy;
@@ -1131,7 +1131,7 @@ void FULLCOND_random_stepwise::update_nongauss(void)  // entspricht "update_rand
       {
       if(randomslope && includefixed)
         *workbeta += ms;
-        
+
       if(!randomslope)
         likep->add_linearpred2(*workbeta-proposal,*itbeg,*itend,index,index2,column);
       else

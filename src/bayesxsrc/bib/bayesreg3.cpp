@@ -50,9 +50,9 @@ bool bayesreg::create_varcoeffmerror(const unsigned & collinpred)
   unsigned min,max,degree,nrknots;
   double lambda, mvar1, mvar2, arva, arpa1, arpa2, bmean, bvar;
   double a1,b1;
-  int gridsize, contourprob;
+  int gridsize; //, contourprob;
   int f;
-  bool diagtransform,derivative,center;
+  bool diagtransform,derivative; //,center;
 
   unsigned i,j,k;
   int j1,j2;
@@ -133,12 +133,12 @@ bool bayesreg::create_varcoeffmerror(const unsigned & collinpred)
         derivative = true;
 
       f = (terms[i].options[16]).strtolong(h);
-      contourprob = unsigned(h);
+//      contourprob = unsigned(h);
 
-      if (terms[i].options[20] == "false")
-        center = false;
-      else
-        center = true;
+//      if (terms[i].options[20] == "false")
+//        center = false;
+//      else
+//        center = true;
 
       // SUSI: read new opttion form the options list
 
@@ -1086,15 +1086,11 @@ void autocorrrun(bayesreg & b)
 void drawmaprun(bayesreg & b)
   {
 
-#if defined(BORLAND_OUTPUT_WINDOW)
+#if !defined(JAVA_OUTPUT_WINDOW)
 
   b.outerror("ERROR: method drawmap is not available in this version\n");
 
-#elif defined(__BUILDING_GNU)
-
-  b.outerror("ERROR: method drawmap is not available in this version\n");
-
-#elif defined(JAVA_OUTPUT_WINDOW)
+#else
 
   bool error = false;
 
@@ -1203,18 +1199,11 @@ void drawmaprun(bayesreg & b)
 
 void plotnonprun(bayesreg & b)
   {
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
+#if !defined(JAVA_OUTPUT_WINDOW)
 
   b.outerror("ERROR: method plotnonp is not available in this version\n");
 
-#elif defined(__BUILDING_GNU)
-
-  b.outerror("ERROR: method plotnonp is not available in this version\n");
-
-#elif defined(JAVA_OUTPUT_WINDOW)
+#else
 
   bool error = false;
 
@@ -1368,11 +1357,11 @@ void plotnonprun(bayesreg & b)
 void texsummaryrun(bayesreg & b)
   {
 
-#if defined(BORLAND_OUTPUT_WINDOW)
+#if !defined(JAVA_OUTPUT_WINDOW)
 
   b.outerror("ERROR: method texsummary is not available in this version\n");
 
-#elif defined(JAVA_OUTPUT_WINDOW)
+#else
 
   ST::string path = b.outfiles[0];
   ST::string path2 = path;
@@ -1675,15 +1664,11 @@ bool bayesreg::create_nonpseason(const unsigned & collinpred)
 void plotautocorrun(bayesreg & b)
   {
 
-#if defined(BORLAND_OUTPUT_WINDOW)
+#if !defined(JAVA_OUTPUT_WINDOW)
 
   b.outerror("ERROR: method plotautocor is not available in this version\n");
 
-#elif defined(__BUILDING_GNU)
-
-  b.outerror("ERROR: method plotautocor is not available in this version\n");
-
-  #elif defined(JAVA_OUTPUT_WINDOW)
+#else
 
   if (b.resultsyesno==true)
 	 {
@@ -2211,7 +2196,7 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
   double shrinkageweight;
   bool shrinkageadaptive=false;
 
-  // Vektoren mit den Startwerten die uebergeben werden für adaptive shrinkkage  
+  // Vektoren mit den Startwerten die uebergeben werden f\FCr adaptive shrinkkage
   vector<double> variances_vec;
   vector<double> shrinkagestart_vec;    // for adaptive shrinkage (individual shrinkageparameters)
   vector<double> a_shrinkage_vec;       // for adaptive shrinkage
@@ -2220,15 +2205,15 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
   vector<double> effectstart_vec;
   vector<double> shrinkageweight_vec;   // for weighted shrinkage (weights for variances)
   vector<bool> shrinkageadaptive_vec;
-  
-  // Matrizen fuer Startwerte 
+
+  // Matrizen fuer Startwerte
   datamatrix variances;    //inverse Varianzparameter lambdastart=tau^2
   datamatrix effects;      //Regressionskoeffizienten
   datamatrix startdata;    //alle Startwerte also mit Hyperparametern
 
-  
- // Sollen die Sartwerte der Effekte verwendet werden. Bei use_effectstart="false" 
- // werden die Startwerte in mcmc_const via ::posteriormode() berechnet.  
+
+ // Sollen die Sartwerte der Effekte verwendet werden. Bei use_effectstart="false"
+ // werden die Startwerte in mcmc_const via ::posteriormode() berechnet.
   bool use_effectstart = true;
   bool external = false;    // stammen Hyperparameter/Startwerte aus externer Datei
   int termnr1 = -1;           // Zaehler fuer die erste Ridgeterm Nummer aus der derzeit der
@@ -2237,7 +2222,7 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
   unsigned readline = 0;    // Zeilennummer die aus Dataset eingelesen wird
   dataobject * datap;       // pointer to datasetobject
   statobject * s;           // pointer to statobject
-  
+
   // names of startdata
   list<ST::string> startnames;
   startnames.push_back("effect");
@@ -2248,7 +2233,7 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
   startnames.push_back("b");
   startnames.push_back("shrinkagefix");
   startnames.push_back("adaptive");
-  
+
   unsigned i, j, f;
 
   vector<ST::string> varnames;
@@ -2267,32 +2252,32 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
         {
         check = true;
         varnames.push_back(terms[i].varnames[0]);
-        if(termnr1==-1) 
-          termnr1 = i; 
-        ridgecount = ridgecount + 1;                              
-        
+        if(termnr1==-1)
+          termnr1 = i;
+        ridgecount = ridgecount + 1;
+
         // Optionen aus externer Datendatei auslesen
         if (terms[i].options[1] != "")
           {
           external = true;
-          }      
+          }
         }
-      }     
+      }
     }
 
   if(check)
     {
-    if(external == false) // Startwerte aus Termen einlesen 
+    if(external == false) // Startwerte aus Termen einlesen
       {
       for(i=0;i<terms.size();i++)
-        { 
+        {
         if (shrinkage.checkvector(terms,i) == true)
           {
           if(terms[i].options[0] == "ridge")
             {
             // Folgende Werte werden nur aus dem 1. Term gesetzt
             if (terms[termnr1].options[8] == "true")                   //Option aus letztem Term
-              {   
+              {
               shrinkagefix = true;
               }
             else
@@ -2300,23 +2285,23 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
               shrinkagefix = false;
               }
             if (terms[termnr1].options[9] == "true")                   //Option aus letztem Term
-              {   
+              {
               shrinkageadaptive = true;
               }
             else
               {
               shrinkageadaptive = false;
               }
-            
+
             // Folgende Werte werden aus jedem Term gesetzt
             f = terms[i].options[2].strtodouble(effectstart);
             if(effectstart==1E8)
               {
               use_effectstart = false;
-              }       
+              }
             f = terms[i].options[5].strtodouble(shrinkageweight);
-            
-            // Folgende Werte werden nur aus jedem Term gesetzt wenn adaptive gewählt
+
+            // Folgende Werte werden nur aus jedem Term gesetzt wenn adaptive gew\E4hlt
             // ansonsten werden die Werte aus dem 1. Term genommen
             if(shrinkageadaptive==false)
               {
@@ -2332,12 +2317,12 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
               f = terms[i].options[6].strtodouble(a_shrinkage);    //Option aus jedem Term
               f = terms[i].options[7].strtodouble(b_shrinkage);    //Option aus jedem Term
               }
-              
+
             // Vektoren der uebergebenen Optionen
             effectstart_vec.push_back(effectstart);
             variances_vec.push_back(tau2start);
             shrinkagestart_vec.push_back(shrinkagestart);
-            shrinkageweight_vec.push_back(shrinkageweight); 
+            shrinkageweight_vec.push_back(shrinkageweight);
             a_shrinkage_vec.push_back(a_shrinkage);
             b_shrinkage_vec.push_back(b_shrinkage);
             shrinkagefix_vec.push_back(shrinkagefix);
@@ -2347,7 +2332,7 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
         }
 
       // Startwerte in Datenmatrix schreiben
-      startdata = datamatrix(variances_vec.size(),startnames.size(),0);          
+      startdata = datamatrix(variances_vec.size(),startnames.size(),0);
       for(readline=0; readline<variances_vec.size(); readline++)
         {
         startdata(readline,0) = effectstart_vec[readline];
@@ -2361,10 +2346,10 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
         }
       }
 
-    
-    if(external == true) // Startwerte aus externem Dataset einlesen 
+
+    if(external == true) // Startwerte aus externem Dataset einlesen
       {
-      
+
       int objpos = findstatobject(*statobj,terms[termnr1].options[1],"dataset");
       if (objpos >= 0)
         {
@@ -2372,28 +2357,28 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
         datap = dynamic_cast<dataobject*>(s);
         if (datap->obs()==0 || datap->getVarnames().size()==0)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " does not contain any data or the length of rows differ\n");
           return true;
           }
         else if (datap->getVarnames().size()>8)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " contains more than seven variables\n");
           return true;
           }
         else if (datap->getVarnames().size()<8)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " contains less than six variables\n");
           return true;
           }
         else if (datap->getVarnames().size()==8)
           {
-          outerror("NOTE: dataset " + terms[termnr1].options[1] + 
-                   " with starting values for the ridge-variables is assigned in variable " + 
+          outerror("NOTE: dataset " + terms[termnr1].options[1] +
+                   " with starting values for the ridge-variables is assigned in variable " +
                    terms[termnr1].varnames[0] + "\n");
-          }  
+          }
         }
       else
         {
@@ -2401,7 +2386,7 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
                  "Check if variable -" + terms[termnr1].varnames[0] + "- contains the startdata option.\n");
         return true;
         }
-  
+
       // create datamatrix
       startnames = datap->getVarnames();
       ST::string expr = "";
@@ -2409,7 +2394,7 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
 
       // column arrangement in matrix startdata:
       // effect | tau2 | shrinkage | weight | a | b | shrinkagefix | adaptive
-  
+
       if(ridgecount==startdata.rows())
         {
         for(readline=0;readline<startdata.rows();readline++)
@@ -2431,16 +2416,16 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
             {
             shrinkageadaptive = true;
             }
-            
+
           // Folgende Werte werden aus jeder Zeile gesetzt
           effectstart = startdata.get(readline,0);
           if(effectstart==1E8)
             {
             use_effectstart = false;
-            }    
+            }
           shrinkageweight = startdata.get(readline,3);
-          
-          // Folgende Werte werden nur aus jeder Zeile gesetzt wenn adaptive gewählt
+
+          // Folgende Werte werden nur aus jeder Zeile gesetzt wenn adaptive gew\E4hlt
           // ansonsten werden die Werte aus der 1. zeile genommen
           if(shrinkageadaptive==false)
             {
@@ -2456,35 +2441,35 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
             a_shrinkage = startdata.get(readline,4);      //Option aus jeder Zeile
             b_shrinkage = startdata.get(readline,5);      //Option aus jeder Zeile
             }
-          
-          // Vektoren der Startwerte die übergeben werden sollen
-          effectstart_vec.push_back(effectstart); 
+
+          // Vektoren der Startwerte die \FCbergeben werden sollen
+          effectstart_vec.push_back(effectstart);
           variances_vec.push_back(tau2start);
           shrinkagestart_vec.push_back(shrinkagestart);
-          shrinkageweight_vec.push_back(shrinkageweight); 
+          shrinkageweight_vec.push_back(shrinkageweight);
           a_shrinkage_vec.push_back(a_shrinkage);
           b_shrinkage_vec.push_back(b_shrinkage);
           shrinkagefix_vec.push_back(shrinkagefix);
           shrinkageadaptive_vec.push_back(shrinkageadaptive);
-          }                                              
+          }
         }
-        
+
         else
           {
-          outerror("ERROR: Number of rows in dataset" + terms[termnr1].options[1] + 
+          outerror("ERROR: Number of rows in dataset" + terms[termnr1].options[1] +
                    " don't coincide with the number of ridge terms in the model formula \n");
-          return true;          
+          return true;
           }
       }
     if(use_effectstart == false)
       {
-      outerror("NOTE: Starting values of ridge effects are comuted as posteriormode \n"); 
+      outerror("NOTE: Starting values of ridge effects are comuted as posteriormode \n");
       }
     if(use_effectstart == true)
       {
-      outerror("NOTE: Starting values of ridge effects are assigned by the user \n"); 
-      }      
-      
+      outerror("NOTE: Starting values of ridge effects are assigned by the user \n");
+      }
+
 
     // Cut-vektor zum identifizieren der Bloecke
     unsigned nr = varnames.size();
@@ -2503,14 +2488,14 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
 
     // Varianzparameter und Startwerte fuer Regressionskoeffizienten
     variances = datamatrix(variances_vec.size(),1,0);
-    effects = datamatrix(variances_vec.size(),1,0); 
+    effects = datamatrix(variances_vec.size(),1,0);
 
     for(i=0; i<variances_vec.size(); i++)
       {
       variances(i,0) = variances_vec[i];
       effects(i,0) = effectstart_vec[i];
       }
-      
+
     // Daten
     datamatrix data(D.rows(),varnames.size(),0);
 
@@ -2559,9 +2544,9 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
 
         // Uebergabe der Optionen an Constuctor FULLCOND_const_gaussian
         normalshrinkage.push_back(FULLCOND_const_gaussian(&generaloptions[generaloptions.size()-1],
-                        distr[distr.size()-1], data.getColBlock(cut[i], cut[i+1]), 
-                        title, constpos, pathconst, pathconstres, 
-                        true, variances.getRowBlock(cut[i], cut[i+1]), 
+                        distr[distr.size()-1], data.getColBlock(cut[i], cut[i+1]),
+                        title, constpos, pathconst, pathconstres,
+                        true, variances.getRowBlock(cut[i], cut[i+1]),
                         use_effectstart, effects.getRowBlock(cut[i], cut[i+1]),
                         collinpred));
 
@@ -2622,10 +2607,10 @@ bool bayesreg::create_ridge(const unsigned & collinpred)
         // Uebergabe der Optionen an Constuctor FULLCOND_const_nongaussian
         nongaussianshrinkage.push_back(FULLCOND_const_nongaussian(&generaloptions[generaloptions.size()-1],
                              distr[distr.size()-1], data.getColBlock(cut[i], cut[i+1]), title, constpos,
-                             pathconst, pathconstres, true, variances.getRowBlock(cut[i], cut[i+1]), 
+                             pathconst, pathconstres, true, variances.getRowBlock(cut[i], cut[i+1]),
                              use_effectstart, effects.getRowBlock(cut[i], cut[i+1]),
                              collinpred));
-                             
+
         nongaussianshrinkage[nongaussianshrinkage.size()-1].init_names(varnameshelp);
         nongaussianshrinkage[nongaussianshrinkage.size()-1].set_fcnumber(fullcond.size());
         fullcond.push_back(&nongaussianshrinkage[nongaussianshrinkage.size()-1]);
@@ -2659,12 +2644,12 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
   double shrinkagestart;
   double a_shrinkage;
   double b_shrinkage;
-  bool shrinkagefix;
+  bool shrinkagefix = false;
   double effectstart;
   double shrinkageweight;
-  bool shrinkageadaptive;
+  bool shrinkageadaptive = false;
 
-  // Vektoren mit den Startwerten die uebergeben werden  
+  // Vektoren mit den Startwerten die uebergeben werden
   vector<double> variances_vec;
   vector<double> shrinkagestart_vec;    // for adaptive shrinkage (individual shrinkageparameters)
   vector<double> a_shrinkage_vec;       // for adaptive shrinkage
@@ -2674,23 +2659,23 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
   vector<double> shrinkageweight_vec;   // for weighted shrinkage (weights for variances)
   vector<bool> shrinkageadaptive_vec;
 
-  // Matrizen fuer Startwerte 
+  // Matrizen fuer Startwerte
   datamatrix variances;    //inverse Varianzparameter lambdastart=tau^2
   datamatrix effects;      //Regressionskoeffizienten
   datamatrix startdata;    //alle Startwerte also mit Hyperparametern
 
 
   // Sollen die Sartwerte der Effekte verwendet werden. Bei use_effectstart="false"
-  // werden die Startwerte in mcmc_const via ::posteriormode() berechnet. 
+  // werden die Startwerte in mcmc_const via ::posteriormode() berechnet.
   bool use_effectstart = true;
   bool external = false;    // stammen Hyperparameter/Startwerte aus externer Datei
   int termnr1 = -1;           // Zaehler fuer die erste Lassoterm Nummer aus der derzeit der
-                            // Startdataset üebergeben wird.
+                            // Startdataset \FCebergeben wird.
   unsigned lassocount = 0;  // Zaehler fuer die Anzahl der Lassoterme
   unsigned readline = 0;    // Zeilennummer die aus Dataset eingelesen wird
   dataobject * datap;       // pointer to datasetobject
   statobject * s;           // pointer to statobject
-  
+
  // names of startdata
   list<ST::string> startnames;
   startnames.push_back("effect");
@@ -2721,32 +2706,32 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
         {
         check = true;
         varnames.push_back(terms[i].varnames[0]);
-        if(termnr1==-1) 
-          termnr1 = i; 
-        lassocount = lassocount + 1;                              
-        
+        if(termnr1==-1)
+          termnr1 = i;
+        lassocount = lassocount + 1;
+
         // Optionen aus externer Datendatei auslesen
         if (terms[i].options[1] != "")
           {
           external = true;
-          }  
+          }
         }
       }
     }
 
   if(check)
     {
-    if(external == false) // Startwerte aus Termen einlesen 
+    if(external == false) // Startwerte aus Termen einlesen
       {
       for(i=0;i<terms.size();i++)
-        { 
+        {
         if (shrinkage.checkvector(terms,i) == true)
           {
           if(terms[i].options[0] == "lasso")
             {
             // Folgende Werte werden nur aus dem 1. Term gesetzt
             if (terms[termnr1].options[8] == "true")                   //Option aus letztem Term
-              {   
+              {
               shrinkagefix = true;
               }
             else
@@ -2754,24 +2739,24 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
               shrinkagefix = false;
               }
             if (terms[termnr1].options[9] == "true")                   //Option aus letztem Term
-              {   
+              {
               shrinkageadaptive = true;
               }
             else
               {
               shrinkageadaptive = false;
               }
-            
+
             // Folgende Werte werden aus jedem Term gesetzt
             f = terms[i].options[2].strtodouble(effectstart);
             if(effectstart==1E8)
               {
               use_effectstart = false;
-              }       
-            f = terms[i].options[3].strtodouble(tau2start); 
+              }
+            f = terms[i].options[3].strtodouble(tau2start);
             f = terms[i].options[5].strtodouble(shrinkageweight);
-            
-            // Folgende Werte werden nur aus jedem Term gesetzt wenn adaptive gewählt
+
+            // Folgende Werte werden nur aus jedem Term gesetzt wenn adaptive gew\E4hlt
             // ansonsten werden die Werte aus dem 1. Term genommen
             if(shrinkageadaptive==false)
               {
@@ -2785,12 +2770,12 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
               f = terms[i].options[6].strtodouble(a_shrinkage);    //Option aus jedem Term
               f = terms[i].options[7].strtodouble(b_shrinkage);    //Option aus jedem Term
               }
-              
+
             // Vektoren der uebergebenen Optionen
             effectstart_vec.push_back(effectstart);
             variances_vec.push_back(tau2start);
             shrinkagestart_vec.push_back(shrinkagestart);
-            shrinkageweight_vec.push_back(shrinkageweight); 
+            shrinkageweight_vec.push_back(shrinkageweight);
             a_shrinkage_vec.push_back(a_shrinkage);
             b_shrinkage_vec.push_back(b_shrinkage);
             shrinkagefix_vec.push_back(shrinkagefix);
@@ -2800,7 +2785,7 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
         }
 
       // Startwerte in Datenmatrix schreiben
-      startdata = datamatrix(variances_vec.size(),startnames.size(),0);          
+      startdata = datamatrix(variances_vec.size(),startnames.size(),0);
       for(readline=0; readline<variances_vec.size(); readline++)
         {
         startdata(readline,0) = effectstart_vec[readline];
@@ -2814,9 +2799,9 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
         }
       }
 
-    if(external == true) // Startwerte aus externem Dataset einlesen 
+    if(external == true) // Startwerte aus externem Dataset einlesen
       {
-      
+
       int objpos = findstatobject(*statobj,terms[termnr1].options[1],"dataset");
       if (objpos >= 0)
         {
@@ -2824,28 +2809,28 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
         datap = dynamic_cast<dataobject*>(s);
         if (datap->obs()==0 || datap->getVarnames().size()==0)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " does not contain any data or the length of rows differ\n");
           return true;
           }
         else if (datap->getVarnames().size()>8)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " contains more than seven variables\n");
           return true;
           }
         else if (datap->getVarnames().size()<8)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " contains less than six variables\n");
           return true;
           }
         else if (datap->getVarnames().size()==8)
           {
-          outerror("NOTE: dataset " + terms[termnr1].options[1] + 
-                   " with starting values for the lasso-variables is assigned in variable " + 
+          outerror("NOTE: dataset " + terms[termnr1].options[1] +
+                   " with starting values for the lasso-variables is assigned in variable " +
                    terms[termnr1].varnames[0] + "\n");
-          }  
+          }
         }
       else
         {
@@ -2853,9 +2838,9 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
                  "Check if variable -" + terms[termnr1].varnames[0] + "- contains the startdata option.\n");
         return true;
         }
-  
+
       // create datamatrix
-      startnames = datap->getVarnames(); 
+      startnames = datap->getVarnames();
       ST::string expr = "";
       datap->makematrix(startnames,startdata,expr);
 
@@ -2883,17 +2868,17 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
             {
             shrinkageadaptive = true;
             }
-            
+
           // Folgende Werte werden aus jeder Zeile gesetzt
           effectstart = startdata.get(readline,0);
           if(effectstart==1E8)
             {
             use_effectstart = false;
-            }    
+            }
           tau2start = startdata.get(readline,1);
           shrinkageweight = startdata.get(readline,3);
-          
-          // Folgende Werte werden nur aus jeder Zeile gesetzt wenn adaptive gewählt
+
+          // Folgende Werte werden nur aus jeder Zeile gesetzt wenn adaptive gew\E4hlt
           // ansonsten werden die Werte aus der 1. zeile genommen
           if(shrinkageadaptive==false)
             {
@@ -2907,35 +2892,35 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
             a_shrinkage = startdata.get(readline,4);      //Option aus jeder Zeile
             b_shrinkage = startdata.get(readline,5);      //Option aus jeder Zeile
             }
-          
-          // Vektoren der Startwerte die übergeben werden sollen
-          effectstart_vec.push_back(effectstart); 
+
+          // Vektoren der Startwerte die \FCbergeben werden sollen
+          effectstart_vec.push_back(effectstart);
           variances_vec.push_back(tau2start);
           shrinkagestart_vec.push_back(shrinkagestart);
-          shrinkageweight_vec.push_back(shrinkageweight); 
+          shrinkageweight_vec.push_back(shrinkageweight);
           a_shrinkage_vec.push_back(a_shrinkage);
           b_shrinkage_vec.push_back(b_shrinkage);
           shrinkagefix_vec.push_back(shrinkagefix);
-          shrinkageadaptive_vec.push_back(shrinkageadaptive);   
-          }                                              
+          shrinkageadaptive_vec.push_back(shrinkageadaptive);
+          }
         }
-        
+
         else
           {
-          outerror("ERROR: Number of rows in dataset" + terms[termnr1].options[1] + 
+          outerror("ERROR: Number of rows in dataset" + terms[termnr1].options[1] +
                    " don't coincide with the number of lasso terms in the model formula \n");
-          return true;          
+          return true;
           }
       }
     if(use_effectstart == false)
       {
-      outerror("NOTE: Starting values of lasso effects are comuted as posteriormode \n"); 
+      outerror("NOTE: Starting values of lasso effects are comuted as posteriormode \n");
       }
     if(use_effectstart == true)
       {
-      outerror("NOTE: Starting values of lasso effects are assigned by the user \n"); 
-      }      
-      
+      outerror("NOTE: Starting values of lasso effects are assigned by the user \n");
+      }
+
 
     // Cut-vektor zum identifizieren der Bloecke
     unsigned nr = varnames.size();
@@ -2954,7 +2939,7 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
 
     // Varianzparameter und Startwerte fuer Regressionskoeffizienten
     variances = datamatrix(variances_vec.size(),1,0);
-    effects = datamatrix(variances_vec.size(),1,0); 
+    effects = datamatrix(variances_vec.size(),1,0);
 
     for(i=0; i<variances_vec.size(); i++)
       {
@@ -3011,8 +2996,8 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
         // Uebergabe der Optionen an Constuctor FULLCOND_const_gaussian
         normalshrinkage.push_back(FULLCOND_const_gaussian(&generaloptions[generaloptions.size()-1],
                         distr[distr.size()-1], data.getColBlock(cut[i], cut[i+1]),
-                        title, constpos, pathconst, pathconstres, 
-                        true, variances.getRowBlock(cut[i], cut[i+1]), 
+                        title, constpos, pathconst, pathconstres,
+                        true, variances.getRowBlock(cut[i], cut[i+1]),
                         use_effectstart, effects.getRowBlock(cut[i], cut[i+1]),
                         collinpred));
 
@@ -3072,7 +3057,7 @@ bool bayesreg::create_lasso(const unsigned & collinpred)
         // Uebergabe der Optionen an Constuctor FULLCOND_const_nongaussian
         nongaussianshrinkage.push_back(FULLCOND_const_nongaussian(&generaloptions[generaloptions.size()-1],
                               distr[distr.size()-1], data.getColBlock(cut[i], cut[i+1]), title, constpos,
-                              pathconst, pathconstres, true, variances.getRowBlock(cut[i], cut[i+1]), 
+                              pathconst, pathconstres, true, variances.getRowBlock(cut[i], cut[i+1]),
                               use_effectstart, effects.getRowBlock(cut[i], cut[i+1]),
                               collinpred));
 
@@ -3119,11 +3104,11 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
   double omega;
   bool omegafix=false;
   bool omegaadaptive=false;
-  
+
   double helpindicator;
   double helpvariances;
- 
-  // Vector-options (ersetzen später die 1-dim optionen von oben) 
+
+  // Vector-options (ersetzen sp\E4ter die 1-dim optionen von oben)
   vector<double> variances_vec;
   vector<double> effectstart_vec;
   vector<unsigned long> indicator_vec;
@@ -3140,13 +3125,13 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
 
 
 
-  // Matrizen fuer Startwerte 
+  // Matrizen fuer Startwerte
   datamatrix variances;    //inverse Varianzparameter tau^2
   datamatrix effects;      //Regressionskoeffizienten
   datamatrix startdata;    //alle Startwerte also mit Hyperparametern
-  
+
   // Sollen die Sartwerte der Effekte verwendet werden. Bei use_effectstart="false"
-  // werden die Startwerte in mcmc_const via ::posteriormode() berechnet. 
+  // werden die Startwerte in mcmc_const via ::posteriormode() berechnet.
   bool use_effectstart = true;
   bool external = false;    // stammen Hyperparameter/Startwerte aus externer Datei
   int termnr1 = -1;           // Zaehler fuer die erste NIGMIXterm Nummer aus der derzeit der
@@ -3155,7 +3140,7 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
   unsigned readline = 0;    // Zeilennummer die aus Dataset eingelesen wird
   dataobject * datap;       // pointer to datasetobject
   statobject * s;           // pointer to statobject
-  
+
  // names of startdata
   list<ST::string> startnames;
   startnames.push_back("effect");
@@ -3171,14 +3156,14 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
   startnames.push_back("wfix");
   startnames.push_back("adaptive");
 
-  
+
   unsigned i, j, f;
   long help;
-  
+
   vector<ST::string> varnames;
 
   bool check=false;
-  
+
   vector<FULLCOND_const*> fc;
 
 
@@ -3191,27 +3176,27 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
         {
         check=true;
         varnames.push_back(terms[i].varnames[0]);
-        if(termnr1==-1) 
-          termnr1 = i; 
+        if(termnr1==-1)
+          termnr1 = i;
         nigmixcount = nigmixcount + 1;
-        
+
         // Optionen aus externer Datendatei auslesen
         if (terms[i].options[1] != "")
           {
           external = true;
           }
-       
+
         }
-      }     
+      }
     }
 
 
   if(check)
     {
-    if(external == false) // Startwerte aus Termen einlesen 
+    if(external == false) // Startwerte aus Termen einlesen
       {
       for(i=0;i<terms.size();i++)
-        { 
+        {
         if (nigmix.checkvector(terms,i) == true)
           {
           if(terms[i].options[0] == "nigmix")
@@ -3225,7 +3210,7 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
               omegaadaptive = true;
             else
               omegaadaptive = false;
-              
+
             // Folgende Werte werden aus jedem Term gesetzt
             f = terms[i].options[2].strtodouble(effectstart);
             if(effectstart==1E8)
@@ -3235,8 +3220,8 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
             f = (terms[i].options[3]).strtolong(help);
             indicator = help;
             f = (terms[i].options[4]).strtodouble(t2);
-            
-            // Folgende Werte werden nur aus jedem Term gesetzt wenn adaptive gewählt
+
+            // Folgende Werte werden nur aus jedem Term gesetzt wenn adaptive gew\E4hlt
             // ansonsten werden die Werte aus dem 1. Term genommen
           if(omegaadaptive==false)
             {
@@ -3273,20 +3258,20 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
             t2_vec.push_back(t2);
             omega_vec.push_back(omega);
             v0_vec.push_back(v0);
-            v1_vec.push_back(v1); 
+            v1_vec.push_back(v1);
             a_t2_vec.push_back(a_t2);
             b_t2_vec.push_back(b_t2);
             a_omega_vec.push_back(a_omega);
             b_omega_vec.push_back(b_omega);
-            omegafix_vec.push_back(omegafix);  
-            omegaadaptive_vec.push_back(omegaadaptive);              
+            omegafix_vec.push_back(omegafix);
+            omegaadaptive_vec.push_back(omegaadaptive);
             }
           }
         }
 
 
       // Startwerte in Datenmatrix schreiben
-      startdata = datamatrix(variances_vec.size(),startnames.size(),0);          
+      startdata = datamatrix(variances_vec.size(),startnames.size(),0);
       for(readline=0; readline<variances_vec.size(); readline++)
         {
         startdata(readline,0) = effectstart_vec[readline];
@@ -3303,11 +3288,11 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
         startdata(readline,11) = omegaadaptive_vec[readline];
         }
      }
-    
-    if(external == true) // Startwerte aus externem Dataset einlesen 
+
+    if(external == true) // Startwerte aus externem Dataset einlesen
       {
 
-      
+
       int objpos = findstatobject(*statobj,terms[termnr1].options[1],"dataset");
       if (objpos >= 0)
         {
@@ -3316,28 +3301,28 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
 
         if (datap->obs()==0 || datap->getVarnames().size()==0)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " does not contain any data or the length of rows differ\n");
           return true;
           }
         else if (datap->getVarnames().size()>12)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " contains more than eleven variables\n");
           return true;
           }
         else if (datap->getVarnames().size()<12)
           {
-          outerror("ERROR: dataset object " + terms[termnr1].options[1] + 
+          outerror("ERROR: dataset object " + terms[termnr1].options[1] +
                    " contains less than eleven variables\n");
           return true;
           }
         else if (datap->getVarnames().size()==12)
           {
-          outerror("NOTE: dataset " + terms[termnr1].options[1] + 
-                   " with starting values for the nigmix-variables is assigned in variable " + 
+          outerror("NOTE: dataset " + terms[termnr1].options[1] +
+                   " with starting values for the nigmix-variables is assigned in variable " +
                    terms[termnr1].varnames[0] + "\n");
-          }  
+          }
         }
       else
         {
@@ -3345,7 +3330,7 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
                  "Check if variable -" + terms[termnr1].varnames[0] + "- contains the startdata option.\n");
         return true;
         }
-  
+
       // create datamatrix
       startnames = datap->getVarnames();
       ST::string expr = "";
@@ -3353,7 +3338,7 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
 
       // column arrangement in matrix startdata:
       // effect | I | t2 | w | v0 | v1 | a | b | aw | bw| wfix | adaptive
-   
+
       if(nigmixcount==startdata.rows())
         {
         for(readline=0;readline<startdata.rows();readline++)
@@ -3375,27 +3360,27 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
             {
             omegaadaptive = true;
             }
-          
+
           // Folgende Werte werden aus jeder Zeile gesetzt
           effectstart = startdata.get(readline,0);
           if(effectstart==1E8)
             {
             use_effectstart = false;
-            }         
-          
+            }
+
           helpindicator = startdata.get(readline,1);
-          
+
           if(helpindicator!=1 && helpindicator!=0)
             {
-            outerror("ERROR: Indicators need to be 0 or 1 \n"); 
+            outerror("ERROR: Indicators need to be 0 or 1 \n");
             return true;
             }
           else
             indicator = startdata.get(readline,1);
-            
+
           t2 = startdata.get(readline,2);
-          
-          // Folgende Werte werden nur aus jeder Zeile gesetzt wenn adaptive gewählt
+
+          // Folgende Werte werden nur aus jeder Zeile gesetzt wenn adaptive gew\E4hlt
           // ansonsten werden die Werte aus der 1. zeile genommen
           if(omegaadaptive==false)
             {
@@ -3426,40 +3411,40 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
             {
             helpvariances = (v1 * t2);
             }
-          // Vektoren denen Startwerte die übergeben werden sollen
+          // Vektoren denen Startwerte die \FCbergeben werden sollen
           variances_vec.push_back(helpvariances);
           effectstart_vec.push_back(effectstart);
           indicator_vec.push_back(indicator);
           t2_vec.push_back(t2);
           omega_vec.push_back(omega);
           v0_vec.push_back(v0);
-          v1_vec.push_back(v1); 
+          v1_vec.push_back(v1);
           a_t2_vec.push_back(a_t2);
           b_t2_vec.push_back(b_t2);
           a_omega_vec.push_back(a_omega);
           b_omega_vec.push_back(b_omega);
-          omegafix_vec.push_back(omegafix); 
-          omegaadaptive_vec.push_back(omegaadaptive);             
-          }                                              
+          omegafix_vec.push_back(omegafix);
+          omegaadaptive_vec.push_back(omegaadaptive);
+          }
         }
-        
+
         else
           {
-          outerror("ERROR: Number of rows in dataset" + terms[termnr1].options[1] + 
+          outerror("ERROR: Number of rows in dataset" + terms[termnr1].options[1] +
                    " don't coincide with the number of nigmix terms in the model formula \n");
-          return true;          
+          return true;
           }
       }
     if(use_effectstart == false)
       {
-      outerror("NOTE: Starting values of nigmix effects are comuted as posteriormode \n"); 
+      outerror("NOTE: Starting values of nigmix effects are comuted as posteriormode \n");
       }
     if(use_effectstart == true)
       {
-      outerror("NOTE: Starting values of nigmix effects are assigned by the user \n"); 
+      outerror("NOTE: Starting values of nigmix effects are assigned by the user \n");
       }
 
-    
+
     // Cut-vektor zum identifizieren der Bloecke
     unsigned nr = varnames.size();
     unsigned bs = blocksize.getvalue();
@@ -3477,7 +3462,7 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
 
     // Varianzparameter und Startwerte fuer Regressionskoeffizienten
     variances = datamatrix(variances_vec.size(),1,0);
-    effects = datamatrix(variances_vec.size(),1,0); 
+    effects = datamatrix(variances_vec.size(),1,0);
 
     for(i=0; i<variances_vec.size(); i++)
       {
@@ -3533,9 +3518,9 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
 
         // Uebergabe der Optionen an Constuctor FULLCOND_const_gaussian
         normalshrinkage.push_back(FULLCOND_const_gaussian(&generaloptions[generaloptions.size()-1],
-                        distr[distr.size()-1], data.getColBlock(cut[i], cut[i+1]), 
-                        title, constpos, pathconst, pathconstres, 
-                        true, variances.getRowBlock(cut[i], cut[i+1]), 
+                        distr[distr.size()-1], data.getColBlock(cut[i], cut[i+1]),
+                        title, constpos, pathconst, pathconstres,
+                        true, variances.getRowBlock(cut[i], cut[i+1]),
                         use_effectstart, effects.getRowBlock(cut[i], cut[i+1]),
                         collinpred));
 
@@ -3596,10 +3581,10 @@ bool bayesreg::create_nigmix(const unsigned & collinpred)
         // Uebergabe der Optionen an Constuctor FULLCOND_const_nongaussian
         nongaussianshrinkage.push_back(FULLCOND_const_nongaussian(&generaloptions[generaloptions.size()-1],
                             distr[distr.size()-1], data.getColBlock(cut[i], cut[i+1]), title, constpos,
-                            pathconst, pathconstres, true, variances.getRowBlock(cut[i], cut[i+1]), 
-                            use_effectstart, effects.getRowBlock(cut[i], cut[i+1]), 
+                            pathconst, pathconstres, true, variances.getRowBlock(cut[i], cut[i+1]),
+                            use_effectstart, effects.getRowBlock(cut[i], cut[i+1]),
                             collinpred));
-                            
+
         nongaussianshrinkage[nongaussianshrinkage.size()-1].init_names(varnameshelp);
         nongaussianshrinkage[nongaussianshrinkage.size()-1].set_fcnumber(fullcond.size());
         fullcond.push_back(&nongaussianshrinkage[nongaussianshrinkage.size()-1]);
@@ -3688,7 +3673,7 @@ void regressrun(bayesreg & b)
   if (!failure)
     failure = b.create_distribution();
 
-// Speicherplatz für normalconst/nongaussianconst/nbinomialconst reservieren
+// Speicherplatz f\FCr normalconst/nongaussianconst/nbinomialconst reservieren
   unsigned nrfcfixed = b.fixedeffects.get_constvariables(b.terms).size()+1;
   unsigned blocksize_fixed = 10;
   unsigned reserved = 20;
@@ -4082,7 +4067,7 @@ void hregressrun(bayesreg & b)
   if (!failure)
     failure = b.create_distribution();
 
-// Speicherplatz für normalconst/nongaussianconst/nbinomialconst reservieren
+// Speicherplatz f\FCr normalconst/nongaussianconst/nbinomialconst reservieren
 /*
   unsigned nrfcfixed = b.fixedeffects.get_constvariables(b.terms).size()+1;
   unsigned blocksize_fixed = 10;

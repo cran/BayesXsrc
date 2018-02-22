@@ -798,6 +798,7 @@ class __EXPORT_TYPE FULLCOND
 
   virtual bool is_missing(const ST::string & na)
     {
+      return false;
     }
 
   virtual void update_missings(datamatrix & x,const datamatrix & linpred,
@@ -860,6 +861,7 @@ class __EXPORT_TYPE FULLCOND
 
   virtual double get_lambda(void)
     {
+      return 0.1;
     }
 
   virtual void set_lambdaconst(double la)
@@ -881,7 +883,7 @@ class __EXPORT_TYPE FULLCOND
     {
     }
 
-  virtual void hierarchical(ST::string & possible)  // neu! für hierarchisches Modell
+  virtual void hierarchical(ST::string & possible)  // neu! f\FCr hierarchisches Modell
     {
     }
 
@@ -914,12 +916,12 @@ class __EXPORT_TYPE FULLCOND
     return 0.;
     }
 
-  virtual void set_dfunstruct(const double & df_unstr)  // für spatialtotal
+  virtual void set_dfunstruct(const double & df_unstr)  // f\FCr spatialtotal
     {
     }
 
     // FUNCTION: set_stepwise_options
-    // TASK: übergibt die Optionen der einzelnen Funktionen
+    // TASK: \FCbergibt die Optionen der einzelnen Funktionen
 
   void set_stepwise_options(double lstart, double lmax, double lmin, bool forced,
                             double df_lmax, double df_lmin, ST::string spdf,
@@ -1031,7 +1033,7 @@ class __EXPORT_TYPE FULLCOND
     return matrixnumber;
     }
 
-  void set_matrixnumber(unsigned mno)    // gibt an, für welche Strafmatrix das fullcond-Objekt zuständig ist
+  void set_matrixnumber(unsigned mno)    // gibt an, f\FCr welche Strafmatrix das fullcond-Objekt zust\E4ndig ist
     {
     matrixnumber = mno;
     }
@@ -1189,6 +1191,7 @@ class __EXPORT_TYPE FULLCOND
                               const bool & ismultinomial,
                               const unsigned plotpos)
     {
+      return 0.0;
     }
 
   virtual void outresultsgrid()

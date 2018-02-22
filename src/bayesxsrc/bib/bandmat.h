@@ -207,7 +207,7 @@ class symbandmatrix
 
   // DEFAULT CONSTRUCTOR
 
-  symbandmatrix(void) {}
+  symbandmatrix(void);
 
   // CONSTRUCTOR 0
   // Initializes a symmetric band matrix with dim 'd' and bandsize 'bs'

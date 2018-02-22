@@ -67,10 +67,11 @@ equation::equation(int enr, int hl,ST::string t)
   }
 
 
-equation::equation(const ST::string & h, DISTR * dp, const vector<FC*> fcp,
-                   const ST::string & pd, const vector<ST::string> & ps)
+equation::equation(unsigned enr, const ST::string & h, DISTR * dp,
+                   const vector<FC*> fcp, const ST::string & pd,
+                   const vector<ST::string> & ps)
   {
-  equationnr = 1;
+  equationnr = enr;
   equationtype = "mean";
   hlevel = 1;
   header = h;
@@ -126,11 +127,11 @@ void equation::add_FC(FC * FCp,const ST::string & p)
 //------------------------------------------------------------------------------
 
 
-MCMCsim::MCMCsim(GENERAL_OPTIONS * go,vector<equation> & equ)
+MCMCsim::MCMCsim(GENERAL_OPTIONS * go,vector<equation> & equ,unsigned maxit)
   {
   genoptions = go;
   equations = equ;
-  maxiterations = 1000;
+  maxiterations = maxit;
 //  maxiterations = 10;
   }
 
@@ -160,7 +161,7 @@ const MCMCsim & MCMCsim::operator=(const MCMCsim & s)
   //       returns true, if simulation error or user break occured
 
 bool MCMCsim::simulate(ST::string & pathgraphs,
-const int & seed, const bool & computemode)
+const int & seed, const bool & computemode, const bool & skipfirst)
   {
   unsigned i,j;
 
@@ -207,34 +208,23 @@ const int & seed, const bool & computemode)
 
   //--------------- Compute posterior mode as starting value -------------------
 
+//    srand((unsigned)time(0));
+
+  if(seed >= 0)
+    srand(seed);
+
   if (computemode)
     {
 
     genoptions->out("  COMPUTING STARTING VALUES (MAY TAKE SOME TIME)");
     genoptions->out("\n");
     ST::string h = "";
-    bool c = posteriormode(h,true);
+    bool c = posteriormode(h,skipfirst,true);
     }
 
   //-------------- end: Compute posterior mode as starting value ---------------
 
 
-  #if defined(MICROSOFT_VISUAL)
-    {
-
-    }
-  #elif!defined(__BUILDING_GNU)
-    {
-    srand((unsigned)time(0));
-    }
-  #else
-    {
-    srand((unsigned)time(0));
-    }
-  #endif
-
-  if(seed >= 0)
-    srand(seed);
 
   clock_t beginsim = clock();
   clock_t it1per;
@@ -249,6 +239,7 @@ const int & seed, const bool & computemode)
 
   for (it=1;it<=iterations;it++)
     {
+
 
     if ( (runtime ==false) && (iterations/it == 100) )
       {
@@ -293,7 +284,73 @@ const int & seed, const bool & computemode)
       equations[nrmodels-1-i].distrp->update();
 
       for(j=0;j<equations[nrmodels-1-i].FCpointer.size();j++)
-        equations[nrmodels-1-i].FCpointer[j]->update();
+         {
+//         cout << j << endl;
+         equations[nrmodels-1-i].FCpointer[j]->update();
+
+/* SAMPLESEL TESTS
+          cout << equations[nrmodels-1-i].distrp->family << "; " << equations[nrmodels-1-i].distrp->equationtype << "; FC " << equations[nrmodels-1-i].FCpointer[j]->title << endl;
+          cout << "nrmodels-1-i: " << nrmodels-1-i << endl;
+          cout << "j: " << j << endl;
+
+          char str[100];
+          ST::string help = equations[nrmodels-1-i].distrp->family;
+          ST::string help2 = ST::inttostring(it);
+          strcpy(str, "c://temp//sampleselection2//");
+          strcat(str, help.strtochar());
+          strcat(str, "_it");
+          strcat(str, help2.strtochar());
+          strcat(str, "_weight.raw");
+          ofstream out1(str);
+          (equations[nrmodels-1-i].distrp->weight).prettyPrint(out1);
+          out1.close();
+
+          str[100];
+          strcpy(str, "c://temp//sampleselection2//");
+          strcat(str, help.strtochar());
+          strcat(str, "_it");
+          strcat(str, help2.strtochar());
+          strcat(str, "_workingweight.raw");
+          ofstream out2(str);
+          (equations[nrmodels-1-i].distrp->workingweight).prettyPrint(out2);
+          out2.close();
+
+          str[100];
+          strcpy(str, "c://temp//sampleselection2//");
+          strcat(str, help.strtochar());
+          strcat(str, "_it");
+          strcat(str, help2.strtochar());
+          strcat(str, "_response.raw");
+          ofstream out3(str);
+          (equations[nrmodels-1-i].distrp->response).prettyPrint(out3);
+          out3.close();
+
+          str[100];
+          strcpy(str, "c://temp//sampleselection2//");
+          strcat(str, help.strtochar());
+          strcat(str, "_it");
+          strcat(str, help2.strtochar());
+          strcat(str, "_workingresponse.raw");
+          ofstream out4(str);
+          (equations[nrmodels-1-i].distrp->workingresponse).prettyPrint(out4);
+          out4.close();
+
+          str[100];
+          strcpy(str, "c://temp//sampleselection2//");
+          strcat(str, help.strtochar());
+          strcat(str, "_it");
+          strcat(str, help2.strtochar());
+          strcat(str, "_linpred.raw");
+          ofstream out5(str);
+          if (equations[nrmodels-1-i].distrp->linpred_current==1)
+            (equations[nrmodels-1-i].distrp->linearpred1).prettyPrint(out5);
+          else
+            (equations[nrmodels-1-i].distrp->linearpred2).prettyPrint(out5);
+          out5.close();*/
+
+         }
+
+      equations[nrmodels-1-i].distrp->update_end();
 
       }
 
@@ -373,9 +430,17 @@ const int & seed, const bool & computemode)
 
       ST::string pathstata = pathgraphs + "_stata.do";
       ST::string pathR = pathgraphs + "_R.r";
+      char hchar = '\\';
+      ST::string hstring = "/";
+      pathR = pathR.insert_string_char(hchar,hstring);
+
+      ST::string pathR2BayesX = pathgraphs + "_R2BayesX.txt";
 
       ofstream out_stata(pathstata.strtochar());
       ofstream out_R(pathR.strtochar());
+      ofstream out_R2BayesX(pathR2BayesX.strtochar());
+
+      out_R << "library(\"BayesX\")\n\n";
 
       for (i=0;i<nrmodels;i++)
         {
@@ -388,10 +453,18 @@ const int & seed, const bool & computemode)
           genoptions->out("\n");
           }
 
-        equations[nrmodels-1-i].distrp->outresults(equations[nrmodels-1-i].pathd);
+//        out_R << "equationnumber=" << equations[nrmodels-1-i].equationnr << ";"
+//              << " header=" << equations[nrmodels-1-i].header << ";"
+//              << " family=" << equations[nrmodels-1-i].distrp->family << ";"
+//              << " equationtype="  << equations[nrmodels-1-i].equationtype << ";"
+//              << " hlevel="        << equations[nrmodels-1-i].hlevel <<  endl;
+
+
+        equations[nrmodels-1-i].distrp->outresults(out_stata,out_R,out_R2BayesX,
+                                                 equations[nrmodels-1-i].pathd);
 
         for(j=0;j<equations[nrmodels-1-i].nrfc;j++)
-          equations[nrmodels-1-i].FCpointer[j]->outresults(out_stata,out_R,equations[nrmodels-1-i].FCpaths[j]);
+          equations[nrmodels-1-i].FCpointer[j]->outresults(out_stata,out_R,out_R2BayesX,equations[nrmodels-1-i].FCpaths[j]);
 
         }
 
@@ -399,7 +472,11 @@ const int & seed, const bool & computemode)
       genoptions->out("\n");
       genoptions->out("    STATA DO-FILE\n");
       genoptions->out("\n");
-      genoptions->out("    " + pathstata);
+      genoptions->out("    " + pathstata + "\n");
+      genoptions->out("\n");
+      genoptions->out("    R-FILE\n");
+      genoptions->out("\n");
+      genoptions->out("    " + pathR + "\n");
       genoptions->out("\n");
 
 
@@ -417,7 +494,7 @@ const int & seed, const bool & computemode)
       genoptions->out("Estimation results: none\n");
       genoptions->out("\n");
 
-/*
+
       for(i=0;i<nrmodels;i++)
         {
 
@@ -429,7 +506,7 @@ const int & seed, const bool & computemode)
           } // end: for(j=0;j<equations[nrmodels-1-i].nrfc;j++)
 
         }
-*/
+
       return true;
       }
 #elif defined(JAVA_OUTPUT_WINDOW)
@@ -463,7 +540,7 @@ const int & seed, const bool & computemode)
   }
 
 
-bool MCMCsim::posteriormode(ST::string & pathgraphs, const bool & presim)
+bool MCMCsim::posteriormode(ST::string & pathgraphs, const bool & skipfirst, const bool & presim)
   {
 
   unsigned i,j;
@@ -475,7 +552,6 @@ bool MCMCsim::posteriormode(ST::string & pathgraphs, const bool & presim)
 
   for (i=0;i<nrmodels;i++)
     {
-
     if (!presim)
       {
 
@@ -490,13 +566,15 @@ bool MCMCsim::posteriormode(ST::string & pathgraphs, const bool & presim)
 
       genoptions->out("RESPONSE DISTRIBUTION:\n",true);
       genoptions->out("\n");
+
+      int nrnonzero = equations[nrmodels-1-i].distrp->response.rows()
+                     - equations[nrmodels-1-i].distrp->nrzeroweights;
+
       genoptions->out("  " + equations[nrmodels-1-i].distrp->family + "\n");
       genoptions->out("  Number of observations: " +
       ST::inttostring(equations[nrmodels-1-i].distrp->response.rows()) + "\n");
-      genoptions->out("  Number of observations with positive Weights: " +
-      ST::inttostring(equations[nrmodels-1-i].distrp->response.rows()-
-      equations[nrmodels-1-i].distrp->nrzeroweights
-      ) + "\n");
+      genoptions->out("  Number of observations with positive weights: " +
+      ST::inttostring(nrnonzero) + "\n");
 
       genoptions->out("\n");
 
@@ -510,6 +588,11 @@ bool MCMCsim::posteriormode(ST::string & pathgraphs, const bool & presim)
 
     converged=false;
 
+    for (i=0;i<nrmodels;i++)
+      {
+      equations[nrmodels-1-i].distrp->posteriormode_end();
+      }
+
     unsigned it=1;
 
     while ((!converged) && (it <= maxiterations))
@@ -519,57 +602,30 @@ bool MCMCsim::posteriormode(ST::string & pathgraphs, const bool & presim)
 
       for (i=0;i<nrmodels;i++)
         {
-
-//        likep_mult[nrmodels-1-i]->compute_iwls();
-
-        if (equations[nrmodels-1-i].distrp->posteriormode() == false)
-          allconverged = false;
-
-        for(j=0;j<equations[nrmodels-1-i].nrfc;j++)
+        if((i==0) && (it==1) && skipfirst) // => JM
           {
-          if (equations[nrmodels-1-i].FCpointer[j]->posteriormode() == false)
-              allconverged = false;
-          } // end: for(j=0;j<equations[nrmodels-1-i].nrfc;j++)
-        }
+          }
+        else
+          {
+          if (equations[nrmodels-1-i].distrp->posteriormode() == false)
+            allconverged = false;
 
+          for(j=0;j<equations[nrmodels-1-i].nrfc;j++)
+            {
+            if (equations[nrmodels-1-i].FCpointer[j]->posteriormode() == false)
+                allconverged = false;
+            } // end: for(j=0;j<equations[nrmodels-1-i].nrfc;j++)
+
+          equations[nrmodels-1-i].distrp->posteriormode_end();
+          }
+
+        }
 
       if (allconverged)
         converged = true;
       else
         it++;
-
-      #if defined(BORLAND_OUTPUT_WINDOW)
-
-      Application->ProcessMessages();
-
-      if (Frame->stop)
-        {
-        break;
-        }
-
-      if (Frame->pause)
-        {
-        genoptions->out("\n");
-        genoptions->out("SIMULATION PAUSED\n");
-        genoptions->out("Click CONTINUE to proceed\n");
-        genoptions->out("\n");
-
-      while (Frame->pause)
-        {
-        Application->ProcessMessages();
-        }
-
-      genoptions->out("SIMULATION CONTINUED\n");
-      genoptions->out("\n");
-      }
-      #elif defined(JAVA_OUTPUT_WINDOW)
-      bool stop = genoptions->adminb_p->breakcommand();
-      if(stop)
-        break;
-      #endif
-
       } // end: while ((!converged) && (it <= maxiterations))
-
 
     if (!presim)
       {
@@ -591,18 +647,31 @@ bool MCMCsim::posteriormode(ST::string & pathgraphs, const bool & presim)
 
         ST::string pathstata = pathgraphs + "_stata.do";
         ST::string pathR = pathgraphs + "_R.r";
+        ST::string pathR2BayesX = pathgraphs + "_R2BayesX.txt";
+        char hchar = '\\';
+        ST::string hstring = "/";
+        pathR = pathR.insert_string_char(hchar,hstring);
 
         ofstream out_stata(pathstata.strtochar());
         ofstream out_R(pathR.strtochar());
+        ofstream out_R2BayesX(pathR2BayesX.strtochar());
 
+        out_R << "library(\"BayesX\")\n\n";
 
         for(i=0;i<nrmodels;i++)
           {
 
-          equations[nrmodels-1-i].distrp->outresults(equations[nrmodels-1-i].pathd);
+//          out_R << "equationnumber=" << equations[nrmodels-1-i].equationnr << ";"
+//                << " header=" << equations[nrmodels-1-i].header << ";"
+//                << " family=" << equations[nrmodels-1-i].distrp->family << ";"
+//                << " equationtype="  << equations[nrmodels-1-i].equationtype << ";"
+//                << " hlevel="        << equations[nrmodels-1-i].hlevel <<  endl;
+
+
+          equations[nrmodels-1-i].distrp->outresults(out_stata,out_R,out_R2BayesX,equations[nrmodels-1-i].pathd);
 
           for(j=0;j<equations[nrmodels-1-i].nrfc;j++)
-            equations[nrmodels-1-i].FCpointer[j]->outresults(out_stata,out_R,equations[nrmodels-1-i].FCpaths[j]);
+            equations[nrmodels-1-i].FCpointer[j]->outresults(out_stata,out_R,out_R2BayesX,equations[nrmodels-1-i].FCpaths[j]);
 
           }
 

@@ -39,6 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
   // TASK: returns the penalty matrix for a first order random walk
 
   envmatrix<double> Krw1env(const vector<double> & weight);
+  envmatrix<double> Krw1env(const datamatrix & weight);
 
   // FUNCTION: Krw2env
   // TASK: returns the penalty matrix for a second order random walk

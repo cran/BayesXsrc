@@ -45,12 +45,14 @@ int main(int argc, char *argv[])
   char path[100] = "";
   getcwd(path, 100);
 
+  srand((unsigned)time(NULL));
+
 #if defined(__BUILDING_LINUX)
   ST::string tempstring = ST::string(path) + "/temp";
 #else
   ST::string tempstring = ST::string(path) + "\\temp";
 #endif
-  char* pathtemp = tempstring.strtochar();
+  const char* pathtemp = tempstring.strtochar();
   int testtemp = access(pathtemp, 06);
   if(testtemp==-1)
     {
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
 #else
   ST::string outputstring = ST::string(path) + "\\output";
 #endif
-  char* pathoutput = outputstring.strtochar();
+  const char* pathoutput = outputstring.strtochar();
   int testoutput = access(pathoutput, 00);
   if(testoutput==-1)
     {
@@ -144,6 +146,8 @@ int main(int argc, char *argv[])
 
   if(!commandline)
     {
+    std::cout << "BayesX - Software for Bayesian Inference in Structured Additive Regression" << endl;
+    std::cout << "Version 3.0.2 (17.07.2015)" << endl;
     while(!run)
       {
       #if defined(__BUILDING_LINUX)
@@ -151,6 +155,11 @@ int main(int argc, char *argv[])
 
       char *buf;
       buf = readline("BayesX>");
+      if (buf == NULL) { // EOF
+        std::cout << "exiting" << std::endl;
+        exit(0);
+      }
+
       ST::string* s=new ST::string(buf);
       run = a.parse(*s);
 

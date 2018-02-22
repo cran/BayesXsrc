@@ -36,6 +36,39 @@ namespace MCMC
 
 FULLCOND::FULLCOND(void)
   {
+  // ASAN/UBSAN checks
+  lambdastart = 0.0;
+  lambdamin = 0.0;
+  lambdamax = 0.0;
+  data_forfixed = datamatrix(1,1);
+  forced_into = false;
+  df_for_lambdamax = 0.0;
+  df_for_lambdamin = 0.0;
+  dfstart = 0.0;
+  spfromdf = "";
+  number = 1;
+  df_equidist = false;
+  betaright = datamatrix(1,1);
+  beta_average = datamatrix(1,1);
+  calculate_xwx = false;
+  calculate_xwx_vc = false;
+  fctype = fixed;
+  isnonparametric = false;
+  catspecific = false;
+  centervcm = false;
+  inthemodel = false;
+  fixornot = false;
+  plotstyle = noplot;
+  isnonparametric = false;
+  identifiable = false;
+  calculate_xwx_vc = false;
+  nofixed = false;
+  transformnonlinear = false;
+  transformed = false;
+  kombimatrix = false;
+  center = false;
+  baseline = false;
+  // end: ASAN/UBSAN checks
   }
 
 
@@ -43,6 +76,36 @@ FULLCOND::FULLCOND(MCMCoptions * o,const datamatrix & d,
                    const ST::string & t,const unsigned & rows,
                    const unsigned & cols,const ST::string & fp)
   {
+
+  // ASAN/UBSAN checks
+  lambdastart=0.0;
+  lambdamin = 0.0;
+  lambdamax = 0.0;
+  data_forfixed = datamatrix(1,1);
+  forced_into = false;
+  df_for_lambdamax = 0.0;
+  df_for_lambdamin = 0.0;
+  dfstart = 0.0;
+  spfromdf = "";
+  number = 1;
+  df_equidist = false;
+  betaright = datamatrix(1,1);
+  beta_average = datamatrix(1,1);
+  calculate_xwx = false;
+  calculate_xwx_vc = false;
+  fctype = fixed;
+  isnonparametric = false;
+  catspecific = false;
+  centervcm = false;
+  inthemodel = false;
+  fixornot = false;
+  plotstyle = noplot;
+  isnonparametric = false;
+  identifiable = false;
+  center = false;
+  // end: ASAN/UBSAN checks
+
+
 
   df_accuracy = 0.05;
   inthemodel = false;
@@ -103,11 +166,34 @@ FULLCOND::FULLCOND(MCMCoptions * o,const datamatrix & d,
   transformmult = datamatrix(1,1,1);
   addon = 0;
 
+//  forced_into = false;
+
   }
 
 // for REML
 FULLCOND::FULLCOND(MCMCoptions * o,const ST::string & t)
   {
+
+  // ASAN/UBSAN checks
+  forced_into = false;
+  df_equidist = 0.0;
+  df_accuracy = 0.0;
+  fixornot = false;
+  calculate_xwx_vc = false;
+  nofixed = false;
+  fctype = fixed;
+  transformnonlinear = false;
+  transformed = false;
+  isnonparametric = false;
+  catspecific = false;
+  centervcm = false;
+  plotstyle = noplot;
+  inthemodel = false;
+  calculate_xwx = false;
+  kombimatrix = false;
+  identifiable = false;
+  center = false;
+  // end: ASAN/UBSAN checks
 
   title = t;
 
@@ -1134,7 +1220,6 @@ void FULLCOND::updatemult(void)
 
 bool FULLCOND::posteriormode(void)
   {
-
   double diffmean;
   double normold;
 

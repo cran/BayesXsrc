@@ -50,7 +50,7 @@ class __EXPORT_TYPE DESIGN_kriging : public DESIGN
 
   double compute_matern(double & nu,double & r);
 
-  void compute_tildeZ(void);  
+  void compute_tildeZ(void);
 
   protected:
 
@@ -134,7 +134,7 @@ class __EXPORT_TYPE DESIGN_kriging : public DESIGN
 
   void compute_penalty(void);
 
-  void compute_XtransposedWres(datamatrix & partres, double l);
+  void compute_XtransposedWres(datamatrix & partres, double l, double t2);
 
   void compute_XtransposedWX(void);
 

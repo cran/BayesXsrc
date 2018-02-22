@@ -1236,6 +1236,7 @@ unsigned dataset::replace(const ST::string & name,const ST::string & e,const ST:
 	 vbool = eval_exp(boole);
 
   if (errormessages.empty())
+    {
 	 if (boole.length() != 0)
 		{
         unsigned i;
@@ -1255,6 +1256,7 @@ unsigned dataset::replace(const ST::string & name,const ST::string & e,const ST:
        *varit = vneu;
        changed = nrobs;
        }
+     }
 
   return changed;
   }

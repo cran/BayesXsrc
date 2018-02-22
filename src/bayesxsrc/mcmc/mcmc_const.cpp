@@ -141,6 +141,9 @@ FULLCOND_const::FULLCOND_const(MCMCoptions * op,const datamatrix & d,
                                const bool & ismcatsp)
                   : FULLCOND(op,t)
   {
+  // ASAN/UBSAN checks
+  interceptyes = false;
+  // end: ASAN/UBSAN checks
 
   // BEGIN: shrinkage
   shrinkage = false;
@@ -676,6 +679,11 @@ FULLCOND_const::FULLCOND_const(MCMCoptions * o,DISTRIBUTION * dp,
           : FULLCOND(o,d,t,d.cols(),1,fs)
   {
 
+  // ASAN/UBSAN checks
+  ismultinomialcatsp = false;
+  interceptyes = false;
+  // end: ASAN/UBSAN checks
+
   // BEGIN: shrinkage
   shrinkage = false;
   use_effectstart = false;
@@ -722,6 +730,14 @@ FULLCOND_const::FULLCOND_const(MCMCoptions * o,DISTRIBUTION * dp,
 
 //  negbin=false;
 
+  }
+
+FULLCOND_const::FULLCOND_const(void) : FULLCOND()
+  {
+  // ASAN/UBSAN checks
+  ismultinomialcatsp = false;
+  interceptyes = false;
+  // end: ASAN/UBSAN checks
   }
 
 
@@ -824,7 +840,7 @@ void FULLCOND_const::posteriormode_fix_varcoeff(double & value,ST::string & name
      {
      beta(pos,0) +=value;
      betameanold(pos,0) += value;
-     effectsadd(pos,0) += value;     
+     effectsadd(pos,0) += value;
      }
 
    }
@@ -857,9 +873,7 @@ void FULLCOND_const::update(void)
 
 bool FULLCOND_const::posteriormode(void)
   {
-
   return FULLCOND::posteriormode();
-
   }
 
 
@@ -1004,7 +1018,7 @@ const FULLCOND_const_gaussian & FULLCOND_const_gaussian::operator=
 void FULLCOND_const_gaussian::compute_matrices(void)
   {
 
- 
+
   // computing X1
 
   unsigned i,j,k;
@@ -1085,7 +1099,7 @@ void FULLCOND_const_gaussian::update(void)
     }
   }
   // END: shrinkage
-  
+
 
   FULLCOND_const::update();
 
@@ -1144,8 +1158,8 @@ void FULLCOND_const_gaussian::posteriormode_intercept(double & m)
 
 bool FULLCOND_const_gaussian::posteriormode(void)
   {
-  
-  
+
+
   unsigned i;
   double * worklinold=linold.getV();        // linold = data * beta
   for(i=0;i<linold.rows();i++,worklinold++) // add interceptadd to linold
@@ -1184,23 +1198,23 @@ bool FULLCOND_const_gaussian::posteriormode(void)
   X1.assign((X1.cinverse()));                         // continued
   likep->substr_linearpred_m(linold,column);          // substracts linold from linpred
   likep->compute_weightiwls_workingresiduals(column); // computes W(y-linpred)
-  
+
 //  beta = X1*data.transposed()*likep->get_workingresiduals();
 
   // BEGIN: shrinkage - Set starting values
   if(!use_effectstart)
     {
-    beta = X1*data.transposed()*likep->get_workingresiduals();                      
-    }           
+    beta = X1*data.transposed()*likep->get_workingresiduals();
+    }
   if(use_effectstart)
     {
     for(unsigned int j=0; j<nrconst; j++)
       {
-      beta(j,0) = effectstart(j,0)/transform;      
-      }                     
-    }                 
+      beta(j,0) = effectstart(j,0)/transform;
+      }
+    }
    // END: shrinkage - Set starting values
-     
+
   linold.mult(data,beta);                            // updates linold
   likep->add_linearpred_m(linold,column);            // updates linpred
   return FULLCOND_const::posteriormode();
@@ -1343,7 +1357,7 @@ bool FULLCOND_const_gaussian_re::posteriormode_converged(const unsigned & itnr)
   if (nrconst > 0)
     return likep->posteriormode_converged_fc(beta,beta_mode,itnr);
   else
-    return true;  
+    return true;
   }
 
 
@@ -1353,7 +1367,7 @@ bool FULLCOND_const_gaussian_re::posteriormode(void)
   if (nrconst > 0)
     return FULLCOND_const_gaussian::posteriormode();
   else
-    return true;  
+    return true;
   }
 
 
@@ -1389,7 +1403,7 @@ FULLCOND_const_nongaussian::FULLCOND_const_nongaussian(MCMCoptions* o,
                             DISTRIBUTION * dp, const datamatrix & d,
                             const ST::string & t, const int & constant,
                             const ST::string & fs,const ST::string & fr,
-                            const bool & r, const datamatrix vars, 
+                            const bool & r, const datamatrix vars,
                             const bool & useeff, const datamatrix eff,            //NEW
                             const unsigned & c)
                             : FULLCOND_const(o,dp,d,t,constant,fs,fr,c)
@@ -1401,7 +1415,7 @@ FULLCOND_const_nongaussian::FULLCOND_const_nongaussian(MCMCoptions* o,
   use_effectstart = useeff;
   effectstart = eff;
   // END: shrinkage
-  
+
   step = o->get_step();
   diff = linnew;
   weightiwls = datamatrix(likep->get_nrobs(),1,1);
@@ -1469,7 +1483,6 @@ void FULLCOND_const_nongaussian::posteriormode_intercept(double & m)
 
 bool FULLCOND_const_nongaussian::posteriormode(void)
   {
-
   likep->fisher(XWX,data,column);
 
   // BEGIN: shrinkage
@@ -1497,22 +1510,22 @@ bool FULLCOND_const_nongaussian::posteriormode(void)
   likep->compute_weightiwls_workingresiduals(column);
 
 
-//    beta = XWX*data.transposed()*likep->get_workingresiduals();                      
+//    beta = XWX*data.transposed()*likep->get_workingresiduals();
 
   // BEGIN: shrinkage - Set starting values
   if(!use_effectstart)
     {
-    beta = XWX*data.transposed()*likep->get_workingresiduals();                      
-    }           
+    beta = XWX*data.transposed()*likep->get_workingresiduals();
+    }
   if(use_effectstart)
     {
     for(unsigned int j=0; j<nrconst; j++)
       {
-      beta(j,0) = effectstart(j,0);      
-      }                     
-    }                 
+      beta(j,0) = effectstart(j,0);
+      }
+    }
    // END: shrinkage - Set starting values
-  
+
   linold.mult(data,beta);                   // updates linold
   likep->add_linearpred_m(linold,column);   // updates linpred
 
@@ -1696,7 +1709,7 @@ void  FULLCOND_const_nongaussian::update(void)
 
 void  FULLCOND_const_nongaussian::update_iwls(void)
   {
-  
+
   // BEGIN: shrinkage
   // outfilestream with starting values for the shrinkage regression coefficients
   if (shrinkage == true && use_effectstart == true && optionsp->get_nriter() == 1)
@@ -1710,7 +1723,7 @@ void  FULLCOND_const_nongaussian::update_iwls(void)
     }
   }
   // END: shrinkage
-  
+
 
   FULLCOND_const::update();
 
@@ -1858,7 +1871,7 @@ void FULLCOND_const_nbinomial::update_intercept(double & m)
 
 void FULLCOND_const_nbinomial::update(void)
   {
-  
+
   // BEGIN: shrinkage
   // outfilestream with starting values for the shrinkage regression coefficients
   if (shrinkage == true && use_effectstart == true && optionsp->get_nriter() == 1)
@@ -1872,7 +1885,7 @@ void FULLCOND_const_nbinomial::update(void)
     }
   }
   // END: shrinkage
-  
+
 
 /*
     Mit der Funktion geht es nicht! die Acceptance-Raten für FixedEffect
@@ -2049,7 +2062,7 @@ double FULLCOND_const_nbinomial::update_hierint(void) const
             nblikep->exchange_accept();
 
         }
-        
+
     }
 
     return intwork;

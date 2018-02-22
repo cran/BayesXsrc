@@ -123,6 +123,8 @@ struct interact
 				return 0;
 			else if(ia_term[1]<(ia.ia_term)[1])
 				return 1;
+      else
+        return 0;
 		}
 	}
 

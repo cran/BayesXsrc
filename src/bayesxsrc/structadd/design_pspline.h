@@ -79,6 +79,8 @@ class __EXPORT_TYPE DESIGN_pspline : public DESIGN
   long difforder;                   // Differenzenordnung (1,2,3)
   double round;
   double binning;
+  double minBS;
+  double maxBS;
 
 
 //----------------------- CONSTRUCTORS, DESTRUCTOR -----------------------------
@@ -106,6 +108,8 @@ class __EXPORT_TYPE DESIGN_pspline : public DESIGN
 
   void compute_penalty(void);
 
+  void compute_penalty2(const datamatrix & pen);
+
   void compute_basisNull(void);
 
   void compute_precision(double l);
@@ -114,7 +118,10 @@ class __EXPORT_TYPE DESIGN_pspline : public DESIGN
 
   void outoptions(GENERAL_OPTIONS * op);
 
-  // DESTRUCTOR
+  void outbasis_R(ofstream & out);
+
+
+// DESTRUCTOR
 
   ~DESIGN_pspline() {}
 

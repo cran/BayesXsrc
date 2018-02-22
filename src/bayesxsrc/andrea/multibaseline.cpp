@@ -39,7 +39,8 @@ pspline_multibaseline::pspline_multibaseline(MCMCoptions * o,DISTRIBUTION * dp,F
                     const int & gs, const unsigned & c,const datamatrix & zustand, const datamatrix & anfang, const bool & gl)
   : FULLCOND_pspline(o,dp,fcc,ft,ti,nrk,degr,kp,fp,pres,false,gs,c)
   {
-  unsigned i,j,k;
+  unsigned j,k;
+  int i;
 
   baseline = true;
   baselinep = vector<pspline_multibaseline*>(0);
@@ -302,7 +303,8 @@ pspline_multibaseline::pspline_multibaseline(MCMCoptions * o,DISTRIBUTION * dp,F
                     const int & gs, const unsigned & c,const datamatrix & zustand, const datamatrix & anfang, const bool & gl)
   : FULLCOND_pspline(o,dp,fcc,ft,ti,nrk,degr,kp,fp,pres,false,gs,c)
   {
-  unsigned i,j;
+  unsigned j;
+  int i;
 
   baselinep = vector<pspline_multibaseline*>(0);
 
@@ -628,7 +630,8 @@ void pspline_multibaseline::update(void)
   double logold;
   double logprop;
   double * workbeta;
-  unsigned i,j,k;
+  unsigned j,k;
+  int i;
 
 
 

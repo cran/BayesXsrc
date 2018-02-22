@@ -90,7 +90,7 @@ class __EXPORT_TYPE FC_predict_predictor   : public FC
 
   bool posteriormode(void);
 
-  void outresults(ofstream & out_stata, ofstream & out_R,
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                   const ST::string & pathresults);
 
   void compute_autocorr_all(const ST::string & path, unsigned lag,

@@ -18,8 +18,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
 
-
-
+#include <math.h>
 #include "distr.h"
 
 namespace MCMC
@@ -34,7 +33,14 @@ void DISTR::get_samples(const ST::string & filename,ofstream & outg) const
 
 void DISTR::check_errors(void)
   {
-  errors=false;
+  if (response.var(0) < 0.0000000001)
+    {
+    errormessages.push_back("ERROR: response is not varying \n");
+    errors=true;
+    }
+  else
+    errors=false;
+
   }
 
 bool DISTR::check_weightsone(void)
@@ -70,22 +76,32 @@ unsigned DISTR::compute_nrzeroweights(void)
 DISTR::DISTR(GENERAL_OPTIONS * o, const datamatrix & r,
              const datamatrix & w)
   {
+  counter = 0;
 
   maindistribution=true;
+  predict_mult=false;
 
   option1 = "";
+  offsetname = "";
 
   sigma2=1;
 
   optionsp = o;
 
+  gamlss = false;
+
   family = "unknown";
+  familyshort = "unknown";
   updateIWLS = false;
+  copularotate = false;
+  copulaoffset = 0;
+  copulapos = 0;
 
   response = r;
-  response_untransformed = r;
   workingresponse = r;
   responsename = "Y";
+
+  multintvar = datamatrix(1,1,0.0);
 
   nrobs = response.rows();
 
@@ -117,17 +133,31 @@ DISTR::DISTR(GENERAL_OPTIONS * o, const datamatrix & r,
 
   meaneffect = 0;
 
+  linpredminlimit = -1000000000;
+  linpredmaxlimit =  1000000000;
+
   check_errors();
+
+  outpredictor = true;
+  outexpectation = false;
+  predictor_name = "";
+  predstart_mumult = 0;
 
   }
 
 
 DISTR::DISTR(const DISTR & d)
   {
+  counter = d.counter;
+  distrp = d.distrp;
+  distrcopulap = d.distrcopulap;
+  copularotate = d.copularotate;
+  copulaoffset = d.copulaoffset;
 
   FCpredict_betamean = d.FCpredict_betamean;
 
   maindistribution = d.maindistribution;
+  predict_mult = d.predict_mult;
 
   option1 = d.option1;
   optionbool1 = d.optionbool1;
@@ -138,9 +168,11 @@ DISTR::DISTR(const DISTR & d)
   nrobs = d.nrobs;
 
   response = d.response;
-  response_untransformed = d.response_untransformed;
   workingresponse = d.workingresponse;
   responsename = d.responsename;
+  offsetname = d.offsetname;
+
+  multintvar = d.multintvar;
 
   weight = d.weight;
   weightname = d.weightname;
@@ -154,8 +186,21 @@ DISTR::DISTR(const DISTR & d)
   linearpred2 = d.linearpred2;
   linpred_current = d.linpred_current;
 
+  helpmat1 = d.helpmat1;
+  helpmat2 = d.helpmat2;
+  helpmat3 = d.helpmat3;
+
+  linpredp = d.linpredp;
+
+  helpquantity1 = d.helpquantity1;
+  helpquantity2 = d.helpquantity2;
+  helpquantity3 = d.helpquantity3;
+
   updateIWLS = d.updateIWLS;
   family = d.family;
+  familyshort = d.familyshort;
+  equationtype = d.equationtype;
+  hlevel = d.hlevel;
 
   trmult=d.trmult;
 
@@ -164,6 +209,18 @@ DISTR::DISTR(const DISTR & d)
   errors = d.errors;
   errormessages = d.errormessages;
 
+  linpredminlimit = d.linpredminlimit;
+  linpredmaxlimit = d.linpredmaxlimit;
+
+  outpredictor = d.outpredictor;
+  outexpectation = d.outexpectation;
+  predictor_name = d.predictor_name;
+  predstart_mumult = d.predstart_mumult;
+
+  copula = d.copula;
+  copulapos = d.copulapos;
+
+  gamlss = d.gamlss;
   }
 
 
@@ -172,9 +229,16 @@ const DISTR & DISTR::operator=(const DISTR & d)
   if (this == &d)
     return *this;
 
+  counter = d.counter;
+  distrp = d.distrp;
+  distrcopulap = d.distrcopulap;
+  copularotate = d.copularotate;
+  copulaoffset = d.copulaoffset;
+
   FCpredict_betamean = d.FCpredict_betamean;
 
   maindistribution = d.maindistribution;
+  predict_mult = d.predict_mult;
 
   option1 = d.option1;
   optionbool1 = d.optionbool1;
@@ -185,9 +249,9 @@ const DISTR & DISTR::operator=(const DISTR & d)
   nrobs = d.nrobs;
 
   response = d.response;
-  response_untransformed = d.response_untransformed;
   workingresponse = d.workingresponse;
   responsename = d.responsename;
+  offsetname = d.offsetname;
 
   weight = d.weight;
   weightname = d.weightname;
@@ -201,8 +265,22 @@ const DISTR & DISTR::operator=(const DISTR & d)
   linearpred2 = d.linearpred2;
   linpred_current = d.linpred_current;
 
+  helpmat1 = d.helpmat1;
+  helpmat2 = d.helpmat2;
+  helpmat3 = d.helpmat3;
+
+  linpredp = d.linpredp;
+
+  helpquantity1 = d.helpquantity1;
+  helpquantity2 = d.helpquantity2;
+  helpquantity3 = d.helpquantity3;
+
+  multintvar = d.multintvar;
+
   updateIWLS = d.updateIWLS;
   family = d.family;
+  equationtype = d.equationtype;
+  hlevel = d.hlevel;
 
   trmult=d.trmult;
 
@@ -211,10 +289,91 @@ const DISTR & DISTR::operator=(const DISTR & d)
   errors = d.errors;
   errormessages = d.errormessages;
 
+  linpredminlimit = d.linpredminlimit;
+  linpredmaxlimit = d.linpredmaxlimit;
+
+  outpredictor = d.outpredictor;
+  outexpectation = d.outexpectation;
+  predictor_name = d.predictor_name;
+  predstart_mumult = d.predstart_mumult;
+
+  copula = d.copula;
+  copulapos = d.copulapos;
+  gamlss = d.gamlss;
 
   return *this;
   }
 
+
+void DISTR::set_copulapos(int cp)
+    {
+    copulapos = cp;
+ /*   if(copulapos==0)
+      {
+      if((optionsp->rotation==270) || (optionsp->rotation==180))
+        {
+        copularotate = true;
+        }
+      }
+    if(copulapos==1)
+      {
+      if((optionsp->rotation==90) || (optionsp->rotation==180))
+        {
+        copularotate = true;
+        }
+      }*/
+
+    }
+
+bool DISTR::check_linpred(bool current)
+  {
+
+  bool ok = true;
+
+  double* worklin;
+  if (current)
+    {
+    if (linpred_current==1)
+      worklin = linearpred1.getV();
+    else
+      worklin = linearpred2.getV();
+    }
+  else
+    {
+    if (linpred_current==1)
+      worklin = linearpred2.getV();
+    else
+      worklin = linearpred1.getV();
+    }
+
+  unsigned i=0;
+  while (ok && (i<nrobs))
+    {
+    // cmp with nan value is always false, thus check for nan first
+    if (isnan(*worklin))
+      {
+      cerr << "linear predictor is NaN in equation " << this->equationtype
+           << ".\ncan not recover.\nterminating bayesx.\n";
+      abort(); // FIXME unify error handling (exit/abort/exceptions/retval)
+      }
+    if (*worklin > linpredmaxlimit)
+      ok = false;
+    if (*worklin < linpredminlimit)
+      ok = false;
+
+    worklin++;
+    i++;
+    }
+
+  return ok;
+  }
+
+
+void DISTR::changelimits(double min,double max)
+  {
+  linpredminlimit=min;
+  linpredmaxlimit=max;
+  }
 
 
 void DISTR::outoptions(void)
@@ -223,11 +382,118 @@ void DISTR::outoptions(void)
   optionsp->out("\n");
   optionsp->out("  Family: " + family + "\n");
   optionsp->out("  Number of observations: " + ST::inttostring(nrobs) + "\n");
+  if (offsetname.length() > 0)
+    optionsp->out("  Offset: " + offsetname + "\n");
+
+
+    optionsp->out("  Number of observations with positive weights: " +
+      ST::inttostring(nrobs-nrzeroweights) + "\n");
+
+      optionsp->out("\n");
+
+
+  if (optionsp->saveestimation)
+    {
+    optionsp->out("  Limits for predictor (save estimation mode):\n");
+    optionsp->out("    Minimum: " + ST::doubletostring(linpredminlimit,6) + "\n");
+    optionsp->out("    Maximum: " + ST::doubletostring(linpredmaxlimit,6) + "\n");
+    }
+  }
+
+
+double DISTR::get_intercept_start(void)
+  {
+  return 0;
+  }
+
+
+double DISTR::compute_quantile_residual(double * res,double * param,double * weight,
+                                        double * scale)
+  {
+  if ((*weight) == 0)
+  {
+    return  0;
+  }
+  else
+  {
+  double u_est = cdf(res,param,weight,scale);
+  double res_est = randnumbers::invPhi2(u_est);
+  return res_est;
+  }
+
+  }
+
+
+double DISTR::compute_quantile_residual_mult(vector<double *> response,
+                                             vector<double *> param,
+                                             vector<double *> weight,
+                                             vector<datamatrix *> aux)
+  {
+
+    double u_est = cdf_mult(response,param,weight,aux);
+    double res_est = randnumbers::invPhi2(u_est);
+    return res_est;
+
+  }
+
+
+double DISTR::compute_quadr(void)
+  {
+  return 0;
+  }
+
+
+double DISTR::compute_quadr_mult(void)
+  {
+  return 0;
+  }
+
+double DISTR::compute_log(double * res,double * param,double * weight,
+                                        double * scale)
+  {
+
+        double result = log(pdf(res,param,weight,scale));
+        return result;
+
+
+  }
+
+
+double DISTR::compute_log_mult(vector<double *> response,
+                               vector<double *> param,
+                               vector<double *> weight,
+                               vector<datamatrix *> aux)
+  {
+
+    double result = log(pdf_mult(response,param,weight,aux));
+    return result;
+
+
+  }
+double DISTR::compute_spherical(void)
+  {
+  return 0;
+  }
+
+
+double DISTR::compute_spherical_mult(void)
+  {
+  return 0;
+  }
+double DISTR::compute_CRPS(void)
+  {
+  return 0;
+  }
+
+
+double DISTR::compute_CRPS_mult(void)
+  {
+  return 0;
   }
 
 
 
-double DISTR::loglikelihood(const bool & current) const
+double DISTR::loglikelihood(const bool & current)
   {
 
   register unsigned  i;
@@ -269,7 +535,7 @@ double DISTR::loglikelihood(const bool & current) const
 
 double DISTR::loglikelihood(int & begin,
 int & end, statmatrix<double *> & responsep,
-statmatrix<double *> & workingweightp, statmatrix<double *> & linpredp) const
+statmatrix<double *> & workingweightp, statmatrix<double *> & linpredp)
   {
   double help=0;
   int i;
@@ -407,11 +673,21 @@ double & sumworkingweight)
 void DISTR::compute_deviance(const double * response,
                            const double * weight,
                            const double * mu, double * deviance,
-                           double * deviancesat,
                            double * scale) const
   {
 
   }
+
+
+void DISTR::compute_deviance_mult(vector<double *> response,
+                                  vector<double *> weight,
+                                  vector<double *> linpred,
+                                  double * deviance,
+                                  vector<datamatrix *> aux)
+  {
+
+  }
+
 
 
 void DISTR::compute_mu(const double * linpred,double * mu)
@@ -419,6 +695,23 @@ void DISTR::compute_mu(const double * linpred,double * mu)
 
   }
 
+
+void DISTR::compute_mu_mult(vector<double *> linpred,vector<double *> response,double * mu)
+  {
+
+  }
+
+
+void DISTR::compute_param(const double * linpred,double * param)
+  {
+  compute_mu(linpred,param);
+  }
+
+
+void DISTR::compute_param_mult(vector<double *> linpred,double * param)
+  {
+
+  }
 
 double DISTR::compute_MSE(const double * response, const double * weight,
                           const double * linpred, msetype t, double v)
@@ -444,10 +737,10 @@ void DISTR::compute_MSE_all(datamatrix & meanpred, double & MSE,
   nrzeroweights = 0;
   MSE = 0;
   MSEzeroweight=0;
-  double * responsep = response_untransformed.getV();
+  double * responsep = response.getV();
   double * weightp = weight.getV();
   double * linpredp = meanpred.getV();
-  for(i=0;i<nrobs;i++,responsep++,weightp++,linpredp+=2)
+  for(i=0;i<nrobs;i++,responsep++,weightp++,linpredp+=3)
     if (*weightp==0)
       {
       MSEzeroweight += compute_MSE(responsep,weightp,linpredp,t,v);
@@ -473,12 +766,20 @@ void DISTR::update(void)
   } // end: update
 
 
+void DISTR::update_end(void)
+  {
+  } // end: update_end
+
+
 bool DISTR::posteriormode(void)
   {
   double h = compute_iwls(true,false);
   return true;
   }
 
+void DISTR::posteriormode_end(void)
+  {
+  }
 
 void DISTR::update_scale_hyperparameters(datamatrix & h)
   {
@@ -539,8 +840,15 @@ double DISTR::compute_iwls(const bool & current, const bool & like)
                                  work_workingweight,work_workingresponse,
                                  likelihood,like);
       }
+/*
+    ofstream out("d:\\_sicher\\papzip\\wweight.raw");
+    workingweight.prettyPrint(out);
+    out.close();
 
-
+    ofstream out2("d:\\_sicher\\papzip\\wresponse.raw");
+    workingresponse.prettyPrint(out2);
+    out2.close();
+*/
     }
   else if (wtype==wweightsnochange_constant)
     {
@@ -570,13 +878,18 @@ double DISTR::compute_iwls(const bool & current, const bool & like)
     }
 
   // TEST
-  /*
-  ofstream out("c:\\bayesx\\test\\results\\workresponse.res");
+
+/*
+  ofstream out("c:\\bayesx\\testh\\results\\workresponse.res");
   workingresponse.prettyPrint(out);
 
-  ofstream out2("c:\\bayesx\\test\\results\\workweight.res");
+  ofstream out2("c:\\bayesx\\testh\\results\\workweight.res");
   workingweight.prettyPrint(out2);
+
+  ofstream out3("c:\\bayesx\\testh\\results\\linpred.res");
+  linearpred1.prettyPrint(out3);
   */
+
   // TEST
 
   return likelihood;
@@ -670,7 +983,6 @@ void DISTR::compute_iwls(const bool & current,datamatrix & likelihood,
     for (i=0;i<nrobs;i++,workresponse++,
           work_workingresponse++,worklin++,workind++)
       {
-
       compute_iwls_wweightsnochange_one(workresponse,worklin,
                                         work_workingresponse,
                                         likelihood(*workind,0),true);
@@ -692,7 +1004,7 @@ void DISTR::compute_iwls(const bool & current,datamatrix & likelihood,
 
 
 
-void DISTR::outresults(ST::string pathresults)
+void DISTR::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX, ST::string pathresults)
   {
   optionsp->out("\n");
   }
@@ -705,21 +1017,16 @@ void DISTR::reset(void)
   linpred_current = 1;
   }
 
-/*
-double DISTR::get_scale(bool transform)
-  {
-  if (!transform)
-    return sigma2;
-  else
-    return sigma2*pow(trmult,2);
-  }
-*/
 
 double DISTR::get_scale(void)
   {
   return sigma2;
   }
 
+datamatrix * DISTR::get_auxiliary_parameter(auxiliarytype t)
+  {
+  return &helpmat1;
+  }
 
 double DISTR::get_scalemean(void)
   {
@@ -769,19 +1076,19 @@ void DISTR::outresults_predictive_check(datamatrix & D,datamatrix & sr)
 
   for (j=1;j<h.rows();j++)
     h(j,0) = sr.quantile(25,j);
-  optionsp->out("    25\% Quantile  " + ST::doubletostring(D.quantile(25,0)) +  "  " +
+  optionsp->out("    25% Quantile  " + ST::doubletostring(D.quantile(25,0)) +  "  " +
                 ST::doubletostring(h.quantile(5,0)) + " - "
                 + ST::doubletostring(h.quantile(95,0)) + "\n" ) ;
 
   for (j=1;j<h.rows();j++)
     h(j,0) = sr.quantile(50,j);
-  optionsp->out("    50\% Quantile  " + ST::doubletostring(D.quantile(50,0)) +  "  " +
+  optionsp->out("    50% Quantile  " + ST::doubletostring(D.quantile(50,0)) +  "  " +
                 ST::doubletostring(h.quantile(5,0)) + " - "
                 + ST::doubletostring(h.quantile(95,0)) + "\n" ) ;
 
   for (j=1;j<h.rows();j++)
     h(j,0) = sr.quantile(75,j);
-  optionsp->out("    75\% Quantile  " + ST::doubletostring(D.quantile(75,0)) +  "  " +
+  optionsp->out("    75% Quantile  " + ST::doubletostring(D.quantile(75,0)) +  "  " +
                 ST::doubletostring(h.quantile(5,0)) + " - "
                 + ST::doubletostring(h.quantile(95,0)) + "\n" ) ;
 
@@ -795,6 +1102,99 @@ void DISTR::outresults_predictive_check(datamatrix & D,datamatrix & sr)
   optionsp->out("\n");
   }
 
+void DISTR::addmult(datamatrix & design, datamatrix & betadiff)
+  {
+  if (linpred_current==1)
+    linearpred1.addmult(design,betadiff);
+  else
+    linearpred2.addmult(design,betadiff);
+  }
+
+void DISTR::add_linpred(datamatrix & l)
+  {
+  if (linpred_current==1)
+    linearpred1.plus(l);
+  else
+    linearpred2.plus(l);
+  }
+
+void DISTR::add_linpred(datamatrix & l, const double & b)
+  {
+  if (linpred_current==1)
+    linearpred1.plus_mult(l, b);
+  else
+    linearpred2.plus_mult(l, b);
+  }
+
+void DISTR::update_linpred(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind)
+  {
+  double * worklinp;
+  if (linpred_current==1)
+    worklinp = linearpred1.getV();
+  else
+    worklinp = linearpred2.getV();
+
+  double * workintvar = intvar.getV();
+
+  unsigned * indp = ind.getV();
+  unsigned i;
+
+  if (intvar.rows()==nrobs)   // varying coefficient
+    {
+    for (i=0;i<nrobs;i++,worklinp++,workintvar++,indp++)
+      {
+      *worklinp += (*workintvar) *  f(*indp,0);
+      }
+    }
+  else                              // additive
+    {
+    for (i=0;i<nrobs;i++,worklinp++,indp++)
+      {
+      *worklinp += f(*indp,0);
+      }
+    }
+  }
+
+bool DISTR::update_linpred_save(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind)
+  {
+  bool ok = true;
+  double max = linpredmaxlimit;
+  double min = linpredminlimit;
+
+  double * worklinp;
+  if (linpred_current==1)
+    worklinp = linearpred1.getV();
+  else
+    worklinp = linearpred2.getV();
+
+  double * workintvar = intvar.getV();
+  unsigned * indp = ind.getV();
+  unsigned i;
+
+  if (intvar.rows()==nrobs)   // varying coefficient
+    {
+    for (i=0;i<nrobs;i++,worklinp++,workintvar++,indp++)
+      {
+      *worklinp += (*workintvar) *  f(*indp,0);
+      if ((*worklinp) > max)
+        ok = false;
+      if ((*worklinp) < min)
+        ok = false;
+      }
+    }
+  else                              // additive
+    {
+    for (i=0;i<nrobs;i++,worklinp++,indp++)
+      {
+      *worklinp += f(*indp,0);
+      if ((*worklinp) > max)
+        ok = false;
+      if ((*worklinp) < min)
+        ok = false;
+      }
+    }
+  return ok;
+  }
 
 //------------------------------------------------------------------------------
 //----------------------- CLASS DISTRIBUTION_gaussian --------------------------
@@ -811,6 +1211,9 @@ DISTR_gaussian::DISTR_gaussian(const double & a,
 
   {
 
+  predictor_name = "mu";
+  outexpectation = true;
+
   lassosum = 0;
   ridgesum = 0;
   nrlasso=0;
@@ -823,10 +1226,10 @@ DISTR_gaussian::DISTR_gaussian(const double & a,
 
   a_invgamma = a;
   double h = sqrt(response.var(0,weight));
-//  h=1;
+//  double h=1.0;
   b_invgamma = b*h;
   trmult = h;
-  family = "Gaussian";
+  family = "Normal distribution with homoscedastic variance";
 
   FCsigma2 = FC(o,"",1,1,ps);
 
@@ -1008,19 +1411,17 @@ void DISTR_gaussian::compute_mu(const double * linpred,double * mu)
 
 void DISTR_gaussian::compute_deviance(const double * response,
                                  const double * weight, const double * mu,
-                                 double * deviance, double * deviancesat,
+                                 double * deviance,
                                  double * scale) const
   {
   if (*weight == 0)
     {
     *deviance = 0;
-    *deviancesat = 0;
     }
   else
     {
     double r = *response-*mu;
     *deviance =  (*weight/(*scale))*r*r+log(2*M_PI*(*scale)/(*weight));
-    *deviancesat = (*weight/(*scale))*r*r;
     }
   }
 
@@ -1054,8 +1455,14 @@ double DISTR_gaussian::compute_MSE(const double * response,
   }
 
 
+double DISTR_gaussian::get_intercept_start(void)
+  {
+  return response.mean(0);
+  }
+
+
 double DISTR_gaussian::loglikelihood(double * res, double * lin,
-                                     double * w) const
+                                     double * w)
   {
   if (*w==0)
     return 0;
@@ -1067,7 +1474,7 @@ double DISTR_gaussian::loglikelihood(double * res, double * lin,
   }
 
 
-double DISTR_gaussian::loglikelihood_weightsone(double * res, double * lin) const
+double DISTR_gaussian::loglikelihood_weightsone(double * res, double * lin)
   {
   double help = *res-*lin;
   return  - (pow(help,2))/(2* sigma2);
@@ -1163,15 +1570,12 @@ bool DISTR_gaussian::posteriormode(void)
   }
 
 
-void DISTR_gaussian::outresults(ST::string pathresults)
+void DISTR_gaussian::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                                ST::string pathresults)
   {
-  DISTR::outresults();
+  DISTR::outresults(out_stata,out_R,out_R2BayesX);
 
-  ofstream out1;
-  ofstream out2;
-
-  FCsigma2.outresults(out1,out2,"");
-
+  FCsigma2.outresults(out_stata,out_R,out_R2BayesX,"");
 
   ST::string l1 = ST::doubletostring(optionsp->lower1,4);
   ST::string l2 = ST::doubletostring(optionsp->lower2,4);
@@ -1239,6 +1643,7 @@ void DISTR_gaussian::outresults(ST::string pathresults)
     optionsp->out("    Results for variance parameter are also stored in file\n");
     optionsp->out("    " +  pathresults + "\n");
     optionsp->out("\n");
+//    out_R << "scale=" << pathresults << ";" <<  endl;
 
     ofstream outscale(pathresults.strtochar());
 
@@ -1303,12 +1708,17 @@ double DISTR_gaussian::get_scalemean(void)
    : DISTR(o,r)
     {
 
+    predictor_name = "sigma2";
     maindistribution=false;
     family="heteroscedastic Gaussian, variance component";
     wtype = wweightschange_weightsneqone;
     weightsone=false;
     updateIWLS = true;
     sigma2old=0;
+
+    linpredminlimit=-10;
+    linpredmaxlimit= 15;
+
     }
 
   // COPY CONSTRUCTOR
@@ -1335,7 +1745,7 @@ double DISTR_gaussian::get_scalemean(void)
 
 
   double DISTR_vargaussian::loglikelihood(double * res,double * lin,
-                                          double * weight) const
+                                          double * weight)
     {
     if (*weight !=0)
       {
@@ -1343,7 +1753,7 @@ double DISTR_gaussian::get_scalemean(void)
       return  -  (*res)/(2*m) - 0.5* (*lin) ;
       }
     else
-      return 0;  
+      return 0;
     }
 
 
@@ -1521,17 +1931,23 @@ void DISTR_vargaussian::update(void)
 
 DISTR_hetgaussian::DISTR_hetgaussian(double a,double b, GENERAL_OPTIONS * o,
                                      const datamatrix & r,
-                                     const ST::string & ps,
+                                     const ST::string & ps, const bool sc,
                                      const datamatrix & w)
   : DISTR_gaussian(a,b,o,r,ps,w)
 
   {
+
+  predictor_name = "mu";
+  outexpectation = true;
 
   wtype = wweightschange_weightsneqone;
 
   family = "Heteroscedastic Gaussian";
 
   weightoriginal = weight;
+
+  sigma2const=sc;
+  sigma2=1;
 
   }
 
@@ -1544,6 +1960,7 @@ const DISTR_hetgaussian & DISTR_hetgaussian::operator=(
   DISTR_gaussian::operator=(DISTR_gaussian(nd));
   weightoriginal = nd.weightoriginal;
   FCpredict_betamean_vargaussian = nd.FCpredict_betamean_vargaussian;
+  sigma2const = nd.sigma2const;
   return *this;
   }
 
@@ -1553,6 +1970,7 @@ DISTR_hetgaussian::DISTR_hetgaussian(const DISTR_hetgaussian & nd)
   {
   weightoriginal = nd.weightoriginal;
   FCpredict_betamean_vargaussian = nd.FCpredict_betamean_vargaussian;
+  sigma2const = nd.sigma2const;
   }
 
 
@@ -1564,7 +1982,7 @@ void DISTR_hetgaussian::compute_MSE_all(datamatrix & meanpred, double & MSE,
   nrzeroweights = 0;
   MSE = 0;
   MSEzeroweight=0;
-  double * responsep = response_untransformed.getV();
+  double * responsep = response.getV();
   double * weightp = FCpredict_betamean_vargaussian->getV();
   weightp++;
   double * weightorigp = weightoriginal.getV();
@@ -1613,6 +2031,29 @@ double DISTR_hetgaussian::compute_MSE(const double * response,
   }
 
 
+void DISTR_hetgaussian::update(void)
+  {
+  if (!sigma2const)
+    DISTR_gaussian::update();
+  }
+
+
+bool DISTR_hetgaussian::posteriormode(void)
+  {
+  if (!sigma2const)
+    return DISTR_gaussian::posteriormode();
+  else
+    return true;
+  }
+
+
+void DISTR_hetgaussian::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                                   ST::string pathresults)
+  {
+  if (!sigma2const)
+    DISTR_gaussian::outresults(out_stata,out_R,out_R2BayesX,pathresults);
+  }
+
 //------------------------------------------------------------------------------
 //------------------------- CLASS DISTR_quantreg -------------------------------
 //------------------------------------------------------------------------------
@@ -1623,6 +2064,10 @@ DISTR_quantreg::DISTR_quantreg(const double & a,const double & b,
                                const datamatrix & w)
   : DISTR_gaussian(a,b,o,r,ps,w)
   {
+  family="Quantile regression based on asymmetric Laplace distribution";
+  predictor_name = "quantile";
+  outexpectation = true;
+
   quantile = quant;
   xi = (1-2*quantile)/(quantile * (1-quantile));
   xi2 = xi*xi;
@@ -1792,6 +2237,9 @@ void DISTR_quantreg::update(void)
   double sumres=0;
   double sumw=0;
 
+
+  //  sigma02 = delta2
+
   for(i=0; i<nrobs; i++, workw++, workweight++, workresp++, workorigresp++,
       worklin++)
     {
@@ -1805,15 +2253,15 @@ void DISTR_quantreg::update(void)
       }
     else
       {
-      *workweight = rand_inv_gaussian(mu, lambda);
+      *workweight = rand_inv_gaussian(mu, lambda);         // 1/z_i
 
-      *workresp = *workorigresp  - xi/ (*workweight);
-      sumw += 1 / (*workweight);
-      sumres += *workweight * pow(*workresp-*worklin,2);
+      *workresp = *workorigresp  - xi/ (*workweight);      // y_i - offset = y_i - xi * z_i
+      sumw += 1 / (*workweight);                           // sum z_i
+      sumres += *workweight * pow(*workresp-*worklin,2);   // 1/z_i * (y_i-eta_i - xi * z_i)
       }
     }
 
-  sumres /= sigma02;
+  sumres /= sigma02;                  // 1/(delta2 *z_i) * (y_i-eta_i - xi * z_i)
 
   sigma2 = rand_invgamma(a_invgamma + 1.5*(nrobs-nrzeroweights),
                          b_invgamma + 0.5*sumres + sumw);
@@ -1876,6 +2324,7 @@ DISTR_loggaussian::DISTR_loggaussian(const double & a,
 
   {
   family = "log-Gaussian";
+  outexpectation = true;
   }
 
 
@@ -1894,19 +2343,6 @@ DISTR_loggaussian::DISTR_loggaussian(const DISTR_loggaussian & nd)
   {
   }
 
-
-/*
-void DISTR_loggaussian::compute_mu(const double * linpred,double * mu,
-                                bool notransform)
-  {
-//  double scale = FCsigma2.beta(0,0);
-
-  if (!notransform)
-    *mu = exp(trmult * (*linpred) + sigma2*pow(trmult,2)/2.0);
-  else
-    *mu = exp((*linpred) + sigma2*pow(trmult,2)/2.0);
-  }
-*/
 
 void DISTR_loggaussian::compute_mu(const double * linpred,double * mu)
   {
@@ -1935,27 +2371,23 @@ double DISTR_loggaussian::compute_MSE(const double * response,
 
 void DISTR_loggaussian::compute_deviance(const double * response,
                                  const double * weight, const double * mu,
-                                 double * deviance, double * deviancesat,
+                                 double * deviance,
                                  double * scale) const
   {
 
 
-  double pred = log(*mu)-(*scale)/2;
+  double pred = log(*mu)-(*scale)/(2*(*weight));
   double deviancehelp;
-  double deviancesathelp;
 
   if (*weight != 0)
     {
-    DISTR_gaussian::compute_deviance(response,weight,&pred,&deviancehelp,
-    &deviancesathelp,scale);
+    DISTR_gaussian::compute_deviance(response,weight,&pred,&deviancehelp,scale);
     *deviance =  2*(*response)  + deviancehelp;
-    *deviancesat = 2*(*response)  + deviancesathelp;;
     }
 
   else
     {
     *deviance = 0;
-    *deviancesat = 0;
     }
 
   }
@@ -1975,8 +2407,7 @@ void DISTR_loggaussian::sample_responses(unsigned i,datamatrix & sr)
 
   unsigned j;
   for (j=0;j<nrobs;j++,linpredp++,rp+=sr.cols())
-//    *rp = exp(trmult*(*linpredp+sqrt(sigma2)*rand_normal()));
-        *rp = exp(*linpredp+sqrt(sigma2)*rand_normal());
+    *rp = exp(*linpredp+sqrt(sigma2)*rand_normal());
   }
 
 
@@ -1992,7 +2423,6 @@ void DISTR_loggaussian::sample_responses_cv(unsigned i,datamatrix & linpred,
 
   unsigned j;
   for (j=0;j<nrobs;j++,linpredp++,rp+=sr.cols())
-//    *rp = exp(*linpredp+trmult*sqrt(sigma2)*rand_normal());
     *rp = exp(*linpredp+sqrt(sigma2)*rand_normal());
   }
 
@@ -2023,9 +2453,8 @@ DISTR_gaussian_exp::DISTR_gaussian_exp(const double & a,
   : DISTR_gaussian(a,b,o,r,ps,w)
 
   {
-  // standardise();
-  // changingworkingweights = true;
   updateIWLS = true;
+  outexpectation = true;
   }
 
 
@@ -2044,28 +2473,6 @@ DISTR_gaussian_exp::DISTR_gaussian_exp(const DISTR_gaussian_exp & nd)
    : DISTR_gaussian(DISTR_gaussian(nd))
   {
   }
-
-
-
-/*
-void DISTR_gaussian_exp::standardise(void)
-  {
-
-  trmult = 1;
-
-  unsigned i;
-  double * workresp = workingresponse.getV();
-  double * worklin = linearpred1.getV();
-  for (i=0;i<nrobs;i++,workresp++,worklin++)
-    {
-    *workresp = response(i,0);
-    *worklin = 0;
-    }
-
-  FCsigma2.transform(0,0) = pow(trmult,2);
-
-  }
-*/
 
 
 void DISTR_gaussian_exp::outoptions(void)
@@ -2122,17 +2529,6 @@ void DISTR_gaussian_exp::update(void)
 
   }
 
-/*
-void DISTR_gaussian_exp::compute_mu(const double * linpred,double * mu,
-                                    bool notransform)
-  {
-    if (!notransform)
-      *mu = trmult * exp(*linpred);
-    else
-      *mu = exp(*linpred);
-  }
-*/
-
 
 void DISTR_gaussian_exp::compute_mu(const double * linpred,double * mu)
   {
@@ -2140,9 +2536,14 @@ void DISTR_gaussian_exp::compute_mu(const double * linpred,double * mu)
   }
 
 
+void DISTR_gaussian_exp::compute_param(const double * linpred,double * param)
+  {
+  *param = (*linpred);
+  }
+
 
 double DISTR_gaussian_exp::loglikelihood(double * res, double * lin,
-                                         double * w) const
+                                         double * w)
   {
   double help = *res-exp(*lin);
   return  - *w * (pow(help,2))/(2* sigma2);
@@ -2248,7 +2649,7 @@ DISTR_gaussian_mult::DISTR_gaussian_mult(const double & a,
   //standardise();
   optionbool1 = false;
 //  changingworkingweights = false;
-  updateIWLS = false;  
+  updateIWLS = false;
   }
 
 
@@ -2354,7 +2755,7 @@ void DISTR_gaussian_mult::compute_mu(const double * linpred,double * mu)
 
 
 double DISTR_gaussian_mult::loglikelihood(double * res, double * lin,
-                                         double * w) const
+                                         double * w)
   {
 
   if (!optionbool1)
@@ -2406,7 +2807,6 @@ bool DISTR_gaussian_mult::posteriormode(void)
   }
 
 
-  
 //------------------------------------------------------------------------------
 //----------------------- CLASS DISTRIBUTION_gaussian_re -----------------------
 //------------------------------------------------------------------------------
@@ -2417,13 +2817,11 @@ DISTR_gaussian_re::DISTR_gaussian_re(GENERAL_OPTIONS * o,const datamatrix & r,
   : DISTR_gaussian(1,1,o,r,"",w)
 
   {
-
   maindistribution=false;
 
   family = "Gaussian_random_effect";
 
   check_errors();
-
   }
 
 
@@ -2433,7 +2831,7 @@ void DISTR_gaussian_re::check_errors(void)
   DISTR::check_errors();
   bool helperror;
 
-  
+
   unsigned col = 0;
   helperror = response.check_ascending(col);
   if (helperror == false)
@@ -2489,7 +2887,7 @@ bool DISTR_gaussian_re::posteriormode(void)
   /*
     ofstream out("c:\\bayesx\\test\\results\\response_RE.res");
     response.prettyPrint(out);
-  */  
+  */
   // ENDE TEST
 
   return true;
@@ -2501,11 +2899,12 @@ void DISTR_gaussian_re::outoptions(void)
   optionsp->out("\n");
   optionsp->out("  Family: " + family + "\n");
   optionsp->out("  Number of clusters: " + ST::inttostring(nrobs) + "\n");
-  optionsp->out("\n");  
+  optionsp->out("\n");
   }
 
 
-void DISTR_gaussian_re::outresults(ST::string pathresults)
+void DISTR_gaussian_re::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                                   ST::string pathresults)
   {
   }
 

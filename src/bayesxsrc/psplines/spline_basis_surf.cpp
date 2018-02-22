@@ -2123,7 +2123,7 @@ void spline_basis_surf::compute_betaweightxy(void)
       }
 
     }   // ENDE: if
-  else  // Sehnentrapezregel an 'nr' äquidistanten Knoten zwischen x(y)min und x(y)max
+  else  // Sehnentrapezregel an 'nr' \E4quidistanten Knoten zwischen x(y)min und x(y)max
     {
     unsigned nr = 30;
 
@@ -2258,7 +2258,7 @@ void spline_basis_surf::compute_beta(void)
     for(j=0;j<nrpar1dim;j++)
       beta2(i,0) += beta(j+i*nrpar1dim,0)*betaweight_main(j,0);
 
-// betas ändern
+// betas \E4ndern
   for(i=0;i<nrpar1dim;i++)
     for(j=0;j<nrpar1dim;j++)
       beta(i+j*nrpar1dim,0) -= beta1(i,0);
@@ -2288,7 +2288,7 @@ void spline_basis_surf::compute_main(void)
   he1.mult(betaweightx,beta);
   he2.mult(betaweighty,beta);
 
-// 'spline' ändern
+// 'spline' \E4ndern
   freqwork = mainp1->get_freqit();
   workindex = mainp1->get_indexp();
   for(i=0;i<spline.rows();i++,freqwork++,workindex++)
@@ -2412,7 +2412,7 @@ bool spline_basis_surf::breakpause(void)
 #elif defined(JAVA_OUTPUT_WINDOW)
     return optionsp->adminb_p->breakcommand();
 #endif
-
+    return true;
   }
 
 

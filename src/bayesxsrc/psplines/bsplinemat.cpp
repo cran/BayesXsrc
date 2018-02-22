@@ -33,6 +33,13 @@ namespace MCMC
 //----------------------- class: bsplinemat -------------------------------
 //---------------------------------------------------------------------------
 
+bsplinemat::bsplinemat(void)
+  {
+  // ASAN/UBSAN checks
+  knpos=equidistant;
+  // end: ASAN/UBSAN checks
+  }
+
 bsplinemat::bsplinemat(const datamatrix & data, const unsigned & nrk, const unsigned & degr,
                 const MCMC::knotpos & kp, const bool & minnull, const deque<double> & k)
   {

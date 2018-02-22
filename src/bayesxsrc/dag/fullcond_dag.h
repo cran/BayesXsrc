@@ -352,12 +352,12 @@ class __EXPORT_TYPE FULLCOND_dag : public FULLCOND
 
 	// FUNCTION: get_current_ia
 	// TASK: returns current_ia
-	virtual vector <vector <unsigned > > & get_current_ia (void)
+/*	virtual vector <vector <unsigned > > & get_current_ia (void)
 	{
 		vector <vector <unsigned > > test;
 		vector <vector <unsigned > >  & reference = test;
 		return reference;
-	}
+	}*/
 
 	// FUNCTION: get_current_ia
 	// TASK: returns k-th element of current_ia

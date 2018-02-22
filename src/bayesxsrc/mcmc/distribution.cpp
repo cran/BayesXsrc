@@ -166,7 +166,7 @@ double DISTRIBUTION::compute_msep(void)
   datamatrix mu = datamatrix(nlcols,1,0);
   double * mum = mu.getV();
   // double mu;   // siehe "compute_deviance"
- 
+
   double nr = 0;
   double * work2 = weight2.getV();
 
@@ -187,7 +187,7 @@ double DISTRIBUTION::compute_msep(void)
       {
       worklin += nlcols - 1;
       workresp += nlcols - 1;
-      }  
+      }
     }
 
   return  deviancesat;   //      /nr;
@@ -267,7 +267,7 @@ double DISTRIBUTION::compute_bic(const double & df)
   double devsat=0;
   compute_overall_deviance(dev,devsat);
 
-  double bic = dev + log(get_nrobs_wpw())*df;
+  double bic = dev + log(static_cast<double>(get_nrobs_wpw()))*df;
   return bic;
   }
 
@@ -695,7 +695,7 @@ ST::string DISTRIBUTION::get_mean_sample(void) const
 
 /*  file = pathresultsscale.substr(0,pathresultsscale.length()-9) + "_predictor_sample.raw";
     responsesave.get_samples(file);*/
-    
+
     }
 
   return file;
@@ -1146,8 +1146,8 @@ double DISTRIBUTION::loglikelihood2(const unsigned & beg,const unsigned & end,
     worklinpred = &((*linpred_proposed)(index(beg,0),0));
 
   for (i=beg;i<=end;i++,workind2++,
-       workresponse += *workind2*response.cols(),workweight += *workind2,
-       obsnr += *workind2,worklinpred+=*workind2*linearpred.cols())
+       workresponse += (*workind2)*((int)response.cols()),workweight += *workind2,
+       obsnr += *workind2,worklinpred+=(*workind2)*((int)linearpred.cols()))
     {
     workresponsehelp = workresponse;
     if (*workweight != 0)
@@ -1317,7 +1317,7 @@ double DISTRIBUTION::compute_sumweight2(const unsigned & beg,
     {
     for (i=beg;i<=end;i++,workind2++,workind++)
       {
-      linpredp_current += *workind2*linearpred.cols();
+      linpredp_current += *workind2*(int)linearpred.cols();
       if (weight(*workind,0) != 0)
         sum += compute_weight(linpredp_current,&weight(*workind,0),*workind,col);
       }
@@ -1326,7 +1326,7 @@ double DISTRIBUTION::compute_sumweight2(const unsigned & beg,
     {
     for (i=beg;i<=end;i++,workind2++,workind++)
       {
-      linpredp_proposed += *workind2*linearpred.cols();
+      linpredp_proposed += *workind2*(int)linearpred.cols();
       if (weight(*workind,0) != 0)
         sum += compute_weight(linpredp_proposed, &weight(*workind,0),
                *workind,col);
@@ -1371,9 +1371,9 @@ double DISTRIBUTION::compute_sumweight_sumy(double beta,
     worklinpred = &((*linpred_proposed)(index(beg,0),0));
 
   for (i=beg;i<=end;i++,workind2++,workind++,
-       workresponse += *workind2*response.cols(),
+       workresponse += (*workind2)*((int)response.cols()),
        workweight += *workind2,obsnr += *workind2,
-       worklinpred+=*workind2*linearpred.cols())
+       worklinpred+=(*workind2)*((int)linearpred.cols()))
     {
     workresponsehelp = workresponse;
     compute_IWLS_weight_tildey(
@@ -1424,9 +1424,9 @@ double beta,double & sumweight,const unsigned & beg, const unsigned & end,
     worklinpred = &((*linpred_proposed)(*workind,0));
 
   for (i=beg;i<=end;i++,workind2++,
-       workresponse += *workind2*response.cols(),
+       workresponse += (*workind2)*((int)response.cols()),
        workweight += *workind2,obsnr += *workind2,
-       worklinpred+=*workind2*linearpred.cols(),workdata++)
+       worklinpred+=(*workind2)*((int)linearpred.cols()),workdata++)
     {
     workresponsehelp = workresponse;
     compute_IWLS_weight_tildey(
@@ -1479,9 +1479,10 @@ double DISTRIBUTION::compute_loglikelihood_sumweight_sumy(
     worklinpred = &((*linpred_proposed)(index(beg,0),0));
 
   for (i=beg;i<=end;i++,workind2++,workind++,
-       workresponse += *workind2*response.cols(),
-       workweight += *workind2,obsnr += *workind2,
-       worklinpred+=*workind2*linearpred.cols())
+       workresponse += (*workind2)*((int)response.cols()),
+       workweight += *workind2,
+       obsnr += *workind2,
+       worklinpred += (*workind2)*((int)linearpred.cols()))
     {
     workresponsehelp = workresponse;
 
@@ -1535,9 +1536,9 @@ double DISTRIBUTION::compute_loglikelihood_sumweight_sumy(
     worklinpred = &((*linpred_proposed)(*workind,0));
 
   for (i=beg;i<=end;i++,workind2++,
-       workresponse += *workind2*response.cols(),
+       workresponse += (*workind2)*((int)response.cols()),
        workweight += *workind2,obsnr += *workind2,
-       worklinpred+=*workind2*linearpred.cols(),workdata++)
+       worklinpred+=(*workind2)*((int)linearpred.cols()),workdata++)
     {
     workresponsehelp = workresponse;
 
@@ -1639,7 +1640,7 @@ double DISTRIBUTION::fisher2(const unsigned & beg, const unsigned & end,
     {
     w = weight(*workind,0);
     if (w > 0)
-      XWX+= compute_weight(worklin+(*workind)*linearpred.cols(),
+      XWX+= compute_weight(worklin+(*workind)*(int)linearpred.cols(),
             &w,*workind,col) * (*workdata)*(*workdata);
     }
   return XWX;
@@ -1949,14 +1950,13 @@ void DISTRIBUTION::add_linearpred(const double & m,const unsigned & beg,
 
   }
 
-  
+
 void DISTRIBUTION::add_linearpred2(const double & m,const unsigned & beg,
                          const unsigned & end,
                          const statmatrix<int> & index,
                          const statmatrix<int> & index2,
                          const unsigned & col,const bool & current)
   {
-
   unsigned register i;
 
   double * worklin;
@@ -2002,7 +2002,7 @@ void DISTRIBUTION::add_linearpred2(
   int * workindex = index.getV()+beg;
 
   for (i=beg;i<=end;i++,workindex2++,workdata++,workindex++,
-       worklin+=*workindex2*linearpred.cols())
+       worklin+=*workindex2*(int)linearpred.cols())
     *worklin += *workdata*m;
 
   }
@@ -3012,10 +3012,7 @@ void DISTRIBUTION::outresults(void)
       out << "mu" << "   ";
       }
 
-    if(family!="cox")
-      out << "saturated_deviance" << "   ";
-    else
-      out << "unstandardized_deviance" << "   ";
+    out << "deviance" << "   ";
 
     out << "leverage" << "   ";
 
@@ -3026,7 +3023,6 @@ void DISTRIBUTION::outresults(void)
     double * workdevmean = deviancemean.getV();
 
     double deviance2=0;
-    double deviance2_sat=0;
 
     double * datap = Dp->getV();
     unsigned sD = Dp->cols();
@@ -3074,7 +3070,6 @@ void DISTRIBUTION::outresults(void)
 //      &reshelp,&devhelp,scalehelp,i);
 
       deviance2 += reshelp;
-      deviance2_sat += devhelp;
 
       if (weight(i,0) != 0 && family!="cox")
         {
@@ -3124,14 +3119,10 @@ void DISTRIBUTION::outresults(void)
     optionsp->out("\n");
 
     results_latex.push_back("\n {\\bf \\large Estimation results for the deviance: }\\\\ \n");
-    results_latex.push_back("{\\bf Unstandardized deviance } \n");
+    results_latex.push_back("{\\bf Deviance } \n");
     results_latex.push_back("\\vspace{-0.4cm}");
     results_latex.push_back("\\begin{tabbing}");
     results_latex.push_back("\\hspace{3cm} \\= \\\\");
-
-
-    optionsp->out("  Unstandardized Deviance (-2*Loglikelihood(y|mu))\n");
-    optionsp->out("\n");
 
     devhelpm = deviance.mean(0);
 
@@ -3201,82 +3192,6 @@ void DISTRIBUTION::outresults(void)
 
     results_latex.push_back("\\end{tabbing}\n");
 
-    if(family!="cox")
-    {
-    results_latex.push_back("{\\bf Saturated deviance } \n");
-    results_latex.push_back("\\vspace{-0.4cm}");
-    results_latex.push_back("\\begin{tabbing}");
-    results_latex.push_back("\\hspace{3cm} \\= \\\\");
-
-    optionsp->out("  Saturated Deviance (-2*Loglikelihood(y|mu) + 2*Loglikelihood(y|mu=y))\n");
-    optionsp->out("\n");
-    
-    devhelpm = deviance.mean(1);
-
-    optionsp->out(meanstr + ST::string(' ',20-l_meanstr) +
-    ST::doubletostring(devhelpm,d) + "\n");
-
-    results_latex.push_back(meanstr + " \\> "
-                           + ST::doubletostring(devhelpm,d)
-                           + " \\\\");
-
-    devhelp = sqrt(deviance.var(1));
-    optionsp->out(stdstr + ST::string(' ',20-l_stdstr) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    results_latex.push_back(stdstr + " \\> "
-                           + ST::doubletostring(devhelp,d)
-                           + " \\\\");
-
-
-    devhelp = deviance.quantile(lower1,1);
-    optionsp->out(l1str +  ST::string(' ',20-l_l1str) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    results_latex.push_back(l1str.insert_string_char(hchar,helpstring) + " \\> "
-                           + ST::doubletostring(devhelp,d)
-                           + " \\\\");
-
-
-    devhelp = deviance.quantile(lower2,1);
-    optionsp->out(l2str +  ST::string(' ',20-l_l2str) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    results_latex.push_back(l2str.insert_string_char(hchar,helpstring) + " \\> "
-                           + ST::doubletostring(devhelp,d)
-                           + " \\\\");
-
-    devhelp = deviance.quantile(50,1);
-    optionsp->out(medianstr +  ST::string(' ',20-l_medianstr) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    results_latex.push_back(medianstr.insert_string_char(hchar,helpstring) + " \\> "
-                           + ST::doubletostring(devhelp,d)
-                           + " \\\\");
-
-
-    devhelp = deviance.quantile(upper1,1);
-    optionsp->out(u1str +  ST::string(' ',20-l_u1str) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    results_latex.push_back(u1str.insert_string_char(hchar,helpstring) + " \\> "
-                           + ST::doubletostring(devhelp,d)
-                           + " \\\\");
-
-
-    devhelp = deviance.quantile(upper2,1);
-    optionsp->out(u2str +  ST::string(' ',20-l_u2str) +
-    ST::doubletostring(devhelp,d) +  "\n");
-
-    results_latex.push_back(u2str.insert_string_char(hchar,helpstring) + " \\> "
-                           + ST::doubletostring(devhelp,d)
-                           + " \\\\");
-
-    results_latex.push_back("\\end{tabbing}\n");
-
-    optionsp->out("\n");
-    }
-
     optionsp->out("  Samples of the deviance are stored in file\n");
     optionsp->out("  " + deviancepath + "\n");
     optionsp->out("\n");
@@ -3286,18 +3201,13 @@ void DISTRIBUTION::outresults(void)
     optionsp->out("\n");
 
     results_latex.push_back("\n {\\bf \\large Estimation results for the DIC: }\\\\ \n");
-    results_latex.push_back("{\\bf DIC based on the unstandardized deviance } \n");
-    results_latex.push_back("\\vspace{-0.4cm}");
     results_latex.push_back("\\begin{tabbing}");
     results_latex.push_back("\\hspace{3cm} \\= \\\\");
 
-
-    optionsp->out("  DIC based on the unstandardized deviance\n");
-    optionsp->out("\n");
     devhelpm = deviance.mean(0);
     optionsp->out("  Deviance(bar_mu):           " +
     ST::doubletostring(deviance2,d) + "\n");
-    results_latex.push_back( "deviance($\\bar{\\mu}$) \\> "
+    results_latex.push_back( "deviance \\> "
                            + ST::doubletostring(deviance2,d)
                            + " \\\\");
 
@@ -3315,62 +3225,18 @@ void DISTRIBUTION::outresults(void)
                             + " \\\\");
 
     results_latex.push_back("\\end{tabbing}\n");
-    if(family!="cox")
-    {
-    optionsp->out("  DIC based on the saturated deviance\n");
-    optionsp->out("\n");
 
-    results_latex.push_back("{\\bf DIC based on the saturated deviance } \n");
-    results_latex.push_back("\\vspace{-0.4cm}");
-    results_latex.push_back("\\begin{tabbing}");
-    results_latex.push_back("\\hspace{3cm} \\= \\\\");
-    }
-
-    double devhelpm_sat = deviance.mean(1);
-    if(family!="cox")
-    {
-    optionsp->out("  Deviance(bar_mu):           " +
-    ST::doubletostring(deviance2_sat,d) + "\n");
-    results_latex.push_back( "deviance($\\bar{\\mu}$) \\> "
-                           + ST::doubletostring(deviance2_sat,d)
-                           + " \\\\");
-
-    optionsp->out("  pD:                         " +
-    ST::doubletostring(devhelpm_sat-deviance2_sat,d) + "\n");
-    results_latex.push_back("pD \\> " +
-                            ST::doubletostring(devhelpm_sat-deviance2_sat,d) + " \\\\");
-
-
-    optionsp->out("  DIC:                        " +
-    ST::doubletostring(2*devhelpm_sat-deviance2_sat,d) + "\n");
-    results_latex.push_back("DIC \\> " +
-                            ST::doubletostring(2*devhelpm_sat-deviance2_sat,d)
-                            + " \\\\");
-
-    optionsp->out("\n");
-
-    results_latex.push_back("\\end{tabbing}\n");
-    }
-    if(family!="cox")
-    out2 << "intnr  unstandardized_deviance  saturated_deviance" << endl;
-    else out2 << "intnr  unstandardized_deviance" << endl;
+    out2 << "intnr  deviance" << endl;
     double * workdev = deviance.getV();
     for (i=0;i<deviance.rows();i++,workdev++)
       {
       out2 << (i+1) << "   ";
       out2 << *workdev << "   ";
       workdev++;
-      if (family!="cox") out2 << *workdev;
       out2 << endl;
       }
-    if(family!="cox")    out2 << "p_D   " << (devhelpm-deviance2) << "   " <<
-                          (devhelpm_sat-deviance2_sat) << endl;
-    else                 out2 << "p_D   " << (devhelpm-deviance2) << "   " <<endl;
-    if(family!="cox")    out2 << "DIC   " << (2*devhelpm-deviance2) << "   " <<
-                          (2*devhelpm_sat-deviance2_sat) << endl;
-    else                 out2 << "DIC   " << (2*devhelpm-deviance2) << "   " << endl;
-
-
+    out2 << "p_D   " << (devhelpm-deviance2) << "   " <<endl;
+    out2 << "DIC   " << (2*devhelpm-deviance2) << "   " << endl;
     } // end: if ( (predict) && (optionsp->get_samplesize() > 0) )
 
   else if ( (predict) && (optionsp->get_samplesize() > 0) && (isbootstrap) )
@@ -3422,7 +3288,7 @@ void DISTRIBUTION::outresults(void)
       out << "average_mu" << "   ";
       }
 
-    out << "saturated_deviance" << "   ";
+    out << "deviance" << "   ";
 
     out << endl;
 
@@ -3432,7 +3298,6 @@ void DISTRIBUTION::outresults(void)
     double * workdevmean = deviancemean.getV();
 
     double deviance2=0;
-    double deviance2_sat=0;
 
     double * datap = Dp->getV();
     unsigned sD = Dp->cols();
@@ -3482,7 +3347,6 @@ void DISTRIBUTION::outresults(void)
 //      &reshelp,&devhelp,scalehelp,i);
 
       deviance2 += reshelp;
-      deviance2_sat += devhelp;
 
       if (weight(i,0) != 0)
         {
@@ -3542,7 +3406,7 @@ void DISTRIBUTION::outresults(void)
       out << "mu" << "   ";
       }
 
-    out << "saturated_deviance" << "   ";
+    out << "deviance" << "   ";
 
     out << endl;
 
@@ -3557,8 +3421,6 @@ void DISTRIBUTION::outresults(void)
     double devhelp;
     double * workmean_firstcol;
     datamatrix mu_meanlinpred(1,size2);
-
-    double deviance_sat=0;
 
     for (i=0;i<nrobs;i++)
       {
@@ -3583,8 +3445,6 @@ void DISTRIBUTION::outresults(void)
       compute_deviance(&response(i,0),&weight(i,0),&mu_meanlinpred(0,0),
       &reshelp,&devhelp,scale,i);
 
-      deviance_sat += devhelp;
-
       if (weight(i,0) != 0)
         {
         out << devhelp  << "   ";
@@ -3597,7 +3457,7 @@ void DISTRIBUTION::outresults(void)
       }
 
     optionsp->out("\n");
-    optionsp->out("  Saturated deviance: " + ST::doubletostring(deviance_sat,6) +
+    optionsp->out("  Deviance: " + ST::doubletostring(deviance,6) +
     "\n");
 
     optionsp->out("\n");
@@ -3845,7 +3705,7 @@ void DISTRIBUTION::outresults(void)
           }
 
         optionsp->out("\n");
-        optionsp->out("  Posterior 50\% quantile:\n");
+        optionsp->out("  Posterior 50 percent quantile:\n");
         optionsp->out("\n");
 
         for (i=0;i<scale.rows();i++)
@@ -6242,7 +6102,7 @@ double DISTRIBUTION_gaussian::compute_improvedaic(const double & df)
 double DISTRIBUTION_gaussian::compute_bic(const double & df)
   {
   double bic = log(compute_rss() / get_nrobs_wpw()) * get_nrobs_wpw()
-               + log(get_nrobs_wpw())*df;
+               + log(static_cast<double>(get_nrobs_wpw()))*df;
   return bic;
   }
 
@@ -7088,7 +6948,7 @@ const double * linpred,double * mu) const
   *mu = el/(1+el);
   }
 
-  
+
 DISTRIBUTION_binomial::DISTRIBUTION_binomial(MCMCoptions * o,
                          const datamatrix & r,const datamatrix & w)
   : DISTRIBUTION(o,r,w)
@@ -7160,6 +7020,7 @@ double DISTRIBUTION_binomial::compute_IWLS(double * response,double * linpred,
                             bool weightyes,
                             const unsigned & col)
   {
+
   double el = exp(*linpred);
   double mu = el/(1+el);
   if(mu > 0.999)
@@ -7725,15 +7586,15 @@ void DISTRIBUTION_binomial_latent::compute_bootstrap_data(const double * linpred
     while(i<=*weight)
       {
       u = uniform();
-      if(u <= mu) 
+      if(u <= mu)
         pres += 1;
       i += 1;
-      } 
+      }
     pres /= *weight;
     }
- 
+
   *wresp = pres;
-  }  
+  }
 
 //------------------------------------------------------------------------------
 //----------------- CLASS DISTRIBUTION_binomial_logit_latent -------------------
@@ -8293,10 +8154,10 @@ void DISTRIBUTION_poisson::compute_bootstrap_data(const double * linpred,const d
     while(zeit<=1)
       {
       zeit += randnumbers::rand_expo(mu);
-      pres += 1; 
+      pres += 1;
       }
     pres -= 1;
-    pres / *weight;
+    pres /= *weight;
     }
   *wresp = pres;
   }

@@ -175,7 +175,7 @@ realvar cumul(realvar & v,vector<int> & index)
 	 if (v[helpindex[j]] == NA)
 		{
 		n--;
-		h[helpindex[j]] == NA;
+		h[helpindex[j]] = NA;
 		}
 	 else
 		break;
@@ -227,7 +227,7 @@ realvar cumul(realvar & v,vector<int> & index)
 
 realvar uniform(unsigned obs)
   {
-  srand((unsigned)time(0));
+//  srand((unsigned)time(0));
   realvar h(obs);
   register unsigned i;
   realvar::iterator it = h.begin();
@@ -251,7 +251,7 @@ realvar cumulnorm(realvar & v)
 
 realvar normal(unsigned obs)
   {
-  srand((unsigned)time(0));
+//  srand((unsigned)time(0));
   realvar h(obs);
   register unsigned i;
   realvar::iterator it = h.begin();
@@ -264,7 +264,7 @@ realvar normal(unsigned obs)
 
 realvar exponential(unsigned obs,realobs lambda)
   {
-  srand((unsigned)time(0));
+//  srand((unsigned)time(0));
   realvar h(obs);
 
   for (unsigned i=0;i<obs;i++)
@@ -276,7 +276,7 @@ realvar exponential(unsigned obs,realobs lambda)
 
 realvar exponential(realvar & lambda)
   {
-  srand((unsigned)time(0));
+//  srand((unsigned)time(0));
   realvar h(lambda.size());
 
   realvar::iterator lambdait = lambda.begin();
@@ -297,7 +297,7 @@ realvar exponential(realvar & lambda)
 
 realvar bernoulli(realvar & p)
   {
-  srand((unsigned)time(0));
+//  srand((unsigned)time(0));
   realobs u;
   realvar h(p.size());
 
@@ -325,7 +325,7 @@ realvar bernoulli(realvar & p)
 
 realvar binomial(realvar & n,realvar & p)
   {
-  srand((unsigned)time(0));
+//  srand((unsigned)time(0));
   unsigned i,j;
   realobs u;
   realvar h(n.size());
@@ -360,7 +360,7 @@ realvar binomial(realvar & n,realvar & p)
 
 realvar gamma(realvar & mu, realvar & nu)
   {
-  srand((unsigned)time(0));
+//  srand((unsigned)time(0));
   register unsigned  i;
   realobs u;
   realvar h(mu.size());

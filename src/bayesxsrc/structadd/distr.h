@@ -63,10 +63,16 @@ wweightsnochange_constant,wweightsnochange_one};
 
 enum msetype{noMSE,quadraticMSE,checkMSE};
 
+enum auxiliarytype{auxcurrent,auxpostmean};
+
 class __EXPORT_TYPE DISTR
   {
 
   protected:
+
+  int copulapos; //gives position of marginals in case of copula model
+  bool copula; //bool only true if copula model specified
+  bool copularotate; // bool only true if copula is rotated
 
   // FUNCTION: check_workingweights_one
   // TASK: checks if all workingweights are one (returns true if this is the
@@ -85,28 +91,41 @@ class __EXPORT_TYPE DISTR
 
   public:
 
+  unsigned counter;
+
+  vector<DISTR*> distrp;  //pointer to other distributions
+
+  vector<DISTR*> distrcopulap; // pointer of copulas
+  int copulaoffset; // size of the other marginal distribution (if copulapos=1)
+
   bool maindistribution;
+  bool predict_mult;
 
   datamatrix * FCpredict_betamean;
 
   bool optionbool1;
   ST::string option1;
 
+  bool gamlss;  // gamlss distribution
 
   double sigma2;
 
   bool updateIWLS;
+
   ST::string family;              // name of the distribution
+  ST::string familyshort;
+  unsigned hlevel;
+  ST::string equationtype;
 
   unsigned nrobs;                 // Number of observations
 
 
   datamatrix response;                // Response
-  datamatrix response_untransformed;  // untransformed response, i.e.
-                                      // response in the original measurement
-                                      // scale
+
   datamatrix workingresponse;         // Working response, tilde y
   ST::string responsename;            // Name of the response
+
+  ST::string offsetname;          // name of offset variable
 
 
   datamatrix weight;              // Weightvariable for weighted regression
@@ -129,12 +148,56 @@ class __EXPORT_TYPE DISTR
   datamatrix linearpred2;          // Proposed linear predictor
   int linpred_current;
 
+  bool outpredictor;
+  bool outexpectation;
+  ST::string predictor_name;
+  unsigned predstart_mumult;
+
   double meaneffect;
+
+  datamatrix multintvar;           // for multiplicative psplines (contains interaction variable for level 2 effects)
+
+  //----------------------------------------------------------------------------
+  //---------------------- linpredlimits for save estimation -------------------
+  //----------------------------------------------------------------------------
+
+  double linpredminlimit;
+  double linpredmaxlimit;
+
+  // FUNCTION: check_linpred
+  // TASK: checks whether current predictor vector is within linpredlimits
+
+  bool check_linpred(bool current = true);
+
+  void changelimits(double min,double max);
+
+  //----------------------------------------------------------------------------
+  //---------------------- linpredlimits for save estimation -------------------
+  //----------------------------------------------------------------------------
+
+  //----------------------------------------------------------------------------
+  //------------------------- auxiliary variables ------------------------------
+  //----------------------------------------------------------------------------
+
+  datamatrix helpmat1;              // Stores auxiliary quantities
+  datamatrix helpmat2;              // Stores auxiliary quantities
+  datamatrix helpmat3;              // Stores auxiliary quantities
+
+  double * linpredp;              // pointer to own linpred
+
+  double helpquantity1;             // Stores auxiliary quantities
+  double helpquantity2;             // Stores auxiliary quantities
+  double helpquantity3;             // Stores auxiliary quantities
+
+  //----------------------------------------------------------------------------
+  //---------------------- end: auxiliary variables ----------------------------
+  //----------------------------------------------------------------------------
+
 
   void swap_linearpred(void);
 
 
-  double trmult;                   // multiplicative constant for hyperparameters
+  double trmult;                 // multiplicative constant for hyperparameters
 
 
 //------------------------------------------------------------------------------
@@ -199,6 +262,131 @@ class __EXPORT_TYPE DISTR
   //-------------- OBTAINING SAMPLES OF DISTRIBUTION PARAMETERS  ---------------
   //----------------------------------------------------------------------------
 
+  //----------------------------------------------------------------------------
+  //----------------------- INITIALIZE AN INTERCEPT ----------------------------
+  //----------------------------------------------------------------------------
+
+  // FUNCTION: get_intercept_start
+  // TASK: returns starting value for the intercept (if specified)
+
+  virtual double get_intercept_start(void);
+
+
+  //----------------------------------------------------------------------------
+  //---------------------------- SET COPULAPS----- -----------------------------
+  //----------------------------------------------------------------------------
+
+  // FUNCTION: set_copulapos get_copulapos
+  // TASK: sets and gets copula position if copula models specificed
+
+  void set_copulapos(int cp);
+
+  int get_copulapos(void)
+    {
+    return copulapos;
+    }
+
+ /* virtual vector<double> derivative(double & F, int & copulapos)
+    {
+    vector<double> res;
+    return res;
+    }
+*/
+  virtual vector<double> logc(double & F, int & copulapos, const bool & deriv)
+    {
+    vector<double> res;
+    return res;
+    }
+
+  virtual double condfc(double & x, double & linpred_F, double & y, int & copulapos)
+    {
+    return 0.0;
+    }
+
+  //----------------------------------------------------------------------------
+  //---------------------------- COMPUTING THE CDF -----------------------------
+  //----------------------------------------------------------------------------
+  // FUNCTION: cdf for copula parameter
+  virtual double cdf(const double & resp, const bool & ifcop)
+    {
+    return 0;
+    }
+  // FUNCTION: cdf for marginal
+  virtual double cdf(const double & resp, const double & linpred)
+    {
+    return 0;
+    }
+  virtual double cdf(const double & resp, vector<double *>  linpred)
+    {
+    return 0;
+    }
+  virtual double cdf(const double & resp, double * mu)
+    {
+    return 0;
+    }
+    // FUN
+    // FUNCTION: logpdf
+ /* virtual double logpdf(const double & resp)
+    {
+    return 0;
+    }*/
+
+  // FUNCTION: cdf
+  // TASK: computes the cdf for a single observation
+
+  virtual double cdf(double * res, double * param, double * weight, double * scale)
+    {
+    return 0;
+    }
+
+
+  virtual double cdf_mult(vector<double *> response,
+                          vector<double *> param,
+                          vector<double *> weight,
+                          vector<datamatrix *> aux)
+
+
+    {
+    return 0;
+    }
+
+
+  virtual double pdf(double * res,double * param,double * weight,double * scale)
+    {
+    return 0;
+    }
+
+  virtual double pdf_mult(vector<double *> response,
+                          vector<double *> param,
+                          vector<double *> weight,
+                          vector<datamatrix *> aux)
+
+
+    {
+    return 0;
+    }
+
+  virtual double compute_quantile_residual(double * res,double * param,double * weight,
+                                    double * scale);
+
+  virtual double compute_quantile_residual_mult(vector<double *> response,
+                                         vector<double *> param,
+                                         vector<double *> weight,
+                                          vector<datamatrix *> aux);
+
+
+   double compute_quadr(void);
+   double compute_quadr_mult(void);
+   double compute_log(double * res,double * param,double * weight,
+                                        double * scale);
+   double compute_log_mult(vector<double *> response,
+                          vector<double *> param,
+                          vector<double *> weight,
+                          vector<datamatrix *> aux);
+   double compute_spherical(void);
+   double compute_spherical_mult(void);
+   double compute_CRPS(void);
+   double compute_CRPS_mult(void);
 
   //----------------------------------------------------------------------------
   //----------------------- COMPUTING THE LOGLIKELIHOOD ------------------------
@@ -207,12 +395,12 @@ class __EXPORT_TYPE DISTR
   // FUNCTION: loglikelihood
   // TASK: computes the loglikelihood for a single observation
 
-  virtual double loglikelihood(double * res,double * lin,double * weight) const
+  virtual double loglikelihood(double * res,double * lin,double * weight)
     {
     return 0;
     }
 
-  virtual double loglikelihood_weightsone(double * res,double * lin) const
+  virtual double loglikelihood_weightsone(double * res,double * lin)
     {
     return 0;
     }
@@ -220,7 +408,7 @@ class __EXPORT_TYPE DISTR
   // FUNCTION: loglikelihood
   // TASK: computes the complete loglikelihood for all observations
 
-  double loglikelihood(const bool & current=true) const;
+  double loglikelihood(const bool & current=true);
 
   // FUNCTION: loglikelihood
   // TASK: computes the loglikelihood for observations between begin and end
@@ -230,24 +418,41 @@ class __EXPORT_TYPE DISTR
   double loglikelihood(int & begin,
                        int & end, statmatrix<double *> & responsep,
                        statmatrix<double *> & workingweightp,
-                       statmatrix<double *> & linpredp) const;
+                       statmatrix<double *> & linpredp);
 
 
   //----------------------------------------------------------------------------
   //------------------------------- COMPUTE mu ---------------------------------
   //----------------------------------------------------------------------------
 
-//  virtual void compute_mu(const double * linpred,double * mu,
-//                          bool notransform=false);
-
   virtual void compute_mu(const double * linpred,double * mu);
 
+  virtual void compute_mu_mult(vector<double *> linpred,vector<double *> response,double * mu);
+
+
+  //----------------------------------------------------------------------------
+  //------------------------------- COMPUTE param ------------------------------
+  //----------------------------------------------------------------------------
+
+  virtual void compute_param(const double * linpred,double * param);
+
+  virtual void compute_param_mult(vector<double *>  linpred,double * param);
+
+  //----------------------------------------------------------------------------
+  //------------------------------- COMPUTE deviance ---------------------------
+  //----------------------------------------------------------------------------
 
   virtual void compute_deviance(const double * response,
                            const double * weight,
                            const double * mu, double * deviance,
-                           double * deviancesat,
                            double * scale) const;
+
+
+  virtual void compute_deviance_mult(vector<double *> response,
+                             vector<double *> weight,
+                             vector<double *> linpred,
+                             double * deviance,
+                             vector<datamatrix *> aux);
 
 
   //----------------------------------------------------------------------------
@@ -295,13 +500,10 @@ class __EXPORT_TYPE DISTR
 
 
   // FUNCTION: compute_IWLS (for one observation)
-
-
   // TASK: computes tildey=predicor+(y-mu)g'(mu) (stored in workingresponse) and
   //       the loglikelihood stored in like (only if compute_like = true)
   //       assumes that workingweighs=constant (for all observations), i.e.
   //       they are not recomputed in the function
-
   //       wweightsnochange_constant
 
   virtual void compute_iwls_wweightsnochange_constant(double * response,
@@ -365,6 +567,7 @@ class __EXPORT_TYPE DISTR
   virtual double get_scale(void);
   virtual double get_scalemean(void);
   virtual void update_scale_hyperparameters(datamatrix & h);
+  virtual datamatrix * get_auxiliary_parameter(auxiliarytype t = auxcurrent);
 
   //----------------------------------------------------------------------------
   //----------------------- POSTERIORMODE FUNCTIONS ----------------------------
@@ -374,6 +577,8 @@ class __EXPORT_TYPE DISTR
   // TASK: computes the posterior mode
 
   virtual bool posteriormode(void);
+
+  virtual void posteriormode_end(void);
 
 
   //----------------------------------------------------------------------------
@@ -388,6 +593,13 @@ class __EXPORT_TYPE DISTR
 
   virtual void update(void);
 
+
+  // FUNCTION: update
+  // TASK: base function for inherited classes,
+  //       may be used to update quantities that have been changed while updating
+  //       FC's and that are required for other equations (e.g. in ZIP models)
+
+  virtual void update_end(void);
 
 
   //----------------------------------------------------------------------------
@@ -413,13 +625,37 @@ class __EXPORT_TYPE DISTR
   // TASK: writes estimation results for the scale parameter
   //       estimated mean and variance
 
-  virtual void outresults(ST::string pathresults="");
+  virtual void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,ST::string pathresults="");
+
+  // FUNCTION: addmult
+  // TASK: addmults design*betadiff to linpred
+
+  virtual void addmult(datamatrix & design, datamatrix & betadiff);
+
+  // FUNCTION: add_linpred
+  // TASK: adds l to linpred
+
+  virtual void add_linpred(datamatrix & l);
+
+  // FUNCTION: update_linpred
+  // TASK: updates linpred
+
+  virtual void add_linpred(datamatrix & l, const double & b);
+
+  // FUNCTION: update_linpred
+  // TASK: updates linpred
+
+  virtual void update_linpred(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind);
+
+  // FUNCTION: update_linpred_save
+  // TASK: updates linpred (safely)
+
+  virtual bool update_linpred_save(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind);
 
   // FUNCTION: reset
   // TASK: resets linpred (all values to 0)
 
   void reset(void);
-
 
   }; // end: class DISTR
 
@@ -457,6 +693,7 @@ class __EXPORT_TYPE DISTR_gaussian : public DISTR
    // CONSTRUCTOR1
    // a_invgamma = a
    // b_invgamma = b
+   // N(linpred,sigma2/weight)
 
    DISTR_gaussian(const double & a,const double & b,GENERAL_OPTIONS * o,
                   const datamatrix & r,const ST::string & ps,
@@ -486,14 +723,15 @@ class __EXPORT_TYPE DISTR_gaussian : public DISTR
   void compute_deviance(const double * response,
                            const double * weight,
                            const double * mu, double * deviance,
-                           double * deviancesat,
                            double * scale) const;
+
+  double get_intercept_start(void);
 
   double loglikelihood(double * res,
                        double * lin,
-                       double * w) const;
+                       double * w);
 
-  double loglikelihood_weightsone(double * res,double * lin) const;
+  double loglikelihood_weightsone(double * res,double * lin);
 
   double compute_iwls(double * response, double * linpred,
                               double * weight, double * workingweight,
@@ -528,7 +766,7 @@ class __EXPORT_TYPE DISTR_gaussian : public DISTR
 
   bool posteriormode(void);
 
-  void outresults(ST::string pathresults="");
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,ST::string pathresults="");
 
   double get_scalemean(void);
 
@@ -669,6 +907,7 @@ class __EXPORT_TYPE DISTR_hetgaussian : public DISTR_gaussian
 
   protected:
 
+  bool sigma2const;
 
   public:
 
@@ -686,7 +925,7 @@ class __EXPORT_TYPE DISTR_hetgaussian : public DISTR_gaussian
 
   DISTR_hetgaussian(double a, double b, GENERAL_OPTIONS * o,
                      const datamatrix & r,
-                     const ST::string & ps,
+                     const ST::string & ps, const bool sc,
                      const datamatrix & w=datamatrix());
 
   // COPY CONSTRUCTOR
@@ -707,6 +946,13 @@ class __EXPORT_TYPE DISTR_hetgaussian : public DISTR_gaussian
   void compute_MSE_all(datamatrix & meanpred, double & MSE,
                                double & MSEzeroweight, unsigned & nrzeroweights,
                                msetype & t, double & v);
+
+  void update(void);
+
+  bool posteriormode(void);
+
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                  ST::string pathresults="");
 
   };
 
@@ -769,7 +1015,7 @@ class __EXPORT_TYPE DISTR_vargaussian  : public DISTR
   // FUNCTION: loglikelihood
   // TASK: computes the loglikelihood for a single observation
 
-  double loglikelihood(double * res,double * lin,double * weight) const;
+  double loglikelihood(double * res,double * lin,double * weight);
 
   //----------------------------------------------------------------------------
   //------------------------------- COMPUTE mu ---------------------------------
@@ -858,7 +1104,6 @@ class __EXPORT_TYPE DISTR_loggaussian : public DISTR_gaussian
 
    ~DISTR_loggaussian() {}
 
-//  void compute_mu(const double * linpred,double * mu, bool notransform);
   void compute_mu(const double * linpred,double * mu);
 
   double compute_MSE(const double * response, const double * weight,
@@ -868,7 +1113,6 @@ class __EXPORT_TYPE DISTR_loggaussian : public DISTR_gaussian
   void compute_deviance(const double * response,
                            const double * weight,
                            const double * mu, double * deviance,
-                           double * deviancesat,
                            double * scale) const;
 
   void sample_responses(unsigned i,datamatrix & sr);
@@ -924,13 +1168,14 @@ class __EXPORT_TYPE DISTR_gaussian_exp : public DISTR_gaussian
 
    ~DISTR_gaussian_exp() {}
 
-//  void compute_mu(const double * linpred,double * mu, bool notransform);
+
   void compute_mu(const double * linpred,double * mu);
 
+  void compute_param(const double * linpred,double * param);
 
   double loglikelihood(double * res,
                        double * lin,
-                       double * w) const;
+                       double * w);
 
   double compute_iwls(double * response, double * linpred,
                               double * weight, double * workingweight,
@@ -1004,7 +1249,7 @@ class __EXPORT_TYPE DISTR_gaussian_mult : public DISTR_gaussian_exp
 
   double loglikelihood(double * res,
                        double * lin,
-                       double * w) const;
+                       double * w);
 
   double compute_iwls(double * response, double * linpred,
                               double * weight, double * workingweight,
@@ -1064,11 +1309,11 @@ class __EXPORT_TYPE DISTR_gaussian_re : public DISTR_gaussian
 
   bool posteriormode(void);
 
-  void outresults(ST::string pathresults="");
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,ST::string pathresults="");
 
   void outoptions(void);
 
-  void get_samples(const ST::string & filename,ofstream & outg) const;  
+  void get_samples(const ST::string & filename,ofstream & outg) const;
 
   void check_errors(void);
 

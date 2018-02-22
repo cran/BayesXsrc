@@ -73,25 +73,40 @@ void FC_hrandom::read_options(vector<ST::string> & op,vector<ST::string> & vn)
   if (op[17] == "true")
     rtype = multexp;
 
-  if (op[18] == "true")
-    pvalue = true;
-  else
-    pvalue = false;
-
   }
 
-FC_hrandom::FC_hrandom(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,DISTR * lp_RE,
+FC_hrandom::FC_hrandom(MASTER_OBJ * mp,unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,DISTR * lp_RE,
                  const ST::string & t,const ST::string & fp,
                  const ST::string & fp2, DESIGN * Dp,
                  vector<ST::string> & op, vector<ST::string> & vn)
-     : FC_nonp(mp,o,lp,t,fp,Dp,op,vn)
+     : FC_nonp(mp,enr,o,lp,t,fp,Dp,op,vn)
   {
   read_options(op,vn);
   likep_RE = lp_RE;
-//  likep_RE->trmult = likep->trmult;
+  simplerandom=false;
   FCrcoeff = FC(o,"",beta.rows(),beta.cols(),fp2);
   derivative=false;
+  varmat=datamatrix(beta.rows(),1,0);
+  pmodemat = datamatrix(beta.rows(),1,0);
   }
+
+
+FC_hrandom::FC_hrandom(MASTER_OBJ * mp,unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,
+                 const ST::string & t,const ST::string & fp,
+                 const ST::string & fp2, DESIGN * Dp,
+                 vector<ST::string> & op, vector<ST::string> & vn)
+     : FC_nonp(mp,enr,o,lp,t,fp,Dp,op,vn)
+  {
+  read_options(op,vn);
+  simplerandom=true;
+  simplerandom_linpred=datamatrix(beta.rows(),1,0);
+
+  FCrcoeff = FC(o,"",beta.rows(),beta.cols(),fp2);
+  derivative=false;
+  varmat=datamatrix(beta.rows(),1,0);
+  pmodemat = datamatrix(beta.rows(),1,0);
+  }
+
 
 
 FC_hrandom::FC_hrandom(const FC_hrandom & m)
@@ -99,12 +114,16 @@ FC_hrandom::FC_hrandom(const FC_hrandom & m)
   {
   rtype = m.rtype;
   likep_RE = m.likep_RE;
+  simplerandom= m.simplerandom;
+  simplerandom_linpred = m.simplerandom_linpred;
   FCrcoeff = m.FCrcoeff;
   response_o = m.response_o;
   linpred_o = m.linpred_o;
   likelihoodc = m.likelihoodc;
   likelihoodn = m.likelihoodn;
   beta_prior = m.beta_prior;
+  varmat = m.varmat;
+  pmodemat = m.pmodemat;
   }
 
 
@@ -116,12 +135,16 @@ const FC_hrandom & FC_hrandom::operator=(const FC_hrandom & m)
   FC_nonp::operator=(FC_nonp(m));
   rtype = m.rtype;
   likep_RE = m.likep_RE;
+  simplerandom= m.simplerandom;
+  simplerandom_linpred = m.simplerandom_linpred;
   FCrcoeff = m.FCrcoeff;
   response_o = m.response_o;
   linpred_o = m.linpred_o;
   likelihoodc = m.likelihoodc;
   likelihoodn = m.likelihoodn;
-  beta_prior = m.beta_prior;  
+  beta_prior = m.beta_prior;
+  varmat = m.varmat;
+  pmodemat = m.pmodemat;
   return *this;
   }
 
@@ -134,28 +157,22 @@ void FC_hrandom::set_rcoeff(void)
 
 
   double * linpredREp;
-  if (likep_RE->linpred_current==1)
-    linpredREp = likep_RE->linearpred1.getV();
+
+  if (simplerandom)
+    linpredREp=simplerandom_linpred.getV();
   else
-    linpredREp = likep_RE->linearpred2.getV();
+    {
+    if (likep_RE->linpred_current==1)
+      linpredREp = likep_RE->linearpred1.getV();
+    else
+      linpredREp = likep_RE->linearpred2.getV();
 
-  for (i=0;i<beta.rows();i++,betap++,betarcoeffp++,linpredREp++)
-    *betarcoeffp = *betap - *linpredREp;
+    for (i=0;i<beta.rows();i++,betap++,betarcoeffp++,linpredREp++)
+      *betarcoeffp = *betap - *linpredREp;
+    }
 
-//  FCrcoeff.transform(0,0) = transform(0,0);
   }
 
-/*
-void FC_hrandom::transform_beta(void)
-  {
-  if (rtype == mult)
-    transform(0,0) = 1.0;
-  else if (rtype== multexp)
-    transform(0,0) = 1.0;
-  else
-    FC_nonp::transform_beta();
-  }
-*/
 
 void FC_hrandom::update_IWLS(void)
   {
@@ -172,10 +189,15 @@ void FC_hrandom::update_IWLS(void)
   double * betaoldp = betaold.getV();
 
   double * linpredREp;
-  if (likep_RE->linpred_current==1)
-    linpredREp = likep_RE->linearpred1.getV();
+  if (simplerandom)
+    linpredREp=simplerandom_linpred.getV();
   else
-    linpredREp = likep_RE->linearpred2.getV();
+    {
+    if (likep_RE->linpred_current==1)
+      linpredREp = likep_RE->linearpred1.getV();
+    else
+      linpredREp = likep_RE->linearpred2.getV();
+    }
 
   if (likelihoodc.rows() <=1)
     {
@@ -194,83 +216,164 @@ void FC_hrandom::update_IWLS(void)
 
   designp->compute_partres(partres,beta);
 
+
   double * workpartres = partres.getV();
   double * worklikelihoodc = likelihoodc.getV();
   double * workWsum = designp->Wsum.getV();
 
-  for (i=0;i<beta.rows();i++,betap++,linpredREp++,
-       workpartres++,worklikelihoodc++,workWsum++)
-
+  if (designp->center==false)
     {
+    for (i=0;i<beta.rows();i++,betap++,linpredREp++,
+         workpartres++,worklikelihoodc++,workWsum++)
 
-    *worklikelihoodc  -= 0.5*pow((*betap)-(*linpredREp),2)/tau2;
+      {
 
-    xwres =  lambda*(*linpredREp)+ (*workpartres);
+      *worklikelihoodc  -= 0.5*pow((*betap)-(*linpredREp),2)/tau2;
 
-    var = 1/(*workWsum+lambda);
-    postmode =  var * xwres;
-    *betap = postmode + sqrt(var)*rand_normal();
-    diff = *betap - postmode;
-    *worklikelihoodc += -1.0/(2*var)* pow(diff,2)-0.5*log(var);
+      xwres =  lambda*(*linpredREp)+ (*workpartres);
+
+      var = 1/(*workWsum+lambda);
+      postmode =  var * xwres;
+      *betap = postmode + sqrt(var)*rand_normal();
+      diff = *betap - postmode;
+      *worklikelihoodc += -1.0/(2*var)* pow(diff,2)-0.5*log(var);
+      }
+    }
+  else
+    {
+    datamatrix pmodemat(beta.rows(),1,0);
+    datamatrix varmat(beta.rows(),1,0);
+    double * pmodematp = pmodemat.getV();
+    double * varp = varmat.getV();
+
+    for (i=0;i<beta.rows();i++,betap++,linpredREp++,
+         workpartres++,worklikelihoodc++,workWsum++,pmodematp++,varp++)
+
+      {
+
+      *worklikelihoodc  -= 0.5*pow((*betap)-(*linpredREp),2)/tau2;
+
+      xwres =  lambda*(*linpredREp)+ (*workpartres);
+      *varp = 1/(*workWsum+lambda);
+      *pmodematp =  *varp * xwres;
+
+      *betap = *pmodematp + sqrt(*varp)*rand_normal();
+
+      }
+
+    double sum=0;
+    betap = beta.getV();
+    unsigned nrpar = beta.rows();
+//    cout << nrpar << endl;
+
+    for (i=0;i<nrpar;i++,betap++)
+      {
+      sum+= *betap;
+      }
+
+    betap = beta.getV();
+
+    sum /= double(nrpar);
+
+    for (i=0;i<nrpar;i++,betap++)
+      *betap-= sum;
+
+    pmodematp = pmodemat.getV();
+    varp = varmat.getV();
+    worklikelihoodc = likelihoodc.getV();
+    betap = beta.getV();
+
+
+    for (i=0;i<beta.rows();i++,betap++,worklikelihoodc++,pmodematp++,varp++)
+      {
+      diff = *betap - *pmodematp;
+      *worklikelihoodc += -1.0/(2*(*varp))* pow(diff,2)-0.5*log((*varp));
+      }
+
     }
 
 
   betadiff.minus(beta,betaold);
-  designp->update_linpred(betadiff);
 
-  likep->compute_iwls(true,likelihoodn,designp->ind);
-  designp->compute_partres(partres,beta);
-
-  workpartres = partres.getV();
-  double * worklikelihoodn = likelihoodn.getV();
-  worklikelihoodc = likelihoodc.getV();
-  workWsum = designp->Wsum.getV();
-
-  betap = beta.getV();
-  betaoldp = betaold.getV();
-
-  if (likep_RE->linpred_current==1)
-    linpredREp = likep_RE->linearpred1.getV();
-  else
-    linpredREp = likep_RE->linearpred2.getV();
-
-  double * betadiffp = betadiff.getV();
-
-  for (i=0;i<beta.rows();i++,betap++,linpredREp++,betadiffp++,
-       betaoldp++,workpartres++,worklikelihoodn++,workWsum++,worklikelihoodc++)
-
+  bool ok;
+  if (optionsp->saveestimation)
     {
-
-    *worklikelihoodn -= 0.5*pow((*betap)-(*linpredREp),2)/tau2;
-
-    xwres =  lambda*(*linpredREp)+ (*workpartres);
-
-
-    var = 1/(*workWsum+lambda);
-    diff = *betaoldp - var * xwres;
-
-    *worklikelihoodn += -1.0/(2*var)* pow(diff,2)-0.5*log(var);
-
-
-    nrtrials++;
-    u = log(uniform());
-    if (u <= (*worklikelihoodn) - (*worklikelihoodc))
+    ok = designp->update_linpred_save(betadiff);
+    if (!ok)
       {
-      acceptance++;
-      *betaoldp = *betap;
-      *betadiffp = 0;
+      int i = optionsp->nriter;
+      outsidelinpredlimits++;
       }
-    else
-      {
-      *betadiffp = *betaoldp - *betap;
-      *betap = *betaoldp;
-      }
-
+    }
+  else
+    {
+    designp->update_linpred(betadiff);
+    ok = true;
     }
 
-  designp->update_linpred(betadiff);
 
-//  transform_beta();
+  if (ok)
+    {
+    likep->compute_iwls(true,likelihoodn,designp->ind);
+    designp->compute_partres(partres,beta);
+
+    workpartres = partres.getV();
+    double * worklikelihoodn = likelihoodn.getV();
+    worklikelihoodc = likelihoodc.getV();
+    workWsum = designp->Wsum.getV();
+
+    betap = beta.getV();
+    betaoldp = betaold.getV();
+
+    if (simplerandom)
+      linpredREp=simplerandom_linpred.getV();
+    else
+      {
+      if (likep_RE->linpred_current==1)
+        linpredREp = likep_RE->linearpred1.getV();
+      else
+        linpredREp = likep_RE->linearpred2.getV();
+      }
+
+    double * betadiffp = betadiff.getV();
+
+    for (i=0;i<beta.rows();i++,betap++,linpredREp++,betadiffp++,
+         betaoldp++,workpartres++,worklikelihoodn++,workWsum++,worklikelihoodc++)
+
+      {
+
+      *worklikelihoodn -= 0.5*pow((*betap)-(*linpredREp),2)/tau2;
+
+      xwres =  lambda*(*linpredREp)+ (*workpartres);
+
+
+      var = 1/(*workWsum+lambda);
+      diff = *betaoldp - var * xwres;
+
+      *worklikelihoodn += -1.0/(2*var)* pow(diff,2)-0.5*log(var);
+
+
+      nrtrials++;
+      u = log(uniform());
+      if (u <= (*worklikelihoodn) - (*worklikelihoodc))
+        {
+        acceptance++;
+        *betaoldp = *betap;
+        *betadiffp = 0;
+        }
+      else
+        {
+        *betadiffp = *betaoldp - *betap;
+        *betap = *betaoldp;
+        }
+
+      }
+
+    } // if ok
+  else
+    betadiff.minus(betaold,beta);
+
+  designp->update_linpred(betadiff);
 
   FC::update();
 
@@ -280,6 +383,9 @@ void FC_hrandom::update_IWLS(void)
 
 void FC_hrandom::update(void)
   {
+
+//  cout << optionsp->nriter << endl;
+//  cout <<  designp->datanames[0] << endl;
 
   if (IWLS)
     {
@@ -293,12 +399,16 @@ void FC_hrandom::update(void)
   FCrcoeff.acceptance++;
   FCrcoeff.update();
 
-  likep_RE->workingresponse.assign(beta);
-  likep_RE->response.assign(beta);
-//  likep_RE->trmult = likep->trmult;
+  if (simplerandom==false)
+    {
+    likep_RE->workingresponse.assign(beta);
+    likep_RE->response.assign(beta);
+    }
 
-//  ofstream out("c:\\bayesx\\testh\\results\\response_h.res");
-//  beta.prettyPrint(out);
+  // TEST
+  //  ofstream out("c:\\bayesx\\testh\\results\\response_h.res");
+  //  beta.prettyPrint(out);
+  // END TEST
 
   }
 
@@ -478,7 +588,7 @@ bool FC_hrandom::posteriormode_multexp(void)
 
   likep->response.assign(response_o);
  */
- 
+
   return true;
 
   }
@@ -494,9 +604,11 @@ bool FC_hrandom::posteriormode_additive(void)
 
   bool conv2 = FCrcoeff.posteriormode();
 
-  likep_RE->workingresponse.assign(beta);
-  likep_RE->response.assign(beta);
-//  likep_RE->trmult = likep->trmult;
+  if (simplerandom==false)
+    {
+    likep_RE->workingresponse.assign(beta);
+    likep_RE->response.assign(beta);
+    }
 
   // TEST
   /*
@@ -541,7 +653,7 @@ void FC_hrandom::get_samples(const ST::string & filename,ofstream & outg) const
   }
 
 
-void FC_hrandom::outgraphs(ofstream & out_stata, ofstream & out_R,
+void FC_hrandom::outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                           const ST::string & path)
   {
 
@@ -604,42 +716,109 @@ void FC_hrandom::outgraphs(ofstream & out_stata, ofstream & out_R,
             << path << endl
             << "drop in 1" << endl;
 
+  char hchar = '\\';
+  ST::string hstring = "/";
+  ST::string pathR = path.insert_string_char(hchar,hstring);
+  out_R << "dat <- read.table(\"" << pathR << "\", header=TRUE)\n";
+
   out_stata << "kdensity pmean_tot" << endl
             << "graph export " << pathps << "_tot.eps, replace"
             << endl << endl;
 
+  out_R << "plot(density(dat$pmean_tot))\n";
+
   out_stata << "kdensity pmean" << endl
             << "graph export " << pathps << ".eps, replace"
             << endl << endl;
+
+  out_R << "plot(density(dat$pmean))\n";
 
   if (computemeaneffect==true)
     {
     out_stata << "kdensity pmean_mu" << endl
               << "graph export " << pathps << "_mu.eps, replace"
               << endl << endl;
+    out_R << "plot(density(dat$pmean_mu))\n";
+
     }
+
+  out_R << "\n";
 
   }
 
 
-void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R,
+void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
                             const ST::string & pathresults)
   {
 
   if (pathresults.isvalidfile() != 1)
     {
 
-    outgraphs(out_stata,out_R,pathresults);
+    ST::string pathbasis = pathresults.substr(0,pathresults.length()-4) +
+                                 "_basisR.res";
 
-    FC::outresults(out_stata,out_R,"");
-    FCrcoeff.outresults(out_stata,out_R,"");
+    outbasis_R(pathbasis);
+
+
+    ST::string paths = pathresults.substr(0,pathresults.length()-4) +
+                                 "_sample.raw";
+
+
+    out_R2BayesX << "family=" << likep->family.strtochar() << ",";
+    out_R2BayesX << "hlevel=" << likep->hlevel << ",";
+    out_R2BayesX << "equationtype=" << likep->equationtype.strtochar() << ",";
+    out_R2BayesX << "term=sx("  << designp->datanames[0].strtochar()  << "),";
+    out_R2BayesX << "filetype=nonlinear,";
+    out_R2BayesX << "pathsamples=" << paths.strtochar() << ",";
+    out_R2BayesX << "pathbasis=" << pathbasis.strtochar() << ",";
+
+
+    outgraphs(out_stata,out_R,out_R2BayesX,pathresults);
+
+    FC::outresults(out_stata,out_R,out_R2BayesX,"");
+    FCrcoeff.outresults(out_stata,out_R,out_R2BayesX,"");
+
+    outresults_acceptance();
 
    if (computemeaneffect==true)
-      meaneffect_sample.outresults(out_stata,out_R,"");
+      meaneffect_sample.outresults(out_stata,out_R,out_R2BayesX,"");
 
     optionsp->out("    Results are stored in file\n");
     optionsp->out("    " +  pathresults + "\n");
     optionsp->out("\n");
+
+//   ofstream out("c:\\bayesx\\trunk\\testh\\results\\datare.raw");
+//   designp->data.prettyPrint(out);
+
+    if (imeasures)
+      {
+      double im_absolute;
+      double im_var;
+      if (designp->discrete)
+        {
+        im_var = compute_importancemeasure_discrete(false);
+        im_absolute = compute_importancemeasure_discrete(true);
+        }
+      else
+        {
+        im_var = compute_importancemeasure(false);
+        im_absolute = compute_importancemeasure(true);
+        }
+
+      if (designp->intvar.rows()==designp->data.rows())
+        {
+        double kintvar = designp->compute_kernel_intvar(true);
+        im_absolute *= kintvar;
+        kintvar = designp->compute_kernel_intvar(false);
+        im_var *= kintvar;
+        }
+
+
+      optionsp->out("    Importance measures\n");
+      optionsp->out("      based on absolute function values: " + ST::doubletostring(im_absolute,6) + "\n");
+      optionsp->out("      based on squared function values:  " + ST::doubletostring(im_var,6) + "\n");
+      optionsp->out("\n");
+      }
 
     optionsp->out("    Mean effects evaluated at " +
                   designp->datanames[designp->datanames.size()-1] + "=" +
@@ -664,14 +843,14 @@ void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R,
       optionsp->out("    Scaling factor to blow up pointwise " +
                    ST::inttostring(optionsp->level1) + " percent credible intervals\n");
       optionsp->out("    to obtain simultaneous credible intervals: " +
-           ST::doubletostring(s_level1,6) + "\n");
+           ST::doubletostring(s_level2,6) + "\n");
 
       optionsp->out("\n");
 
       optionsp->out("    Scaling factor to blow up pointwise " +
                    ST::inttostring(optionsp->level2) + " percent credible intervals\n");
       optionsp->out("    to obtain simultaneous credible intervals: " +
-           ST::doubletostring(s_level2,6) + "\n");
+           ST::doubletostring(s_level1,6) + "\n");
 
       optionsp->out("\n");
       }
@@ -696,45 +875,37 @@ void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R,
     outres << designp->datanames[designp->datanames.size()-1] << "   ";
     outres << "pmean_tot   ";
 
-    if (optionsp->samplesize > 1)
-      {
-      outres << "pqu"  << l1  << "_tot   ";
-      outres << "pqu"  << l2  << "_tot   ";
-      outres << "pmed_tot   ";
-      outres << "pqu"  << u1  << "_tot   ";
-      outres << "pqu"  << u2  << "_tot   ";
-      outres << "pcat" << optionsp->level1 << "_tot   ";
-      outres << "pcat" << optionsp->level2 << "_tot   ";
+    outres << "pqu"  << l1  << "_tot   ";
+    outres << "pqu"  << l2  << "_tot   ";
+    outres << "pmed_tot   ";
+    outres << "pqu"  << u1  << "_tot   ";
+    outres << "pqu"  << u2  << "_tot   ";
+    outres << "pcat" << optionsp->level1 << "_tot   ";
+    outres << "pcat" << optionsp->level2 << "_tot   ";
 
-      outres << "pqu"  << l1  << "tot_sim   ";
-      outres << "pqu"  << l2  << "tot_sim   ";
-      outres << "pqu"  << u1  << "tot_sim   ";
-      outres << "pqu"  << u2  << "tot_sim   ";
-      outres << "pcat" << optionsp->level1 << "tot_sim   ";
-      outres << "pcat" << optionsp->level2 << "tot_sim   ";
-      }
-
+    outres << "pqu"  << l1  << "tot_sim   ";
+    outres << "pqu"  << l2  << "tot_sim   ";
+    outres << "pqu"  << u1  << "tot_sim   ";
+    outres << "pqu"  << u2  << "tot_sim   ";
+    outres << "pcat" << optionsp->level1 << "tot_sim   ";
+    outres << "pcat" << optionsp->level2 << "tot_sim   ";
 
     outres << "pmean   ";
 
-    if (optionsp->samplesize > 1)
-      {
-      outres << "pqu"  << l1  << "   ";
-      outres << "pqu"  << l2  << "   ";
-      outres << "pmed   ";
-      outres << "pqu"  << u1  << "   ";
-      outres << "pqu"  << u2  << "   ";
-      outres << "pcat" << optionsp->level1 << "   ";
-      outres << "pcat" << optionsp->level2 << "   ";
+    outres << "pqu"  << l1  << "   ";
+    outres << "pqu"  << l2  << "   ";
+    outres << "pmed   ";
+    outres << "pqu"  << u1  << "   ";
+    outres << "pqu"  << u2  << "   ";
+    outres << "pcat" << optionsp->level1 << "   ";
+    outres << "pcat" << optionsp->level2 << "   ";
 
-      outres << "pqu"  << l1  << "_sim   ";
-      outres << "pqu"  << l2  << "_sim   ";
-      outres << "pqu"  << u1  << "_sim   ";
-      outres << "pqu"  << u2  << "_sim   ";
-      outres << "pcat" << optionsp->level1 << "_sim   ";
-      outres << "pcat" << optionsp->level2 << "_sim   ";
-      }
-
+    outres << "pqu"  << l1  << "_sim   ";
+    outres << "pqu"  << l2  << "_sim   ";
+    outres << "pqu"  << u1  << "_sim   ";
+    outres << "pqu"  << u2  << "_sim   ";
+    outres << "pcat" << optionsp->level1 << "_sim   ";
+    outres << "pcat" << optionsp->level2 << "_sim   ";
 
     if (computemeaneffect==true)
       {
@@ -786,7 +957,7 @@ void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R,
       mu_workbetaqu50 = meaneffect_sample.betaqu50.getV();
       }
 
-    double l1_sim,l2_sim,u1_sim,u2_sim;  
+    double l1_sim,l2_sim,u1_sim,u2_sim;
 
     unsigned nrpar = beta.rows();
     for(i=0;i<nrpar;i++,workmean++,workbetaqu_l1_lower_p++,
@@ -849,6 +1020,8 @@ void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R,
           outres << 0 << "   ";
 
         }
+      else
+        outres << "0   0   0   0   0   0   0   0   0   0   0   0   0   ";
 
       outres << *workmean_rcoeff << "   ";
 
@@ -899,6 +1072,8 @@ void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R,
           outres << 0 << "   ";
 
         }
+      else
+        outres << "0   0   0   0   0   0   0   0   0   0   0   0   0   ";
 
 
       if (computemeaneffect==true)
@@ -914,6 +1089,8 @@ void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R,
           outres << *mu_workbetaqu_l2_upper_p << "   ";
           outres << *mu_workbetaqu_l1_upper_p << "   ";
           }
+        else
+          outres << "0   0   0   0   0   ";
 
         if (i <nrpar-1)
           {
@@ -932,17 +1109,172 @@ void FC_hrandom::outresults(ofstream & out_stata,ofstream & out_R,
       }
 
 
-    if (pvalue)
-      FC_nonp::compute_pvalue(pathresults);
-
-
     }
 
 
 
   }
 
+
+// -----------------------------------------------------------------//
+// class: FC_hrandom_distributional (for non-normal random effects)
+// -----------------------------------------------------------------//
+
+FC_hrandom_distributional::FC_hrandom_distributional(void)
+  {
+  }
+
+
+void FC_hrandom_distributional::read_options(vector<ST::string> & op,vector<ST::string> & vn)
+  {
+  //FC_hrandom::read_options(op, vn);
+  /*
+  1       degree
+  2       numberknots
+  3       difforder
+  4       lambda
+  5       a
+  6       b
+  7       center
+  8       map
+  9       lambda_re
+  10      a_re
+  11      b_re
+  12      internal_mult
+  13      samplemult
+  14      constraints
+
+  17     internal_multexp
+  */
+
+/*  if (op[14] == "increasing")
+    stype = increasing;
+  else if (op[14] == "decreasing")
+    stype = decreasing;
+  else
+*/
+    stype = unconstrained;
+
+  rtype = additive;
+  if (op[12] == "true")
+    rtype = mult;
+
+  if (op[17] == "true")
+    rtype = multexp;
+  }
+
+FC_hrandom_distributional::FC_hrandom_distributional(MASTER_OBJ * mp,unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,DISTR * lp_RE,
+                 const ST::string & t,const ST::string & fp,
+                 const ST::string & fp2, DESIGN * Dp,
+                 vector<ST::string> & op, vector<ST::string> & vn)
+     : FC_hrandom(mp,enr,o,lp,lp_RE,t,fp,fp2,Dp,op,vn)
+  {
+  read_options(op,vn);
+  offset_RE = datamatrix(beta.rows(),1,0);
+  offsetold_RE = datamatrix(beta.rows(),1,0);
+  }
+
+
+FC_hrandom_distributional::FC_hrandom_distributional(MASTER_OBJ * mp,unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,
+                 const ST::string & t,const ST::string & fp,
+                 const ST::string & fp2, DESIGN * Dp,
+                 vector<ST::string> & op, vector<ST::string> & vn)
+     : FC_hrandom(mp,enr,o,lp,t,fp,fp2,Dp,op,vn)
+  {
+//  read_options(op,vn);
+  offset_RE = datamatrix(beta.rows(),1,0);
+  offsetold_RE = datamatrix(beta.rows(),1,0);
+  }
+
+
+
+FC_hrandom_distributional::FC_hrandom_distributional(const FC_hrandom_distributional & m)
+  : FC_hrandom(FC_hrandom(m))
+  {
+  offset_RE = m.offset_RE;
+  offsetold_RE = m.offsetold_RE;
+  }
+
+
+const FC_hrandom_distributional & FC_hrandom_distributional::operator=(const FC_hrandom_distributional & m)
+  {
+
+  if (this==&m)
+	 return *this;
+  FC_hrandom_distributional::operator=(FC_hrandom_distributional(m));
+
+  offset_RE = m.offset_RE;
+  offsetold_RE = m.offsetold_RE;
+
+  return *this;
+  }
+
+void FC_hrandom_distributional::update(void)
+  {
+  unsigned i;
+  // update den offset und hyperparameter geeignet
+  double * offsetp = offset_RE.getV();
+  double * offsetoldp = offsetold_RE.getV();
+  for(i=0; i<beta.rows(); i++, offsetp++, offsetoldp++)
+    {
+    *offsetoldp = *offsetp;
+    *offsetp = 0.0;
+    }
+
+  double * betap = beta.getV();
+  double * betarcoeffp = FCrcoeff.beta.getV();
+
+
+  double * linpredREp;
+  offsetoldp = offsetold_RE.getV();
+  offsetp = offset_RE.getV();
+
+  if (simplerandom)
+    linpredREp=simplerandom_linpred.getV();
+  else
+    {
+    if (likep_RE->linpred_current==1)
+      linpredREp = likep_RE->linearpred1.getV();
+    else
+      linpredREp = likep_RE->linearpred2.getV();
+
+    for (i=0;i<beta.rows();i++,betap++,betarcoeffp++,linpredREp++,offsetp++,offsetoldp++)
+      *linpredREp += *offsetp - *offsetoldp;
+    }
+
+  FC_hrandom::update();
+  }
+
+void FC_hrandom_distributional::compute_autocorr_all(const ST::string & path,
+                                      unsigned lag, ofstream & outg) const
+  {
+  FC_hrandom::compute_autocorr_all(path,lag,outg);
+  }
+
+void FC_hrandom_distributional::get_samples(const ST::string & filename,ofstream & outg) const
+  {
+  FC_hrandom::get_samples(filename,outg);
+  }
+
+void FC_hrandom_distributional::outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                          const ST::string & path)
+  {
+  FC_hrandom::outgraphs(out_stata, out_R, out_R2BayesX, path);
+  }
+
+void FC_hrandom_distributional::outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
+                            const ST::string & pathresults)
+  {
+  FC_hrandom::outresults(out_stata, out_R, out_R2BayesX, pathresults);
+  }
+
+
+
+
+
+
 } // end: namespace MCMC
+
 
 
 

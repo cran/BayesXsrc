@@ -48,7 +48,7 @@ class __EXPORT_TYPE MASTER_OBJ
 
   public:
 
-  DISTR * level1_likep;
+  vector<DISTR *> level1_likep;
 
   // DEFAULT CONSTRUCTOR
 

@@ -564,7 +564,9 @@ int dagobject::parse(const ST::string & c)
 
   if (pos >= 0)
 	 (*functions[pos])(*this);
-  }
+
+ return(pos);
+ }
 
 
 

@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 
 
+
 #include "FC.h"
 #include "clstring.h"
 
@@ -41,6 +42,7 @@ void FC::read_options(vector<ST::string> & op,vector<ST::string> & vn)
 
 FC::FC(void)
   {
+  this->nosamples = false;
   }
 
 
@@ -55,6 +57,7 @@ FC::FC(GENERAL_OPTIONS * o,const ST::string & t,const unsigned & rows,
   {
 
   nosamples = false;
+  nosamplessave = false;
   optionsp = o;
 
   title = t;
@@ -65,6 +68,7 @@ FC::FC(GENERAL_OPTIONS * o,const ST::string & t,const unsigned & rows,
 
   acceptance = 0;
   nrtrials = 0;
+  outsidelinpredlimits = 0;
 
   column = 0;
 
@@ -80,6 +84,7 @@ FC::FC(const FC & m)
   {
 
   nosamples = m.nosamples;
+  nosamplessave = m.nosamplessave;
 
   optionsp = m.optionsp;
 
@@ -110,12 +115,11 @@ FC::FC(const FC & m)
 
   sampled_beta = m.sampled_beta;
 
-//  transform = m.transform;
   addon = m.addon;
-
 
   acceptance = m.acceptance;
   nrtrials = m.nrtrials;
+  outsidelinpredlimits = m.outsidelinpredlimits;
 
   column = m.column;
 
@@ -135,6 +139,7 @@ const FC & FC::operator=(const FC & m)
 	 return *this;
 
   nosamples = m.nosamples;
+  nosamplessave = m.nosamplessave;
 
   optionsp = m.optionsp;
 
@@ -165,12 +170,12 @@ const FC & FC::operator=(const FC & m)
 
   sampled_beta = m.sampled_beta;
 
-//  transform = m.transform;
   addon = m.addon;
 
 
   acceptance = m.acceptance;
   nrtrials = m.nrtrials;
+  outsidelinpredlimits = m.outsidelinpredlimits;
 
   column = m.column;
 
@@ -205,7 +210,6 @@ void FC::setbeta(const unsigned & rows,const unsigned & cols,
   betavarold = datamatrix(rows,cols,0);
   betaminold = datamatrix(rows,cols,0);
   betamaxold = datamatrix(rows,cols,0);
-//  transform = datamatrix(cols,1,1);
 
   }
 
@@ -235,7 +239,6 @@ void FC::setbeta(const datamatrix & betanew)
   betavarold = datamatrix(beta.rows(),beta.cols(),0);
   betaminold = datamatrix(beta.rows(),beta.cols(),0);
   betamaxold = datamatrix(beta.rows(),beta.cols(),0);
-//  transform = datamatrix(beta.cols(),1,1);
 
   }
 
@@ -281,11 +284,10 @@ void FC::readsample2(datamatrix & b,const unsigned & nr) const
 void FC::readsample3(datamatrix & b) const
   {
 
-  if (nosamples == false)
+  if ((nosamples == false) && (nosamplessave == false))
     {
     b.assign(sampled_beta);
     } // end: if (nosamples == false)
-
 
   }
 
@@ -293,7 +295,7 @@ void FC::readsample3(datamatrix & b) const
 datamatrix FC::compute_autocorr(const unsigned & lag,const unsigned & row,
                                       const unsigned & col) const
   {
-  if (nosamples==false)
+  if ((nosamples == false) && (nosamplessave == false))
     {
 
     unsigned nr = row*(beta.cols())+col;
@@ -309,7 +311,7 @@ datamatrix FC::compute_autocorr(const unsigned & lag,const unsigned & row,
 double FC::compute_autocorr_single(const unsigned & lag,const unsigned & row,
                                       const unsigned & col) const
   {
-  if (nosamples == false)
+  if ((nosamples == false) && (nosamplessave == false))
     {
 
     unsigned nr = row*(beta.cols())+col;
@@ -411,7 +413,7 @@ void FC::compute_autocorr_all(const ST::string & path,
 
 void FC::get_samples(const ST::string & filename,ofstream & outg) const
   {
-  if (nosamples == false)
+  if ((nosamples == false) && (nosamplessave == false))
     {
 
     unsigned i,j,k;
@@ -487,7 +489,7 @@ void FC::update(void)
 
     unsigned samplesize = optionsp->samplesize;
 
-    if (samplesize==1)
+    if ((samplesize==1) && (nosamplessave == false))
      {
      unsigned ssize = optionsp->compute_samplesize();
      unsigned npar = beta.rows()*beta.cols();
@@ -497,54 +499,103 @@ void FC::update(void)
 
     double betatransform;
 
-    double * sbetap = sampled_beta.getV() +  (samplesize-1)*sampled_beta.cols();
-
-    for(i=0;i<beta.rows();i++)
+    if (nosamplessave==false)
       {
-      for (j=0;j<beta.cols();j++,workbeta++,workbetamean++,workbetas2++,
-           workbetavar++,workbetamin++,workbetamax++,sbetap++)
+      double * sbetap = sampled_beta.getV() +  (samplesize-1)*sampled_beta.cols();
 
+      for(i=0;i<beta.rows();i++)
         {
+        for (j=0;j<beta.cols();j++,workbeta++,workbetamean++,workbetas2++,
+             workbetavar++,workbetamin++,workbetamax++,sbetap++)
 
-        betatransform = (*workbeta)+addon;
-
-        // storing sampled parameters in binary mode
-
-        *sbetap = betatransform;
-
-        // updating betamean
-        if (samplesize==1)
-          *workbetamean = betatransform;
-        else
-          *workbetamean = (1.0/(samplesize))*
-                       ((samplesize-1)*(*workbetamean) + betatransform);
-
-        // updating betavar
-        if (samplesize==1)
-          *workbetas2 = betatransform*betatransform;
-        else
-          *workbetas2 += betatransform*betatransform;
-        *workbetavar = (1.0/samplesize)*
-                       (*workbetas2)-(*workbetamean)*(*workbetamean);
-
-        // updating betamin, betamax
-        if (samplesize==1)
           {
-          *workbetamin = betatransform;
-          *workbetamax = betatransform;
-          }
-        else
-          {
-          if (betatransform < *workbetamin)
+
+          betatransform = (*workbeta)+addon;
+
+          // storing sampled parameters in binary mode
+
+          *sbetap = betatransform;
+
+          // updating betamean
+          if (samplesize==1)
+            *workbetamean = betatransform;
+          else
+            *workbetamean = (1.0/(samplesize))*
+                         ((samplesize-1)*(*workbetamean) + betatransform);
+
+          // updating betavar
+          if (samplesize==1)
+            *workbetas2 = betatransform*betatransform;
+          else
+            *workbetas2 += betatransform*betatransform;
+          *workbetavar = (1.0/samplesize)*
+                         (*workbetas2)-(*workbetamean)*(*workbetamean);
+
+          // updating betamin, betamax
+          if (samplesize==1)
+            {
             *workbetamin = betatransform;
-          if (betatransform > *workbetamax)
             *workbetamax = betatransform;
+            }
+          else
+            {
+            if (betatransform < *workbetamin)
+              *workbetamin = betatransform;
+            if (betatransform > *workbetamax)
+              *workbetamax = betatransform;
+            }
+
           }
 
-        }
+        }  // end: for i=0; ...
 
-      }  // end: for i=0; ...
+      }
+    else
+      {
 
+      for(i=0;i<beta.rows();i++)
+        {
+        for (j=0;j<beta.cols();j++,workbeta++,workbetamean++,workbetas2++,
+             workbetavar++,workbetamin++,workbetamax++)
+
+          {
+
+          betatransform = (*workbeta)+addon;
+
+          // updating betamean
+          if (samplesize==1)
+            *workbetamean = betatransform;
+          else
+            *workbetamean = (1.0/(samplesize))*
+                         ((samplesize-1)*(*workbetamean) + betatransform);
+
+          // updating betavar
+          if (samplesize==1)
+            *workbetas2 = betatransform*betatransform;
+          else
+            *workbetas2 += betatransform*betatransform;
+          *workbetavar = (1.0/samplesize)*
+                         (*workbetas2)-(*workbetamean)*(*workbetamean);
+
+          // updating betamin, betamax
+          if (samplesize==1)
+            {
+            *workbetamin = betatransform;
+            *workbetamax = betatransform;
+            }
+          else
+            {
+            if (betatransform < *workbetamin)
+              *workbetamin = betatransform;
+            if (betatransform > *workbetamax)
+              *workbetamax = betatransform;
+            }
+
+          }
+
+        }  // end: for i=0; ...
+
+      }
 
     } // end: if ( (nriter > optionsp->burnin) && ((nriter-burnin-1) % optionsp->step == 0) )
 
@@ -655,10 +706,8 @@ void FC::posteriormode_betamean(void)
 
   for(i=0;i<beta.rows();i++)
     for (j=0;j<beta.cols();j++,workbetamean++,workbeta++)
-      {
-//      *workbetamean = transform(j,0) * (*workbeta)+addon;
       *workbetamean =  (*workbeta)+addon;
-      }
+
   }
 
 
@@ -667,11 +716,24 @@ void FC::outresults_acceptance(void)
   if (optionsp->samplesize > 0)
     {
     double rate;
+    double rateoutside;
+    rateoutside = (double(outsidelinpredlimits)/double(optionsp->nriter))*100;
     if (nrtrials == 0)
+      {
       rate = (double(acceptance)/double(optionsp->nriter))*100;
+      }
     else
+      {
       rate = (double(acceptance)/double(nrtrials))*100;
+      }
     optionsp->out("    Acceptance rate:    "  + ST::doubletostring(rate,4) + " %\n");
+    if (optionsp->saveestimation)
+      {
+      if (outsidelinpredlimits > 0)
+        optionsp->out("    WARNING: In " + ST::doubletostring(rateoutside,4) +
+                      " percent of iterations the predictor was outside limits\n");
+
+      }
     optionsp->out("\n");
     }
   }
@@ -781,7 +843,8 @@ double FC::simconfBand(bool l1)
 
 void FC::outresults_help(ofstream & out_stata, ofstream & out_R,
                     const ST::string & pathresults,
-                    const vector<ST::string> & datanames)
+                    const vector<ST::string> & datanames,
+                    unsigned col)
   {
 
   unsigned i;
@@ -866,12 +929,12 @@ void FC::outresults_help(ofstream & out_stata, ofstream & out_R,
     else
       nsp = 10-vnames[i].length();
 
-    m= betamean(i,0);
+    m= betamean(i,col);
 
-    if (betavar(i,0) == 0)
+    if (betavar(i,col) < 0.0000000000001)
       stddouble = 0;
     else
-      stddouble = sqrt(betavar(i,0));
+      stddouble = sqrt(betavar(i,col));
 
     if (pathresults.isvalidfile() != 1)
       {
@@ -880,21 +943,21 @@ void FC::outresults_help(ofstream & out_stata, ofstream & out_R,
       outp << m << "   ";
       outp << stddouble << "   ";
 
-      outp << betaqu_l1_lower(i,0) << "   ";
-      outp << betaqu_l2_lower(i,0) << "   ";
-      outp << betaqu50(i,0) << "   ";
-      outp << betaqu_l2_upper(i,0) << "   ";
-      outp << betaqu_l1_upper(i,0) << "   ";
-      if (betaqu_l1_lower(i,0) > 0)
+      outp << betaqu_l1_lower(i,col) << "   ";
+      outp << betaqu_l2_lower(i,col) << "   ";
+      outp << betaqu50(i,col) << "   ";
+      outp << betaqu_l2_upper(i,col) << "   ";
+      outp << betaqu_l1_upper(i,col) << "   ";
+      if (betaqu_l1_lower(i,col) > 0)
         outp << "1   ";
-      else if (betaqu_l1_upper(i,0) < 0)
+      else if (betaqu_l1_upper(i,col) < 0)
         outp << "-1   ";
       else
         outp << "0   ";
 
-      if (betaqu_l2_lower(i,0) > 0)
+      if (betaqu_l2_lower(i,col) > 0)
         outp << "1   ";
-      else if (betaqu_l2_upper(i,0) < 0)
+      else if (betaqu_l2_upper(i,col) < 0)
         outp << "-1   ";
       else
         outp << "0   ";
@@ -903,8 +966,8 @@ void FC::outresults_help(ofstream & out_stata, ofstream & out_R,
 
 
       optionsp->out(ST::outresults(nsp,vnames[i],m,
-                        stddouble,betaqu_l1_lower(i,0),
-                        betaqu50(i,0),betaqu_l1_upper(i,0)) + "\n");
+                        stddouble,betaqu_l1_lower(i,col),
+                        betaqu50(i,col),betaqu_l1_upper(i,col)) + "\n");
 
       }
 
@@ -916,7 +979,7 @@ void FC::outresults_help(ofstream & out_stata, ofstream & out_R,
 
 
 
-void FC::outresults(ofstream & out_stata, ofstream & out_R,
+void FC::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                     const ST::string & pathresults)
   {
 
@@ -928,6 +991,7 @@ void FC::outresults(ofstream & out_stata, ofstream & out_R,
     optionsp->out("  " + title + "\n",true);
     optionsp->out("\n");
     }
+
 
   if (optionsp->samplesize > 0)
     {
@@ -942,24 +1006,22 @@ void FC::outresults(ofstream & out_stata, ofstream & out_R,
     double* wqu1u = betaqu_l2_upper.getV();
     double* wqu2u = betaqu_l1_upper.getV();
 
-    for(i=0;i<nrpar;i++,wqu1l++,wqu2l++,wqu50++,wqu1u++,wqu2u++)
+    if (nosamplessave==false)
       {
-
-      index.indexinit();
-
-      sampled_beta.indexsort(index,0,sampled_beta.rows()-1,i,0);
-
-      *wqu1l = sampled_beta.quantile(optionsp->lower1,i,index);
-      *wqu2l = sampled_beta.quantile(optionsp->lower2,i,index);
-      *wqu50 = sampled_beta.quantile(50,i,index);
-      *wqu1u = sampled_beta.quantile(optionsp->upper1,i,index);
-      *wqu2u = sampled_beta.quantile(optionsp->upper2,i,index);
+      for(i=0;i<nrpar;i++,wqu1l++,wqu2l++,wqu50++,wqu1u++,wqu2u++)
+        {
+        index.indexinit();
+        sampled_beta.indexsort(index,0,sampled_beta.rows()-1,i,0);
+        *wqu1l = sampled_beta.quantile(optionsp->lower1,i,index);
+        *wqu2l = sampled_beta.quantile(optionsp->lower2,i,index);
+        *wqu50 = sampled_beta.quantile(50,i,index);
+        *wqu1u = sampled_beta.quantile(optionsp->upper1,i,index);
+        *wqu2u = sampled_beta.quantile(optionsp->upper2,i,index);
+        }
       }
-
 
     if (pathresults.isvalidfile() != 1)
       {
-
       ofstream outres(pathresults.strtochar());
 
       unsigned i;
@@ -976,50 +1038,94 @@ void FC::outresults(ofstream & out_stata, ofstream & out_R,
       outres << "intnr" << "   ";
       outres << "pmean   ";
 
-      if (optionsp->samplesize > 1)
+      if (nosamplessave==false)
         {
-        outres << "pqu"  << l1  << "   ";
-        outres << "pqu"  << l2  << "   ";
-        outres << "pmed   ";
-        outres << "pqu"  << u1  << "   ";
-        outres << "pqu"  << u2  << "   ";
-        }
-
-      outres << endl;
-
-      double * workmean;
-      double * workbetaqu_l1_lower_p;
-      double * workbetaqu_l2_lower_p;
-      double * workbetaqu_l1_upper_p;
-      double * workbetaqu_l2_upper_p;
-      double * workbetaqu50;
-
-      workmean = betamean.getV();
-      workbetaqu_l1_lower_p = betaqu_l1_lower.getV();
-      workbetaqu_l2_lower_p = betaqu_l2_lower.getV();
-      workbetaqu_l1_upper_p = betaqu_l1_upper.getV();
-      workbetaqu_l2_upper_p = betaqu_l2_upper.getV();
-      workbetaqu50 = betaqu50.getV();
-
-      unsigned nrpar = beta.rows();
-      for(i=0;i<nrpar;i++,workmean++,workbetaqu_l1_lower_p++,
-                                 workbetaqu_l2_lower_p++,workbetaqu50++,
-                                 workbetaqu_l1_upper_p++,workbetaqu_l2_upper_p++)
-        {
-        outres << (i+1) << "   ";
-        outres << *workmean << "   ";
 
         if (optionsp->samplesize > 1)
           {
-          outres << *workbetaqu_l1_lower_p << "   ";
-          outres << *workbetaqu_l2_lower_p << "   ";
-          outres << *workbetaqu50 << "   ";
-          outres << *workbetaqu_l2_upper_p << "   ";
-          outres << *workbetaqu_l1_upper_p << "   ";
-
+          outres << "pstd   ";
+          outres << "pqu"  << l1  << "   ";
+          outres << "pqu"  << l2  << "   ";
+          outres << "pmed   ";
+          outres << "pqu"  << u1  << "   ";
+          outres << "pqu"  << u2  << "   ";
           }
 
         outres << endl;
+
+        double * workmean;
+        double * workstd;
+        double * workbetaqu_l1_lower_p;
+        double * workbetaqu_l2_lower_p;
+        double * workbetaqu_l1_upper_p;
+        double * workbetaqu_l2_upper_p;
+        double * workbetaqu50;
+
+        workmean = betamean.getV();
+        workstd =  betavar.getV();
+        workbetaqu_l1_lower_p = betaqu_l1_lower.getV();
+        workbetaqu_l2_lower_p = betaqu_l2_lower.getV();
+        workbetaqu_l1_upper_p = betaqu_l1_upper.getV();
+        workbetaqu_l2_upper_p = betaqu_l2_upper.getV();
+        workbetaqu50 = betaqu50.getV();
+
+        unsigned nrpar = beta.rows();
+        for(i=0;i<nrpar;i++,workmean++,workstd++,workbetaqu_l1_lower_p++,
+                                   workbetaqu_l2_lower_p++,workbetaqu50++,
+                                   workbetaqu_l1_upper_p++,workbetaqu_l2_upper_p++)
+          {
+          outres << (i+1) << "   ";
+          outres << *workmean << "   ";
+
+          if (optionsp->samplesize > 1)
+            {
+            if (*workstd < 0.0000000000001)
+              outres << 0 << "   ";
+            else
+              outres << sqrt(*workstd) << "   ";
+            outres << *workbetaqu_l1_lower_p << "   ";
+            outres << *workbetaqu_l2_lower_p << "   ";
+            outres << *workbetaqu50 << "   ";
+            outres << *workbetaqu_l2_upper_p << "   ";
+            outres << *workbetaqu_l1_upper_p << "   ";
+
+            }
+
+          outres << endl;
+
+          }
+
+        }
+      else
+        {
+        if (optionsp->samplesize > 1)
+          outres << "pstd   ";
+
+        outres << endl;
+
+        double * workmean;
+        double * workstd;
+
+        workmean = betamean.getV();
+        workstd =  betavar.getV();
+
+        unsigned nrpar = beta.rows();
+        for(i=0;i<nrpar;i++,workmean++,workstd++)
+          {
+          outres << (i+1) << "   ";
+          outres << *workmean << "   ";
+
+          if (optionsp->samplesize > 1)
+            {
+            if (*workstd < 0.0000000000001)
+              outres << 0 << "   ";
+            else
+              outres << sqrt(*workstd) << "   ";
+            }
+
+          outres << endl;
+
+          }
 
         }
 
@@ -1027,6 +1133,97 @@ void FC::outresults(ofstream & out_stata, ofstream & out_R,
 
     }  // if (optionsp->get_samplesize() > 0)
   }
+
+
+void FC::outresults_singleparam(ofstream & out_stata,ofstream & out_R,
+                                  const ST::string & pathresults)
+  {
+
+  ST::string l1 = ST::doubletostring(optionsp->lower1,4);
+  ST::string l2 = ST::doubletostring(optionsp->lower2,4);
+  ST::string u1 = ST::doubletostring(optionsp->upper1,4);
+  ST::string u2 = ST::doubletostring(optionsp->upper2,4);
+
+  ST::string nl1 = ST::doubletostring(optionsp->lower1,4);
+  ST::string nl2 = ST::doubletostring(optionsp->lower2,4);
+  ST::string nu1 = ST::doubletostring(optionsp->upper1,4);
+  ST::string nu2 = ST::doubletostring(optionsp->upper2,4);
+  nl1 = nl1.replaceallsigns('.','p');
+  nl2 = nl2.replaceallsigns('.','p');
+  nu1 = nu1.replaceallsigns('.','p');
+  nu2 = nu2.replaceallsigns('.','p');
+
+  ST::string vstr;
+
+  vstr = "    Mean:         ";
+  optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
+  ST::doubletostring(betamean(0,0),6) + "\n");
+
+  if (optionsp->samplesize > 1)
+    {
+
+    vstr = "    Std. dev.:    ";
+
+    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
+    ST::doubletostring(sqrt(betavar(0,0)),6) + "\n");
+
+    vstr = "    " + l1 + "% Quantile: ";
+    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
+    ST::doubletostring(betaqu_l1_lower(0,0),6) + "\n");
+
+    vstr = "    " + l2 + "% Quantile: ";
+    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
+    ST::doubletostring(betaqu_l2_lower(0,0),6) + "\n");
+
+    vstr = "    50% Quantile: ";
+    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
+    ST::doubletostring(betaqu50(0,0),6) + "\n");
+
+    vstr = "    " + u1 + "% Quantile: ";
+    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
+    ST::doubletostring(betaqu_l2_upper(0,0),6) + "\n");
+
+    vstr = "    " + u2 + "% Quantile: ";
+    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
+    ST::doubletostring(betaqu_l1_upper(0,0),6) + "\n");
+
+    optionsp->out("\n");
+    }
+
+
+  if (pathresults.isvalidfile() != 1)
+    {
+
+    ofstream ou(pathresults.strtochar());
+
+    if (optionsp->samplesize > 1)
+      {
+      ou << "pmean  pstddev  pqu"  << nl1 << "   pqu" << nl2 << "  pmed pqu" <<
+      nu1 << "   pqu" << nu2 << "  pmin  pmax" << endl;
+      }
+    else
+      {
+      ou << "pmean" << endl;
+      }
+
+    ou << betamean(0,0) << "  ";
+    if (optionsp->samplesize > 1)
+      {
+      ou << (betavar(0,0)<0.0?0.0:sqrt(betavar(0,0))) << "  ";
+      ou << betaqu_l1_lower(0,0) << "  ";
+      ou << betaqu_l2_lower(0,0) << "  ";
+      ou << betaqu50(0,0) << "  ";
+      ou << betaqu_l2_upper(0,0) << "  ";
+      ou << betaqu_l1_upper(0,0) << "  ";
+      ou << betamin(0,0) << "  ";
+      ou << betamax(0,0) << "  " << endl;
+      }
+
+    optionsp->out("\n");
+    }
+
+  }
+
 
 
 void FC::reset(void)
@@ -1039,6 +1236,3 @@ void FC::reset(void)
 
 
 } // end: namespace MCMC
-
-
-

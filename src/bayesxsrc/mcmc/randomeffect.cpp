@@ -40,7 +40,7 @@ namespace MCMC
       likep->initialise_mscheck(path, index, nrpar-includefixed, posbeg, posend);
       }
     }
-#endif    
+#endif
   // END: DSB //
 
 
@@ -1421,7 +1421,9 @@ void FULLCOND_random::update_linpred(const bool & add)
             {
             h = *workbeta+ms;
             for(j=*itbeg;j<=*itend;j++,workindex2++,datap++)
+              {
               likep->add_linearpred2(-h*(*datap),*workindex2);
+              }
             }
           }
         }
@@ -1505,7 +1507,7 @@ void FULLCOND_random::init_data_varcoeff(const datamatrix & intvar,double add)
   double * datap = data.getV();
   double * datap2 = data2.getV();
   int * workindex = index.getV();
-  unsigned j;  
+  unsigned j;
 
   for(j=0;j<data.rows();j++,datap++,datap2++,workindex++)
     {
@@ -1619,7 +1621,6 @@ void FULLCOND_random::get_effectmatrix(datamatrix & e,
 
 bool FULLCOND_random::posteriormode(void)
   {
-
   lambda=1;
   unsigned n = nrpar;
   if (includefixed)
@@ -1634,9 +1635,11 @@ bool FULLCOND_random::posteriormode(void)
   unsigned i,j;
   vector<unsigned>::iterator itbeg = posbeg.begin();
   vector<unsigned>::iterator itend = posend.begin();
+
   int * workindex2 = index2.getV();
   itbeg = posbeg.begin();
   itend = posend.begin();
+
   double * workmuy = muy.getV();
   likep->set_workingresp();
 
@@ -1681,7 +1684,6 @@ bool FULLCOND_random::posteriormode(void)
       }
 
     }
-
 
   itbeg = posbeg.begin();
   itend = posend.begin();
@@ -1862,7 +1864,7 @@ void FULLCOND_random_gaussian::update(void)
   if (notransform==false)
     transform = likep->get_trmult(column);
   else
-    transform=1;  
+    transform=1;
 
 
   FULLCOND_random::update();
@@ -2559,6 +2561,7 @@ update_random_slope_includefixed_iwls_singleblock(void)
     // Compute loglikelihood based on current beta
     // compute sum weightiwls  (corresponds to X'WX) and sum tildey based on
     // current beta
+
     logold = likep->compute_loglikelihood_sumweight_sumy(
     *workbeta+ms,sumw,sumy,*itbeg,*itend,data,index,index2,column);
 
@@ -2991,7 +2994,7 @@ void FULLCOND_random_nongaussian::update_random_intercept_iwls_singleblock(void)
     // add proposed beta and substract current beta from linear predictor
     likep->add_linearpred2(proposal-*workbeta,*itbeg,*itend,index,index2,column);
 
-    // Compute log-likelihood based on proposed beta
+   // Compute log-likelihood based on proposed beta
     // compute sum weightiwls  (corresponds to X'WX) and sum
     // tildey based on proposed beta
     lognew = likep->compute_loglikelihood_sumweight_sumy(
@@ -3000,7 +3003,7 @@ void FULLCOND_random_nongaussian::update_random_intercept_iwls_singleblock(void)
     // log-prior densities
     lognew -= 0.5*(proposal)*(proposal)*lambda;
 
-    // log q(proposal,beta_c)
+   // log q(proposal,beta_c)
     var = 1.0/(sumw + lambda);
 
     mode = var*sumy;
@@ -3329,7 +3332,7 @@ void FULLCOND_random_nongaussian::update_random_intercept(void)
 
   }
 
-  
+
 void FULLCOND_random_nongaussian::update_random_slope(void)
   {
 
@@ -3455,7 +3458,6 @@ void FULLCOND_random_nongaussian::update(void)
 
   if (iwlsmode)
     {
-
     if (!randomslope)
       {
 //      update_random_intercept();

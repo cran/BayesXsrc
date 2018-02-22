@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 namespace MCMC
 {
-                            
+
 
 void spline_basis::change_K(void)
   {
@@ -273,6 +273,10 @@ spline_basis::spline_basis(MCMCoptions * o, DISTRIBUTION * dp,
   : FULLCOND_nonp_basis(o,dp,ft,ti,fp,pres,c)
   {
 
+  //    /UBSAN checks
+  refcheck=false;
+  // end: ASAN/UBSAN checks
+
   fcconst = fcc;
 
   lambdaconst = false;
@@ -331,6 +335,12 @@ spline_basis::spline_basis(MCMCoptions * o,
   : FULLCOND_nonp_basis(o,ti)
   {
   catspecific = catsp;
+
+  // ASAN/UBSAN checks
+  predictleft=false;
+  predictright=false;
+  approx = false;
+  // end: ASAN/UBSAN checks
 
   pseudocontourprob = false;
 
@@ -1456,14 +1466,20 @@ void spline_basis::add_linearpred_multBS(const bool & current)
   while (k<nrpar)
     {
     stop = lastnonzero[k];
-//    while (i<lastnonzero[k]+1)
+// ASAN / UBSAN checks
     while (i <= stop)
+//    while (i < stop)
+// end: ASAN / UBSAN checks
       {
       workbeta = beta.getV() + k;
       for(j=0;j<col;j++,workBS++,workbeta++)
         {
-        *lp += *workBS * *workbeta;
-        *workspline += *workBS * *workbeta;
+// ASAN/UBSAN
+        if( (!(lp==NULL)) && (!(workBS==NULL)) && (!(workbeta==NULL)) && (!(workspline==NULL)) )
+          {
+          *lp += *workBS * *workbeta;
+          *workspline += *workBS * *workbeta;
+          }
         }
       if((freqwork+1)!=freq.end() && *freqwork==*(freqwork+1))
         {
@@ -1471,10 +1487,17 @@ void spline_basis::add_linearpred_multBS(const bool & current)
         workbeta -= col;
         }
       i++;
-      freqwork++;
-      workindex2++;
-      workspline += *workindex2;
-      lp += *workindex2*lpcols;
+//      if(i<=stop)
+        {
+        freqwork++;
+        workindex2++;
+// ASAN/UBSAN
+        if(workindex2!=index2.end())
+          {
+          workspline += *workindex2;
+          lp += *workindex2*lpcols;
+          }
+        }
       }
     k++;
     }
@@ -1776,7 +1799,9 @@ double spline_basis::deriv_f(const double & x)
   for(unsigned i=0;i<nrpar;i++)
     res += beta(i,0)*(X(i,0)-X(i+1,0));
 
-  return res/h;
+  res = res/h;
+
+  return res;
   }
 
 
@@ -2529,12 +2554,15 @@ void spline_basis::compute_XWX(const datamatrix & weight)
           else
             *workupper += *(workBS+j) * *workweight * *(workBS+k);
           l++;
+// ASAN/UBSAN checks
           freqwork++;
           workBS += BScols*(*freqwork-*(freqwork-1));
-          workindex2++;
-          workweight += *workindex2;
+          if(l<=stop)
+            {
+            workindex2++;
+            workweight += *workindex2;
+            }
           }
-
         }
       }
     }
@@ -2604,11 +2632,14 @@ void spline_basis::compute_XWXenv(const datamatrix & weight, const unsigned & c)
             else
               *workupper += *(workBS+j) * *workweight * *(workBS+k);
             l++;
-            if ( l >= stop ) break;
-            freqwork++;
-            workBS += BScols*(*freqwork-*(freqwork-1));
-            workindex2++;
-            workweight += *workindex2*weightcols;
+// ASAN/UBSAN checks
+            if (l <= stop )
+              {
+              freqwork++;
+              workBS += BScols*(*freqwork-*(freqwork-1));
+              workindex2++;
+              workweight += *workindex2*weightcols;
+              }
             }
 
           }
@@ -2700,11 +2731,15 @@ void spline_basis::compute_XWXenv_XWtildey(const datamatrix & weight, const doub
               *workupper += *(workBS+j) * *workweight * *(workBS+k);
               }
             l++;
+// ASAN/UBSAN checks
             freqwork++;
             workBS += BScols*(*freqwork-*(freqwork-1));
-            workindex2++;
-            workweight += *workindex2*weightcols;
-            workmu += *workindex2;
+            if (l<=stop)
+              {
+              workindex2++;
+              workweight += *workindex2*weightcols;
+              workmu += *workindex2;
+              }
             }
           }
         }
@@ -2794,11 +2829,15 @@ void spline_basis::compute_XWtildey(const datamatrix & weight, const double & sc
           {
           *workmuy2 += *workBS * *workweight * *workmu;
           l++;
+// ASAN/UBSAN checks
           freqwork++;
-          workindex2++;
-          workweight += *workindex2;
-          workmu += *workindex2;
           workBS += BScols*(*freqwork - *(freqwork-1));
+          if (l<=stop)
+            {
+            workindex2++;
+            workweight += *workindex2;
+            workmu += *workindex2;
+            }
           }
         }
       }
@@ -2857,11 +2896,15 @@ void spline_basis::compute_XWtildey(const datamatrix & weight, const datamatrix 
           {
           *workmuy2 += *workBS * *workweight * *workmu;
           l++;
+// ASAN/UBSAN checks
           freqwork++;
-          workindex2++;
-          workweight += *workindex2*weightcols;
-          workmu += *workindex2;
           workBS += BScols*(*freqwork - *(freqwork-1));
+          if (l <= stop )
+            {
+            workindex2++;
+            workweight += *workindex2*weightcols;
+            workmu += *workindex2;
+            }
           }
         }
       }
@@ -3727,7 +3770,7 @@ double spline_basis::outresultsreml(datamatrix & X,datamatrix & Z,
 
   if(varcoeff || X.rows()<X_VCM.rows())
     {
-    for(i=0,j=0;i<Z_VCM.rows();i++,indexit++,freqwork++,k+=*indexit)
+    for(i=0,j=0;i<Z_VCM.rows();)
       {
       if(freqwork==freqoutput.begin() || *freqwork!=*(freqwork-1))
         {
@@ -3782,11 +3825,18 @@ double spline_basis::outresultsreml(datamatrix & X,datamatrix & Z,
           }
         j++;
         }
+      i++;
+      if(i<Z_VCM.rows())
+        {
+         indexit++;
+         freqwork++;
+         k+=*indexit;
+        }
       }
     }
   else
     {
-    for(i=0,j=0;i<X.rows();i++,indexit++,freqwork++,k+=*indexit)
+    for(i=0,j=0;i<X.rows();)
       {
       if(freqwork==freqoutput.begin() || *freqwork!=*(freqwork-1))
         {
@@ -3817,6 +3867,13 @@ double spline_basis::outresultsreml(datamatrix & X,datamatrix & Z,
                              );
           }
         j++;
+        }
+      i++;
+      if(i<X.rows())
+        {
+        indexit++;
+        freqwork++;
+        k+=*indexit;
         }
       }
     }
@@ -3849,11 +3906,11 @@ double spline_basis::outresultsreml(datamatrix & X,datamatrix & Z,
   k = *indexit;
   freqwork = freqoutput.begin();
 
-  if(refcheck)
+ if(refcheck)
     {
     if(varcoeff || X.rows()<X_VCM.rows())
       {
-      for(i=0,j=0;i<Z_VCM.rows();i++,indexit++,freqwork++,k+=*indexit)
+      for(i=0,j=0;i<Z_VCM.rows();)
         {
         if(freqwork==freqoutput.begin() || *freqwork!=*(freqwork-1))
           {
@@ -3908,11 +3965,18 @@ double spline_basis::outresultsreml(datamatrix & X,datamatrix & Z,
             }
           j++;
           }
+        i++;
+        if(i<Z_VCM.rows())
+          {
+          indexit++;
+          freqwork++;
+          k+=*indexit;
+          }
         }
       }
     else
       {
-      for(i=0,j=0;i<X.rows();i++,indexit++,freqwork++,k+=*indexit)
+      for(i=0,j=0;i<X.rows();)
         {
         if(freqwork==freqoutput.begin() || *freqwork!=*(freqwork-1))
           {
@@ -3944,8 +4008,15 @@ double spline_basis::outresultsreml(datamatrix & X,datamatrix & Z,
             }
           j++;
           }
+        i++;
+        if(i<X.rows())
+          {
+          indexit++;
+          freqwork++;
+          k+=*indexit;
+          }
         }
-      }  
+      }
     for(j=0; j<nr; j++)
       {
 //      betarefmean(j,0)=betarefmean(j,0)-mean;

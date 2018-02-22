@@ -400,6 +400,15 @@ void FULLCOND_nonp_basis::set_adaptiv(void)
 
   }
 
+FULLCOND_nonp_basis::FULLCOND_nonp_basis(MCMCoptions * o, const ST::string & ti)
+  : FULLCOND(o,ti)
+  {
+  // ASAN/UBSAN checks
+  changingweight = false;
+  interaction=false;
+  polex = false;
+  // end: ASAN/UBSAN checks
+  }
 
 
 FULLCOND_nonp_basis::FULLCOND_nonp_basis(MCMCoptions * o,DISTRIBUTION * dp,
@@ -408,6 +417,10 @@ FULLCOND_nonp_basis::FULLCOND_nonp_basis(MCMCoptions * o,DISTRIBUTION * dp,
                             const unsigned & c,const unsigned & per)
   : FULLCOND(o,datamatrix(1,1),ti,1,1,fp)
   {
+  // ASAN/UBSAN checks
+  polex = false;
+  // end: ASAN/UBSAN checks
+
   interaction=false;
   changingweight = dp->get_changingweight();
   tildey = datamatrix(1,1);

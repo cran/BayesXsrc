@@ -77,6 +77,69 @@ class __EXPORT_TYPE term_nonp : public basic_termtype
   stroption prior;
   fileoption knotpath;
   stroption datasetref;
+  simpleoption lambdaconst;
+
+  doubleoption abeta;
+  doubleoption bbeta;
+  doubleoption r;
+  doubleoption v;
+  doubleoption aQ;
+  doubleoption bQ;
+  intoption regiterates;
+  simpleoption center;
+
+  doubleoption tildea;
+  doubleoption tildeb;
+  simpleoption cauchy;
+
+  // deprecated
+  simpleoption wei;
+  doubleoption scaletau2;
+  doubleoption r2;
+  doubleoption tildev1;
+  doubleoption tildev2;
+  // end: deprecated
+
+  doubleoption v1;
+  doubleoption v2;
+  simpleoption gig;
+  stroption proposal;
+
+  intoption rankK;
+  stroption penmatdata;
+
+
+  simpleoption cprior;
+
+  stroption designmatdata;
+  stroption priormeandata;
+
+  stroption hyperprior;
+
+  stroption penmatdata2;
+  stroption designmatdata2;
+
+  stroption constrmatdata;
+
+  intoption nraniso;
+  doubleoption minaniso;
+
+  simpleoption WAICoff;
+
+  stroption betastart;
+
+  stroption mevar;
+  stroption covdata;
+
+  doubleoption a_tau2_x;
+  doubleoption b_tau2_x;
+  doubleoption m_mu_x;
+  doubleoption s_mu_x;
+  doubleoption mepropscale;
+
+  simpleoption reduceddesign;
+
+  stroption ssvsupdate;
 
   vector<ST::string> termnames;
 

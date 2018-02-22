@@ -50,7 +50,6 @@ void FC_linear::read_options(vector<ST::string> & op,vector<ST::string> & vn)
   13      samplemult
   14      constraints
   */
-
   }
 
 
@@ -67,14 +66,15 @@ int FC_linear::add_variable(const datamatrix & d,ST::string & name)
   }
 
 
-FC_linear::FC_linear(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,
+FC_linear::FC_linear(MASTER_OBJ * mp,unsigned & enr,GENERAL_OPTIONS * o,DISTR * lp,
                     datamatrix & d,
                  vector<ST::string> & vn, const ST::string & t,
-                 const ST::string & fp,bool cent)
+                 const ST::string & fp,bool cent, bool IWLSle)
      : FC(o,t,1,1,fp)
   {
 
   masterp = mp;
+  equationnr = enr;
   likep = lp;
   unsigned i;
   datanames = vn;
@@ -85,17 +85,21 @@ FC_linear::FC_linear(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,
     }
   initialize = false;
   IWLS = likep->updateIWLS;
+  IWLSmode = !IWLSle;
 
   center = cent;
   rankXWX_ok = true;
+  constwarning=false;
   }
 
 
 FC_linear::FC_linear(const FC_linear & m)
   : FC(FC(m))
   {
+  constwarning=m.constwarning;
   constposition = m.constposition;
   masterp = m.masterp;
+  equationnr = m.equationnr;
   IWLS = m.IWLS;
   likep = m.likep;
   design = m.design;
@@ -124,6 +128,7 @@ FC_linear::FC_linear(const FC_linear & m)
   datanames = m.datanames;
   mean_designcols = m.mean_designcols;
   center = m.center;
+  IWLSmode = m.IWLSmode;
   }
 
 
@@ -133,8 +138,10 @@ const FC_linear & FC_linear::operator=(const FC_linear & m)
   if (this==&m)
 	 return *this;
   FC::operator=(FC(m));
+  constwarning=m.constwarning;
   constposition = m.constposition;
   masterp = m.masterp;
+  equationnr = m.equationnr;
   IWLS = m.IWLS;
   likep = m.likep;
   design = m.design;
@@ -163,27 +170,31 @@ const FC_linear & FC_linear::operator=(const FC_linear & m)
   mean_designcols = m.mean_designcols;
   datanames = m.datanames;
   center = m.center;
+  IWLSmode = m.IWLSmode;
   return *this;
   }
 
 
 void FC_linear::add_linpred(datamatrix & l)
   {
-
-  if (likep->linpred_current==1)
-    likep->linearpred1.plus(l);
-  else
-    likep->linearpred2.plus(l);
+  likep->add_linpred(l);
   }
-
 
 
 
 void FC_linear::update_IWLS(void)
   {
 
-  double qoldbeta;
-  double qnewbeta;
+
+/*
+      ofstream out3("c:\\bayesx\\testh\\results\\linpred.res");
+      if (likep->linpred_current==1)
+        likep->linearpred1.prettyPrint(out3);
+      else
+        likep->linearpred2.prettyPrint(out3);
+*/
+  double qoldbeta = 0.0;
+  double qnewbeta = 0.0;
 
   if (!initialize)
     create_matrices();
@@ -193,8 +204,13 @@ void FC_linear::update_IWLS(void)
     linold.mult(design,beta);
     mode.assign(beta);
     }
+  double logold = 0.0;
+  bool ok = true;
+  double logprop = 0.0;
 
-    double logold = likep->loglikelihood(true);
+  if(IWLSmode)
+    {
+    logold = likep->loglikelihood(true);
 
     linmode.mult(design,mode);
     diff.minus(linmode,*linoldp);
@@ -206,12 +222,10 @@ void FC_linear::update_IWLS(void)
 
     compute_Wpartres(linmode);
     Xtresidual.mult(Xt,residual);
-
     XWXroot.solveroot(Xtresidual,help,mode);
 
     help.minus(beta,mode);
     qoldbeta = -0.5*XWXold.compute_quadform(help);
-
 
     unsigned i;
     double * workh = help.getV();
@@ -219,14 +233,10 @@ void FC_linear::update_IWLS(void)
       *workh = rand_normal();
 
     XWXroot.solveroot_t(help,proposal);
-
     proposal.plus(mode);
-
-
     help.minus(proposal,mode);
 
     qnewbeta = -0.5*XWXold.compute_quadform(help);
-
 
     linnewp->mult(design,proposal);
 
@@ -234,32 +244,120 @@ void FC_linear::update_IWLS(void)
 
     add_linpred(diff);                           // (mit proposed)
 
-    double logprop = likep->loglikelihood();     // mit proposed
-
-
-    double u = log(uniform());
-
-    if (u <= (logprop + qoldbeta - logold - qnewbeta) )
+    if (optionsp->saveestimation)
       {
-      datamatrix * mp = linoldp;
-      linoldp = linnewp;
-      linnewp = mp;
-
-      beta.assign(proposal);
-
-      acceptance++;
+      ok = likep->check_linpred();
+      if (!ok)
+        outsidelinpredlimits++;
       }
     else
+      ok = true;
+
+    if (ok)
+      logprop = likep->loglikelihood();     // mit proposed
+
+/*    ofstream out1("c://temp//XWX.raw");
+    XWX.prettyPrint(out1);
+    out1.close();
+
+    ofstream out2("c://temp//design.raw");
+    design.prettyPrint(out2);
+    out2.close();
+
+    ofstream out3("c://temp//Xtresidual.raw");
+    Xtresidual.prettyPrint(out3);
+    out3.close();*/
+
+
+    }
+  else
+    {
+    logold = likep->loglikelihood(true);
+    // calcculate proposal based on current parameter
+    likep->compute_iwls(true, false);
+    compute_XWXroot(XWX); // Assumption: Matrix::root calculates Cholesky decomposition such that A = L' L
+                          // second assumption: calling compute_XWXroot always updates this->XWXroot
+    compute_Wpartres(*linoldp);
+    Xtresidual.mult(Xt,residual);
+    XWXroot.solveroot(Xtresidual,help,mode);
+
+    double log_det_XWX_half = 0.0;
+    for (unsigned i = 0; i < XWXroot.rows(); i++)
       {
-      diff.minus(*linoldp,*linnewp);
-      add_linpred(diff);
+      log_det_XWX_half += log(XWXroot(i,i));
+      }
+    double* help_p = help.getV();
+    for (unsigned i = 0; i < help.rows(); i++, help_p++)
+      {
+      *help_p = rand_normal();
+      }
+    XWXroot.solveroot_t(help,proposal);
+    qnewbeta = -0.5*XWX.compute_quadform(proposal) - log_det_XWX_half; // log q(proposal | current)
+    proposal.plus(mode); // add location to proposal after calculating qnewbeta!
+
+    // update lin pred to use proposed value
+    linnewp->mult(design,proposal);
+    diff.minus(*linnewp,*linoldp);
+    add_linpred(diff);
+
+/*    ofstream out1("c://temp//XWX.raw");
+    XWX.prettyPrint(out1);
+    out1.close();
+
+    ofstream out2("c://temp//design.raw");
+    design.prettyPrint(out2);
+    out2.close();
+
+    ofstream out3("c://temp//Xtresidual.raw");
+    Xtresidual.prettyPrint(out3);
+    out3.close();*/
+
+    // check if proposed lin pred is within limits
+    ok = true;
+    if (optionsp->saveestimation)
+      {
+      ok = likep->check_linpred();
+      if (!ok)
+        {
+        outsidelinpredlimits++;
+        }
       }
 
-    FC::update();
+    // calc log posterior and log q(current | proposal)
+    if (ok)
+      {
+      logprop = likep->loglikelihood();
+      likep->compute_iwls(true, false);
+      compute_XWXroot(XWX);
+      compute_Wpartres(*linnewp);
+      Xtresidual.mult(Xt,residual);
+      XWXroot.solveroot(Xtresidual,help,mode);
+      log_det_XWX_half = 0.0;
+      for (unsigned i = 0; i < XWXroot.rows(); i++)
+        {
+        log_det_XWX_half += log(XWXroot(i,i));
+        }
+      help.minus(mode, beta);
+      qoldbeta = -0.5*XWX.compute_quadform(help) - log_det_XWX_half;
+      }
+    }
+  double u = log(uniform());
+  if (ok && (u <= (logprop + qoldbeta - logold - qnewbeta)))
+    {
+    datamatrix * mp = linoldp;
+    linoldp = linnewp;
+    linnewp = mp;
+    beta.assign(proposal);
 
-//    }
+    acceptance++;
+    }
+  else
+    {
+    diff.minus(*linoldp,*linnewp);
+    add_linpred(diff);
+    }
 
-
+  FC::update();
   }
 
 void FC_linear::update(void)
@@ -269,11 +367,15 @@ void FC_linear::update(void)
     if (IWLS)
       update_IWLS();
     else
+      {
+      if(likep->gamlss)
+        double logold = likep->compute_iwls(true,false);
       update_gaussian();
+      }
 
-    masterp->level1_likep->meaneffect -= meaneffect;
+    masterp->level1_likep[equationnr]->meaneffect -= meaneffect;
     meaneffect = (meaneffectdesign*beta)(0,0);
-    masterp->level1_likep->meaneffect += meaneffect;
+    masterp->level1_likep[equationnr]->meaneffect += meaneffect;
 
     }
   else
@@ -285,6 +387,7 @@ void FC_linear::update_gaussian(void)
   {
   if ((datanames.size() > 0) && (rankXWX_ok==true))
     {
+
     if (!initialize)
       create_matrices();
 
@@ -312,10 +415,33 @@ void FC_linear::update_gaussian(void)
     else
       likep->linearpred2.addmult(design,betadiff);
 
-    betaold.assign(beta);
+    bool ok;
+    if (optionsp->saveestimation)
+      {
+      ok = likep->check_linpred();
+      if (!ok)
+        outsidelinpredlimits++;
+      }
+    else
+      ok = true;
 
-//    transform(0,0) = likep->trmult;
-    acceptance++;
+    if (ok)
+      {
+      betaold.assign(beta);
+
+      acceptance++;
+      }
+    else
+      {
+      betadiff.minus(betaold,beta);
+
+      if (likep->linpred_current==1)
+        likep->linearpred1.addmult(design,betadiff);
+      else
+        likep->linearpred2.addmult(design,betadiff);
+
+      beta.assign(betaold);
+      }
 
     FC::update();
     }
@@ -372,6 +498,9 @@ void FC_linear::compute_XWX(datamatrix & r)
       }
     else
       {
+/*      ofstream out1("c://temp//weights.raw");
+      (likep->workingweight).prettyPrint(out1);
+      out1.close();*/
       for (i=0;i<nrconst;i++)
         for (j=i;j<nrconst;j++)
           {
@@ -381,7 +510,9 @@ void FC_linear::compute_XWX(datamatrix & r)
           workingweightp = likep->workingweight.getV();
 
           for (k=0;k<nrobs;k++,Xt_ip++,Xt_jp++,workingweightp++)
+            {
             help += (*workingweightp) * (*Xt_ip)*(*Xt_jp);
+            }
 
           r(i,j) = help;
           if (i!=j)
@@ -450,6 +581,14 @@ void FC_linear::find_const(datamatrix & design)
     i++;
     }
 
+  if (constposition==-1)
+    {
+    optionsp->out("\n");
+    optionsp->out("WARNING: AT LEAST ONE EQUATION CONTAINS NO INTERCEPT\n");
+    optionsp->out("         Intercept may be specified using const in linear effects term\n");
+    optionsp->out("\n");
+    }
+
   }
 
 
@@ -502,13 +641,31 @@ void FC_linear::create_matrices(void)
 
   setbeta(design.cols(),1,0);
   betaold=datamatrix(beta.rows(),1,0);
+
+  /*
+  if (constposition != -1)
+    {
+    double m = likep->get_intercept_start();
+    beta(constposition,0) = m;
+    betaold(constposition,0) = m;
+    double * linpred;
+    if (likep->linpred_current==1)
+      linpred = likep->linearpred1.getV();
+    else
+      linpred = likep->linearpred2.getV();
+    unsigned i;
+    for (i=0;i<likep->nrobs;i++,linpred++)
+      *linpred += m;
+    }
+   */
+
   betadiff = betaold;
   betam = beta;
   help = beta;
   linold = datamatrix(design.rows(),1,0);
   initialize=true;
 
-  // For IWLS
+
   linnew = datamatrix(design.rows(),1,0);
   linmode = datamatrix(design.rows(),1,0);
   diff = datamatrix(design.rows(),1,0);
@@ -517,6 +674,7 @@ void FC_linear::create_matrices(void)
   mode = beta;
   proposal = beta;
   XWXold = datamatrix(design.cols(),design.cols(),0);
+
   }
 
 
@@ -545,11 +703,14 @@ void FC_linear::compute_Wpartres(datamatrix & linpred)
     {
     for (i=0;i<likep->nrobs;i++,workingweightp++,workingresponsep++,
                                 residualp++,linpredp++,predictorp++)
+      {
+//      cout << *workingweightp << endl;
       if (*workingweightp==0)
-        *residualp==0;
+        *residualp=0;
       else
         *residualp = *workingweightp * ((*workingresponsep)  - (*predictorp)
                      + (*linpredp));
+      }
     }
   }
 
@@ -584,6 +745,9 @@ double FC_linear::compute_XtWpartres(double & mo)
 bool FC_linear::posteriormode(void)
   {
 
+//  ofstream out("d:\\_sicher\\papzip\\resultsconst\\linpredvorher.raw");
+//  likep->linearpred1.prettyPrint(out);
+
   if (datanames.size() > 0)
     {
     if (rankXWX_ok == true)
@@ -593,8 +757,10 @@ bool FC_linear::posteriormode(void)
 
       double h = likep->compute_iwls(true,false);
 
+
       compute_XWX(XWX);
       datamatrix test = XWX.cinverse();
+
       if (test.rows() < XWX.rows())
         {
         rankXWX_ok = false;
@@ -613,20 +779,54 @@ bool FC_linear::posteriormode(void)
 
       beta = XWX.solve(Xtresidual);
 
+/*      ofstream out1("c:/temp/XWX.raw");
+      XWX.prettyPrint(out1);
+      out1.close();
+      ofstream out2("c:/temp/weights.raw");
+      (likep->workingweight).prettyPrint(out2);
+      out2.close();
+      ofstream out3("c:/temp/Xtresidual.raw");
+      Xtresidual.prettyPrint(out3);
+      out3.close();*/
+
       betadiff.minus(beta,betaold);
 
-      if (likep->linpred_current==1)
-        likep->linearpred1.addmult(design,betadiff);
+     likep->addmult(design, betadiff);
+
+      bool ok;
+      if (optionsp->saveestimation)
+        ok = likep->check_linpred();
       else
-        likep->linearpred2.addmult(design,betadiff);
+        ok = true;
 
-      betaold.assign(beta);
+      if (ok)
+        {
+        betaold.assign(beta);
 
-      masterp->level1_likep->meaneffect -= meaneffect;
-      meaneffect = (meaneffectdesign*beta)(0,0);
-      masterp->level1_likep->meaneffect += meaneffect;
+        masterp->level1_likep[equationnr]->meaneffect -= meaneffect;
+        meaneffect = (meaneffectdesign*beta)(0,0);
+        masterp->level1_likep[equationnr]->meaneffect += meaneffect;
+        }
+      else
+        {
+        betadiff.minus(betaold,beta);
+        likep->addmult(design, betadiff);
+
+        beta.assign(betaold);
+        }
 
       return FC::posteriormode();
+      }
+    }
+  else
+    {
+    if (constwarning==false)
+      {
+      constwarning=true;
+      optionsp->out("\n");
+      optionsp->out("WARNING: AT LEAST ONE EQUATION CONTAINS NO INTERCEPT\n");
+      optionsp->out("         Intercept may be specified using const in linear effects term\n");
+      optionsp->out("\n");
       }
     }
 
@@ -653,17 +853,33 @@ void FC_linear::outoptions(void)
 
 
 
-void FC_linear::outresults(ofstream & out_stata,ofstream & out_R,
+void FC_linear::outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
                            const ST::string & pathresults)
   {
   if ((datanames.size() > 0) && (rankXWX_ok==true))
     {
 
-    FC::outresults(out_stata,out_R,pathresults);
+    FC::outresults(out_stata,out_R,out_R2BayesX,pathresults);
     FC::outresults_help(out_stata,out_R,pathresults,datanames);
+    FC::outresults_acceptance();
 
     optionsp->out("    Results for fixed effects are also stored in file\n");
     optionsp->out("    " + pathresults + "\n");
+
+    ST::string paths = pathresults.substr(0,pathresults.length()-4) +
+                                 "_sample.raw";
+
+    out_R2BayesX << "family=" << likep->familyshort.strtochar() << ",";
+    out_R2BayesX << "hlevel=" << likep->hlevel << ",";
+    out_R2BayesX << "equationtype=" << likep->equationtype.strtochar() << ",";
+    out_R2BayesX << "term=";
+    unsigned k;
+    for (k=0;k<datanames.size();k++)
+      out_R2BayesX << datanames[k].strtochar() << " ";
+    out_R2BayesX  << ",";
+    out_R2BayesX << "filetype=linear,";
+    out_R2BayesX << "pathsamples=" << paths.strtochar() << ",";
+    out_R2BayesX << "pathbasis=" << endl;
 
     if (center==true)
       {
@@ -697,6 +913,33 @@ void FC_linear::reset(void)
 
   }
 
+void FC_linear::change_variable(datamatrix & x, unsigned & col)
+  {
+  if (!initialize)
+    create_matrices();
+  design.putCol(col, x);
+  Xt.putRow(col, x.transposed());
+
+/*  if((optionsp->nriter % 500) == 0)
+  {
+  ofstream out1("c:\\temp\\design.raw");
+  design.prettyPrint(out1);
+  out1.close();
+  ofstream out2("c:\\temp\\eta.raw");
+  x.prettyPrint(out2);
+  out2.close();
+  ofstream out3("c:\\temp\\Xt.raw");
+  Xt.prettyPrint(out3);
+  out3.close();
+  }*/
+
+  }
+
+void FC_linear::compute_linold(void)
+  {
+  linoldp->mult(design,beta);
+  }
+
 
 //------------------------------------------------------------------------------
 //------------------------------- FC_linear_pen --------------------------------
@@ -710,11 +953,11 @@ FC_linear_pen::FC_linear_pen(void)
 
 
 
-FC_linear_pen::FC_linear_pen(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,
-                    datamatrix & d,
+FC_linear_pen::FC_linear_pen(MASTER_OBJ * mp,unsigned & enr,
+                            GENERAL_OPTIONS * o,DISTR * lp, datamatrix & d,
                  vector<ST::string> & vn, const ST::string & t,
-                 const ST::string & fp,bool cent)
-     : FC_linear(mp,o,lp,d,vn,t,fp,cent)
+                 const ST::string & fp,bool cent, bool IWLSle)
+     : FC_linear(mp,enr,o,lp,d,vn,t,fp,cent,IWLSle)
   {
 
 
@@ -748,6 +991,10 @@ void FC_linear_pen::update(void)
   FC_linear::update();
   }
 
+void FC_linear_pen::find_const(datamatrix & design)
+  {
+
+  }
 
 
 bool FC_linear_pen::posteriormode(void)
@@ -764,10 +1011,10 @@ void FC_linear_pen::outoptions(void)
 //  optionsp->out("\n");
   }
 
-void FC_linear_pen::outresults(ofstream & out_stata,ofstream & out_R,
+void FC_linear_pen::outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
                            const ST::string & pathresults)
   {
-  FC_linear::outresults(out_stata,out_R,pathresults);
+  FC_linear::outresults(out_stata,out_R,out_R2BayesX,pathresults);
   }
 
 
@@ -793,7 +1040,8 @@ void FC_linear_pen::compute_XWX(datamatrix & r)
     FC_linear::compute_XWX(r);
     for (i=0;i<nrpar;i++,tau2p++,tau2oldinvp++)
       {
-      XWX(i,i) += (1/(*tau2p));
+//      XWX(i,i) += (1/(*tau2p));
+      r(i,i) += (1/(*tau2p));
       *tau2oldinvp =  1/(*tau2p);
       }
 
@@ -803,7 +1051,8 @@ void FC_linear_pen::compute_XWX(datamatrix & r)
 
     for (i=0;i<nrpar;i++,tau2p++,tau2oldinvp++)
       {
-      XWX(i,i) += (1/(*tau2p) - *tau2oldinvp);
+//      XWX(i,i) += (1/(*tau2p) - *tau2oldinvp);
+      r(i,i) += (1/(*tau2p) - *tau2oldinvp);
       *tau2oldinvp =  1/(*tau2p);
       }
 

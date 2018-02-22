@@ -95,7 +95,7 @@ class __EXPORT_TYPE FC_predictive_check   : public FC
 
   void outoptions(void);
 
-  void outresults(ofstream & out_stata, ofstream & out_R,
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                   const ST::string & pathresults);
 
   void reset(void);

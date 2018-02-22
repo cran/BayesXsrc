@@ -884,7 +884,7 @@ for (l=0; l<zcutbeta[zcutbeta.size()-1]; l++ )                                  
   loglike *= -2;
   gcv = loglike/(double)nrobspos*(1-(double)df/(double)nrobspos)*(1-(double)df/(double)nrobspos);
   aic = loglike + 2*df;
-  bic = loglike + log(nrobspos)*df;
+  bic = loglike + log(static_cast<double>(nrobspos))*df;
 
   out("\n");
   out("  Model Fit\n",true);
@@ -1364,7 +1364,7 @@ for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                  
   loglike *= -2;
   gcv = loglike/(double)nrobspos*(1-(double)df/(double)nrobspos)*(1-(double)df/(double)nrobspos);
   aic = loglike + 2*df;
-  bic = loglike + log(nrobspos)*df;
+  bic = loglike + log(static_cast<double>(nrobspos))*df;
 
   out("\n");
   out("  Model Fit\n",true);

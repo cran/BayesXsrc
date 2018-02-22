@@ -106,7 +106,7 @@ class __EXPORT_TYPE DISTRIBUTION
   datamatrix weight2;             // saves the original weightvariable when a second one is defined for Cross-Validation
   datamatrix weightiwls2;         // saves original "weightiwls" when Cross-Validation is performed
   datamatrix weightcv;            // contains information about how the dataset is splitted for CV
-  unsigned nrobs_wpw;             // contains the number of observations with positive weights
+  int nrobs_wpw;             // contains the number of observations with positive weights
 
   datamatrix weight;              // Weightvariable for weighted regression
   double sumweight;               // sum of weights
@@ -374,7 +374,7 @@ class __EXPORT_TYPE DISTRIBUTION
   // FUNCTION: get_nrobs_wpw
   // TASK: returns the number of observation with positive weights
 
-  unsigned get_nrobs_wpw(void)
+  int get_nrobs_wpw(void)
     {
     if(nrobs_wpw == -1)
       set_nrobs_wpw();
@@ -1240,12 +1240,12 @@ class __EXPORT_TYPE DISTRIBUTION
     {
     if (current)
       {
-      linpredp_current += index*linearpred.cols();
+      linpredp_current += index*(int)linearpred.cols();
       *linpredp_current += m;
       }
     else
       {
-      linpredp_proposed += index*linearpred.cols();
+      linpredp_proposed += index*(int)linearpred.cols();
       *linpredp_proposed += m;
       }
 

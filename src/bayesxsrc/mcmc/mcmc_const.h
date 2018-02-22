@@ -90,9 +90,7 @@ class __EXPORT_TYPE FULLCOND_const : public FULLCOND
 
   // DEFAULT CONSTRUCTOR
 
-  FULLCOND_const(void) : FULLCOND()
-    {
-    }
+  FULLCOND_const(void);
 
 
   // CONSTRUCTOR_1 (diffuse prior)

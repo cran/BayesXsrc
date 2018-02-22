@@ -83,10 +83,12 @@ void DESIGN_pspline::read_options(vector<ST::string> & op,
 
   f = op[15].strtodouble(round);
 
-  if (op[16]=="mean")
-    centermethod = cmean;
+  if (op[16]=="meancoeff")
+    centermethod = meancoeff;
   else if (op[16] == "meansimple")
     centermethod = meansimple;
+  else if (op[16] == "integralsimple")
+    centermethod = integralsimple;
   else if (op[16] == "nullspace")
     centermethod = nullspace;
   else if (op[16] == "meaninvvar")
@@ -94,7 +96,9 @@ void DESIGN_pspline::read_options(vector<ST::string> & op,
   else if (op[16] == "meanintegral")
     centermethod = cmeanintegral;
   else if (op[16] == "meanf")
-    centermethod = cmeanf;
+    centermethod = meanf;
+  else if (op[16] == "meanfd")
+    centermethod = meanfd;
   else if (op[16] == "meansum2")
     centermethod = meansum2;
 
@@ -115,7 +119,7 @@ void DESIGN_pspline::read_options(vector<ST::string> & op,
     derivative = false;
   else
     derivative = true;
-    
+
 
   datanames = vn;
 
@@ -137,6 +141,12 @@ DESIGN_pspline::DESIGN_pspline(datamatrix & dm,datamatrix & iv,
   {
 
   read_options(op,vn);
+
+  if(op[35]=="ssvs" && centermethod != nullspace)
+    {
+    optionsp->out("WARNING: centermethod=nullspace has to be specified when using ssvs priors for nonlinear effects\n");
+    }
+
 
   datamatrix dmr = dm;
   if (round != -1)
@@ -209,6 +219,14 @@ DESIGN_pspline::DESIGN_pspline(datamatrix & dm,datamatrix & iv,
 
   compute_basisNull();
 
+/*
+  ofstream out("c:\\bayesx\\trunk\\testh\\results\\dm.raw");
+  dm.prettyPrint(out);
+
+  ofstream out2("c:\\bayesx\\trunk\\testh\\results\\iv.raw");
+  iv.prettyPrint(out2);
+*/
+
   }
 
 
@@ -226,6 +244,8 @@ DESIGN_pspline::DESIGN_pspline(const DESIGN_pspline & m)
   round = m.round;
   binning = m.binning;
   ccov = m.ccov;
+  minBS = m.minBS;
+  maxBS = m.maxBS;
   }
 
 
@@ -245,10 +265,44 @@ const DESIGN_pspline & DESIGN_pspline::operator=(const DESIGN_pspline & m)
   round = m.round;
   binning = m.binning;
   ccov = m.ccov;
+  minBS = m.minBS;
+  maxBS = m.maxBS;
   return *this;
   }
 
-
+void DESIGN_pspline::outbasis_R(ofstream & out)
+  {
+  unsigned i;
+  out << "BayesX.design.matrix<-function(x, ...) {" << endl;
+  out << "  require(\"splines\")" << endl;
+  out << "  x <- unlist(x)" << endl;
+  out << "  knots <- c(";
+  for(i = 0; i < knot.size() - 1; i++)
+    out << knot[i] << ", ";
+  out << knot[knot.size() - 1] << ")" << endl;
+  out << "  degree <- " << degree << endl;
+  out << "  ll <- knots[degree + 1]" << endl;
+  out << "  ul <- knots[length(knots) - degree]" << endl;
+  out << "  degree <- degree + 1" << endl;
+  out << "  n <- length(x)" << endl;
+  out << "  ind <- x <= ul & x >= ll" << endl;
+  out << "  if(sum(ind) == n) {" << endl;
+  out << "    X <- spline.des(knots, x, degree)$design" << endl;
+  out << "  } else {" << endl;
+  out << "    D <- spline.des(knots, c(ll, ll, ul, ul), degree, c(0, 1, 0, 1))$design" << endl;
+  out << "    X <- matrix(0, n, ncol(D))" << endl;
+  out << "    X[ind, ] <- spline.des(knots, x[ind], degree)$design" << endl;
+  out << "    ind <- x < ll" << endl;
+  out << "    if(sum(ind) > 0) " << endl;
+  out << "    X[ind, ] <- cbind(1, x[ind] - ll) %*% D[1:2, ]" << endl;
+  out << "    ind <- x > ul" << endl;
+  out << "    if(sum(ind) > 0)" << endl;
+  out << "    X[ind, ] <- cbind(1, x[ind] - ul) %*% D[3:4, ]" << endl;
+  out << "  }" << endl;
+  out << "  attr(X, \"type\") <- \"ps\"" << endl;
+  out << "  return(X)" << endl;
+  out << "}" << endl;
+  }
 
 void DESIGN_pspline::make_Bspline(void)
   {
@@ -259,22 +313,22 @@ void DESIGN_pspline::make_Bspline(void)
   datamatrix help;
 
 // berechne x_min, x_max
-  double min;
-  min = data(0,0);
 
-  double max;
-  max = data(data.rows()-1,0);
+  minBS = data(0,0);
 
-  double dist = max-min;
 
-  min -= 0.01*dist;
-  max += 0.01*dist;
+  maxBS= data(data.rows()-1,0);
+
+  double dist = maxBS-minBS;
+
+  minBS -= 0.01*dist;
+  maxBS += 0.01*dist;
 
 
 // Knoten berechnen
 
-  dist = (max - min)/(nrknots-1);
-  knot.push_back(min - degree*dist);
+  dist = (maxBS - minBS)/(nrknots-1);
+  knot.push_back(minBS - degree*dist);
   for(i=1;i<nrknots+2*degree;i++)
     knot.push_back(knot[i-1] + dist);
 
@@ -309,27 +363,47 @@ void DESIGN_pspline::make_Bspline(void)
   if (derivative)
     make_Bspline_derivative();
 
+
+
   // TEST
   /*
   bool t = check_Zout_consecutive();
 
-  ofstream out("c:\\bayesx\\test\\results\\Zout.res");
+
+  ofstream out("c:\\temp\\userdefined_zerocols\\Zout_pspline.res");
+  Zout.prettyPrint(out);
+  */
+
+  /*
+  ofstream out("c:\\temp\\userdefined_zerocols\\Zout.res");
   Zout.prettyPrint(out);
 
-  ofstream out2("c:\\bayesx\\test\\results\\index_Zout.res");
+  ofstream out2("c:\\temp\\userdefined_zerocols\\index_Zout.res");
   index_Zout.prettyPrint(out2);
 
   datamatrix Zoutm(data.rows(),nrpar,0);
   for (i=0;i<posbeg.size();i++)
     {
+    cout << "i: " << i << "\n";
     for (j=posbeg[i];j<=posend[i];j++)
       {
+      cout << "j: " << j << "\n";
+      cout << "posbeg[i]: " << posbeg[i] << "\n";
+      cout << "posend[i]: " << posend[i] << "\n";
       for(k=0;k<Zout.cols();k++)
-        Zoutm(j,index_Zout(i,k)) = sqrt(likep->workingweight(index_data(j,0),0))*Zout(i,k)*intvar(j,0);
+        {
+        cout << "k: " << k << "\n";
+        cout << "index_Zout(i,k): " << index_Zout(i,k) << "\n";
+//        Zoutm(j,index_Zout(i,k)) = sqrt(likep->workingweight(index_data(j,0),0))*Zout(i,k)*intvar(j,0);
+        Zoutm(j,index_Zout(i,k)) = Zout(i,k);
+        }
       }
 
     }
+  ofstream out3("c:\\temp\\userdefined_zerocols\\Zoutm.res");
+  Zoutm.prettyPrint(out3);*/
 
+  /*
   datamatrix h(data.rows(),1,1);
   datamatrix Zteins =  Zoutm.transposed()*h;
 
@@ -503,6 +577,25 @@ datamatrix DESIGN_pspline::bspline_derivative(const double & x)
   }
 
 
+void DESIGN_pspline::compute_penalty2(const datamatrix & pen)
+  {
+  if (type==Rw1)
+    {
+    K = Krw1env(pen);
+    rankK = nrpar-1;
+    }
+  else if (type==Rw2)
+    {
+    K = Krw2env(nrpar);
+    rankK = nrpar-2;
+    }
+  else if (type==Rw3)
+    {
+    K = Krw3env(nrpar);
+    rankK = nrpar-3;
+    }
+  }
+
 
 void DESIGN_pspline::compute_penalty(void)
   {
@@ -579,9 +672,8 @@ void DESIGN_pspline::compute_basisNull(void)
   if (center==true)
   {
   unsigned i,j;
-  int h;
 
-  if (centermethod==cmean || centermethod==meansimple)
+  if (centermethod==meancoeff || centermethod==meansimple)
     {
     basisNull = datamatrix(1,nrpar,1);
     position_lin = -1;
@@ -602,12 +694,12 @@ void DESIGN_pspline::compute_basisNull(void)
 
     position_lin = -1;
     }
-  else if (centermethod==cmeanintegral)
+  else if ((centermethod==cmeanintegral) || (centermethod==integralsimple))  // integral f = 0
     {
     compute_betaweight(basisNull);
     position_lin = -1;
     }
-  else if (centermethod==cmeanf)
+  else if (centermethod==meanf)            // sum of f's zero (over all observations)
     {
 
     basisNull = datamatrix(1,nrpar,1);
@@ -615,6 +707,23 @@ void DESIGN_pspline::compute_basisNull(void)
     unsigned k;
     for (k=0;k<nrpar;k++)
       basisNull(0,k) = compute_sumBk(k);
+
+    // TEST
+    // ofstream out("c:\\bayesx\\testh\\results\\basisnull.res");
+    // basisNull.prettyPrint(out);
+    // ende: TEST
+
+    position_lin = -1;
+
+    }
+  else if (centermethod==meanfd)            // sum of f's zero
+    {
+
+    basisNull = datamatrix(1,nrpar,1);
+
+    unsigned k;
+    for (k=0;k<nrpar;k++)
+      basisNull(0,k) = compute_sumBk_different(k);
 
     // TEST
     // ofstream out("c:\\bayesx\\testh\\results\\basisnull.res");
@@ -690,7 +799,13 @@ void DESIGN_pspline::compute_precision(double l)
     precisiondeclared = true;
     }
 
+//cout << l << endl;
+
   precision.addto(XWX,K,1.0,l);
+
+  // ofstream out("c:\\temp\\precision_pspline.res");
+  // precision.print2(out);
+
 
   /*
   // TEST
@@ -765,7 +880,7 @@ void DESIGN_pspline::outoptions(GENERAL_OPTIONS * op)
          ") knots(" + ST::doubletostring(min,8) + "(" +
           ST::doubletostring(dist,8) + ")" + ST::doubletostring(max,8) + ") \n"
          );
-  op->out("  where x contains the values for which the basis functions should be created\n");       
+  op->out("  where x contains the values for which the basis functions should be created\n");
   op->out("\n");
 
   }

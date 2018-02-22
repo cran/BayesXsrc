@@ -107,7 +107,7 @@ class __EXPORT_TYPE string
     // FUNCTION: strtochar
     // TASK: converts the calling string to char* and returns the result
 
-    char * strtochar() const;
+  const  char * strtochar() const;
 
    // FUNCTION: to_bstr
    // TASK: converts the string to Std::string an returns the result

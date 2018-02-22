@@ -1318,7 +1318,7 @@ double DISTRIBUTION_zip::proposal_scale(void) const
             b = *scalework/(*pwork);
             *scalework=randnumbers::rand_gamma(a, b);
             a_neu = *scalework*(*scalework)/(*pwork);
-            while(a_neu < exp(-16*log(10)))
+            while(a_neu < exp(-16*log(10.0)))
             {
                 *scalework=randnumbers::rand_gamma(a, b);
                 a_neu = *scalework*(*scalework)/(*pwork);

@@ -62,6 +62,8 @@ class __EXPORT_TYPE fullcond_merror : public FULLCOND
   statmatrix<int> index;
 
   FULLCOND fc_merrorvar;    // full conditional for the variance of the measurement error
+  datamatrix merrorvar;
+  datamatrix mesd;
   FULLCOND fc_ximu;         // full conditional for the expectation of the true covariate values
   FULLCOND fc_xivar;        // full conditional for the variance of the true covariate values
 
@@ -154,7 +156,7 @@ class __EXPORT_TYPE fullcond_merror : public FULLCOND
   fullcond_merror(MCMCoptions * o, spline_basis * p, DISTRIBUTION * dp,
            const datamatrix & d, const ST::string & t, const ST::string & fp,
            const ST::string & pres, const double & lk, const double & uk,
-           const double & mvar, const bool & disc, const int & dig,
+           datamatrix & mvar, const bool & disc, const int & dig,
            const unsigned & nb);
 // END: merror
 
@@ -208,7 +210,7 @@ class __EXPORT_TYPE fullcond_merror : public FULLCOND
 
   void reset(void);
 
-  vector<ST::string> & get_results_latex(void);
+//  vector<ST::string> & get_results_latex(void);
 
   };
 

@@ -24,6 +24,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 administrator::administrator(void)
   {
 
+  srand((unsigned)time(NULL));
+
   adminb = administrator_basic();
   adminp = administrator_pointer();
 
@@ -33,57 +35,111 @@ administrator::administrator(void)
   char disk = 'A'+getdisk();
   ST::string d(disk,1);
 
-  defaultpath = d + ":\\" + path;
+  #if defined(__BUILDING_LINUX)
+    defaultpath = d + ":/" + path;
+  #else
+    defaultpath = d + ":\\" + path;
+  #endif
 
   bool error = false;
 
-  if(DirectoryExists((defaultpath+"\\temp").strtochar()))
-    {
-    AnsiString temp = (defaultpath+"\\temp\\test").strtochar();
-    ForceDirectories(temp);
-    if(DirectoryExists(temp))
+  #if defined(__BUILDING_LINUX)
+    if(DirectoryExists((defaultpath+"/temp").strtochar()))
       {
-      rmdir((defaultpath+"\\temp\\test").strtochar());
+      AnsiString temp = (defaultpath+"/temp/test").strtochar();
+      ForceDirectories(temp);
+      if(DirectoryExists(temp))
+        {
+        rmdir((defaultpath+"/temp/test").strtochar());
+        }
+      else
+        {
+        outerror("ERROR: No permission to write to " + defaultpath + "/temp\n");
+        error = true;
+        }
       }
     else
       {
-      outerror("ERROR: No permission to write to " + defaultpath + "\\temp\n");
-      error = true;
+      AnsiString temp = (defaultpath+"/temp").strtochar();
+      ForceDirectories(temp);
+      if(!DirectoryExists(temp))
+        {
+        error = true;
+        }
       }
-    }
-  else
-    {
-    AnsiString temp = (defaultpath+"\\temp").strtochar();
-    ForceDirectories(temp);
-    if(!DirectoryExists(temp))
+  
+    if(DirectoryExists((defaultpath+"/output").strtochar()))
       {
-      error = true;
-      }
-    }
-
-  if(DirectoryExists((defaultpath+"\\output").strtochar()))
-    {
-    AnsiString output = (defaultpath+"\\output\\test").strtochar();
-    ForceDirectories(output);
-    if(DirectoryExists(output))
-      {
-      rmdir((defaultpath+"\\output\\test").strtochar());
+      AnsiString output = (defaultpath+"/output/test").strtochar();
+      ForceDirectories(output);
+      if(DirectoryExists(output))
+        {
+        rmdir((defaultpath+"/output/test").strtochar());
+        }
+      else
+        {
+        outerror("ERROR: No permission to write to " + defaultpath + "/output\n");
+        error = true;
+        }
       }
     else
       {
-      outerror("ERROR: No permission to write to " + defaultpath + "\\output\n");
-      error = true;
+      AnsiString output = (defaultpath+"/output").strtochar();
+      ForceDirectories(output);
+      if(!DirectoryExists(output))
+        {
+        error = true;
+        }
       }
-    }
-  else
-    {
-    AnsiString output = (defaultpath+"\\output").strtochar();
-    ForceDirectories(output);
-    if(!DirectoryExists(output))
+  #else
+    if(DirectoryExists((defaultpath+"\\temp").strtochar()))
       {
-      error = true;
+      AnsiString temp = (defaultpath+"\\temp\\test").strtochar();
+      ForceDirectories(temp);
+      if(DirectoryExists(temp))
+        {
+        rmdir((defaultpath+"\\temp\\test").strtochar());
+        }
+      else
+        {
+        outerror("ERROR: No permission to write to " + defaultpath + "\\temp\n");
+        error = true;
+        }
       }
-    }
+    else
+      {
+      AnsiString temp = (defaultpath+"\\temp").strtochar();
+      ForceDirectories(temp);
+      if(!DirectoryExists(temp))
+        {
+        error = true;
+        }
+      }
+  
+    if(DirectoryExists((defaultpath+"\\output").strtochar()))
+      {
+      AnsiString output = (defaultpath+"\\output\\test").strtochar();
+      ForceDirectories(output);
+      if(DirectoryExists(output))
+        {
+        rmdir((defaultpath+"\\output\\test").strtochar());
+        }
+      else
+        {
+        outerror("ERROR: No permission to write to " + defaultpath + "\\output\n");
+        error = true;
+        }
+      }
+    else
+      {
+      AnsiString output = (defaultpath+"\\output").strtochar();
+      ForceDirectories(output);
+      if(!DirectoryExists(output))
+        {
+        error = true;
+        }
+      }
+  #endif
 
   if(error==true)
     {
@@ -100,6 +156,7 @@ administrator::administrator(void)
 
   objecttyps.push_back("dataset");
   objecttyps.push_back("bayesreg");
+  objecttyps.push_back("mcmcreg");
   objecttyps.push_back("stepwisereg");
   objecttyps.push_back("remlreg");
   objecttyps.push_back("map");
@@ -186,6 +243,20 @@ void administrator::dropobjects(ST::string name, ST::string type)
 		i++;
 		}
 	 }  // end: type bayesreg
+  else if (type == "mcmcreg")
+	 {
+	 while ( (i < mcmcregobjects.size()) && (recognized == 0) )
+		{
+
+		if ( name == mcmcregobjects[i].getname())
+		  {
+
+		  mcmcregobjects.erase(mcmcregobjects.begin()+i,mcmcregobjects.begin()+i+1);
+		  recognized = 1;
+		  }
+		i++;
+		}
+	 }  // end: type mcmcreg
   else if (type == "stepwisereg")
 	 {
 	 while ( (i < stepwiseregobjects.size()) && (recognized == 0) )
@@ -305,8 +376,11 @@ ST::string administrator::create(const ST::string & in)
 	 else
 		{
 		if (alreadyexisting(token[1]) == true)
+		  {
 		  errormessages.push_back(
 		  "ERROR: object " + token[1] + " is already existing\n");
+		  return "";
+		  }
 		else
     	  {
 		  if (token[0] == "dataset")
@@ -319,6 +393,12 @@ ST::string administrator::create(const ST::string & in)
 			 bayesreg newobject(&adminb,&adminp,
              token[1],&logout,input,defaultpath,&objects);
 			 bayesregobjects.push_back(newobject);
+			 }
+          else if (token[0] == "mcmcreg")
+			 {
+			 superbayesreg newobject(&adminb,&adminp,
+			 token[1],&logout,input,defaultpath,&objects);
+			 mcmcregobjects.push_back(newobject);
 			 }
 		  else if (token[0] == "stepwisereg")
 			 {
@@ -404,6 +484,9 @@ void administrator::adjustobjects(void)
 
   for (i=0;i<bayesregobjects.size();i++)
 	 objects.push_back(&bayesregobjects[i]);
+
+  for (i=0;i<mcmcregobjects.size();i++)
+	 objects.push_back(&mcmcregobjects[i]);
 
   for (i=0;i<stepwiseregobjects.size();i++)
 	 objects.push_back(&stepwiseregobjects[i]);

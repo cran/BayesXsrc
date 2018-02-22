@@ -75,18 +75,18 @@ FC_hrandom_variance_vec::FC_hrandom_variance_vec(void)
   }
 
 
-FC_hrandom_variance_vec::FC_hrandom_variance_vec(MASTER_OBJ * mp,
+FC_hrandom_variance_vec::FC_hrandom_variance_vec(MASTER_OBJ * mp,unsigned & enr,
                  GENERAL_OPTIONS * o,DISTR * lp,
                   DISTR * lpRE,
                  const ST::string & t,const ST::string & fp,
                  DESIGN * Dp,FC_nonp * FCn,vector<ST::string> & op,
                  vector<ST::string> & vn)
-     : FC_nonp_variance_vec(mp,o,lp,t,fp,Dp,FCn,op,vn)
+     : FC_nonp_variance_vec(mp,enr,o,lp,t,fp,Dp,FCn,op,vn)
   {
   read_options(op,vn);
   likepRE = lpRE;
 
-  b_invgamma = masterp->level1_likep->trmult*b_invgamma_orig;
+  b_invgamma = masterp->level1_likep[equationnr]->trmult*b_invgamma_orig;
 
 //  hyperLambda=rand_gamma(a_invgamma,b_invgamma);
   hyperLambda=0.1;
@@ -120,7 +120,7 @@ const FC_hrandom_variance_vec & m)
 void FC_hrandom_variance_vec::update(void)
   {
 
-  b_invgamma = masterp->level1_likep->trmult*b_invgamma_orig;
+  b_invgamma = masterp->level1_likep[equationnr]->trmult*b_invgamma_orig;
 
   register unsigned i;
   double * workbeta = beta.getV();
@@ -137,7 +137,7 @@ void FC_hrandom_variance_vec::update(void)
 
   double * ww = likepRE->workingweight.getV();
 
-  for (i=0;i<beta.rows();i++,workbeta++,workbetafcn++,ww++)
+  for (i=0;i<beta.rows();i++,workbeta++,workbetafcn++,ww++,linpredREp++)
     {
     *workbeta = rand_inv_gaussian(fabs(hyperLambda)/
     fabs((*workbetafcn - (*linpredREp))),hyperLambda2);

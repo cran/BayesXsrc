@@ -492,7 +492,7 @@ bool remlest_multinomial::estimate(const datamatrix resp, const datamatrix & off
   loglike *= -2;
   gcv = loglike/(double)nrobspos*(1-(double)df/(double)nrobspos)*(1-(double)df/(double)nrobspos);
   aic = loglike + 2*df;
-  bic = loglike + log(nrobspos)*df;
+  bic = loglike + log(static_cast<double>(nrobspos))*df;
 
   out("\n");
   out("  Model Fit\n",true);
@@ -733,7 +733,7 @@ bool remlest_multinomial::estimate_glm(const datamatrix resp,
   loglike *= -2;
   gcv = loglike/(double)nrobspos*(1-(double)df/(double)nrobspos)*(1-(double)df/(double)nrobspos);
   aic = loglike + 2*df;
-  bic = loglike + log(nrobspos)*df;
+  bic = loglike + log(static_cast<double>(nrobspos))*df;
 
   out("\n");
   out("  Model Fit\n",true);

@@ -870,7 +870,7 @@ vector<double> & lvec, int & number)
   if(spfromdf=="automatic")
     {
     df_equidist = true;
-    double maxi = floor(nrpar/4*3);
+    double maxi = floor(nrpar/4.0*3.0);
 
     if(type != seasonal)
       {

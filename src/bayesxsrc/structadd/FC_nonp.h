@@ -48,6 +48,7 @@ class __EXPORT_TYPE FC_nonp  : public FC
   protected:
 
   MASTER_OBJ * masterp;
+  unsigned equationnr;
 
   FC fsample;
   bool samplef;
@@ -57,39 +58,21 @@ class __EXPORT_TYPE FC_nonp  : public FC
   bool derivative;
   bool samplederivative;
   FC derivativesample;
-  //  FC elasticitysample;
-  //  void compute_elasticity(void);
-
-
-  bool IWLS;
-
 
   bool orthogonal;
   datamatrix acuteparam;
 
   sampletype stype;
 
-  DISTR * likep;                             // Pointer to DISTR obejct
-
-  datamatrix betaold;
   datamatrix betadiff;
 
   double s2;
+  void perform_centering(void);
   void centerparam(void);
+  void centerparam_weight(void);
   void centerparam_sum2(double & s2);
   void centerparam_sample(void);
-
-
-  FC pvalue_sample;                          // stores required quantities for
-                                             // computing p-values
-  bool pvalue;                               // compute pvalues, yes, no
-                                             // default no
-  datamatrix mPhelp;                         // help matrix for updating p-value
-                                             // information
-
-  void compute_pvalue(const ST::string & pathresults);
-  void update_pvalue(void);
-
+  void centerparam_sample_var(void);
 
   bool computemeaneffect;
   double meaneffectconstant;
@@ -97,6 +80,17 @@ class __EXPORT_TYPE FC_nonp  : public FC
 
 
   public:
+
+  DISTR * likep;                             // Pointer to DISTR obejct
+
+  bool multf;
+  double multf_value;
+
+  datamatrix betaold;
+
+  bool IWLS;
+
+  bool ssvs;
 
   DESIGN * designp;                          // Pointer to design object
 
@@ -123,6 +117,10 @@ class __EXPORT_TYPE FC_nonp  : public FC
   datamatrix ccenter;
   datamatrix helpcenter;
 
+  //--------------------------- importance measures ---------------------------
+
+  bool imeasures;
+
   void get_linparam(void);
 
   void initialize_center(void);
@@ -138,9 +136,10 @@ class __EXPORT_TYPE FC_nonp  : public FC
   // t    : title of the full conditional (for example "fixed effects")
   // fp   : file path for storing sampled parameters
 
-  FC_nonp(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp, const ST::string & t,
+  FC_nonp(MASTER_OBJ * mp,unsigned & enr ,GENERAL_OPTIONS * o,DISTR * lp,
+          const ST::string & t,
            const ST::string & fp,DESIGN * dp,vector<ST::string> & op,
-             vector<ST::string> & vn);
+             vector<ST::string> & vn, datamatrix pstart = datamatrix(1,1,0));
 
   // COPY CONSTRUCTOR
 
@@ -153,7 +152,7 @@ class __EXPORT_TYPE FC_nonp  : public FC
 
   // DESTRUCTOR
 
-  
+
   ~FC_nonp()
     {
     }
@@ -168,6 +167,8 @@ class __EXPORT_TYPE FC_nonp  : public FC
   void update_gaussian(void);
   void update_IWLS(void);
   void update_isotonic(void);
+
+  void ssvs_update(double & tauratio, bool signswitch, bool onlyupdate);
 
   // FUNCTION: posteriormode
   // TASK: computes the posterior mode
@@ -184,21 +185,30 @@ class __EXPORT_TYPE FC_nonp  : public FC
   // FUNCTION: outgraphs
   // TASK: writes batch files for STATA and R for visualizing results
 
-  void outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string & path);
+  void outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,const ST::string & path);
+
+
+  double kernel_density(const double & x, const double & h);
+
+  double compute_importancemeasure(bool absolute);
+  double compute_importancemeasure_discrete(bool absolute);
+
+  double compute_importance(void);
 
 
   // FUNCTION: outresults
   // TASK: writes estimation results to logout or into a file
 
-  void outresults(ofstream & out_stata, ofstream & out_R,
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                   const ST::string & pathresults);
 
   // FUNCTION: outresults_derivative
   // TASK: writes estimated first derivatives
 
-  void outresults_derivative(ofstream & out_stata, ofstream & out_R,
+  void outresults_derivative(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                         const ST::string & pathresults);
 
+  void outbasis_R(const ST::string & pathbasis);
 
   void read_options(vector<ST::string> & op,vector<ST::string> & vn);
 
@@ -206,8 +216,6 @@ class __EXPORT_TYPE FC_nonp  : public FC
   // TASK: resets all parameters
 
   void reset(void);
-
-//  virtual void transform_beta(void);
 
   void compute_autocorr_all(const ST::string & path,
                                       unsigned lag, ofstream & outg) const;
@@ -217,6 +225,13 @@ class __EXPORT_TYPE FC_nonp  : public FC
   void check_errors(void);
 
   void get_effect(datamatrix & effect);
+
+  void set_multiplicative(void);
+
+/*  //return log-proposal density
+  double compute_log_proposal(void);
+  //return log-full conditional
+  double compute_log_FC(void);*/
 
 
   };

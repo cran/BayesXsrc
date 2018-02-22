@@ -124,13 +124,13 @@ int eigen(statmatrix<double> & a, statmatrix<double> & values,
 //           are stored in a and eigenvalues are stored in d. If the return
 //           value is false, no convergence could be achieved
 
-bool eigen2(statmatrix<double> & a, statmatrix<double> & d);
+bool eigen2(datamatrix & a, datamatrix & d);
 
 // FUNCTION: eigensort
 // TASK:     sorts the eigenvalues in values into descending order and
 //           rearranges the columns of vectors correspondingly
 
-void eigensort(statmatrix<double> & values, statmatrix<double> & vectors);
+void eigensort(datamatrix & values, datamatrix & vectors);
 
 // FUNCTION: kronecker
 // TASK:     computes the kronecker product of the matrices Aand B

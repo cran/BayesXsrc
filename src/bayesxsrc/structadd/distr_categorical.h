@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include"GENERAL_OPTIONS.h"
 #include"FC.h"
 #include"distr.h"
+#include"FC_linear.h"
 
 
 namespace MCMC
@@ -43,8 +44,9 @@ class __EXPORT_TYPE DISTR_binomial : public DISTR
 
   protected:
 
-
   public:
+
+  void check_errors(void);
 
    // DEFAULT CONSTRUCTOR
 
@@ -71,14 +73,18 @@ class __EXPORT_TYPE DISTR_binomial : public DISTR
 
   void compute_mu(const double * linpred,double * mu);
 
+  void compute_mu_mult(vector<double *> linpred,vector<double *> response,double * mu);
+
   void compute_deviance(const double * response, const double * weight,
                         const double * mu,double * deviance,
-                        double * deviancesat, double * scale) const;
+                        double * scale) const;
+
+  double get_intercept_start(void);
 
   double loglikelihood(double * response, double * linpred,
-                       double * weight) const;
+                       double * weight);
 
-  double loglikelihood_weightsone(double * response, double * linpred) const;
+  double loglikelihood_weightsone(double * response, double * linpred);
 
   double compute_iwls(double * response, double * linpred,
                       double * weight, double * workingweight,
@@ -127,6 +133,8 @@ class __EXPORT_TYPE DISTR_logit_fruehwirth : public DISTR_binomial
 
 
  public:
+
+ void check_errors(void);
 
  	// DEFAULT CONSTRUCTOR
 
@@ -240,8 +248,14 @@ class __EXPORT_TYPE DISTR_binomialprobit : public DISTR
 
   protected:
 
+  bool utilities;
+  FC FC_latentutilities;
+
+  double * workrespp;
 
   public:
+
+  void check_errors(void);
 
    // DEFAULT CONSTRUCTOR
 
@@ -251,8 +265,8 @@ class __EXPORT_TYPE DISTR_binomialprobit : public DISTR
 
    // CONSTRUCTOR
 
-   DISTR_binomialprobit(GENERAL_OPTIONS * o, const datamatrix & r,
-                  const datamatrix & w=datamatrix());
+   DISTR_binomialprobit(GENERAL_OPTIONS * o, const datamatrix & r,const bool ut,
+                        const ST::string & ps,const datamatrix & w=datamatrix());
 
    // COPY CONSTRUCTOR
 
@@ -268,14 +282,24 @@ class __EXPORT_TYPE DISTR_binomialprobit : public DISTR
 
   void compute_mu(const double * linpred,double * mu);
 
+  void compute_mu_mult(vector<double *> linpred,vector<double *> response,double * mu);
+
   void compute_deviance(const double * response, const double * weight,
                         const double * mu,double * deviance,
-                        double * deviancesat, double * scale) const;
+                        double * scale) const;
+
+  double get_intercept_start(void);
+
+ // double cdf(const double & resp, const bool & ifcop);
+
+ // double cdf(const double & resp, const double & linpred);
+
+ // double cdf(const double & resp, double * mu);
 
   double loglikelihood(double * response, double * linpred,
-                       double * weight) const;
+                       double * weight);
 
-  double loglikelihood_weightsone(double * response, double * linpred) const;
+  double loglikelihood_weightsone(double * response, double * linpred);
 
   double compute_iwls(double * response, double * linpred,
                       double * weight, double * workingweight,
@@ -304,7 +328,78 @@ class __EXPORT_TYPE DISTR_binomialprobit : public DISTR
 
   void update(void);
 
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                  ST::string pathresults);
+
+  void get_samples(const ST::string & filename,ofstream & outg) const;
+
   };
+
+
+//------------------------------------------------------------------------------
+//-------------------- CLASS: DISTRIBUTION_binomialsvm -------------------------
+//------------------------------------------------------------------------------
+
+class __EXPORT_TYPE DISTR_binomialsvm : public DISTR
+  {
+
+  protected:
+
+
+  public:
+
+   // DEFAULT CONSTRUCTOR
+
+   DISTR_binomialsvm(void) : DISTR()
+     {
+     }
+
+   // CONSTRUCTOR
+
+   DISTR_binomialsvm(GENERAL_OPTIONS * o, const datamatrix & r,
+                  const datamatrix & w=datamatrix());
+
+   // COPY CONSTRUCTOR
+
+   DISTR_binomialsvm(const DISTR_binomialsvm & nd);
+
+   // OVERLOADED ASSIGNMENT OPERATOR
+
+   const DISTR_binomialsvm & operator=(const DISTR_binomialsvm & nd);
+
+   // DESTRUCTOR
+
+   ~DISTR_binomialsvm() {}
+
+  void compute_mu(const double * linpred,double * mu);
+
+  void compute_deviance(const double * response, const double * weight,
+                        const double * mu,double * deviance, double * scale)
+                        const;
+
+  double loglikelihood(double * response, double * linpred,
+                       double * weight);
+
+  double loglikelihood_weightsone(double * response, double * linpred);
+
+  double compute_iwls(double * response, double * linpred,
+                      double * weight, double * workingweight,
+                      double * workingresponse, const bool & like);
+
+  void compute_iwls_wweightschange_weightsone(
+                                         double * response, double * linpred,
+                                         double * workingweight,
+                                         double * workingresponse,double & like,
+                                         const bool & compute_like);
+
+
+
+  void outoptions(void);
+
+  void update(void);
+
+  };
+
 
 
 //------------------------------------------------------------------------------
@@ -316,8 +411,9 @@ class __EXPORT_TYPE DISTR_poisson : public DISTR
 
   protected:
 
-
   public:
+
+  void check_errors(void);
 
    // DEFAULT CONSTRUCTOR
 
@@ -346,12 +442,18 @@ class __EXPORT_TYPE DISTR_poisson : public DISTR
 
   void compute_deviance(const double * response, const double * weight,
                         const double * mu,double * deviance,
-                        double * deviancesat, double * scale) const;
+                        double * scale) const;
+
+  double get_intercept_start(void);
+
+  double cdf(double * res,double * param,double * weight,double * scale);
+
+  double pdf(double * res,double * param,double * weight,double * scale);
 
   double loglikelihood(double * response, double * linpred,
-                       double * weight) const;
+                       double * weight);
 
-  double loglikelihood_weightsone(double * response, double * linpred) const;
+  double loglikelihood_weightsone(double * response, double * linpred);
 
   double compute_iwls(double * response, double * linpred,
                       double * weight, double * workingweight,
@@ -363,19 +465,6 @@ class __EXPORT_TYPE DISTR_poisson : public DISTR
                                          double * workingresponse,double & like,
                                          const bool & compute_like);
 
-  void compute_iwls_wweightsnochange_constant(double * response,
-                                              double * linpred,
-                                              double * workingweight,
-                                              double * workingresponse,
-                                              double & like,
-                                              const bool & compute_like);
-
-  void compute_iwls_wweightsnochange_one(double * response,
-                                              double * linpred,
-                                              double * workingresponse,
-                                              double & like,
-                                              const bool & compute_like);
-
   void sample_responses(unsigned i,datamatrix & sr);
 
   void sample_responses_cv(unsigned i,datamatrix & linpred,
@@ -386,6 +475,224 @@ class __EXPORT_TYPE DISTR_poisson : public DISTR
   };
 
 
+//------------------------------------------------------------------------------
+//-------------------- CLASS: DISTRIBUTION_poisson_ext -------------------------
+//------------------------------------------------------------------------------
+
+class __EXPORT_TYPE DISTR_poisson_ext : public DISTR_poisson
+  {
+
+  protected:
+
+  double a;
+  double b;
+  bool adapt;
+
+  public:
+
+   // DEFAULT CONSTRUCTOR
+
+   DISTR_poisson_ext(void) : DISTR_poisson()
+     {
+     }
+
+   // CONSTRUCTOR
+
+   DISTR_poisson_ext(GENERAL_OPTIONS * o, const datamatrix & r,
+                     double ap, double bp, bool ada,
+                     const datamatrix & w=datamatrix());
+
+   // COPY CONSTRUCTOR
+
+   DISTR_poisson_ext(const DISTR_poisson_ext & nd);
+
+   // OVERLOADED ASSIGNMENT OPERATOR
+
+   const DISTR_poisson_ext & operator=(const DISTR_poisson_ext & nd);
+
+   // DESTRUCTOR
+
+   ~DISTR_poisson_ext() {}
+
+  void compute_mu(const double * linpred,double * mu);
+
+  double get_intercept_start(void);
+
+  double loglikelihood(double * response, double * linpred,
+                       double * weight);
+
+  double loglikelihood_weightsone(double * response, double * linpred);
+
+  double compute_iwls(double * response, double * linpred,
+                      double * weight, double * workingweight,
+                      double * workingresponse, const bool & like);
+
+  void compute_iwls_wweightschange_weightsone(
+                                         double * response, double * linpred,
+                                         double * workingweight,
+                                         double * workingresponse,double & like,
+                                         const bool & compute_like);
+
+  void outoptions(void);
+
+  };
+
+
+//------------------------------------------------------------------------------
+//-------------------- CLASS: DISTRIBUTION_poisson_extlin ----------------------
+//------------------------------------------------------------------------------
+
+class __EXPORT_TYPE DISTR_poisson_extlin : public DISTR_poisson
+  {
+
+  protected:
+
+  public:
+
+   // DEFAULT CONSTRUCTOR
+
+   DISTR_poisson_extlin(void) : DISTR_poisson()
+     {
+     }
+
+   // CONSTRUCTOR
+
+   DISTR_poisson_extlin(GENERAL_OPTIONS * o, const datamatrix & r,
+                        const datamatrix & w=datamatrix());
+
+   // COPY CONSTRUCTOR
+
+   DISTR_poisson_extlin(const DISTR_poisson_extlin & nd);
+
+   // OVERLOADED ASSIGNMENT OPERATOR
+
+   const DISTR_poisson_extlin & operator=(const DISTR_poisson_extlin & nd);
+
+   // DESTRUCTOR
+
+   ~DISTR_poisson_extlin() {}
+
+  void compute_mu(const double * linpred,double * mu);
+
+  double get_intercept_start(void);
+
+  double loglikelihood(double * response, double * linpred,
+                       double * weight);
+
+  double loglikelihood_weightsone(double * response, double * linpred);
+
+  double compute_iwls(double * response, double * linpred,
+                      double * weight, double * workingweight,
+                      double * workingresponse, const bool & like);
+
+  void compute_iwls_wweightschange_weightsone(
+                                         double * response, double * linpred,
+                                         double * workingweight,
+                                         double * workingresponse,double & like,
+                                         const bool & compute_like);
+
+  void outoptions(void);
+
+  };
+
+//------------------------------------------------------------------------------
+//----------------------- CLASS: DISTRIBUTION_JM -------------------------------
+//------------------------------------------------------------------------------
+
+class __EXPORT_TYPE DISTR_JM : public DISTR
+  {
+
+  protected:
+
+  public:
+
+  DISTR * dpois;
+  DISTR * dist2;
+
+  double * resppoisp;
+  double * respd2p;
+  double * predpoisp;
+  double * predd2p;
+  double * weightpoisp;
+  double * weightd2p;
+
+  FC_linear * FClinp;
+  unsigned FClincol;
+
+  double alpha;
+
+  unsigned counter;
+
+  void check_errors(void);
+
+   // DEFAULT CONSTRUCTOR
+
+   DISTR_JM(void) : DISTR()
+     {
+     }
+
+   // CONSTRUCTOR
+
+   DISTR_JM(GENERAL_OPTIONS * o, const datamatrix & r,
+                  const datamatrix & w=datamatrix());
+
+   // COPY CONSTRUCTOR
+
+   DISTR_JM(const DISTR_JM & nd);
+
+   // OVERLOADED ASSIGNMENT OPERATOR
+
+   const DISTR_JM & operator=(const DISTR_JM & nd);
+
+   // DESTRUCTOR
+
+   ~DISTR_JM() {}
+
+  void compute_mu(const double * linpred,double * mu);
+
+  void compute_deviance(const double * response, const double * weight,
+                        const double * mu,double * deviance,
+                        double * scale) const;
+
+  double get_intercept_start(void);
+
+  double cdf(double * res,double * param,double * weight,double * scale);
+
+  double pdf(double * res,double * param,double * weight,double * scale);
+
+  double loglikelihood(double * response, double * linpred,
+                       double * weight);
+
+  double loglikelihood_weightsone(double * response, double * linpred);
+
+  double compute_iwls(double * response, double * linpred,
+                      double * weight, double * workingweight,
+                      double * workingresponse, const bool & like);
+
+  void compute_iwls_wweightschange_weightsone(
+                                         double * response, double * linpred,
+                                         double * workingweight,
+                                         double * workingresponse,double & like,
+                                         const bool & compute_like);
+
+  void outoptions(void);
+
+  void set_pointer(void);
+
+  void update_pointer(void);
+
+  void update_end(void);
+
+  void posteriormode_end(void);
+
+  void addmult(datamatrix & design, datamatrix & betadiff);
+
+  void add_linpred(datamatrix & l);
+
+  void update_linpred(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind);
+
+  bool update_linpred_save(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind);
+  };
 
 } // end: namespace MCMC
 

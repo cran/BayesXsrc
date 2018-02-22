@@ -134,6 +134,26 @@ const string & string::operator=(const char * s)
   str = new char[len+1];
   strcpy(str,s);
   return *this;
+/*  delete [] str;
+  size_t maxsize = 1000;
+  len = strnlen(s, maxsize);
+  str = new char[len+1];
+  strncpy(str, s, maxsize);
+  if(len == maxsize)
+    str[maxsize] = '\0';
+  return *this;*/
+/*  delete [] str;
+  const char * help = s;
+  len = 0;
+  for(; *help != '\0'; ++help )
+    ++len;
+
+  str = new char[len+1];
+//  while ( *str++ = *s++ )
+//    ;
+  strcpy(str,s);
+
+  return *this;*/
   }
 
 
@@ -191,9 +211,13 @@ string operator+(const char * s,const string & st)
 
 istream & operator>>(istream & i, string & s)
   {
-  char buffer[256];
-  i >> buffer;
-  s = buffer;
+  std::string ss;
+  i >> ss;
+  s = ss;
+
+  // char buffer[256];
+  // i >> buffer;
+  // s = buffer;
   return i;
   }
 
@@ -337,7 +361,7 @@ string string::insert_string_char(char p, string & str) const
   string result = s;
   unsigned l = str.length();
   unsigned k = 0;
-  for (unsigned i=0;i<s.length()-1;i++)
+  for (int i=0;i<s.length()-1;i++)
       {
       char z = s[i];
       if (z == p)
@@ -545,7 +569,7 @@ int string::lowestprecedencepos(string & sign) const
 		  }
 		i++;
 		}
-	 else if ( (str[i] == '^') )
+	 else if (str[i] == '^')
 		{
 		if (minp >= 5)
 		  {
@@ -694,11 +718,17 @@ int string::issubscribing(string & varname,string & argument) const
 
 int string::isexistingfile(void) const
   {
-  ifstream fin(str,ios::in);
+  /*ifstream fin(str,ios::in);
   if (fin.fail() != 0)
 	 return 1;
   else
-	 return 0;
+	 return 0;*/
+  ifstream file(str);
+  if(!file)            // If the file was not found, then file is 0, i.e. !file=1 or true.
+    return 1;    // The file was not found.
+  else                 // If the file was found, then file is non-0.
+    return 0;     // The file was found.
+
   }
 
 
@@ -786,11 +816,12 @@ int string::isint(void) const
   }
 
 
-char * string::strtochar() const
+const char * string::strtochar() const
   {
-  char * h = new char[len+1];
-  strcpy(h,str);
-  return h;
+//  char * h = new char[len+1];
+//  strcpy(h,str);
+//  return h;
+  return str;
   }
 
 

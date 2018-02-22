@@ -47,14 +47,16 @@ class __EXPORT_TYPE FC_linear  : public FC
   protected:
 
   int constposition;
+  bool constwarning;
   bool center;
 
   MASTER_OBJ * masterp;
+  unsigned equationnr;
 
   void compute_meaneffect_design(void);
 
-  bool initialize;
   bool IWLS;
+  bool IWLSmode;
 
   DISTR * likep;                             // Pointer to DISTR obejct
   datamatrix design;                         // Designmatrix
@@ -86,7 +88,7 @@ class __EXPORT_TYPE FC_linear  : public FC
   datamatrix * linoldp;
   datamatrix * linnewp;
 
-  void find_const(datamatrix & design);
+  virtual void find_const(datamatrix & design);
 
   void create_matrices(void);
 
@@ -103,6 +105,8 @@ class __EXPORT_TYPE FC_linear  : public FC
 
   public:
 
+  bool initialize;
+
   vector<ST::string> datanames;              // names of covariates
 
 //----------------------- CONSTRUCTORS, DESTRUCTOR -----------------------------
@@ -113,9 +117,9 @@ class __EXPORT_TYPE FC_linear  : public FC
 
   // CONSTRUCTOR
 
-  FC_linear(MASTER_OBJ * mp, GENERAL_OPTIONS * o,DISTR * lp, datamatrix & d,
-            vector<ST::string> & vn, const ST::string & t,
-           const ST::string & fp,bool cent);
+  FC_linear(MASTER_OBJ * mp, unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,
+            datamatrix & d, vector<ST::string> & vn, const ST::string & t,
+            const ST::string & fp,bool cent, bool IWLSle);
 
   // COPY CONSTRUCTOR
 
@@ -151,7 +155,7 @@ class __EXPORT_TYPE FC_linear  : public FC
 
   // FUNCTION: outresults
 
-  void outresults(ofstream & out_stata,ofstream & out_R,
+  void outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
                   const ST::string & pathresults);
 
   void compute_autocorr_all(const ST::string & path,
@@ -167,6 +171,10 @@ class __EXPORT_TYPE FC_linear  : public FC
   // FUNCTION: add_variable
 
   int add_variable(const datamatrix & d,ST::string & name);
+
+  void change_variable(datamatrix & x, unsigned & col);
+
+  void compute_linold(void);
 
   };
 
@@ -194,9 +202,10 @@ class __EXPORT_TYPE FC_linear_pen  : public FC_linear
 
   // CONSTRUCTOR
 
-  FC_linear_pen(MASTER_OBJ * mp, GENERAL_OPTIONS * o,DISTR * lp, datamatrix & d,
-            vector<ST::string> & vn, const ST::string & t,
-           const ST::string & fp,bool cent);
+  FC_linear_pen(MASTER_OBJ * mp,unsigned & enr,
+                GENERAL_OPTIONS * o,DISTR * lp, datamatrix & d,
+                vector<ST::string> & vn, const ST::string & t,
+                const ST::string & fp,bool cent,bool IWLSle);
 
   // COPY CONSTRUCTOR
 
@@ -223,6 +232,8 @@ class __EXPORT_TYPE FC_linear_pen  : public FC_linear
 
   bool posteriormode(void);
 
+  void find_const(datamatrix & design);
+
   void compute_XWX(datamatrix & r);
   void compute_XWXroot(datamatrix & r);
 
@@ -232,7 +243,7 @@ class __EXPORT_TYPE FC_linear_pen  : public FC_linear
 
   // FUNCTION: outresults
 
-  void outresults(ofstream & out_stata,ofstream & out_R,
+  void outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
                   const ST::string & pathresults);
 
   // FUNCTION: reset

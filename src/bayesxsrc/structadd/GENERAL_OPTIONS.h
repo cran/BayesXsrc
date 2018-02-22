@@ -86,6 +86,18 @@ class __EXPORT_TYPE GENERAL_OPTIONS
                                   // compute characteristics of the
                                   // posterior
 
+  bool saveestimation;
+
+  bool copula;                    // does the user want to specify a copula model? default is false
+  bool samplesel;                 // does the user want to specify a sample selection model? default is false
+  double sampleselval;            // value of the response that indicates sample selection
+
+  unsigned rotation;             // possible rotation of the copula
+
+  bool IWLSlineff;
+  bool forceIWLS;
+
+
 
   // DEFAULT CONSTRUCTOR
   // Defines:
@@ -97,6 +109,7 @@ class __EXPORT_TYPE GENERAL_OPTIONS
   // nriter = 0
   // samplesize = 0
   // logout = &cout
+  // savestimation = false;
 
   GENERAL_OPTIONS(void);
 
@@ -111,15 +124,18 @@ class __EXPORT_TYPE GENERAL_OPTIONS
   // nriter = 0
   // samplesize = 0
   // logout = lo
+  // saveestimation = sa
+  // copula = cop
 
+  GENERAL_OPTIONS(
   #if defined(JAVA_OUTPUT_WINDOW)
-  GENERAL_OPTIONS(administrator_basic * abp,
-              const unsigned & it,const unsigned & bu,const unsigned & st,
-              ostream * lo=&cout,const double & l1=95,const double & l2=80);
-  #else
-  GENERAL_OPTIONS(const unsigned & it,const unsigned & bu,const unsigned & st,
-                  ostream * lo=&cout,const double & l1=95,const double & l2=80);
+                  administrator_basic * abp,
   #endif
+                  const unsigned & it,const unsigned & bu,const unsigned & st,
+                  const bool & sa,const bool & cop, const unsigned & rot,
+                  const bool & samsel, const double & samselval, const bool & fiwls,
+                  ostream * lo=&cout,const double & l1=95,
+                  const double & l2=80);
 
   // COPY CONSTRUCTOR
 

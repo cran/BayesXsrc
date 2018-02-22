@@ -33,6 +33,10 @@ using std::endl;
 //------------------------------ CLASS: envmatrix ------------------------------
 //------------------------------------------------------------------------------
 
+const double sqrtmin = 0.0000000000000000001;
+const double sqrtmax = 100000000000000000000.0;
+const double logmin =  0.0000000000000000001;
+const double logmax =  100000000000000000000.0;
 
 template<class T>
 class envmatrix
@@ -79,11 +83,9 @@ class envmatrix
 //----------------------------- Constructor------------------------------------
 //-----------------------------------------------------------------------------
 
-
   // DEFAULT CONSTRUCTOR
 
-  envmatrix(void) { dim = 0; }
-
+  envmatrix(void);
 
   // CONSTRUCTOR1
   // Initializes an enevelope-matrix with dimension d, envelope-structure xenv
@@ -176,6 +178,8 @@ class envmatrix
   // TASK: Computes the cholesky decomposition and stores it in lenv and ldiag
 
   void decomp();
+
+  bool decomp_save();
 
   // FUNCTION: decomp2
   // TASK: Computes the cholesky decomposition and stores it in lenv and ldiag
@@ -325,6 +329,8 @@ class envmatrix
 
   T getLogDet();
 
+  T getLogDet_save(bool error);
+
   // FUNCTION: traceOfProduct
   // TASK: returns the trace of the product A*B, where A is the calling matrix.
 
@@ -334,7 +340,7 @@ class envmatrix
   // TASK: Computes an envelope structure that combines the envelopes of the
   //       calling matrix and B
 
-  vector<unsigned> computeMaxXenv(const envmatrix<T> & B);
+  vector<unsigned> computeMaxXenv(envmatrix<T> & B);
 
 
 //------------------------------------------------------------------------------
@@ -400,7 +406,7 @@ class envmatrix
   // FUNCTION: addto
   // TASK: computes f1*X + f2*K and assigns it to the calling matrix.
   //       The calling matrix is assumed to have the maximum envelope of X and K
-  //       which may be computed with the function getMaxXenv()
+  //       which may be computed with the function computeMaxXenv()
 
   void addto(envmatrix &X, envmatrix &K, const T &f1,
                  const T &f2);
@@ -472,6 +478,7 @@ class envmatrix
   };
 
   typedef envmatrix<double> envmatdouble;
+  typedef long double ldouble;
 
 #if !defined(ENVMATRIX_CPP_INCLUDED)
 #include"envmatrix.cpp"

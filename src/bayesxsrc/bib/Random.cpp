@@ -23,7 +23,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 
 #include "Random.h"
-
+#if defined(BAYESX_GSL_INCLUDED)
+  #include <gsl/gsl_cdf.h>
+  #include <gsl/gsl_sf_gamma.h>
+#endif
 
 // BEGIN: DSB //
 
@@ -508,7 +511,23 @@ double truncnormal(const double & a,const double & b)
   }
 
 
+// efficient random number generation from truncated normal for copula models.
+//compared to trunc_normal2, u has already been computed
+/*double trunc_normal_copula(const double & a,const double & b,const double & mu,
+                    const double & s, const double & F1)
+  {
+  double at = Phi2((a-mu)/s);
+  double bt = Phi2((b-mu)/s);
+  double u = at+(bt-at)*F1;
+  double r = mu+s*invPhi2(u);
+  if (r < a)
+    r = a+0.00000001;
+  if (r > b)
+    r = b-0.00000001;
 
+  return r;
+  }
+*/
 // Erzeugen eines standardnormalverteilten Zufallsvektors (Spaltenvektor)
 // mit Dimension dim !
 
@@ -670,7 +689,7 @@ double GIG(double chi)
 double GIG(double lambda, double psi, double chi)
   {
 
-  double out;
+  double out = 0.0;
 
   if (chi == 0)
     return rand_gamma(lambda,psi/2);
@@ -755,6 +774,528 @@ double GIG(double lambda, double psi, double chi)
 
   }
 
+
+double GIG2(double lambda, double a, double b)
+  {
+  double omega = sqrt(a*b);
+  if(b==0)
+    {
+    return(rand_gamma(lambda,0.5*a));
+    }
+  else if(lambda==(-0.5))
+    {
+    return(rand_inv_gaussian(sqrt(b/a),b));
+    }
+  else if(a==0)
+    {
+    return(rand_invgamma(lambda,b));
+    }
+ /* else if(lambda<=0.0000001)
+    {
+    double alpha = omega;
+
+    double mfpsi1 = -fpsi(1, alpha, 0);
+    double mfpsim1 = -fpsi(-1, alpha, 0);
+
+    double t = 1;
+
+    if(mfpsi1>2)
+      {
+      t = sqrt(2/(alpha));
+      }
+    else if(mfpsi1<0.5)
+      {
+      t = log(4/(alpha));
+      }
+    else
+      {
+      t=1;
+      }
+
+    double s = 1;
+
+    if(mfpsim1>2)
+      {
+      s = sqrt(4/(alpha*cosh(1)));
+      }
+    else if(mfpsim1<0.5)
+      {
+      s =   log(1+1/alpha+sqrt(1/(alpha*alpha)+2/(alpha)));
+      }
+    else
+      {
+    s=1;
+      }
+    double eta = -fpsi(t, alpha, 0);
+    double zeta = -dfpsi(t, alpha, 0);
+    double theta = -fpsi(-s, alpha, 0);
+    double xi = dfpsi(-s, alpha, 0);
+    double p = 1/xi;
+    double r = 1/zeta;
+    double dt = t-r*eta;
+    double ds = s-p*theta;
+    double q = ds+dt;
+
+    double u = uniform();
+    double v = uniform();
+    double w = uniform();
+    double x = 0;
+
+    if(u < (q / (p + q + r)))
+      {
+      x = -ds+q*v;
+      }
+    else if(u < ((q + r) / (p + q + r)))
+      {
+      x = dt+r*log(1/v);
+      }
+    else
+      {
+      x = -ds-p*log(1/v);
+      }
+
+    double chi=1.0*((x>= (-ds)) && (x<=dt)) + 1.0*((x> dt))*exp(-eta-zeta*(x-t))+1.0*((x< (-ds)))*exp(-theta+xi*(x+s));
+
+
+    while(chi*w > exp(fpsi(x, alpha, 0)))
+      {
+      u = uniform();
+      v = uniform();
+      w = uniform();
+
+      if(u < (q / (p + q + r)))
+        {
+        x = -ds+q*v;
+        }
+      else if(u < ((q + r) / (p + q + r)))
+        {
+        x = dt+r*log(1/v);
+        }
+      else
+        {
+        x = -ds-p*log(1/v);
+        }
+      chi=1*((x>= (-ds)) && (x<=dt)) + 1*((x> dt))*exp(-eta-zeta*(x-t))+1*((x< (-ds)))*exp(-theta+xi*(x+s));
+
+      }
+    double ret = exp(x);
+    ret *= sqrt(b/a);
+    return ret;
+    }*/
+  else
+    {
+    double alpha = sqrt(omega*omega+lambda*lambda) - lambda;
+
+    double mfpsi1 = -fpsi(1, alpha, lambda);
+    double mfpsim1 = -fpsi(-1, alpha, lambda);
+
+    double t = 1;
+
+    if(mfpsi1>2)
+      {
+      t = sqrt(2/(alpha+lambda));
+      }
+    else if(mfpsi1<0.5)
+      {
+      t = log(4/(alpha+2*lambda));
+      }
+    else
+      {
+      t=1;
+      }
+
+    double s = 1;
+
+    if(mfpsim1>2)
+      {
+      s = sqrt(4/(alpha*cosh(1.0)+lambda));
+      }
+    else if(mfpsim1<0.5)
+      {
+      if(lambda<=0.0000001)
+        {
+        s =   log(1+1/alpha+sqrt(1/(alpha*alpha)+2/(alpha)));
+        }
+        else
+          {
+          s = fmin(1/lambda, log(1+1/alpha+sqrt(1/(alpha*alpha)+2/(alpha))));
+          }
+      }
+    else
+      {
+    s=1;
+      }
+    double eta = -fpsi(t, alpha, lambda);
+    double zeta = -dfpsi(t, alpha, lambda);
+    double theta = -fpsi(-s, alpha, lambda);
+    double xi = dfpsi(-s, alpha, lambda);
+    double p = 1/xi;
+    double r = 1/zeta;
+    double dt = t-r*eta;
+    double ds = s-p*theta;
+    double q = ds+dt;
+
+    double u = uniform();
+    double v = uniform();
+    double w = uniform();
+    double x = 0;
+
+    if(u < (q / (p + q + r)))
+      {
+      x = -ds+q*v;
+      }
+    else if(u < ((q + r) / (p + q + r)))
+      {
+      x = dt+r*log(1/v);
+      }
+    else
+      {
+      x = -ds-p*log(1/v);
+      }
+
+    double chi=1.0*((x>= (-ds)) && (x<=dt)) + 1.0*((x> dt))*exp(-eta-zeta*(x-t))+1.0*((x< (-ds)))*exp(-theta+xi*(x+s));
+
+/*	double chi2 = 1;
+	if(x> dt)
+	  {
+	  chi2 = exp(-eta-zeta*(x-t));
+	  }
+	else if(x< (-ds))
+	  {
+	  chi2 = exp(-theta+xi*(x+s));
+	  }
+	else
+      {
+	  chi2 = 1;
+	  }
+	  cout << "chi: " << chi << endl;
+	  cout << "chi2: " << chi2 << endl;
+*/
+
+    while(chi*w > exp(fpsi(x, alpha, lambda)))
+      {
+      u = uniform();
+      v = uniform();
+      w = uniform();
+
+      if(u < (q / (p + q + r)))
+        {
+        x = -ds+q*v;
+        }
+      else if(u < ((q + r) / (p + q + r)))
+        {
+        x = dt+r*log(1/v);
+        }
+      else
+        {
+        x = -ds-p*log(1/v);
+        }
+      chi=1*((x>= (-ds)) && (x<=dt)) + 1*((x> dt))*exp(-eta-zeta*(x-t))+1*((x< (-ds)))*exp(-theta+xi*(x+s));
+
+      }
+    double ret = (lambda/omega+sqrt(1+lambda*lambda/(omega*omega)))*exp(x);
+    ret *= sqrt(b/a);
+    return ret;
+    }
+
+  }
+
+// Compute CDF of bivariate normal distribution with zero mean vector and unit marginal variances
+// correlation r
+//-------------------begin pbivn ---------------------------------------------------------
+
+double pbivn(const double & xl, const double &  xu, const double &  yl, const double &  yu, const double &  r)
+  {
+// A function for computing bivariate normal probabilities.
+// pbivn calculates the probability that
+// xl < x < xu and yl < y < yu,
+// with correlation coefficient r.
+//
+// Author of the original Matlab implemenation:
+// Alan Genz, Department of Mathematics
+// Washington State University, Pullman, Wa 99164-3113
+  double p = pbivnu(xl,yl,r);
+  //cout << "p=" << p << endl;
+  p -= pbivnu(xu,yl,r);
+  //cout << "p=" << p << endl;
+  p -= pbivnu(xl,yu,r);
+  //cout << "p=" << p << endl;
+  p += pbivnu(xu,yu,r);
+  //cout << "p=" << p << endl;
+  // double minp = min( p, 1.0 );
+  //p = max( 0.0, minp );
+  return p;
+  }
+
+// helper function for pbivn
+double pbivnu(const double &  dh, const double &  dk, const double &  r)
+  {
+// pbivnu calculates the probability that x > dh and y > dk.
+// parameters
+// dh 1st lower integration limit
+// dk 2nd lower integration limit
+// r   correlation coefficient
+/*%  Example: p = pbivnu( -3, -1, .35 )
+%  Note: to compute the probability that x < dh and y < dk,
+%        use pbivnu( -dh, -dk, r ).
+%
+
+%   Author of the original Matlab implementation:
+%       Alan Genz
+%       Department of Mathematics
+%       Washington State University
+%       Pullman, Wa 99164-3113
+%       Email : alangenz@wsu.edu
+%
+%    This function is based on the method described by
+%        Drezner, Z and G.O. Wesolowsky, (1989),
+%        On the computation of the bivariate normal inegral,
+%        Journal of Statist. Comput. Simul. 35, pp. 101-107,
+%    with major modifications for double precision, for |r| close to 1,
+%    and for Matlab by Alan Genz. Minor bug modifications 7/98, 2/10.
+%
+%
+% Copyright (C) 2013, Alan Genz,  All rights reserved.
+*/
+  double p;
+  double temp = DBL_MAX;
+  if((dh ==  temp) || (dk ==  temp))
+    {
+    p = 0;
+    }
+  else if(dh == -temp)
+    {
+    if(dk == -temp)
+      {
+      p = 1;
+      }
+    else
+      {
+      p = randnumbers::Phi2(-dk);
+      }
+    }
+  else if(dk == -temp)
+    {
+    p = randnumbers::Phi2(-dh);
+    }
+  else if(r == 0.0)
+    {
+    p = randnumbers::Phi2(-dh)*randnumbers::Phi2(-dk);
+    }
+  else
+    {
+    double tp = 2.0*PI;
+    double h = dh;
+    double k = dk;
+    double hk = h*k;
+    double bvn = 0;
+    double sizew = 0;
+    vector<double> w;
+    vector<double> x;
+    if(fabs(r) < 0.3)//      % Gauss Legendre points and weights, n =  6
+      {
+      w.push_back(0.1713244923791705);
+      w.push_back(0.3607615730481384);
+      w.push_back(0.4679139345726904);
+      x.push_back(0.9324695142031522);
+      x.push_back(0.6612093864662647);
+      x.push_back(0.2386191860831970);
+      sizew = w.size();
+      for(int j=0; j<sizew; j++)
+        {
+        w.push_back(w[j]);
+        x.push_back(1+x[j]);
+        x[j] = 1-x[j];
+        }
+      sizew = w.size();
+      }
+    else if(fabs(r) < 0.75) // % Gauss Legendre points and weights, n = 12
+      {
+      w.push_back(0.04717533638651177);
+      w.push_back(0.1069393259953183);
+      w.push_back(0.1600783285433464);
+      w.push_back(0.2031674267230659);
+      w.push_back(0.2334925365383547);
+      w.push_back(0.2491470458134029);
+      x.push_back(0.9815606342467191);
+      x.push_back(0.9041172563704750);
+      x.push_back(0.7699026741943050);
+      x.push_back(0.5873179542866171);
+      x.push_back(0.3678314989981802);
+      x.push_back(0.1252334085114692);
+      sizew = w.size();
+      for(int j=0; j<sizew; j++)
+        {
+        w.push_back(w[j]);
+        x.push_back(1+x[j]);
+        x[j] = 1-x[j];
+        }
+      sizew = w.size();
+      }
+    else//                % Gauss Legendre points and weights, n = 20
+      {
+      w.push_back(0.01761400713915212);
+      w.push_back(0.04060142980038694);
+      w.push_back(0.06267204833410906);
+      w.push_back(0.08327674157670475);
+      w.push_back(0.1019301198172404);
+      w.push_back(0.1181945319615184);
+      w.push_back(0.1316886384491766);
+      w.push_back(0.1420961093183821);
+      w.push_back(0.1491729864726037);
+      w.push_back(0.1527533871307259);
+      x.push_back(0.9931285991850949);
+      x.push_back(0.9639719272779138);
+      x.push_back(0.9122344282513259);
+      x.push_back(0.8391169718222188);
+      x.push_back(0.7463319064601508);
+      x.push_back(0.6360536807265150);
+      x.push_back(0.5108670019508271);
+      x.push_back(0.3737060887154196);
+      x.push_back(0.2277858511416451);
+      x.push_back(0.07652652113349733);
+      sizew = w.size();
+      for(int j=0; j<sizew; j++)
+        {
+        w.push_back(w[j]);
+        x.push_back(1+x[j]);
+        x[j] = 1-x[j];
+        }
+      sizew = w.size();
+      }
+//    cout << "sizew=" << sizew << endl;
+//    for(int j=0; j<sizew; j++)
+//        {
+//        cout << "w_" << j << "=" << w[j] << endl;
+//        cout << "x_" << j << "=" << x[j] << endl;
+//        }
+    if(fabs(r) < 0.925)
+      {
+      double hs = ( h*h + k*k )/2;
+      double asr = asin(r)/2;
+      double sn = 0.0;
+      for(int j=0; j<sizew; j++)
+        {
+        sn = 0.0;
+        sn = sin(asr*x[j]);
+        bvn += exp((sn*hk-hs)/(1-sn*sn))*w[j];
+
+        }
+//      cout << "hs=" << hs << endl;
+//      cout << "asr=" << asr << endl;
+//      cout << "sn=" << sn << endl;
+//      cout << "hk=" << hk << endl;
+//      cout << "h=" << h << endl;
+//      cout << "k=" << k << endl;
+      bvn *= asr/tp;
+//      cout << "bvn=" << bvn << endl;
+      double p1 = randnumbers::Phi2(-h);
+      p1 *= randnumbers::Phi2(-k);
+      bvn += p1;
+//      cout << "bvn=" << bvn << endl;
+//      cout << "p1=" << p1 << endl;
+//      cout << "p2=" << p1 << endl;
+      }
+    else
+      {
+      if(r < 0)
+        {
+        k = -k;
+        hk = -hk;
+        }
+      if(fabs(r) < 1)
+        {
+        double as = 1-r*r;
+        double a = sqrt(as);
+        double bs = (h-k)*(h-k);
+        double asr = -( bs/as + hk )/2;
+        double c = (4-hk)/8 ;
+        double d = (12-hk)/80;
+        if(asr > -100)
+          {
+          bvn = a*exp(asr)*(1-c*(bs-as)*(1-d*bs)/3+c*d*as*as);
+          }
+        if(hk  > -100)
+          {
+          double b = sqrt(bs);
+          double sp = sqrt(tp)*randnumbers::Phi2(-b/a);
+          bvn -=  exp(-hk/2)*sp*b*( 1 - c*bs*(1-d*bs)/3 );
+          }
+        a = a/2;
+        double xs = 0;
+        for(int j=0; j<w.size(); j++)
+        {
+        xs = 0;
+        xs = a*a*x[j]*x[j];
+        asr = -( bs/xs + hk )/2;
+        if(asr > -100)
+          {
+          double sp = ( 1 + c*xs*(1+5*d*xs) );
+          double rs = sqrt(1-xs);
+          double ep = exp( -(hk/2)*xs/((1+rs)*(1+rs)) )/rs;
+          bvn = ( a*( (exp(asr)*(sp-ep))*w[j] ) - bvn )/tp;
+          }
+        }
+        }
+      if(r > 0)
+        {
+        bvn +=  randnumbers::Phi2( -max( h, k ) );
+        }
+      else if(h >= k)
+        {
+        bvn = -bvn;
+        }
+      else
+        {
+        double L;
+        if(h < 0)
+          {
+          L = randnumbers::Phi2(k)-randnumbers::Phi2(h);
+          }
+        else
+          {
+          L = randnumbers::Phi2(-h)-randnumbers::Phi2(-k);
+          }
+        bvn =  L - bvn;
+        }
+      }
+    if(bvn>1.0)
+      bvn = 1.0;
+    if(bvn<0.0)
+      bvn = 0.0;
+
+    p = bvn;
+    }
+  return p;
+  }
+//-------------------end pbivn ---------------------------------------------------------
+
+//-------------------begin bbivn ---------------------------------------------------------
+// Compute density of bivariate normal distribution with zero mean vector and unit marginal variances
+// correlation r
+//-------------------begin dbivn ---------------------------------------------------------
+
+double dbivn(const double & x1, const double &  x2, const double &  r)
+  {
+// A function for computing bivariate normal densities with correlation coefficient r.
+  double omr2 = 1.0-r*r;
+  double d = (0.1591549155/sqrt(omr2))*exp(-0.5*(x1*x1-2*r*x1*x2+x2*x2)/omr2);
+  return d;
+  }
+//-------------------end pbivn ---------------------------------------------------------
+
+
+double fpsi(double x, double alpha, double lambda)
+  {
+  double ret = -alpha*(cosh(x)-1)-lambda*(exp(x)-x-1);
+  return ret;
+  }
+
+double dfpsi(double x, double alpha, double lambda)
+  {
+  double ret = -alpha*sinh(x)-lambda*(exp(x)-1);
+  return ret;
+  }
 
 double f1old(double x, int j)
   {
@@ -1579,13 +2120,25 @@ double incomplete_beta (double a, double b, double x)
     return Ix;
 }
 
+double sgn (double x)
+{
+
+    if (x > 0)
+        return 1;
+    else if(x < 0)
+        return -1;
+    else
+        return 0;
+}
+
+
 double incomplete_gamma (double a, double x)
 {
     const int ITMAX = 100;
     const double EPS = 2.22045e-016;
     int n;
     double sum;
-    double gamser;
+    double gamser = 0.0;
     double gln = randnumbers::lngamma_exact(a);
     double ap = a;
     double del = sum = 1.0/a;
@@ -1598,6 +2151,16 @@ double incomplete_gamma (double a, double x)
         }
     }
     return gamser;
+}
+
+double gamma_cdf(double y, double mu, double sigma)
+  {
+  const double p = 0.0;
+  #if defined(BAYESX_GSL_INCLUDED)
+  p = gsl_cdf_gamma_P(y, sigma, mu/sigma);
+  #endif
+  // TODO check for errors
+  return p;
 }
 
 

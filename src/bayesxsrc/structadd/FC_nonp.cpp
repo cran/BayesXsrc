@@ -65,11 +65,6 @@ void FC_nonp::read_options(vector<ST::string> & op,vector<ST::string> & vn)
   else
     stype = unconstrained;
 
-  if (op[18] == "true")
-    pvalue = true;
-  else
-    pvalue = false;
-
   if (op[19] == "true")
     computemeaneffect = true;
   else
@@ -100,7 +95,12 @@ void FC_nonp::read_options(vector<ST::string> & op,vector<ST::string> & vn)
   else
     samplef = true;
 
-   f = op[34].strtodouble(meaneffectconstant);
+  f = op[34].strtodouble(meaneffectconstant);
+
+  if(op[35] == "ssvs")
+    ssvs=true;
+  else
+    ssvs=false;
 
   }
 
@@ -116,21 +116,30 @@ FC_nonp::FC_nonp(void)
   }
 
 
-FC_nonp::FC_nonp(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,
+FC_nonp::FC_nonp(MASTER_OBJ * mp,unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,
                  const ST::string & t,const ST::string & fp,
                  DESIGN * Dp,vector<ST::string> & op,
-                 vector<ST::string> & vn)
-     : FC(o,t,Dp->Zout.rows(),1,fp)
+                 vector<ST::string> & vn,datamatrix  pstart)
+     : FC(o,t,Dp->posbeg.size(),1,fp)
   {
 
   read_options(op,vn);
+
+  multf=false;
+
+  imeasures=false;
+
   masterp = mp;
+  equationnr = enr;
   likep = lp;
   designp = Dp;
 
   if (designp->errors==false)
     {
-    param = datamatrix(designp->nrpar,1,0);
+    if (pstart.rows()==1)
+      param = datamatrix(designp->nrpar,1,0);
+    else
+      param = pstart;
     paramold = param;
     parammode = param;
     paramhelp = param;
@@ -151,12 +160,6 @@ FC_nonp::FC_nonp(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,
 
     helpcenter = datamatrix(designp->nrpar,1);
 
-    if (pvalue==true)
-      {
-      pvalue_sample = FC(o,"",param.rows()*2+6,1,fp + ".pvalue");
-      mPhelp = datamatrix(param.rows(),1,0);
-      }
-
     if (computemeaneffect==true)
       {
       meaneffect_sample = FC(o,"",beta.rows(),1,fp+".meaneffect");
@@ -169,7 +172,6 @@ FC_nonp::FC_nonp(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,
       else
         {
         derivativesample = FC(o,"",beta.rows(),1,fp+".derivative");
-        // elasticitysample = FC(o,"",beta.rows(),1,fp+".elasticity");
         }
       }
 
@@ -179,7 +181,7 @@ FC_nonp::FC_nonp(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,
     errors=true;
     }
 
-//  check_errors();
+  check_errors();
 
   }
 
@@ -188,15 +190,17 @@ FC_nonp::FC_nonp(const FC_nonp & m)
   : FC(FC(m))
   {
 
+  multf=m.multf;
+  multf_value=m.multf_value;
+
+  imeasures=m.imeasures;
+
   masterp = m.masterp;
+  equationnr = m.equationnr;
 
   fsample = m.fsample;
 
   paramsample = m.paramsample;
-
-  pvalue_sample = m.pvalue_sample;
-  pvalue = m.pvalue;
-  mPhelp = m.mPhelp;
 
   computemeaneffect = m.computemeaneffect;
   meaneffectconstant = m.meaneffectconstant;
@@ -210,7 +214,7 @@ FC_nonp::FC_nonp(const FC_nonp & m)
   parammode = m.parammode;
   paramold = m.paramold;
   paramhelp = m.paramhelp;
-  paramKparam = paramKparam;
+  paramKparam = m.paramKparam;
   betaold = m.betaold;
   betadiff = m.betadiff;
   partres = m.partres;
@@ -234,7 +238,8 @@ FC_nonp::FC_nonp(const FC_nonp & m)
   derivativesample = m.derivativesample;
   samplederivative = m.samplederivative;
   samplef = m.samplef;
-  // elasticitysample = m.elasticitysample;
+
+  ssvs = m.ssvs;
   }
 
 
@@ -245,18 +250,20 @@ const FC_nonp & FC_nonp::operator=(const FC_nonp & m)
 	 return *this;
   FC::operator=(FC(m));
 
+  multf=m.multf;
+  multf_value=m.multf_value;
+
+  imeasures=m.imeasures;
+
   masterp = m.masterp;
+  equationnr = m.equationnr;
 
   fsample = m.fsample;
 
   paramsample = m.paramsample;
 
-  pvalue_sample = m.pvalue_sample;
-  pvalue = m.pvalue;
-  mPhelp = m.mPhelp;
-
   computemeaneffect = m.computemeaneffect;
-  meaneffectconstant = m.meaneffectconstant;  
+  meaneffectconstant = m.meaneffectconstant;
   meaneffect_sample = m.meaneffect_sample;
 
   stype = m.stype;
@@ -264,7 +271,7 @@ const FC_nonp & FC_nonp::operator=(const FC_nonp & m)
   designp = m.designp;
   param = m.param;
   paramlin = m.paramlin;
-  paramKparam = paramKparam;
+  paramKparam = m.paramKparam;
   parammode = m.parammode;
   paramold = m.paramold;
   paramhelp = m.paramhelp;
@@ -291,189 +298,11 @@ const FC_nonp & FC_nonp::operator=(const FC_nonp & m)
   derivativesample = m.derivativesample;
   samplederivative = m.samplederivative;
   samplef = m.samplef;
-  // elasticitysample = m.elasticitysample;
+
+  ssvs = m.ssvs;
 
   return *this;
   }
-
-
-
-void FC_nonp::update_pvalue(void)
-  {
-
-  if( (optionsp->nriter > optionsp->burnin) &&
-      ((optionsp->nriter-optionsp->burnin-1) % (optionsp->step) == 0) )
-    {
-    unsigned i,j;
-    unsigned nrpar = param.rows();
-
-    double * contourp = pvalue_sample.beta.getV();
-    double * parammodep = parammode.getV();
-
-    for(i=0;i<nrpar;i++,contourp++,parammodep++)
-      *contourp = *parammodep;
-
-    *contourp = 1/likep->get_scale();                                // contour(,nrpar) : 1/sigma^2(nu)
-
-    // TEST
-    // ofstream out("c:\\bayesx\\testh\\results\\beta_pvalue.raw");
-    // pvalue_sample.beta.prettyPrint(out);
-    // END: TEST
-
-    contourp++;
-    *contourp = lambda;                                              // contour(,nrpar+1) : lambda(nu)
-
-    contourp++;
-    *contourp =                                                      // contour(,nrpar+2) : beta(t)' X'WX beta(t)
-    designp->XWX.compute_quadform(param,0);
-    contourp++;
-    *contourp = designp->penalty_compute_quadform(param);                // contour(,nrpar+3) : beta(t)' K beta(t)
-    contourp++;
-    *contourp = designp->precision.compute_quadform(parammode,0);    // contour(,nrpar+4) : m(nu)' P(nu) m(nu)
-    contourp++;
-    *contourp = designp->precision.getLogDet();                      // contour(,nrpar+5)  : log(det(P(v))
-
-
-    double * mPhelp_p=mPhelp.getV();
-    for(i=0;i<nrpar;i++,mPhelp_p++)
-      {
-      *mPhelp_p = 0;
-      parammodep = parammode.getV();
-      for(j=0;j<nrpar;j++,parammodep++)
-        *mPhelp_p += (*parammodep)*(designp->precision)(j,i);
-      }
-
-    contourp++;
-    mPhelp_p=mPhelp.getV();
-    for(i=0;i<nrpar;i++,contourp++,mPhelp_p++)
-      *contourp = *mPhelp_p;
-
-  // TEST
-  //   ofstream out("c:\\bayesx\\testh\\results\\beta_pvalue.res");
-  //   pvalue_sample.beta.prettyPrint(out);
-  // END: TEST
-
-    }
-
-  pvalue_sample.update();
-
-  }
-
-
-void FC_nonp::compute_pvalue(const ST::string & pathresults)
-  {
-
-  if (optionsp->nriter == optionsp->iterations)
-    {
-    unsigned nrpar = param.rows();
-
-    unsigned k,t,nu;
-
-    datamatrix * contour;
-    datamatrix contourm;
-
-    contour = &pvalue_sample.sampled_beta;
-
-    // TEST
-    // ofstream out2("c:\\bayesx\\testh\\results\\contour.res");
-    // contour.prettyPrint(out2);
-    // END: TEST
-
-    double exponent,mPbeta;
-
-    double pbeta_0;
-    datamatrix pbeta_t(optionsp->samplesize,1,0);
-
-    datamatrix RB(optionsp->samplesize,1,0);
-
-    datamatrix * parameter;
-    datamatrix parameterm;
-
-    parameter = &paramsample.sampled_beta;
-
-    // TEST
-    // ofstream out3("c:\\bayesx\\testh\\results\\parameter.res");
-    // parameter.prettyPrint(out3);
-    // TEST
-
-
-  // 0-nrpar-1 : pmode
-  // nrpar     : 1/scale
-  // nrpar+1   : lambda
-  // nrpar+2   : param' XWX param
-  // nrpar+3   : param'K param
-  // nrpar+4   : parammode' precision parammode
-  // nrpar+5   : logdetprecison
-  // rest      : m'P
-
-    double * paramp;
-    double * pbeta_tp = pbeta_t.getV();
-    for(t=0;t<optionsp->samplesize;t++,pbeta_tp++)
-      {
-      for(nu=0;nu<optionsp->samplesize;nu++)
-        {
-        mPbeta = 0.0;
-        paramp = (*parameter).getV()+t*nrpar;
-        for(k=0;k<nrpar;k++,paramp++)
-          mPbeta += (*contour)(nu,nrpar+6+k)* (*paramp);
-//        mPbeta += (*contour)(nu,nrpar+6+k)* (*parameter)(t,k);
-
-//        exponent =  (*contour)(t,nrpar+2)
-//                 + (*contour)(nu,nrpar+1) * (*contour)(t,nrpar+3)
-//                 + (*contour)(nu,nrpar+4) - 2*mPbeta/transform(0,0);
-
-        exponent =  (*contour)(t,nrpar+2)
-                 + (*contour)(nu,nrpar+1) * (*contour)(t,nrpar+3)
-                 + (*contour)(nu,nrpar+4) - 2*mPbeta;
-
-        RB(nu,0) = 0.5* (*contour)(nu,nrpar+5) - (*contour)(nu,nrpar)   * 0.5*(exponent);
-        }
-
-      *pbeta_tp = RB.quantile(50,0);
-      }
-
-    // compute p(beta_0)
-    for(nu=0;nu<optionsp->samplesize;nu++)
-      {
-
-      exponent = (*contour)(nu,nrpar+4);
-      RB(nu,0) = 0.5*(*contour)(nu,nrpar+5) - (*contour)(nu,nrpar)*0.5*(exponent);
-      }
-
-    pbeta_0 = RB.quantile(50,0);
-
-   //---------------------------------------------------------------------------
-
-    double contourprob=0;
-
-    pbeta_tp = pbeta_t.getV();
-    for(t=0;t<optionsp->samplesize;t++,pbeta_tp++)
-      {
-      if((*pbeta_tp) < pbeta_0)
-        contourprob++;
-      }
-    contourprob = contourprob/optionsp->samplesize;
-
-
-    optionsp->out("    Bayesian p-value: " +
-    ST::doubletostring(contourprob,2) + "\n");
-
-    optionsp->out("\n");
-
-    ST::string path = pathresults.substr(0,pathresults.length()-4)+"_contour.res";
-
-    ofstream out(path.strtochar());
-    out << "contourprob" << endl;
-    out << ST::doubletostring(contourprob) << endl;
-
-    out.close();
-
-    }
-
-  }
-
-
-
 
 
 void FC_nonp::get_linparam(void)
@@ -484,9 +313,34 @@ void FC_nonp::get_linparam(void)
     paramlin(i,0) = designp->FClinearp->beta(pos+i,0);
   }
 
-void FC_nonp::update_IWLS(void)
+
+void FC_nonp::perform_centering(void)
   {
 
+  if(designp->center)
+    {
+    if (designp->centermethod==meansimple)
+      centerparam();
+    else if (designp->centermethod==integralsimple)
+      centerparam_weight();
+    else if (designp->centermethod==meansum2)
+      centerparam_sum2(s2);
+    else if (designp->centermethod==meansimplevar)
+      centerparam_sample_var();
+    else
+      centerparam_sample();
+    }
+
+  if (designp->position_lin!=-1)
+    {
+    get_linparam();
+    }
+
+  }
+
+
+void FC_nonp::update_IWLS(void)
+  {
   // TEST
 //  ofstream out("c:\\bayesx\\testh\\results\\beta.res");
 //  beta.prettyPrint(out);
@@ -514,115 +368,120 @@ void FC_nonp::update_IWLS(void)
 
   designp->compute_partres(partres,beta);
   designp->compute_XtransposedWX();
-  designp->compute_XtransposedWres(partres,lambda);
+  designp->compute_XtransposedWres(partres,lambda,tau2);
 
   designp->compute_precision(lambda);
 
-  designp->precision.solve(*(designp->XWres_p),paramhelp);
+//  bool error = designp->precision.decomp_save();
 
-  // TEST
-  // ofstream out("c:\\bayesx\\testh\\results\\paramhelp_v.res");
-  // paramhelp.prettyPrint(out);
-  // TEST
+//  if (error == false)
+//    {
+    designp->precision.solve(*(designp->XWres_p),paramhelp);
 
-  workparam = param.getV();
-  unsigned nrpar = param.rows();
-  for(i=0;i<nrpar;i++,workparam++)
-    *workparam = rand_normal();
+    // TEST
+    // ofstream out("c:\\bayesx\\testh\\results\\paramhelp_v.res");
+    // paramhelp.prettyPrint(out);
+    // TEST
 
-  designp->precision.solveU(param,paramhelp); // param contains now the proposed
-                                              // new parametervector
+    workparam = param.getV();
+    unsigned nrpar = param.rows();
+    for(i=0;i<nrpar;i++,workparam++)
+      *workparam = rand_normal();
 
+    designp->precision.solveU(param,paramhelp); // param contains now the proposed
+                                                // new parametervector
 
-  if(designp->center)
-    {
-    if (designp->centermethod==meansimple)
-      centerparam();
-    else if (designp->centermethod==meansum2)
-      centerparam_sum2(s2);
+    perform_centering();
+
+    paramhelp.minus(param,paramhelp);
+
+    double qold = 0.5*designp->precision.getLogDet()-
+                0.5*designp->precision.compute_quadform(paramhelp,0);
+
+    designp->compute_f(param,paramlin,beta,fsample.beta);
+
+    betadiff.minus(beta,betaold);
+
+    bool ok;
+    if (optionsp->saveestimation)
+      {
+      ok = designp->update_linpred_save(betadiff);
+      if (!ok)
+        outsidelinpredlimits++;
+      }
     else
-      centerparam_sample();
-    }
+      {
+      designp->update_linpred(betadiff);
+      ok = true;
+      }
 
-  paramhelp.minus(param,paramhelp);
+    // Compute new log-likelihood
 
-  double qold = 0.5*designp->precision.getLogDet()-
-                0.5*designp->precision.compute_quadform(paramhelp,0);
+    double lognew=0;
+    double qnew=0;
+    if (ok)
+      {
+      lognew   = likep->compute_iwls(true,true);
+      lognew  -= 0.5*designp->penalty_compute_quadform(param)*lambda;
 
-  if (designp->position_lin!=-1)
-    {
-    get_linparam();
-    }
+      designp->compute_partres(partres,beta);
+      designp->compute_XtransposedWX();
+      designp->compute_XtransposedWres(partres,lambda,tau2);
 
+      designp->compute_precision(lambda);
 
-  designp->compute_f(param,paramlin,beta,fsample.beta);
+      designp->precision.solve(*(designp->XWres_p),paramhelp);
 
-  betadiff.minus(beta,betaold);
-
-  designp->update_linpred(betadiff);
-
-  // Compute new log-likelihood
-
-  double lognew = likep->compute_iwls(true,true);
-  lognew  -= 0.5*designp->penalty_compute_quadform(param)*lambda;
-
-  designp->compute_partres(partres,beta);
-  designp->compute_XtransposedWX();
-  designp->compute_XtransposedWres(partres,lambda);
-
-  designp->compute_precision(lambda);
-
-  designp->precision.solve(*(designp->XWres_p),paramhelp);
-
-  // TEST
-  // ofstream out2("c:\\bayesx\\testh\\results\\paramhelp_n.res");
-  // paramhelp.prettyPrint(out2);
-  // TEST
+      // TEST
+      // ofstream out2("c:\\bayesx\\testh\\results\\paramhelp_n.res");
+      // paramhelp.prettyPrint(out2);
+      // TEST
 
 
-  paramhelp.minus(paramold,paramhelp);
-  double qnew = 0.5*designp->precision.getLogDet() -
-                0.5*designp->precision.compute_quadform(paramhelp,0);
+      paramhelp.minus(paramold,paramhelp);
+      qnew = 0.5*designp->precision.getLogDet() -
+             0.5*designp->precision.compute_quadform(paramhelp,0);
+      }
+
+    double u = log(uniform());
+
+    if (ok && (u <= (lognew - logold  + qnew - qold)) )
+      {
+      acceptance++;
+
+      paramKparam=designp->penalty_compute_quadform(param);
+
+      betaold.assign(beta);
+      paramold.assign(param);
+      }
+    else
+      {
+
+      betadiff.minus(betaold,beta);
+      designp->update_linpred(betadiff);
 
 
-  double u = log(uniform());
-  if (u <= (lognew - logold  + qnew - qold) )
-    {
-    acceptance++;
+      param.assign(paramold);
+      beta.assign(betaold);
+      }
 
-    paramKparam=designp->penalty_compute_quadform(param);
-
-    betaold.assign(beta);
-    paramold.assign(param);
-    }
-  else
-    {
-
-    betadiff.minus(betaold,beta);
-    designp->update_linpred(betadiff);
-
-
-    param.assign(paramold);
-    beta.assign(betaold);
-    }
-
+//    } // end if (error==false)
 
   if (derivative)
     {
     designp->compute_f_derivative(param,paramlin,derivativesample.beta,
                                     derivativesample.beta);
-    // compute_elasticity();
     }
 
 
   // TEST
-  /*
-  ofstream out("c:\\bayesx\\test\\results\\param.res");
-  param.prettyPrint(out);
 
-  ofstream out2("c:\\bayesx\\test\\results\\beta.res");
-  beta.prettyPrint(out2);
-  */
+  // ofstream out("c:\\bayesx\\test\\results\\param.res");
+  // param.prettyPrint(out);
+
+  // ofstream out2("c:\\bayesx\\test\\results\\beta.res");
+  // beta.prettyPrint(out2);
+
   // TEST
 
   // transform_beta();
@@ -633,23 +492,59 @@ void FC_nonp::update_IWLS(void)
     }
 
 
-  paramsample.beta.assign(param);
-//  paramsample.transform(0,0) = likep->trmult;
-  paramsample.update();
-
-  if (derivative)
+  if(!ssvs)
     {
-//    derivativesample.transform(0,0) = likep->trmult;
-    derivativesample.update();
+    paramsample.beta.assign(param);
+    paramsample.update();
+
+    if (derivative)
+      derivativesample.update();
+
+    FC::update();
     }
-
-  FC::update();
-
   }
 
+void FC_nonp::ssvs_update(double & tauratio, bool signswitch, bool onlyupdate)
+  {
+  if(onlyupdate)
+    {
+    if (derivative)
+      derivativesample.update();
+    paramsample.beta.assign(param);
+    paramsample.update();
+    FC::update();
+    }
+  else
+    {
+    if(signswitch)
+      {
+      param.assign(-param);
+      paramold.assign(-paramold);
+      }
+
+    // computes effect
+    beta.mult_scalar(beta,tauratio);
+    betaold.assign(beta);
+
+    if (derivative)
+      {
+      (derivativesample.beta).mult_scalar(derivativesample.beta,tauratio);
+      derivativesample.update();
+      }
+
+    param.mult_scalar(param,tauratio);
+    paramsample.beta.assign(param);
+    paramsample.update();
+    paramold.assign(param);
+    paramKparam=designp->penalty_compute_quadform(param);
+
+    FC::update();
+    }
+  }
 
 void FC_nonp::update(void)
   {
+  set_multiplicative();
   if (IWLS)
     {
     update_IWLS();
@@ -662,12 +557,14 @@ void FC_nonp::update(void)
       }
     else
       {
+      if(likep->gamlss)
+        double logold = likep->compute_iwls(true,false);
       update_gaussian();
       }
     }
 
 
-  designp->compute_meaneffect(masterp->level1_likep,meaneffect,beta,
+  designp->compute_meaneffect(masterp->level1_likep[equationnr],meaneffect,beta,
                              meaneffect_sample.beta,computemeaneffect,
                              meaneffectconstant);
 
@@ -683,13 +580,15 @@ void FC_nonp::update_gaussian_transform(void)
   {
 
   betaold.assign(beta);
+  if (optionsp->saveestimation)
+    paramold.assign(param);
 
   double sigma2resp = likep->get_scale();
   lambda = sigma2resp/tau2;
 
   designp->compute_partres(partres,beta);
 
-  designp->compute_XtransposedWres(partres, lambda);
+  designp->compute_XtransposedWres(partres, lambda,tau2);
 
   designp->u.mult(designp->QtRinv,*(designp->XWres_p));
 
@@ -709,56 +608,52 @@ void FC_nonp::update_gaussian_transform(void)
 
   param.mult(designp->RtinvQ,acuteparam);
 
-  if(designp->center)
-    {
-    if (designp->centermethod==meansimple)
-      centerparam();
-    else if (designp->centermethod==meansum2)
-      centerparam_sum2(s2);
-    else
-      centerparam_sample();
-    }
-
-  if (designp->position_lin!=-1)
-    {
-    get_linparam();
-    }
-
+  perform_centering();
 
   designp->compute_f(param,paramlin,beta,fsample.beta);
 
   betadiff.minus(beta,betaold);
 
-  designp->update_linpred(betadiff);
+  bool ok;
+  if (optionsp->saveestimation)
+    {
+    ok = designp->update_linpred_save(betadiff);
 
-  acceptance++;
-
-  // transform_beta();
+    if (!ok)
+      {
+      outsidelinpredlimits++;
+      betadiff.minus(betaold,beta);
+      designp->update_linpred(betadiff);
+      beta.assign(betaold);
+      param.assign(paramold);
+      }
+    else
+      acceptance++;
+    }
+  else
+    {
+    designp->update_linpred(betadiff);
+    ok = true;
+    acceptance++;
+    }
 
 /*
   if (designp->position_lin!=-1)
     {
     fsample.update();
     }
-
-  if (pvalue)
-    {
-    update_pvalue();
-    }
 */
 
   paramsample.beta.assign(param);
-//  paramsample.transform(0,0) = likep->trmult;
   paramsample.update();
 
   FC::update();
 
   }
 
+
 void FC_nonp::update_gaussian(void)
   {
-
-
 
   // TEST
   // ofstream out0("c:\\bayesx\\testh\\results\\beta_re.res");
@@ -777,9 +672,13 @@ void FC_nonp::update_gaussian(void)
     bool lambdaconst = false;
 
     betaold.assign(beta);
+    if (optionsp->saveestimation)
+      paramold.assign(param);
 
     double sigmaresp = sqrt(likep->get_scale());
     lambda = likep->get_scale()/tau2;
+    // cout << lambda << endl;
+//    param.prettyPrint(cout);
 
     // TEST
     //  ofstream out("c:\\bayesx\\testh\\results\\responseRE.res");
@@ -794,16 +693,17 @@ void FC_nonp::update_gaussian(void)
        )
        designp->compute_XtransposedWX();
 
-    designp->compute_XtransposedWres(partres, lambda);
+    designp->compute_XtransposedWres(partres, lambda, tau2);
 
     if ((likep->wtype==wweightschange_weightsneqone) ||
         (likep->wtype==wweightschange_weightsone) ||
         (designp->changingdesign) ||
         (!lambdaconst)
         )
+      {
       designp->compute_precision(lambda);
+      }
 
-      
     double * work = paramhelp.getV();
     unsigned i;
     unsigned nrpar = param.rows();
@@ -812,96 +712,73 @@ void FC_nonp::update_gaussian(void)
 
     designp->precision.solveU(paramhelp);
 
-    if (pvalue)
-      {
-      designp->precision.solve(*(designp->XWres_p),parammode);
-      param.plus(parammode,paramhelp);
-      }
-    else
-      designp->precision.solve(*(designp->XWres_p),paramhelp,param);
+    designp->precision.solve(*(designp->XWres_p),paramhelp,param);
 
-    if(designp->center)
-      {
-      if (designp->centermethod==meansimple)
-        centerparam();
-      else if (designp->centermethod==meansum2)
-        centerparam_sum2(s2);
-      else
-        centerparam_sample();
-      }
+/*    ofstream out1("c:/temp/beta1.raw");
+    param.prettyPrint(out1);
+    out1.close();*/
 
-    if (designp->position_lin!=-1)
-      {
-      get_linparam();
-      }
+    perform_centering();
+
+/*    ofstream out2("c:/temp/beta2.raw");
+    param.prettyPrint(out2);
+    out2.close();*/
 
     designp->compute_f(param,paramlin,beta,fsample.beta);
 
     if (derivative)
-      {
       designp->compute_f_derivative(param,paramlin,derivativesample.beta,
                                     derivativesample.beta);
-      // compute_elasticity();
-      }
+
 
     betadiff.minus(beta,betaold);
 
-    designp->update_linpred(betadiff);
+    bool ok;
+    if (optionsp->saveestimation)
+      {
+      ok = designp->update_linpred_save(betadiff);
+
+      if (!ok)
+        {
+        outsidelinpredlimits++;
+        betadiff.minus(betaold,beta);
+        designp->update_linpred(betadiff);
+        beta.assign(betaold);
+        param.assign(paramold);
+        }
+      else
+        acceptance++;
+      }
+    else
+      {
+      designp->update_linpred(betadiff);
+      ok = true;
+      acceptance++;
+      }
+
 
     // TEST
     // ofstream out("c:\\bayesx\\testh\\results\\beta_re.res");
     // beta.prettyPrint(out);
     // TEST
 
-    acceptance++;
-
-    // transform_beta();
-
     if (designp->position_lin!=-1)
       {
       fsample.update();
       }
 
-    if (pvalue)
-      {
-      update_pvalue();
-      }
-
     paramsample.beta.assign(param);
-//    paramsample.transform(0,0) = likep->trmult;
+
     paramsample.update();
 
     if (derivative)
-      {
-//      derivativesample.transform(0,0) = likep->trmult;
       derivativesample.update();
-      }
 
     FC::update();
     }
 
   }
 
-/*
-void FC_nonp::compute_elasticity(void)
-  {
-
-  unsigned i;
-  double * workf = beta.getV();
-  double * workelasticity = elasticitysample.beta.getV();
-  double * workderivative = derivativesample.beta.getV();
-  double d;
-  for (i=0;i<beta.rows();i++,workf++,workelasticity++,workderivative++)
-    {
-    d = designp->data(designp->posbeg[i],0);
-    if (*workf != 0)
-      *workelasticity = *workderivative * d / (*workf);
-    else
-      *workelasticity =  100000;
-    }
-
-  }
-*/
 
 void FC_nonp::update_isotonic(void)
   {
@@ -926,6 +803,9 @@ void FC_nonp::update_isotonic(void)
   lambda = likep->get_scale()/tau2;
 
   betaold.assign(beta);
+  if (optionsp->saveestimation)
+    paramold.assign(param);
+
 
   designp->compute_partres(partres,beta);
 
@@ -935,14 +815,16 @@ void FC_nonp::update_isotonic(void)
      )
     designp->compute_XtransposedWX();
 
-  designp->compute_XtransposedWres(partres, lambda);
+  designp->compute_XtransposedWres(partres, lambda, tau2);
 
   if ((likep->wtype==wweightschange_weightsneqone) ||
       (likep->wtype==wweightschange_weightsone) ||
       (designp->changingdesign) ||
       (!lambdaconst)
       )
+    {
     designp->compute_precision(lambda);
+    }
 
   int count = 0;
   int maxit = 20;
@@ -965,7 +847,7 @@ void FC_nonp::update_isotonic(void)
       paramp = param.getV();
       for (j=0;j<i;j++,paramp++)    // links
         {
-//        mu+= param(j,0)*designp->precision(i,j);
+        // mu+= param(j,0)*designp->precision(i,j);
         mu+= (*paramp) * designp->precision(i,j);
         }
 
@@ -974,11 +856,11 @@ void FC_nonp::update_isotonic(void)
       paramp = param.getV()+i+1;
       for (j=i+1;j<param.rows();j++,paramp++)  // rechts
         {
-//        mu+= param(j,0)*designp->precision(i,j);
+        // mu+= param(j,0)*designp->precision(i,j);
         mu+= (*paramp)*designp->precision(i,j);
         }
 
-//      mu = ((*(designp->XWres_p))(i,0) -mu)/designp->precision(i,i);
+      // mu = ((*(designp->XWres_p))(i,0) -mu)/designp->precision(i,i);
       mu = (*XWresp -mu)/designp->precision(i,i);
 
       s = sqrt(sigma2resp/designp->precision(i,i));
@@ -1022,87 +904,59 @@ void FC_nonp::update_isotonic(void)
   TEST
   */
 
-  if(designp->center)
-    {
-    if (designp->centermethod==meansimple)
-      centerparam();
-    else if (designp->centermethod==meansum2)
-      centerparam_sum2(s2);
-    else
-      centerparam_sample();
-    }
-
-  if (designp->position_lin!=-1)
-    {
-    get_linparam();
-    }
+  perform_centering();
 
   designp->compute_f(param,paramlin,beta,fsample.beta);
 
-  if (derivative)
-    {
-    designp->compute_f_derivative(param,paramlin,derivativesample.beta,
-                                    derivativesample.beta);
-    // compute_elasticity();
-    }
-
-
   betadiff.minus(beta,betaold);
 
-  designp->update_linpred(betadiff);
+  bool ok;
+  if (optionsp->saveestimation)
+    {
+    ok = designp->update_linpred_save(betadiff);
 
-  acceptance++;
-
-  // transform_beta();
+    if (!ok)
+      {
+      outsidelinpredlimits++;
+      betadiff.minus(betaold,beta);
+      designp->update_linpred(betadiff);
+      beta.assign(betaold);
+      param.assign(paramold);
+      }
+    else
+      acceptance++;
+    }
+  else
+    {
+    designp->update_linpred(betadiff);
+    ok = true;
+    acceptance++;
+    }
 
   if (designp->position_lin!=-1)
     {
     fsample.update();
     }
 
-  // TEST
-  // ofstream out("c:\\bayesx\\testh\\results\\beta_f.res");
-  // beta.prettyPrint(out);
-  // TEST
-
   paramsample.beta.assign(param);
-//  paramsample.transform(0,0) = likep->trmult;
   paramsample.update();
 
   if (derivative)
     {
-//    derivativesample.transform(0,0) = likep->trmult;
+    designp->compute_f_derivative(param,paramlin,derivativesample.beta,
+                                    derivativesample.beta);
+
     derivativesample.update();
-    // elasticitysample.update();
     }
-
-  // TEST
-  // ofstream out0_1("c:\\bayesx\\testh\\results\\beta_f.res");
-  // beta.prettyPrint(out0_1);
-  // out0_1.close();
-
-  // ofstream out00_1("c:\\bayesx\\testh\\results\\intvar_f.res");
-  // designp->intvar.prettyPrint(out00_1);
-  // out00_1.close();
-  // TEST
 
   FC::update();
 
   }
 
-  
-/*
-void FC_nonp::transform_beta(void)
-  {
-  transform(0,0) = likep->trmult;
-  if (designp->position_lin != -1)
-  fsample.transform(0,0) = likep->trmult;
-  }
-*/
-
 
 bool FC_nonp::posteriormode_transform(void)
   {
+  set_multiplicative();
 
   double h = likep->compute_iwls(true,false);
 
@@ -1116,7 +970,7 @@ bool FC_nonp::posteriormode_transform(void)
     acuteparam = datamatrix(param.rows(),1,0);
     }
 
-  designp->compute_XtransposedWres(partres, lambda);
+  designp->compute_XtransposedWres(partres, lambda, tau2);
 
   designp->u.mult(designp->QtRinv,*(designp->XWres_p));
 
@@ -1147,8 +1001,6 @@ bool FC_nonp::posteriormode_transform(void)
 
   designp->update_linpred(betadiff);
 
-  // transform_beta();
-
   if (designp->position_lin!=-1)
     {
     fsample.posteriormode_betamean();
@@ -1157,7 +1009,7 @@ bool FC_nonp::posteriormode_transform(void)
 
   ST::string n = designp->datanames[0];
 
-  designp->compute_meaneffect(masterp->level1_likep,meaneffect,beta,
+  designp->compute_meaneffect(masterp->level1_likep[equationnr],meaneffect,beta,
                               meaneffect_sample.beta,computemeaneffect,
                               meaneffectconstant);
 
@@ -1165,48 +1017,49 @@ bool FC_nonp::posteriormode_transform(void)
 
   }
 
-
-
 bool FC_nonp::posteriormode(void)
   {
+  set_multiplicative();
 
   if (orthogonal)
-    posteriormode_transform();
+    return posteriormode_transform();
   else
     {
 
     double h = likep->compute_iwls(true,false);
 
     betaold.assign(beta);
-
     designp->compute_partres(partres,beta,true);
 
-    // TEST
-
-    // ofstream out4("c:\\bayesx\\test\\results\\partres.res");
-    // partres.prettyPrint(out4);
-
-    // TEST
 
     designp->compute_XtransposedWX();
-    designp->compute_XtransposedWres(partres, lambda);
+
+    designp->compute_XtransposedWres(partres, lambda, tau2);
 
     designp->compute_precision(lambda);
 
-    // TEST
-    // ofstream out1("c:\\bayesx\\test\\results\\precision.res");
-    // designp->precision.print1(out1);
-    // TEST
+/*    ofstream out("c:\\temp\\precision.raw");
+    designp->precision.print4(out);
+    out.close();
+    ofstream out2("c:\\temp\\XWX.raw");
+    designp->XWX.print4(out2);
+    out2.close();
+    ofstream out3("c:\\temp\\XWres.raw");
+    designp->XWres.prettyPrint(out3);
+    out3.close();*/
 
     designp->precision.solve(*(designp->XWres_p),param);
 
-    // TEST
-    // ofstream out8("c:\\bayesx\\test\\results\\param.res");
-    // param.prettyPrint(out8);
-    // TEST
-
     if(designp->center)
-      centerparam();
+      {
+      if ((designp->centermethod==integralsimple) ||
+          (designp->centermethod==meanf) ||
+          (designp->centermethod==meanfd)
+         )
+        centerparam_weight();
+      else
+        centerparam();
+      }
 
     if (designp->position_lin!=-1)
       {
@@ -1215,31 +1068,47 @@ bool FC_nonp::posteriormode(void)
 
     designp->compute_f(param,paramlin,beta,fsample.beta);
 
-    // TEST
-    // ofstream out5("c:\\bayesx\\testh\\results\\f.res");
-    // beta.prettyPrint(out5);
-    // TEST
-
     betadiff.minus(beta,betaold);
 
-    designp->update_linpred(betadiff);
+    bool ok;
 
-    // transform_beta();
+    if (optionsp->saveestimation)
+      {
+      ok = designp->update_linpred_save(betadiff);
+      }
+    else
+      {
+      ok = true;
+      designp->update_linpred(betadiff);
+      }
+
+
+    if (!ok)
+      {
+      betadiff.minus(betaold,beta);
+
+      designp->update_linpred(betadiff);
+
+      beta.assign(betaold);
+      }
+
 
     if (designp->position_lin!=-1)
       {
       fsample.posteriormode_betamean();
       }
 
-//    ST::string n = designp->datanames[0];
 
-    designp->compute_meaneffect(masterp->level1_likep,meaneffect,beta,
-                               meaneffect_sample.beta,computemeaneffect,
-                               meaneffectconstant);
+    designp->compute_meaneffect(masterp->level1_likep[equationnr],meaneffect,
+                                beta,meaneffect_sample.beta,computemeaneffect,
+                                meaneffectconstant);
 
-    return FC::posteriormode();
+//    ofstream out("c:\\bayesx\\trunk\\testh\\results\\intvar.raw");
+//    designp->intvar.prettyPrint(out);
+
     }
 
+  return FC::posteriormode();
   }
 
 void FC_nonp::outoptions(void)
@@ -1250,7 +1119,7 @@ void FC_nonp::outoptions(void)
   }
 
 
-void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string & path)
+void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,const ST::string & path)
   {
 
   ST::string pathps = path.substr(0,path.length()-4) + "_statagraph";
@@ -1286,20 +1155,14 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
     ST::string pathderivativeps = path.substr(0,path.length()-4) +
                                   "_derivative_statagraph";
 
-    // ST::string pathelasticityps = path.substr(0,path.length()-4) +
-    //                              "_elasticity_statagraph";
 
 
     out_stata << "clear" << endl
               << "infile intnr " << xvar
 
-              << " pmean pqu" << pu1_str
+              << " pmean pstd pqu" << pu1_str
               << " pqu" << po1_str << " pmed pqu" << po2_str << " pqu" << pu2_str
               << " pcat" << pu_str << " pcat" << po_str
-              // << " pmean_elast pqu" << pu1_str << "_elast"
-              // << " pqu" << po1_str << "_elast pmed_elast pqu" << po2_str
-              // << "_elast pqu" << pu2_str
-              // << "_elast pcat" << pu_str << "_elast pcat" << po_str << "_elast"
               << " using "
               << pathderivative << endl
               << "drop in 1" << endl;
@@ -1315,11 +1178,19 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
               << endl << "graph export " << pathderivativeps << ".eps, replace"
                       << endl << endl;
 
+   out_stata << "sleep 1000" << endl << endl;
+
+   char hchar = '\\';
+   ST::string hstring = "/";
+   ST::string pathderivativeR = pathderivative.insert_string_char(hchar,hstring);
+
+   out_R << "plotnonp(\"" << pathderivativeR << "\", y=c(3,5,6,9,8))\n";
+
     }
 
   out_stata << "clear" << endl
             << "infile intnr " << xvar
-            << " pmean pqu" << pu1_str
+            << " pmean pstd pqu" << pu1_str
             << " pqu" << po1_str << " pmed pqu" << po2_str << " pqu" << pu2_str
             << " pcat" << pu_str << " pcat" << po_str
             << " sim_pqu" << pu1_str
@@ -1330,7 +1201,7 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
 
   if (designp->position_lin!=-1)
     {
-    out_stata << " pmean_d pqu"
+    out_stata << " pmean_d pstd_d pqu"
               << pu1_str << "_d"
               << " pqu" << po1_str << "_d"
               << " pmed_d pqu" << po2_str << "_d"
@@ -1342,7 +1213,7 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
 
   if (computemeaneffect==true)
     {
-    out_stata << " pmean_mu pqu"
+    out_stata << " pmean_mu pstd_mu pqu"
               << pu1_str << "_mu"
               << " pqu" << po1_str << "_mu"
               << " pmed_d pqu" << po2_str << "_mu"
@@ -1353,15 +1224,23 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
   out_stata << " using "
             << path << endl
             << "drop in 1" << endl;
-            if (designp->type == Mrf)
-              {
-              out_stata << "kdensity pmean" << endl
-              << "graph export " << pathps << ".eps, replace"
-                      << endl << endl;
-              }
-            else
-              {
-              out_stata << "graph twoway rarea pqu" << pu1_str << " pqu" << pu2_str
+
+  if (designp->type == Mrf)
+    {
+    out_stata << "kdensity pmean" << endl
+     << "graph export " << pathps << ".eps, replace"
+     << endl << endl;
+
+    char hchar = '\\';
+    ST::string hstring = "/";
+    ST::string pathR = path.insert_string_char(hchar,hstring);
+    out_R << "Replace pathtomap with the actual path to file containing the map in bnd format\n";
+    out_R << "m <- read.bnd(\"pathtothemap\")\n";
+    out_R << "drawmap(\"" << pathR << "\",map=m)\n";
+    }
+  else if(designp->type == Rw1 || designp->type == Rw2 || designp->type == Rw3)
+    {
+    out_stata << "graph twoway rarea pqu" << pu1_str << " pqu" << pu2_str
               << " " << xvar << ", bcolor(gs13) || rarea pqu" << po1_str
               << " pqu" << po2_str << " " << xvar << " , bcolor(gs10) || /*"
               << endl << " */ scatter pmean "
@@ -1371,7 +1250,13 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
               << "\") xlab(,grid) ylab(,grid) legend(off)"
               << endl << "graph export " << pathps << ".eps, replace"
                       << endl << endl;
-              }
+    char hchar = '\\';
+    ST::string hstring = "/";
+    ST::string pathR = path.insert_string_char(hchar,hstring);
+    out_R << "plotnonp(\"" << pathR << "\", y=c(3,5,6,9,8))\n";
+    }
+
+   out_stata << "sleep 1000" << endl << endl;
 
 
   if (designp->position_lin!=-1)
@@ -1382,8 +1267,15 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
                 << "graph export " << pathps << "_linexluded.eps, replace"
                 << endl << endl;
 
+      char hchar = '\\';
+      ST::string hstring = "/";
+      ST::string pathR = path.insert_string_char(hchar,hstring);
+
+      out_R << "Replace pathtomap with the actual path to file containing the map in bnd format\n";
+      out_R << "m <- read.bnd(\"pathtothemap\")\n";
+      out_R << "drawmap(\"" << pathR << "\",map=m)\n";
       }
-    else
+    else if(designp->type == Rw1 || designp->type == Rw2 || designp->type == Rw3)
       {
 
       out_stata << "graph twoway rarea pqu" << pu1_str << "_d"
@@ -1398,8 +1290,13 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
                 << "\") xlab(,grid) ylab(,grid) legend(off)"
                 << endl << "graph export " << pathps << "_linexluded.eps, replace"
                       << endl << endl;
+    char hchar = '\\';
+    ST::string hstring = "/";
+    ST::string pathR = path.insert_string_char(hchar,hstring);
+      out_R << "plotnonp(\"" << pathR << "\", y=c(3,5,6,9,8))\n";
       }
 
+    out_stata << "sleep 1000" << endl << endl;
     }
 
 
@@ -1428,21 +1325,21 @@ void FC_nonp::outgraphs(ofstream & out_stata, ofstream & out_R,const ST::string 
                       << endl << endl;
       }
 
+    out_stata << "sleep 1000" << endl << endl;
     }
 
   }
 
 
 
-void FC_nonp::outresults_derivative(ofstream & out_stata, ofstream & out_R,
+void FC_nonp::outresults_derivative(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                         const ST::string & pathresults)
   {
 
   if (pathresults.isvalidfile() != 1)
     {
 
-    derivativesample.outresults(out_stata,out_R,"");
-    // elasticitysample.outresults(out_stata,out_R,"");
+    derivativesample.outresults(out_stata,out_R,out_R2BayesX,"");
 
     optionsp->out("    Estimated first derivatives are stored in file\n");
     optionsp->out("    " +  pathresults + "\n");
@@ -1481,15 +1378,6 @@ void FC_nonp::outresults_derivative(ofstream & out_stata, ofstream & out_R,
     outres << "pcat" << optionsp->level1 << "   ";
     outres << "pcat" << optionsp->level2 << "   ";
 
-    // outres << "pmean_elast   ";
-    // outres << "pqu"  << l1  << "_elast   ";
-    // outres << "pqu"  << l2  << "_elast   ";
-    // outres << "pmed_elast   ";
-    // outres << "pqu"  << u1  << "_elast   ";
-    // outres << "pqu"  << u2  << "_elast   ";
-    // outres << "pcat" << optionsp->level1 << "_elast   ";
-    // outres << "pcat" << optionsp->level2 << "_elast   ";
-
 
     outres << endl;
 
@@ -1508,31 +1396,12 @@ void FC_nonp::outresults_derivative(ofstream & out_stata, ofstream & out_R,
     workbetaqu_l2_upper_p = derivativesample.betaqu_l2_upper.getV();
     workbetaqu50 = derivativesample.betaqu50.getV();
 
-    /*
-    double * workmean_elast;
-    double * workbetaqu_l1_lower_p_elast;
-    double * workbetaqu_l2_lower_p_elast;
-    double * workbetaqu_l1_upper_p_elast;
-    double * workbetaqu_l2_upper_p_elast;
-    double * workbetaqu50_elast;
-
-    workmean_elast = elasticitysample.betamean.getV();
-    workbetaqu_l1_lower_p_elast = elasticitysample.betaqu_l1_lower.getV();
-    workbetaqu_l2_lower_p_elast = elasticitysample.betaqu_l2_lower.getV();
-    workbetaqu_l1_upper_p_elast = elasticitysample.betaqu_l1_upper.getV();
-    workbetaqu_l2_upper_p_elast = elasticitysample.betaqu_l2_upper.getV();
-    workbetaqu50_elast = elasticitysample.betaqu50.getV();
-    */
 
     unsigned nrpar = beta.rows();
     for(i=0;i<nrpar;i++,
         workmean++,workbetaqu_l1_lower_p++,
                               workbetaqu_l2_lower_p++,workbetaqu50++,
                               workbetaqu_l1_upper_p++,workbetaqu_l2_upper_p++
-//                              workmean_elast++,workbetaqu_l1_lower_p_elast++,
-//                              workbetaqu_l2_lower_p_elast++,workbetaqu50_elast++,
-//                              workbetaqu_l1_upper_p_elast++,
-//                              workbetaqu_l2_upper_p_elast++
                               )
       {
       outres << (i+1) << "   ";
@@ -1559,30 +1428,6 @@ void FC_nonp::outresults_derivative(ofstream & out_stata, ofstream & out_R,
       else
         outres << 0 << "   ";
 
-      /*
-      outres << *workmean_elast << "   ";
-
-      outres << *workbetaqu_l1_lower_p_elast << "   ";
-      outres << *workbetaqu_l2_lower_p_elast << "   ";
-      outres << *workbetaqu50_elast << "   ";
-      outres << *workbetaqu_l2_upper_p_elast << "   ";
-      outres << *workbetaqu_l1_upper_p_elast << "   ";
-
-      if (*workbetaqu_l1_lower_p_elast > 0)
-        outres << 1 << "   ";
-      else if (*workbetaqu_l1_upper_p_elast < 0)
-        outres << -1 << "   ";
-      else
-        outres << 0 << "   ";
-
-      if (*workbetaqu_l2_lower_p_elast > 0)
-        outres << 1 << "   ";
-      else if (*workbetaqu_l2_upper_p_elast < 0)
-        outres << -1 << "   ";
-      else
-        outres << 0 << "   ";
-      */
-
       outres << endl;
       }
 
@@ -1591,30 +1436,144 @@ void FC_nonp::outresults_derivative(ofstream & out_stata, ofstream & out_R,
   }
 
 
+void FC_nonp::outbasis_R(const ST::string & pathbasis)
+  {
+  ofstream out(pathbasis.strtochar());
+  designp->outbasis_R(out);
+  }
 
 
-void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
+double FC_nonp::kernel_density(const double & x, const double & h)
+  {
+  double sum=0;
+  double n = designp->data.rows();
+  unsigned j;
+  double n_j;
+  double u;
+  double x_j;
+  double Kd;
+
+  for (j=0;j<designp->posbeg.size();j++)
+    {
+    x_j = designp->data(designp->posbeg[j],0);
+    u = (x-x_j)/h;
+    if ( (u <= 1) && (u >= -1) )
+      {
+      n_j = designp->posend[j]-designp->posbeg[j]+1;
+      Kd = 0.75*(1.0-u*u);
+      sum += n_j * Kd;
+
+     }
+    }
+
+  return 1/(n*h)*sum;
+  }
+
+
+double FC_nonp::compute_importancemeasure(bool absolute)
+  {
+  double n = designp->data.rows();
+
+  double si=sqrt(designp->data.var(0));
+  double R = (designp->data.quantile(75,0) - designp->data.quantile(25,0))/1.34;
+
+  double h;
+  if (si < R)
+    h = 0.9*si*pow(n,-0.2);
+  else
+    h = 0.9*R*pow(n,-0.2);
+
+  unsigned j;
+  double x_jm1 = designp->data(designp->posbeg[0],0);
+  double x_j;
+  double diff;
+  double kd_xjm1;
+  double kd_xj;
+  double sum = 0;
+
+  for (j=1;j<designp->posbeg.size();j++)
+    {
+    x_j = designp->data(designp->posbeg[j],0);
+    diff = x_j - x_jm1;
+    kd_xjm1 = kernel_density(x_jm1,h);
+    kd_xj = kernel_density(x_j,h);
+    if (absolute)
+      sum += diff* (fabs(betamean(j-1,0))* kd_xjm1 + fabs(betamean(j,0))*kd_xj)/2;
+    else
+      sum += diff* (pow(betamean(j-1,0),2)* kd_xjm1 + pow(betamean(j,0),2)*kd_xj)/2;
+
+    x_jm1 = x_j;
+    }
+  return sum;
+  }
+
+
+double FC_nonp::compute_importancemeasure_discrete(bool absolute)
+  {
+  double n = designp->data.rows();
+
+  unsigned j;
+  double sum = 0;
+  double pr;
+
+  for (j=0;j<designp->posbeg.size();j++)
+    {
+    pr = (designp->posend[j]-designp->posbeg[j]+1)/n;
+    if (absolute)
+      sum +=  fabs(betamean(j,0))*pr;
+    else
+      sum +=  pow(betamean(j,0),2)*pr;
+
+    }
+  return sum;
+  }
+
+
+void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                         const ST::string & pathresults)
   {
 
   if (pathresults.isvalidfile() != 1)
     {
 
-    outgraphs(out_stata,out_R,pathresults);
+    if ((designp->intvar.rows()==designp->data.rows()) && (designp->datanames.size() == 1))
+      designp->intvar = datamatrix(1,1,1);
 
-    FC::outresults(out_stata,out_R,"");
+    outgraphs(out_stata,out_R,out_R2BayesX,pathresults);
+
+    FC::outresults(out_stata,out_R,out_R2BayesX,"");
     if (designp->position_lin != -1)
-      fsample.outresults(out_stata,out_R,"");
+      fsample.outresults(out_stata,out_R,out_R2BayesX,"");
 
     if (computemeaneffect==true)
-       meaneffect_sample.outresults(out_stata,out_R,"");
+       meaneffect_sample.outresults(out_stata,out_R,out_R2BayesX,"");
 
     ST::string pathresultsbeta = pathresults.substr(0,pathresults.length()-4) +
                                  "_param.res";
 
+
+    ST::string pathbasis = pathresults.substr(0,pathresults.length()-4) +
+                                 "_basisR.res";
+
+    outbasis_R(pathbasis);
+
     outresults_acceptance();
 
-    paramsample.outresults(out_stata,out_R,pathresultsbeta);
+    paramsample.outresults(out_stata,out_R,out_R2BayesX,pathresultsbeta);
+
+    ST::string paths = pathresults.substr(0,pathresults.length()-4) +
+                                 "_sample.raw";
+
+    out_R2BayesX << "family=" << likep->familyshort.strtochar() << ",";
+    out_R2BayesX << "hlevel=" << likep->hlevel << ",";
+    out_R2BayesX << "equationtype=" << likep->equationtype.strtochar() << ",";
+    if (designp->intvar.rows()==designp->data.rows())
+      out_R2BayesX << "term=sx("  << designp->datanames[1].strtochar() << ",by=" << designp->datanames[0].strtochar() << "),";
+    else
+      out_R2BayesX << "term=sx("  << designp->datanames[0].strtochar()  << "),";
+    out_R2BayesX << "filetype=nonlinear,";
+    out_R2BayesX << "pathsamples=" << paths.strtochar() << ",";
+    out_R2BayesX << "pathbasis=" << pathbasis.strtochar() << ",";
 
     optionsp->out("    Estimated parameters are stored in file\n");
     optionsp->out("    " +  pathresultsbeta + "\n");
@@ -1624,29 +1583,87 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
     optionsp->out("    " +  pathresults + "\n");
     optionsp->out("\n");
 
-    optionsp->out("    Mean effects evaluated at " +
+    // ---------------------------- compute importancemeasures ------------------------
+
+    if (imeasures)
+      {
+      double im_absolute;
+      double im_var;
+      if (designp->discrete)
+        {
+        im_var = compute_importancemeasure_discrete(false);
+        im_absolute = compute_importancemeasure_discrete(true);
+        }
+      else
+        {
+        im_var = compute_importancemeasure(false);
+        im_absolute = compute_importancemeasure(true);
+        }
+
+      if (designp->intvar.rows()==designp->data.rows())
+        {
+        double kintvar = designp->compute_kernel_intvar(true);
+        im_absolute *= kintvar;
+        kintvar = designp->compute_kernel_intvar(false);
+        im_var *= kintvar;
+        }
+
+      optionsp->out("    Importance measures\n");
+      optionsp->out("      based on absolute function values: " + ST::doubletostring(im_absolute,6) + "\n");
+      optionsp->out("      based on squared function values:  " + ST::doubletostring(im_var,6) + "\n");
+
+      // NEW
+      double imeasurenew = compute_importance();
+
+      optionsp->out("      NEW:  " + ST::doubletostring(imeasurenew,6) + "\n");
+      // NEW
+
+      optionsp->out("\n");
+
+
+
+
+      }
+
+    // ---------------------------- end: compute importancemeasures -----------------------------------------
+
+    if (designp->intvar.rows()==designp->data.rows())
+      {
+      optionsp->out("    Mean effects evaluated at " +
+                  designp->datanames[0] + "=" + ST::doubletostring(designp->meaneffectintvar,6)
+                   + " and " + designp->datanames[1] + "=" +
+                   designp->effectvalues[designp->meaneffectnr]
+                  + " with value " +
+                  ST::doubletostring(designp->meaneffectintvar * betamean(designp->meaneffectnr,0),6) + "\n");
+      }
+    else
+      {
+      optionsp->out("    Mean effects evaluated at " +
                   designp->datanames[designp->datanames.size()-1] + "=" +
-                  designp->effectvalues[designp->meaneffectnr]);
+                  designp->effectvalues[designp->meaneffectnr]
+                  + " with value " +
+                  ST::doubletostring(betamean(designp->meaneffectnr,0)) + "\n");
+      }
 
     double s_level1=0;
     double s_level2=0;
     if (optionsp->samplesize > 0)
       {
-      optionsp->out("\n");      
+      optionsp->out("\n");
       s_level1 = simconfBand(true);
       s_level2 = simconfBand(false);
 
       optionsp->out("    Scaling factor to blow up pointwise " +
                    ST::inttostring(optionsp->level1) + " percent credible intervals\n");
       optionsp->out("    to obtain simultaneous credible intervals: " +
-           ST::doubletostring(s_level1,6) + "\n");
+           ST::doubletostring(s_level2,6) + "\n");
 
       optionsp->out("\n");
 
       optionsp->out("    Scaling factor to blow up pointwise " +
                    ST::inttostring(optionsp->level2) + " percent credible intervals\n");
       optionsp->out("    to obtain simultaneous credible intervals: " +
-           ST::doubletostring(s_level2,6) + "\n");
+           ST::doubletostring(s_level1,6) + "\n");
 
       optionsp->out("\n");
       }
@@ -1658,7 +1675,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
                          pathresults.substr(0,pathresults.length()-4) +
                                  "_derivative.res";
 
-      outresults_derivative(out_stata,out_R,pathresultsderivative);
+      outresults_derivative(out_stata,out_R,out_R2BayesX,pathresultsderivative);
       }
 
 
@@ -1687,8 +1704,8 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
       outres << designp->datanames[i] << "   ";
     outres << "pmean   ";
 
-    if (optionsp->samplesize > 1)
-      {
+    outres << "pstd   ";
+
       outres << "pqu"  << l1  << "   ";
       outres << "pqu"  << l2  << "   ";
       outres << "pmed   ";
@@ -1703,13 +1720,14 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
       outres << "pqu"  << u2  << "_sim   ";
       outres << "pcat" << optionsp->level1 << "_sim   ";
       outres << "pcat" << optionsp->level2 << "_sim   ";
-      }
+
 
 
     if (designp->position_lin!=-1)
       {
 
       outres << "pmean_d   ";
+      outres << "pstd_d   ";
 
       if (optionsp->samplesize > 1)
         {
@@ -1728,6 +1746,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
       {
 
       outres << "pmean_mu   ";
+      outres << "pstd_mu   ";
 
       if (optionsp->samplesize > 1)
         {
@@ -1745,6 +1764,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
 
 
     double * workmean=NULL;
+    double * workstd=NULL;
     double * workbetaqu_l1_lower_p=NULL;
     double * workbetaqu_l2_lower_p=NULL;
     double * workbetaqu_l1_upper_p=NULL;
@@ -1752,6 +1772,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
     double * workbetaqu50=NULL;
 
     double * dworkmean=NULL;
+    double * dworkstd=NULL;
     double * dworkbetaqu_l1_lower_p=NULL;
     double * dworkbetaqu_l2_lower_p=NULL;
     double * dworkbetaqu_l1_upper_p=NULL;
@@ -1760,6 +1781,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
 
 
     double * mu_workmean=NULL;
+    double * mu_workstd=NULL;
     double * mu_workbetaqu_l1_lower_p=NULL;
     double * mu_workbetaqu_l2_lower_p=NULL;
     double * mu_workbetaqu_l1_upper_p=NULL;
@@ -1770,6 +1792,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
     if (designp->position_lin!=-1)
       {
       workmean = fsample.betamean.getV();
+      workstd = fsample.betavar.getV();
       workbetaqu_l1_lower_p = fsample.betaqu_l1_lower.getV();
       workbetaqu_l2_lower_p = fsample.betaqu_l2_lower.getV();
       workbetaqu_l1_upper_p = fsample.betaqu_l1_upper.getV();
@@ -1777,6 +1800,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
       workbetaqu50 = fsample.betaqu50.getV();
 
       dworkmean = betamean.getV();
+      dworkstd = betavar.getV();
       dworkbetaqu_l1_lower_p = betaqu_l1_lower.getV();
       dworkbetaqu_l2_lower_p = betaqu_l2_lower.getV();
       dworkbetaqu_l1_upper_p = betaqu_l1_upper.getV();
@@ -1787,6 +1811,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
     else
       {
       workmean = betamean.getV();
+      workstd = betavar.getV();
       workbetaqu_l1_lower_p = betaqu_l1_lower.getV();
       workbetaqu_l2_lower_p = betaqu_l2_lower.getV();
       workbetaqu_l1_upper_p = betaqu_l1_upper.getV();
@@ -1798,6 +1823,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
     if (computemeaneffect==true)
       {
       mu_workmean = meaneffect_sample.betamean.getV();
+      mu_workstd = meaneffect_sample.betavar.getV();
       mu_workbetaqu_l1_lower_p = meaneffect_sample.betaqu_l1_lower.getV();
       mu_workbetaqu_l2_lower_p = meaneffect_sample.betaqu_l2_lower.getV();
       mu_workbetaqu_l1_upper_p = meaneffect_sample.betaqu_l1_upper.getV();
@@ -1805,10 +1831,10 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
       mu_workbetaqu50 = meaneffect_sample.betaqu50.getV();
       }
 
-    double l1_sim,l2_sim,u1_sim,u2_sim;  
+    double l1_sim,l2_sim,u1_sim,u2_sim;
 
     unsigned nrpar = beta.rows();
-    for(i=0;i<nrpar;i++,workmean++,workbetaqu_l1_lower_p++,
+    for(i=0;i<nrpar;i++,workmean++,workstd++,workbetaqu_l1_lower_p++,
                               workbetaqu_l2_lower_p++,workbetaqu50++,
                               workbetaqu_l1_upper_p++,workbetaqu_l2_upper_p++)
       {
@@ -1818,6 +1844,10 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
 
       if (optionsp->samplesize > 1)
         {
+        if (*workstd < 0.0000000000001)
+          outres << 0 << "   ";
+        else
+          outres << sqrt(*workstd) << "   ";
         outres << *workbetaqu_l1_lower_p << "   ";
         outres << *workbetaqu_l2_lower_p << "   ";
         outres << *workbetaqu50 << "   ";
@@ -1862,8 +1892,9 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
         else
           outres << 0 << "   ";
 
-
         }
+      else
+        outres << "0  0  0  0  0  0  0  0  0  0  0  0  0  0  ";
 
 
       if (designp->position_lin!=-1)
@@ -1873,6 +1904,12 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
 
         if (optionsp->samplesize > 1)
           {
+
+          if ((*dworkstd) < 0.0000000000001)
+            outres << 0 << "   ";
+          else
+            outres << sqrt(*dworkstd) << "   ";
+
           outres << *dworkbetaqu_l1_lower_p << "   ";
           outres << *dworkbetaqu_l2_lower_p << "   ";
           outres << *dworkbetaqu50 << "   ";
@@ -1898,6 +1935,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
         if (i <nrpar-1)
           {
           dworkmean++;
+          dworkstd++;
           dworkbetaqu_l1_lower_p++;
           dworkbetaqu_l2_lower_p++;
           dworkbetaqu50++;
@@ -1915,6 +1953,11 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
 
         if (optionsp->samplesize > 1)
           {
+          if (*mu_workstd < 0.0000000000001)
+            outres << 0 << "   ";
+          else
+            outres << sqrt(*mu_workstd) << "   ";
+
           outres << *mu_workbetaqu_l1_lower_p << "   ";
           outres << *mu_workbetaqu_l2_lower_p << "   ";
           outres << *mu_workbetaqu50 << "   ";
@@ -1925,6 +1968,7 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
         if (i <nrpar-1)
           {
           mu_workmean++;
+          mu_workstd++;
           mu_workbetaqu_l1_lower_p++;
           mu_workbetaqu_l2_lower_p++;
           mu_workbetaqu50++;
@@ -1937,11 +1981,41 @@ void FC_nonp::outresults(ofstream & out_stata, ofstream & out_R,
       outres << endl;
       }
 
-    if (pvalue)
-      compute_pvalue(pathresults);
+    }
+
+  }
+
+
+double FC_nonp::compute_importance(void)
+  {
+
+  double n = designp->data.rows();
+
+  datamatrix meaneffect;
+  designp->compute_effect(meaneffect,betamean);
+
+  unsigned i;
+  double help;
+  double helpm;
+  double help_param;
+  double help_paramm;
+  double diff = 0;
+
+  for (i=0;i<n;i++)
+    {
+    help = (*likep->FCpredict_betamean)(i,0);
+    likep->compute_param(&help,&help_param);
+
+    helpm = help-meaneffect(i,0);
+    likep->compute_param(&helpm,&help_paramm);
+
+    diff+= abs(help_param-help_paramm);
 
     }
 
+  diff /= n;
+
+  return diff;
   }
 
 
@@ -1957,6 +2031,28 @@ void FC_nonp::initialize_center(void)
   Utc = datamatrix(nrpar,1);
   }
 
+
+void FC_nonp::centerparam_sample_var(void)
+  {
+  unsigned j;
+  double * paramp = param.getV();
+  double sumparam = 0;
+  double sumvar =  0;
+  for (j=0;j<param.rows();j++,paramp++)
+    {
+    sumparam += (*paramp);
+    sumvar += 1/designp->precision.getDiag(j);
+    }
+
+  double c = sumparam/sumvar;
+
+  paramp = param.getV();
+  for (j=0;j<param.rows();j++,paramp++)
+    {
+    *paramp -= c/designp->precision.getDiag(j);
+    }
+
+  }
 
 void FC_nonp::centerparam_sample(void)
   {
@@ -1979,6 +2075,60 @@ void FC_nonp::centerparam_sample(void)
 
     designp->precision.solve(designp->basisNullt[i],helpcenter);
 
+/*    datamatrix helpcenter2(nrpar,1,0.0);
+    datamatrix helpcenter3(nrpar,1,0.0);
+    designp->precision.solveL(designp->basisNullt[i],helpcenter2);
+
+    ofstream out0("c:/temp/lhs.res");
+    helpcenter2.prettyPrint(out0);
+    out0.close();
+
+    vector<double> help;
+    for(j=0; j<helpcenter2.rows(); j++)
+      help.push_back(helpcenter2(j,0));
+    designp->precision.solveU(helpcenter2);
+    designp->precision.solveU(help);
+
+    for(j=0; j<helpcenter2.rows(); j++)
+      helpcenter3(j,0) = help[j];
+
+    ofstream out1("c:/temp/res1.res");
+    helpcenter2.prettyPrint(out1);
+    out1.close();
+
+    ofstream out2("c:/temp/res2.res");
+    helpcenter3.prettyPrint(out2);
+    out2.close();
+
+   ofstream out10("c:/temp/precisionL.res");
+   (designp->precision).print4L(out10);
+   out10.close();*/
+
+/*   datamatrix helpcenter2(nrpar,1,0.0);
+   designp->precision.solveL(designp->basisNullt[i],helpcenter2);
+
+   ofstream out8("c:\\temp\\helpcenter.res");
+   helpcenter.prettyPrint(out8);
+   out8.close();
+   ofstream out9("c:\\temp\\basisnull1.res");
+   (designp->basisNullt[i]).prettyPrint(out9);
+   out9.close();
+   ofstream out10("c:\\temp\\precision.res");
+   (designp->precision).print4(out10);
+   out10.close();
+   ofstream out11("c:\\temp\\precisionL.res");
+   (designp->precision).print4L(out11);
+   out11.close();
+   ofstream out12("c:\\temp\\helpcenter2.res");
+   helpcenter2.prettyPrint(out12);
+   out12.close();
+
+   designp->precision.solveU(helpcenter2);
+
+   ofstream out13("c:\\temp\\helpcenter3.res");
+   helpcenter2.prettyPrint(out13);
+   out13.close();*/
+
     helpcenterp = helpcenter.getV();
 
     for (j=0;j<nrpar;j++,helpcenterp++,Vcentertp++,Vcenterp+=nrrest)
@@ -1989,16 +2139,28 @@ void FC_nonp::centerparam_sample(void)
     }
 
   // TEST
-   /*
-   ofstream out0("c:\\bayesx\\testh\\results\\basisnull.res");
+
+/*   ofstream out0("c:\\temp\\basisnull1.res");
    (designp->basisNullt[0]).prettyPrint(out0);
+   out0.close();
+   if(designp->basisNullt.size()>1)
+     {
+     ofstream out01("c:\\temp\\basisnull2.res");
+     (designp->basisNullt[1]).prettyPrint(out01);
+     out01.close();
+     ofstream out02("c:\\temp\\basisnull3.res");
+     (designp->basisNullt[2]).prettyPrint(out02);
+     out02.close();
+     }
 
-   ofstream out("c:\\bayesx\\testh\\results\\Vcenter.res");
+   ofstream out("c:\\temp\\Vcenter.res");
    Vcenter.prettyPrint(out);
+   out.close();
 
-   ofstream out2("c:\\bayesx\\testh\\results\\praecision.res");
+   ofstream out2("c:\\temp\\praecision.res");
    designp->precision.print4(out2);
-   */
+   out2.close();*/
+
   // TEST
 
   Wcenter.mult(designp->basisNull,Vcenter);
@@ -2008,19 +2170,22 @@ void FC_nonp::centerparam_sample(void)
 
   //  TEST
 
-  // ofstream out4("c:\\bayesx\\testh\\results\\param.res");
-  // param.prettyPrint(out4);
+/*   ofstream out4("c:\\temp\\param.res");
+   param.prettyPrint(out4);
+   out4.close();*/
 
   //  TEST
 
   param.minus(param,Utc);
 
   //  TEST
-  // ofstream out5("c:\\bayesx\\testh\\results\\paramneu.res");
-  // param.prettyPrint(out5);
+/*   ofstream out5("c:\\temp\\paramneu.res");
+   param.prettyPrint(out5);
+   out5.close();
 
-  // ofstream out6("c:\\bayesx\\testh\\results\\Utc.res");
-  // Utc.prettyPrint(out6);
+   ofstream out6("c:\\temp\\Utc.res");
+   Utc.prettyPrint(out6);
+   out6.close();*/
   //  TEST
 
 
@@ -2061,6 +2226,34 @@ void FC_nonp::centerparam(void)
     *workparam-= sum;
 
   }
+
+
+void FC_nonp::centerparam_weight(void)
+  {
+
+  unsigned i;
+  double sum=0;
+  double * workparam = param.getV();
+  unsigned nrparam = param.rows();
+  double * wp = designp->basisNull.getV();
+
+  double sumw=0;
+
+  for (i=0;i<nrparam;i++,workparam++,wp++)
+    {
+    sum+= (*workparam)*(*wp);
+    sumw+= (*wp);
+    }
+
+  sum /= sumw;
+
+  workparam = param.getV();
+
+  for (i=0;i<nrparam;i++,workparam++)
+    *workparam-= sum;
+
+  }
+
 
 
 void FC_nonp::centerparam_sum2(double & s2)
@@ -2111,6 +2304,7 @@ void FC_nonp::compute_autocorr_all(const ST::string & path,
 void FC_nonp::get_samples(const ST::string & filename,ofstream & outg) const
   {
   paramsample.get_samples(filename,outg);
+
   if (derivative && samplederivative)
     {
     ST::string filed = filename.substr(0,filename.length()-11) +
@@ -2129,6 +2323,15 @@ void FC_nonp::get_samples(const ST::string & filename,ofstream & outg) const
 
   }
 
+void FC_nonp::set_multiplicative(void)
+  {
+  if(likep->multintvar.rows()>1)
+    {
+    designp->changingdesign=true;
+    designp->set_intvar(likep->multintvar,0);
+    designp->meaneffectintvar = 1;
+    }
+  }
 
 
 void FC_nonp::reset(void)
@@ -2137,7 +2340,19 @@ void FC_nonp::reset(void)
   }
 
 
+/*double FC_nonp::compute_log_proposal(void)
+  {
+  return 0;
+  }
+
+double FC_nonp::compute_log_FC(void)
+  {
+  return 0;
+  }*/
+
 } // end: namespace MCMC
+
+
 
 
 

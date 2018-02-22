@@ -49,6 +49,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include"statobj.h"
 #include"dataobj.h"
 #include"bayesreg.h"
+#include"superbayesreg.h"
 #include"remlreg.h"
 #include"mapobject.h"
 #include"dagobject.h"
@@ -108,6 +109,10 @@ class __EXPORT_TYPE administrator
   // 'bayesregobjects' contains current bayesreg objects
 
   vector<bayesreg> bayesregobjects;
+
+  // 'mcmcregobjects' contains current bayesreg objects
+
+  vector<superbayesreg> mcmcregobjects;
 
   // 'stepwiseregobjects' contains current stepwisereg objects
 

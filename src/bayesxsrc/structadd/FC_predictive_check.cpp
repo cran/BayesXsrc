@@ -115,7 +115,7 @@ void  FC_predictive_check::update(void)
 
     unsigned samplesize = optionsp->samplesize;
 
-    likep->sample_responses(samplesize-1,sampled_responses); 
+    likep->sample_responses(samplesize-1,sampled_responses);
 
     }
 
@@ -136,7 +136,7 @@ void FC_predictive_check::outoptions(void)
   }
 
 
-void FC_predictive_check::outresults(ofstream & out_stata, ofstream & out_R,
+void FC_predictive_check::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                             const ST::string & pathresults)
   {
 

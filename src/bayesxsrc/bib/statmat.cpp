@@ -183,6 +183,19 @@ void statmatrix<T>::plus(const statmatrix & A)
         *workR += *workA;
   }
 
+template<class T>
+void statmatrix<T>::plus_mult(const statmatrix & A, const T & b)
+  {
+
+  unsigned size = this->rows( ) * this->cols( );
+
+  T *workA = A.getV( );
+  T *workR = this->getV( );
+  register unsigned i;
+
+  for ( i = 0;i < size;i++, workA++, workR++ )
+        *workR += b * *workA;
+  }
 
 template<class T>
 void statmatrix<T>::minus(const statmatrix & A,const statmatrix & B)
@@ -1014,6 +1027,41 @@ T statmatrix<T>::max (const unsigned & c) const
   return maxv;
   }
 
+template<class T>
+T statmatrix<T>::min (void) const
+  {
+  T* work = this->getV();
+  T minv = *work;
+  unsigned i,j;
+  for(i=0; i<this->rows(); i++)
+    {
+    for(j=0; j<this->cols(); j++, work++)
+      {
+      if ((*work) < minv)
+        minv = *work;
+      }
+    }
+  return minv;
+  }
+
+
+template<class T>
+T statmatrix<T>::max (void) const
+  {
+  T* work = this->getV();
+  T maxv = *work;
+  unsigned i,j;
+  for(i=0; i<this->rows(); i++)
+    {
+    for(j=0; j<this->cols(); j++, work++)
+      {
+      if ((*work) > maxv)
+        maxv = *work;
+      }
+    }
+  return maxv;
+  }
+
 
 template<class T>
 T statmatrix<T>::sumcomplete(void) const
@@ -1121,7 +1169,6 @@ T statmatrix<T>::quantile(const T & percent,const unsigned & col) const
 template<class T>
 T statmatrix<T>::quantile(const T & percent,const unsigned & col, statmatrix<int> & index) const
   {
-
   T k = this->rows()*(percent/100.0);           // (alpha * Anzahl der Beobachtungen)
   unsigned kganz = unsigned(k);
 

@@ -17,10 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
-#if defined(BORLAND_OUTPUT_WINDOW)
-using namespace std;
-#endif
-
 #if !defined (MODEL_INCLUDED)
 #define MODEL_INCLUDED
 
@@ -30,7 +26,9 @@ using namespace std;
 #include"data.h"
 #include"option.h"
 
-
+#if !defined(BORLAND_OUTPUT_WINDOW)
+using namespace std;
+#endif
 
 //------------------------------------------------------------------------------
 //--------------------------- CLASS: model -------------------------------------
@@ -755,6 +753,7 @@ class __EXPORT_TYPE term_pspline : public basic_termtype
   doubleoption lowerknot;
   doubleoption upperknot;
   doubleoption merrorvar;
+  stroption merrorvarvec;
   doubleoption lowergrid;
   doubleoption uppergrid;
   simpleoption discretize;

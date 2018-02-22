@@ -81,6 +81,11 @@ void DESIGN_kriging::read_options(vector<ST::string> & op,vector<ST::string> & v
 
   datanames = vn;
 
+  if (op[46] == "true")
+    center = true;
+  else
+    center = false;
+
   int f;
 
   f = op[2].strtolong(nrknots);
@@ -154,7 +159,6 @@ void DESIGN_kriging::help_construct(const datamatrix & dmy, const datamatrix & i
                                datamatrix & kd)
   {
 
-  center = false;
 
   full = true;
 
@@ -311,50 +315,6 @@ DESIGN_kriging::DESIGN_kriging(const datamatrix & dm,const datamatrix & iv,
   {
 
   help_construct(dm,iv,op,vn,kd);
-
-  /*
-  center = false;
-  full = true;
-
-  read_options(op,vn);
-
-  type = Grf;
-
-  init_data(dm,iv);
-
-  compute_knots(xvalues,yvalues,nrknots,-20,20,xknots,yknots);
-  //  xknots = xvalues;
-  //  yknots = yvalues;
-  nrpar = xknots.size();
-
-  // berechne rho
-  unsigned i,j;
-  rho=0;
-  double norm2;
-  for(i=0; i<xvalues.size(); i++)
-    {
-    for(j=0; j<xvalues.size(); j++)
-      {
-      norm2=(xvalues[i]-xvalues[j])*(xvalues[i]-xvalues[j])+
-      (yvalues[i]-yvalues[j])*(yvalues[i]-yvalues[j]);
-      if(norm2>rho)
-        {
-        rho=norm2;
-        }
-      }
-    }
-  rho=sqrt(rho)/maxdist;
-
-  compute_penalty();
-
-  compute_tildeZ();
-
-  XWres = datamatrix(nrpar,1);
-
-  XWXfull = datamatrix(nrpar,nrpar);
-  WsumtildeZ = datamatrix(Zout.rows(),Zout.cols());
-  Wsum = datamatrix(posbeg.size(),1,1);
-  */
 
   }
 
@@ -838,7 +798,7 @@ double DESIGN_kriging::penalty_compute_quadform(datamatrix & beta)
   }
 
 
-void DESIGN_kriging::compute_XtransposedWres(datamatrix & partres, double l)
+void DESIGN_kriging::compute_XtransposedWres(datamatrix & partres, double l, double t2)
   {
   XWres.mult(tildeZ_t,partres);
   XWres_p = &XWres;

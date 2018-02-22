@@ -58,8 +58,8 @@ void DESIGN_mrf::read_options(vector<ST::string> & op,vector<ST::string> & vn)
   else
     center = false;
 
-  if (op[16]=="mean" || op[16] == "nullspace")
-    centermethod = cmean;
+  if (op[16]=="meancoeff" || op[16] == "nullspace")
+    centermethod = meancoeff;
   else if (op[16] == "meansimple")
     centermethod = meansimple;
   else if (op[16] == "meaninvvar")
@@ -67,7 +67,7 @@ void DESIGN_mrf::read_options(vector<ST::string> & op,vector<ST::string> & vn)
   else if (op[16] == "meanintegral")
     centermethod = cmeanintegral;
   else if (op[16] == "meanf")
-    centermethod = cmeanf;
+    centermethod = meanf;
 
   datanames = vn;
 
@@ -82,7 +82,7 @@ DESIGN_mrf::DESIGN_mrf(void) : DESIGN()
   // CONSTRUCTOR 1
   // Spatial covariates
 
-DESIGN_mrf::DESIGN_mrf(const datamatrix & dm,const datamatrix & iv,
+DESIGN_mrf::DESIGN_mrf(datamatrix & dm,datamatrix & iv,
                        GENERAL_OPTIONS * o,DISTR * dp,FC_linear * fcl,
                        const MAP::map & m,vector<ST::string> & op,
                        vector<ST::string> & vn)
@@ -93,6 +93,8 @@ DESIGN_mrf::DESIGN_mrf(const datamatrix & dm,const datamatrix & iv,
     {
 
     read_options(op,vn);
+
+    discrete = true;
 
     ma = m;
     type = Mrf;
@@ -122,6 +124,15 @@ DESIGN_mrf::DESIGN_mrf(const datamatrix & dm,const datamatrix & iv,
 
     identity=true;
     }
+
+/*
+  ofstream out("c:\\bayesx\\trunk\\testh\\results\\dm.raw");
+  dm.prettyPrint(out);
+
+  ofstream out2("c:\\bayesx\\trunk\\testh\\results\\iv.raw");
+  iv.prettyPrint(out2);
+*/
+
   }
 
 
@@ -156,7 +167,7 @@ void DESIGN_mrf::init_data(const datamatrix & dm, const datamatrix & iv)
   vector<ST::string> errormessages = ma.get_errormessages();
   if (errormessages.size() >= 1)
     {
-    
+
     errors=true;
     unsigned i;
     for (i=0;i<errormessages.size();i++)
@@ -227,6 +238,26 @@ void DESIGN_mrf::init_data(const datamatrix & dm, const datamatrix & iv)
   }
 
 
+void DESIGN_mrf::outbasis_R(ofstream & out)
+  {
+  unsigned i;
+  out << "BayesX.design.matrix <- function(x, ...) {" << endl;
+  out << "  w <- getOption(\"warn\")" << endl;
+  out << "  options(warn = -1)" << endl;
+  out << "  tx <- as.integer(as.character(unlist(x)))" << endl;
+  out << "  options(\"warn\" = w)" << endl;
+  out << "  x <- if(!any(is.na(tx))) tx else as.integer(x)" << endl;
+  out << "  levels <- c(";
+  for(i = 0; i < effectvalues.size() - 1; i++)
+    out << effectvalues[i] << ", ";
+  out << effectvalues[effectvalues.size() - 1] << ")" << endl;
+  out << "  x <- factor(x, levels = levels)" << endl;
+  out << "  X <- diag(length(levels))[x, ]" << endl;
+  out << "  attr(X, \"type\") <- \"mrf\"" << endl;
+  out << "  return(X)" << endl;
+  out << "}" << endl;
+  }
+
 
 void DESIGN_mrf::compute_penalty(void)
   {
@@ -237,16 +268,13 @@ void DESIGN_mrf::compute_penalty(void)
 
 
 
-
-
-
 void DESIGN_mrf::compute_basisNull(void)
   {
   int i,j;
 
   basisNull = datamatrix(1,nrpar,1);
 
-  if (centermethod==cmeanf || centermethod==cmeanintegral)
+  if (centermethod==meanf || centermethod==cmeanintegral)
     {
 
     unsigned k;
@@ -285,7 +313,7 @@ void DESIGN_mrf::compute_basisNull(void)
   }
 
 
-void DESIGN_mrf::compute_XtransposedWres(datamatrix & partres, double l)
+void DESIGN_mrf::compute_XtransposedWres(datamatrix & partres, double l, double t2)
   {
   XWres_p = &partres;
   }

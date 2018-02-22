@@ -816,15 +816,15 @@ int eigen(statmatrix<double> & a, statmatrix<double> & values,
   return i;
   }
 
-bool eigen2(statmatrix<double> & a, statmatrix<double> & d)
+bool eigen2(datamatrix & a, datamatrix & d)
   {
-  statmatrix<double> e(d.rows(),1,0);
+  datamatrix e(d.rows(),1,0);
   tridiag(a,d,e);
   return eigentridiag(d,e,a);
   }
 
 
-void eigensort(statmatrix<double> & values, statmatrix<double> & vectors)
+void eigensort(datamatrix & values, datamatrix & vectors)
   {
   int i,j,k;
   double p;

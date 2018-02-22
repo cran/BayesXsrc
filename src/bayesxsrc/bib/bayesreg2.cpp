@@ -1169,7 +1169,7 @@ bool bayesreg::create_hrandom(const unsigned & collinpred)
   double a1,b1,lambda;
   int f;
 //  long h;
-  bool iwlsmode=false;
+//  bool iwlsmode=false;
 
   unsigned i;
   int j;
@@ -1186,8 +1186,8 @@ bool bayesreg::create_hrandom(const unsigned & collinpred)
 
       f = (terms[i].options[3]).strtodouble(b1);
 
-      if (terms[i].options[4]=="iwlsmode")
-        iwlsmode=true;
+//      if (terms[i].options[4]=="iwlsmode")
+//        iwlsmode=true;
 
 
       if (f==1)
@@ -2906,7 +2906,7 @@ bool bayesreg::create_random_rw1rw2(const unsigned & collinpred)
   double lambda,a1,b1,alpha;
 //  bool updatetau;
   double ftune;
-  unsigned updateW;
+//  unsigned updateW;
   ST::string proposal;
   int f;
 
@@ -2948,7 +2948,7 @@ bool bayesreg::create_random_rw1rw2(const unsigned & collinpred)
       proposal = terms[i].options[11];
 
       f = (terms[i].options[12]).strtolong(h);
-      updateW = unsigned(h);
+//      updateW = unsigned(h);
 
  //     if (terms[i].options[13] == "true")
  //       updatetau=true;

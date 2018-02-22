@@ -269,7 +269,7 @@ namespace MCMC
   fullcond_merror::fullcond_merror(MCMCoptions * o, spline_basis * p,
            DISTRIBUTION * dp, const datamatrix & d, const ST::string & t,
            const ST::string & fp, const ST::string & pres, const double & lk,
-           const double & uk, const double & mvar, const bool & disc,
+           const double & uk, datamatrix & mvar, const bool & disc,
            const int & dig, const unsigned & nb)
            : FULLCOND(o,d,t,d.rows(),1,fp)
   {
@@ -313,10 +313,10 @@ namespace MCMC
   pathresults = pres;
   ST::string path = samplepath.substr(0,samplepath.length()-4);
 
-  fc_merrorvar = FULLCOND(o,datamatrix(1,1,mvar),title+"_merror_var",1,1,path+"_merror_var.raw");
-  fc_merrorvar.setflags(MCMC::norelchange | MCMC::nooutput);
-  double * merrorvarp = fc_merrorvar.getbetapointer();
-  *merrorvarp = mvar;
+  merrorvar = mvar;
+  mesd = mvar;
+  for(i=0; i<mesd.rows(); i++)
+    mesd(i,0) = sqrt(merrorvar(i,0));
 
   fc_ximu = FULLCOND(o,datamatrix(1,1,0.0),title+"_truecov_expectation",1,1,path+"_truecov_expectation.raw");
   fc_ximu.setflags(MCMC::norelchange | MCMC::nooutput);
@@ -357,6 +357,8 @@ namespace MCMC
     logfcold = m.logfcold;
     logfcnew = m.logfcnew;
     fc_merrorvar = m.fc_merrorvar;
+    merrorvar = m.merrorvar;
+    mesd = m.mesd;
     fc_ximu = m.fc_ximu;
     fc_xivar = m.fc_xivar;
     generrcount = m.generrcount;
@@ -416,6 +418,8 @@ namespace MCMC
     index = m.index;
     merror = m.merror;
     fc_merrorvar = m.fc_merrorvar;
+    merrorvar = m.merrorvar;
+    mesd = m.mesd;
     fc_ximu = m.fc_ximu;
     fc_xivar = m.fc_xivar;
     generrcount = m.generrcount;
@@ -511,8 +515,8 @@ namespace MCMC
 
         logold += likep->loglikelihood(k,k,inde,true);
 
- 	    help = e(k,0);
-        help = help/=drows;
+ 	      help = e(k,0);
+        help = help / ((double)drows);
 
         propold = proposalold(k,0);
         propold = propold*help;
@@ -593,7 +597,7 @@ namespace MCMC
       double propmean = (biasmean/biasvar + empbias/sigma12)/propvar;
 
       *biasp = propmean + sqrt(propvar)*rand_normal();
-      
+
       // and update
       fc_bias.update();
 
@@ -609,7 +613,7 @@ namespace MCMC
 
       // sampling step:
       // standard deviation of measurement error
-      double * merrorvarp = fc_merrorvar.getbetapointer();
+//      double * merrorvarp = fc_merrorvar.getbetapointer();
       double anew, bnew;
 /*    currently disabled: measurement error variance is treated as fixed
       anew = 0.001 + 0.5*nbeta*data.cols();
@@ -619,8 +623,8 @@ namespace MCMC
           bnew += (data(i,j)-beta(i,0))*(data(i,j)-beta(i,0));
       bnew = 0.001 + 0.5*bnew;
       *merrorvarp = rand_invgamma(anew,bnew);*/
-      double mesd = sqrt(*merrorvarp);
-      fc_merrorvar.update();
+//      double mesd = sqrt(*merrorvarp);
+//      fc_merrorvar.update();
 
       // sampling step:
       // expectation of true covariate values
@@ -651,16 +655,17 @@ namespace MCMC
       // generate proposed values (random walk proposal according to Berry et al.)
       double * work = beta.getV();
       double * workold = old.getV();
-      for(i=0;i<nbeta;i++,work++,workold++)
+      double * mesdp = mesd.getV();
+      for(i=0;i<nbeta;i++,work++,workold++,mesdp++)
         {
-        *work = *workold + 2*mesd*rand_normal()/(double)merror;
+        *work = *workold + 2* *mesdp * rand_normal() / (double)merror;
         generrtrial++;
         while(*work<minx || *work>maxx)
           {
           generrcount++;
 //          optionsp->out("  WARNING in "+title+":");
 //          optionsp->out("          Generated true covariate value out of range!");
-          *work = *workold + 2*mesd*rand_normal()/(double)merror;
+          *work = *workold + 2* *mesdp * rand_normal() / (double)merror;
           generrtrial++;
           }
         }
@@ -685,7 +690,7 @@ namespace MCMC
         logfcold(i,0) = likep->loglikelihood(i,i,index,true) - 0.5*((old(i,0)-priormean)/priorsd)*((old(i,0)-priormean)/priorsd);
         for(j=0; j<merror; j++)
           {
-          logfcold(i,0) -= 0.5*((data(i,j)-old(i,0))/mesd)*((data(i,j)-old(i,0))/mesd);
+          logfcold(i,0) -= 0.5*((data(i,j)-old(i,0))/mesd(i,0))*((data(i,j)-old(i,0))/mesd(i,0));
           }
         }
 
@@ -696,7 +701,7 @@ namespace MCMC
         logfcnew(i,0) = likep->loglikelihood(i,i,index,false) - 0.5*((beta(i,0)-priormean)/priorsd)*((beta(i,0)-priormean)/priorsd);
         for(j=0; j<merror; j++)
           {
-          logfcnew(i,0) -= 0.5*((data(i,j)-beta(i,0))/mesd)*((data(i,j)-beta(i,0))/mesd);
+          logfcnew(i,0) -= 0.5*((data(i,j)-beta(i,0))/mesd(i,0))*((data(i,j)-beta(i,0))/mesd(i,0));
           }
         }
 
@@ -847,10 +852,12 @@ namespace MCMC
 
   bool fullcond_merror::posteriormode(void)
     {
+      return true;
     }
 
   bool fullcond_merror::posteriormode_converged(const unsigned & itnr)
     {
+      return true;
     }
 
   void fullcond_merror::posteriormode_set_beta_mode(void)
@@ -920,72 +927,74 @@ namespace MCMC
 
 // Variance of the measurement error
 
-    fc_merrorvar.outresults();
+    if(varcoeff)
+      {
+      fc_merrorvar.outresults();
 //    ST::string pathhelp = pathresults.substr(0,pathresults.length()-7)+"merrorvar_sample.raw";
 //    fc_merrorvar.get_samples(pathhelp);
 
-    optionsp->out("\n");
-    optionsp->out("  "+fc_merrorvar.get_title()+"\n");
-    optionsp->out("\n");
-    optionsp->out("\n");
+      optionsp->out("\n");
+      optionsp->out("  "+fc_merrorvar.get_title()+"\n");
+      optionsp->out("\n");
+      optionsp->out("\n");
 
-    vstr = "  Mean:         ";
-    vstr = vstr + ST::string(' ',20-vstr.length())
-                + ST::doubletostring(fc_merrorvar.get_betamean(0,0),6);
-    optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
+      vstr = "  Mean:         ";
+      vstr = vstr + ST::string(' ',20-vstr.length())
+                  + ST::doubletostring(fc_merrorvar.get_betamean(0,0),6);
+      optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
 
-    vstr = "  Std. dev.:    ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring((fc_merrorvar.get_betavar(0,0)<0.0?0.0:sqrt(fc_merrorvar.get_betavar(0,0))),6) + "\n");
+      vstr = "  Std. dev.:    ";
+      optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
+      ST::doubletostring((fc_merrorvar.get_betavar(0,0)<0.0?0.0:sqrt(fc_merrorvar.get_betavar(0,0))),6) + "\n");
 
-    vstr = "  " + l1 + "% Quantile: ";
-    vstr = vstr + ST::string(' ',20-vstr.length())
-                + ST::doubletostring(fc_merrorvar.get_beta_lower1(0,0),6);
-    optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
+      vstr = "  " + l1 + "% Quantile: ";
+      vstr = vstr + ST::string(' ',20-vstr.length())
+                  + ST::doubletostring(fc_merrorvar.get_beta_lower1(0,0),6);
+      optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
 
-    vstr = "  " + l2 + "% Quantile: ";
-    vstr = vstr + ST::string(' ',20-vstr.length())
-                + ST::doubletostring(fc_merrorvar.get_beta_lower2(0,0),6);
-    optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
+      vstr = "  " + l2 + "% Quantile: ";
+      vstr = vstr + ST::string(' ',20-vstr.length())
+                  + ST::doubletostring(fc_merrorvar.get_beta_lower2(0,0),6);
+      optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
 
-    vstr = "  50% Quantile: ";
-    vstr = vstr + ST::string(' ',20-vstr.length())
-                + ST::doubletostring(fc_merrorvar.get_betaqu50(0,0),6);
-    optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
+      vstr = "  50% Quantile: ";
+      vstr = vstr + ST::string(' ',20-vstr.length())
+                  + ST::doubletostring(fc_merrorvar.get_betaqu50(0,0),6);
+      optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
 
-    vstr = "  " + u1 + "% Quantile: ";
-    vstr = vstr + ST::string(' ',20-vstr.length())
-                + ST::doubletostring(fc_merrorvar.get_beta_upper2(0,0),6);
-    optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
+      vstr = "  " + u1 + "% Quantile: ";
+      vstr = vstr + ST::string(' ',20-vstr.length())
+                  + ST::doubletostring(fc_merrorvar.get_beta_upper2(0,0),6);
+      optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
 
-    vstr = "  " + u2 + "% Quantile: ";
-    vstr = vstr + ST::string(' ',20-vstr.length())
-                + ST::doubletostring(fc_merrorvar.get_beta_upper1(0,0),6);
-    optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
+      vstr = "  " + u2 + "% Quantile: ";
+      vstr = vstr + ST::string(' ',20-vstr.length())
+                  + ST::doubletostring(fc_merrorvar.get_beta_upper1(0,0),6);
+      optionsp->out(vstr + ST::string(' ',40-vstr.length()) + "\n");
 
-    optionsp->out("\n");
+      optionsp->out("\n");
 
-    ST::string merrorvar_pathresults = pathresults.substr(0,pathresults.length()-4) + "_merror_var.res";
+      ST::string merrorvar_pathresults = pathresults.substr(0,pathresults.length()-4) + "_merror_var.res";
 
-    ofstream ou1(merrorvar_pathresults.strtochar());
+      ofstream ou1(merrorvar_pathresults.strtochar());
 
-    ou1 << "pmean  pstddev  pqu"  << nl1 << "   pqu" << nl2 << "  pmed pqu" <<
-    nu1 << "   pqu" << nu2 << "  pmin  pmax" << endl;
-    ou1 << fc_merrorvar.get_betamean(0,0) << "  ";
-    ou1 << (fc_merrorvar.get_betavar(0,0)<0.0?0.0:sqrt(fc_merrorvar.get_betavar(0,0))) << "  ";
-    ou1 << fc_merrorvar.get_beta_lower1(0,0) << "  ";
-    ou1 << fc_merrorvar.get_beta_lower2(0,0) << "  ";
-    ou1 << fc_merrorvar.get_betaqu50(0,0) << "  ";
-    ou1 << fc_merrorvar.get_beta_upper2(0,0) << "  ";
-    ou1 << fc_merrorvar.get_beta_upper1(0,0) << "  ";
-    ou1 << fc_merrorvar.get_betamin(0,0) << "  ";
-    ou1 << fc_merrorvar.get_betamax(0,0) << "  " << endl;
+      ou1 << "pmean  pstddev  pqu"  << nl1 << "   pqu" << nl2 << "  pmed pqu" <<
+      nu1 << "   pqu" << nu2 << "  pmin  pmax" << endl;
+      ou1 << fc_merrorvar.get_betamean(0,0) << "  ";
+      ou1 << (fc_merrorvar.get_betavar(0,0)<0.0?0.0:sqrt(fc_merrorvar.get_betavar(0,0))) << "  ";
+      ou1 << fc_merrorvar.get_beta_lower1(0,0) << "  ";
+      ou1 << fc_merrorvar.get_beta_lower2(0,0) << "  ";
+      ou1 << fc_merrorvar.get_betaqu50(0,0) << "  ";
+      ou1 << fc_merrorvar.get_beta_upper2(0,0) << "  ";
+      ou1 << fc_merrorvar.get_beta_upper1(0,0) << "  ";
+      ou1 << fc_merrorvar.get_betamin(0,0) << "  ";
+      ou1 << fc_merrorvar.get_betamax(0,0) << "  " << endl;
 
-    optionsp->out("  Results for the variance of the measurement error are also stored in file\n");
-    optionsp->out("  " + merrorvar_pathresults + "\n");
+      optionsp->out("  Results for the variance of the measurement error are also stored in file\n");
+      optionsp->out("  " + merrorvar_pathresults + "\n");
 
-    optionsp->out("\n");
-
+      optionsp->out("\n");
+      }
 // mean of the true covariate values
 
     fc_ximu.outresults();
@@ -1131,9 +1140,10 @@ namespace MCMC
     {
     }
 
-  vector<ST::string> & fullcond_merror::get_results_latex(void)
-    {
-    }
+//  vector<ST::string> & fullcond_merror::get_results_latex(void)
+//    {
+//      return vector<ST::string>();
+//    }
 
 } // end: namespace MCMC
 

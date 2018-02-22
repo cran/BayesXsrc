@@ -518,7 +518,7 @@ using std::flush;
   gcv = loglike+2*gcv;
   gcv /= (double)nrobspos*(1-(double)df/(double)nrobspos)*(1-(double)df/(double)nrobspos);
   aic = loglike + 2*df;
-  bic = loglike + log(nrobspos)*df;
+  bic = loglike + log(static_cast<double>(nrobspos))*df;
 
   out("\n");
   out("  Model Fit\n",true);
@@ -1370,7 +1370,7 @@ bool remlest::estimate_dispers(const datamatrix resp, const datamatrix & offset,
       }
     gcv /= (double)nrobspos*(1-(double)df/(double)nrobspos)*(1-(double)df/(double)nrobspos);
     aic = loglike + 2*df;
-    bic = loglike + log(nrobspos)*df;
+    bic = loglike + log(static_cast<double>(nrobspos))*df;
 
     out("\n");
     out("  Model Fit\n",true);
@@ -1619,7 +1619,8 @@ bool remlest::estimate_glm_dispers(const datamatrix resp,
     out("\n");
 
     // test criterion
-    test=((crit1>eps) || (crit2>eps) && (it<(unsigned)maxit));
+    test=(crit1>eps) || (crit2>eps);
+    test = test && (it<(unsigned)maxit);
     if(it>2)
       {
       test = test && crit1<maxchange;
@@ -1768,7 +1769,7 @@ bool remlest::estimate_glm_dispers(const datamatrix resp,
       }*/
     gcv /= (double)nrobspos*(1-(double)df/(double)nrobspos)*(1-(double)df/(double)nrobspos);
     aic = loglike + 2*df;
-    bic = loglike + log(nrobspos)*df;
+    bic = loglike + log(static_cast<double>(nrobspos))*df;
 
     out("\n");
     out("  Model Fit\n",true);
@@ -5495,7 +5496,7 @@ for(i=0; i<nrobs; i++)
                   for(l=ttrunc[i]; l<tright[i]; l++)
                     {
                     help += 0.5*tsteps(l,0) * interactvar(i,fc_pos[xcols+k]) *
-                                (t_Z(l,dm_pos[xcols+k])*baseline(i,l) + (l+1,dm_pos[xcols+k])*baseline(i,l+1));
+                                (t_Z(l,dm_pos[xcols+k])*baseline(i,l) + t_Z(l+1,dm_pos[xcols+k])*baseline(i,l+1));
                     }
                   H(xcols+j,xcols+k) += -help*Z(i,j)*mult_hazard(i,0);
                   }
@@ -5896,7 +5897,7 @@ for(i=0; i<nrobs; i++)
 
   loglike *= -2;
   aic = loglike + 2*df;
-  bic = loglike + log(nrobspos)*df;
+  bic = loglike + log(static_cast<double>(nrobspos))*df;
 
 
   out("\n");

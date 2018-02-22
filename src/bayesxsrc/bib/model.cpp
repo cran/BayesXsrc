@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 
 model::model(const model & m)
-  {                                                  
+  {
   modelexisting = m.modelexisting;
   modeltext = m.modeltext;
   errormessages = m.errormessages;
@@ -157,7 +157,7 @@ void expression::parse(const ST::string & e)
 	   expr = expr.eatwhitespace();
        }
      else
-       errormessages.push_back("ERROR: expression expected\n");  
+       errormessages.push_back("ERROR: expression expected\n");
 
 	 }
 
@@ -263,7 +263,7 @@ term_shrinkage::term_shrinkage(void)
 
   // Startwerte für die shhrinkgeeffekte
   effectstart = doubleoption("effect",1E8,-1E7,1E7) ;
-  
+
   // Startwert fuer inverse varianzparameter tau^2
   tau2 = doubleoption("tau2",0.1,0,10000000);
 
@@ -376,7 +376,7 @@ bool term_shrinkage::check(term & t)
        t.options[9] = "false";
     else
        t.options[9] = "true";
-       
+
     setdefault();
     return true;
     }
@@ -422,17 +422,17 @@ term_nigmix::term_nigmix(void)
   // Startwert für t^2 (2. Komponente des Varianzparameters)
   t2start = doubleoption("t2",11,0,10000000);
 
-  // Startwert fuer die Mischungskomponente 
-  omegastart = doubleoption("w",0.5,0,1);  
-  
+  // Startwert fuer die Mischungskomponente
+  omegastart = doubleoption("w",0.5,0,1);
+
   // Lage der Punktmassen des Indikators
   v0 = doubleoption("v0",0.005,0,10000000);
   v1 = doubleoption("v1",1,0,10000000);
-  
+
   // Hyperparameter der Priori fuer Shrinkageparameter
   a_t2 = doubleoption("a",5,0,500);
   b_t2 = doubleoption("b",50,0,500);
-  
+
   // Hyperparameter der Priori fuer Mischungskomponente
   a_omega = doubleoption("aw",1,0,500);
   b_omega = doubleoption("bw",1,0,500);
@@ -442,7 +442,7 @@ term_nigmix::term_nigmix(void)
 
   // Varinazspezifische Werte für die Komponenten
   omegaadaptive = simpleoption("adaptive",false);
- 
+
   }
 
 
@@ -477,7 +477,7 @@ bool term_nigmix::check(term & t)
     // prior coorespponds to Normal-Indicator-Mixing
     if (t.options[0] == "nigmix")
       t.type = "nigmix";
-    
+
     else
       {
       setdefault();
@@ -529,7 +529,7 @@ bool term_nigmix::check(term & t)
     t.options[2] = ST::doubletostring(effectstart.getvalue());
     t.options[3] = ST::inttostring(indicatorstart.getvalue());
     t.options[4] = ST::doubletostring(t2start.getvalue());
-    t.options[5] = ST::doubletostring(omegastart.getvalue());    
+    t.options[5] = ST::doubletostring(omegastart.getvalue());
     t.options[6] = ST::doubletostring(v0.getvalue());
     t.options[7] = ST::doubletostring(v1.getvalue());
     t.options[8] = ST::doubletostring(a_t2.getvalue());
@@ -1094,6 +1094,7 @@ term_pspline::term_pspline(void)
   lowerknot = doubleoption("lowerknot",0,-10000000,10000000);
   upperknot = doubleoption("upperknot",0,-10000000,10000000);
   merrorvar = doubleoption("merrorvar",0,0,10000000);
+  merrorvarvec = stroption("merrorvarvec","");
   lowergrid = doubleoption("lowergrid",0,-10000000,10000000);
   uppergrid = doubleoption("uppergrid",0,-10000000,10000000);
   discretize = simpleoption("discretize", false);
@@ -1140,6 +1141,7 @@ void term_pspline::setdefault(void)
   lowerknot.setdefault();
   upperknot.setdefault();
   merrorvar.setdefault();
+  merrorvarvec.setdefault();
   lowergrid.setdefault();
   uppergrid.setdefault();
   discretize.setdefault();
@@ -1218,7 +1220,8 @@ bool term_pspline::check(term & t)
     optlist.push_back(&discretize);
     optlist.push_back(&digits);
     optlist.push_back(&nobs);
-    optlist.push_back(&centermethod);    
+    optlist.push_back(&centermethod);
+    optlist.push_back(&merrorvarvec);
 
 
     unsigned i;
@@ -1244,7 +1247,7 @@ bool term_pspline::check(term & t)
       }
 
    t.options.erase(t.options.begin(),t.options.end());
-   t.options = vector<ST::string>(39);
+   t.options = vector<ST::string>(40);
    t.options[0] = t.type;
    t.options[1] = ST::inttostring(min.getvalue());
    t.options[2] = ST::inttostring(max.getvalue());
@@ -1315,6 +1318,7 @@ bool term_pspline::check(term & t)
    t.options[37] = ST::inttostring(nobs.getvalue());
 
    t.options[38] = centermethod.getvalue();
+   t.options[39] = merrorvarvec.getvalue();
 
    if (t.options[1].strtolong(minim) == 1)
      {
@@ -2623,7 +2627,7 @@ bool term_varcoeff_geospline::check(term & t)
    else
      t.options[16] = "true";
 
-    t.options[17] = centermethod.getvalue();     
+    t.options[17] = centermethod.getvalue();
 
    t.options[1].strtolong(minim);
    t.options[2].strtolong(maxim);
@@ -2834,7 +2838,7 @@ bool term_varcoeff_pspline::check(term & t)
     else
       t.options[20] = "true";
 
-    t.options[21] = centermethod.getvalue();      
+    t.options[21] = centermethod.getvalue();
 
     if ( contourprob.getvalue()-1 > degree.getvalue())
       {
@@ -2898,7 +2902,7 @@ term_varcoeff_merror::term_varcoeff_merror(void)
   adm_centerm.push_back("samplecentered");
   adm_centerm.push_back("meanintercept");
   centermethod = stroption("centermethod",adm_centerm,"mean");
-  
+
 
   // SUSI: initialize new option
   // Syntax : doubleoption("name", default, lower limit, upper limit)
@@ -4002,7 +4006,7 @@ void modeltermmult::clear(void)
   {
   model::clear();
   responsevar.erase(responsevar.begin(),responsevar.end());
-  responsecol.erase(responsecol.begin(),responsecol.end()); 
+  responsecol.erase(responsecol.begin(),responsecol.end());
   }
 
 

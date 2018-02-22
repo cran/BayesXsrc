@@ -1,3 +1,9 @@
+Changes in Version 3.0-0
+
+  o New release of BayesXsrc accompanying the forthcoming release of
+    BayesX. This includes many fixed errors in the C++ code.
+
+
 Changes in Version 2.1-2
 
   o Fixed readline linkage failure on OS X by adding '-L${R_HOME}/lib'

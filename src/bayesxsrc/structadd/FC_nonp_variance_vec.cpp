@@ -56,11 +56,11 @@ FC_nonp_variance_vec::FC_nonp_variance_vec(void)
 
 
 
-FC_nonp_variance_vec::FC_nonp_variance_vec(MASTER_OBJ * mp, GENERAL_OPTIONS * o,
+FC_nonp_variance_vec::FC_nonp_variance_vec(MASTER_OBJ * mp,unsigned & enr, GENERAL_OPTIONS * o,
                  DISTR * lp, const ST::string & t,const ST::string & fp,
                  DESIGN * Dp,FC_nonp * FCn,vector<ST::string> & op,
                  vector<ST::string> & vn)
-     : FC_nonp_variance(mp,o,lp,t,fp,Dp,FCn,op,vn)
+     : FC_nonp_variance(mp,enr, o,lp,t,fp,Dp,FCn,op,vn)
   {
 
 
@@ -104,7 +104,7 @@ bool FC_nonp_variance_vec::posteriormode(void)
   {
 
 
-  b_invgamma = masterp->level1_likep->trmult*b_invgamma_orig;
+  b_invgamma = masterp->level1_likep[equationnr]->trmult*b_invgamma_orig;
 
   unsigned i;
   for(i=0;i<beta.rows();i++)
@@ -122,14 +122,11 @@ bool FC_nonp_variance_vec::posteriormode(void)
 
 
 
-void FC_nonp_variance_vec::outresults(ofstream & out_stata,ofstream & out_R,
+void FC_nonp_variance_vec::outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
                                   const ST::string & pathresults)
   {
 
-  /*
-  FC::outresults(out_stata,out_R,"");
-
-//  optionsp->out("\n");
+  FC::outresults(out_stata,out_R,out_R2BayesX,"");
 
   ST::string l1 = ST::doubletostring(optionsp->lower1,4);
   ST::string l2 = ST::doubletostring(optionsp->lower2,4);
@@ -145,87 +142,6 @@ void FC_nonp_variance_vec::outresults(ofstream & out_stata,ofstream & out_R,
   nu1 = nu1.replaceallsigns('.','p');
   nu2 = nu2.replaceallsigns('.','p');
 
-  ST::string vstr;
-
-
-  if (optionsp->samplesize > 1)
-    {
-
-    vstr = "    Mean:         ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betamean(0,0),6) + "\n");
-
-    vstr = "    Std. dev.:    ";
-
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(sqrt(betavar(0,0)),6) + "\n");
-
-    vstr = "    " + l1 + "% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu_l1_lower(0,0),6) + "\n");
-
-    vstr = "    " + l2 + "% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu_l2_lower(0,0),6) + "\n");
-
-    vstr = "    50% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu50(0,0),6) + "\n");
-
-    vstr = "    " + u1 + "% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu_l2_upper(0,0),6) + "\n");
-
-    vstr = "    " + u2 + "% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu_l1_upper(0,0),6) + "\n");
-
-    optionsp->out("\n");
-
-    optionsp->out("    Smoothing parameter\n");
-
-    optionsp->out("\n");
-
-    vstr = "    Mean:         ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betamean(0,1),6) + "\n");
-
-    vstr = "    Std. dev.:    ";
-
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(sqrt(betavar(0,1)),6) + "\n");
-
-    vstr = "    " + l1 + "% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu_l1_lower(0,1),6) + "\n");
-
-    vstr = "    " + l2 + "% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu_l2_lower(0,1),6) + "\n");
-
-    vstr = "    50% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu50(0,1),6) + "\n");
-
-    vstr = "    " + u1 + "% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu_l2_upper(0,1),6) + "\n");
-
-    vstr = "    " + u2 + "% Quantile: ";
-    optionsp->out(vstr + ST::string(' ',20-vstr.length()) +
-    ST::doubletostring(betaqu_l1_upper(0,1),6) + "\n");
-
-    optionsp->out("\n");
-    }
-  else
-    {
-    optionsp->out("    Smoothing parameter: " +
-    ST::doubletostring(betamean(0,1),6) + "\n");
-
-    optionsp->out("\n");
-    }
-
-
   if (pathresults.isvalidfile() != 1)
     {
 
@@ -237,31 +153,36 @@ void FC_nonp_variance_vec::outresults(ofstream & out_stata,ofstream & out_R,
 
     if (optionsp->samplesize > 1)
       {
-      ou << "pmean  pstddev  pqu"  << nl1 << "   pqu" << nl2 << "  pmed pqu" <<
+      ou << "intnr  pmean  pstddev  pqu"  << nl1 << "   pqu" << nl2 << "  pmed pqu" <<
       nu1 << "   pqu" << nu2 << "  pmin  pmax" << endl;
       }
     else
       {
-      ou << "pmean" << endl;
+      ou << "intnr  pmean" << endl;
       }
 
-    ou << betamean(0,0) << "  ";
-    if (optionsp->samplesize > 1)
+
+    unsigned i;
+    for (i=0;i<beta.rows();i++)
       {
-      ou << (betavar(0,0)<0.0?0.0:sqrt(betavar(0,0))) << "  ";
-      ou << betaqu_l1_lower(0,0) << "  ";
-      ou << betaqu_l2_lower(0,0) << "  ";
-      ou << betaqu50(0,0) << "  ";
-      ou << betaqu_l2_upper(0,0) << "  ";
-      ou << betaqu_l1_upper(0,0) << "  ";
-      ou << betamin(0,0) << "  ";
-      ou << betamax(0,0) << "  " << endl;
+      ou << (i+1) << "  "  << betamean(i,0) << "  ";
+      if (optionsp->samplesize > 1)
+        {
+        ou << (betavar(i,0)<0.0?0.0:sqrt(betavar(i,0))) << "  ";
+        ou << betaqu_l1_lower(i,0) << "  ";
+        ou << betaqu_l2_lower(i,0) << "  ";
+        ou << betaqu50(i,0) << "  ";
+        ou << betaqu_l2_upper(i,0) << "  ";
+        ou << betaqu_l1_upper(i,0) << "  ";
+        ou << betamin(i,0) << "  ";
+        ou << betamax(i,0) << "  " << endl;
+        }
       }
 
     optionsp->out("\n");
     }
 
-    */
+
   }
 
 
@@ -275,8 +196,6 @@ void FC_nonp_variance_vec::outoptions(void)
 
 void FC_nonp_variance_vec::reset(void)
   {
-
-double t= 0;
   }
 
 

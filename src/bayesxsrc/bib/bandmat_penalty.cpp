@@ -96,7 +96,7 @@ bandmatdouble Kseasonband(const unsigned & per,const unsigned & s)
 
   unsigned k = per-1;
   datamatrix F(s-k,s,0);
-  unsigned i,j;
+  int i,j;
   for(i=0;i<F.rows();i++)
     for(j=i;j<i+per;j++)
       F(i,j) = 1;

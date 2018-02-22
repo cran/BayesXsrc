@@ -28,6 +28,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include "bandmat.h"
 
 template<class T>
+symbandmatrix<T>::symbandmatrix(void)
+  {
+  // ASAN/UBSAN checks
+  decomposedonly = false;
+  decomposed = false;
+  // end: ASAN/UBSAN checks
+  }
+
+template<class T>
 symbandmatrix<T>::symbandmatrix(const unsigned & d,const unsigned & bs,
                                 const double & v)
   {

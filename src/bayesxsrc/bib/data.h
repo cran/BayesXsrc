@@ -67,7 +67,7 @@ class __EXPORT_TYPE data
   friend class dataset;
 
 
-  protected:
+  public:
 
 
   //----------------------- PROTECTED VARIABLES --------------------------------

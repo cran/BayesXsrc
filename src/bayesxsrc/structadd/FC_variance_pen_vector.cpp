@@ -46,7 +46,7 @@ void FC_variance_pen_vector::add_variable(datamatrix & x,vector<ST::string> & op
   bool adsh;
   double a,b;
   double shw;
-  
+
   // read options
   f = op[33].strtodouble(ta);
   f = op[29].strtodouble(shrink);
@@ -66,23 +66,23 @@ void FC_variance_pen_vector::add_variable(datamatrix & x,vector<ST::string> & op
   // options from each term
   tau2.push_back(ta);
   shrinkageweight.push_back(shw);
-  
+
   // options from first term or all terms. Depends on adaptiveshrinkage
   shrinkagefix.push_back(sfix);
   adaptiveshrinkage.push_back(adsh);
-  
+
   // shrinkagefix and adaptiveshrinkage are set from first term
   is_fix = shrinkagefix[0];
   is_adaptive = adaptiveshrinkage[0];
-  
+
   if(is_ridge==1)                        // for Ridge
     shrinkagestart.push_back(1/(2*ta));
   if(is_ridge==0)                        // for Lasso
     shrinkagestart.push_back(shrink);
- 
+
   a_shrinkagegamma.push_back(a);
   b_shrinkagegamma.push_back(b);
- 
+
   if(is_adaptive==false)
     {
     shrinkagestart[nrpen] = shrinkagestart[0];
@@ -100,10 +100,10 @@ void FC_variance_pen_vector::add_variable(datamatrix & x,vector<ST::string> & op
   // optionsp->out("a_shrinkage = " + ST::doubletostring(a_shrinkagegamma[nrpen]) + "\n");
   // optionsp->out("b_shrinkage = " + ST::doubletostring(b_shrinkagegamma[nrpen]) + "\n");
   // optionsp->out("\n");
-    
+
   nrpen++;
   Cp->tau2 = datamatrix(nrpen,1,0);
-  Cp->tau2oldinv = datamatrix(nrpen,1,0);  
+  Cp->tau2oldinv = datamatrix(nrpen,1,0);
   for(int i=0;i<nrpen;i++)
     {
     Cp->tau2(i,0) = tau2[i];
@@ -145,11 +145,17 @@ void FC_variance_pen_vector::add_variable(datamatrix & x,vector<ST::string> & op
 FC_variance_pen_vector::FC_variance_pen_vector(MASTER_OBJ * mp,
                         GENERAL_OPTIONS * o, FC_linear_pen * p,
                         DISTR * d,const ST::string & ti,
-                        const ST::string & fp, bool isr)
+                        const ST::string & fp, shrinktype sh)
                         :FC(o,ti,1,1,fp)
   {
 
-  is_ridge = isr;
+  masterp = mp;
+
+  shtype = sh;
+  if (shtype==ridge)
+    is_ridge = true;
+  else
+    is_ridge = false;
 
   update_sigma2 = true;
 
@@ -181,6 +187,7 @@ FC_variance_pen_vector::FC_variance_pen_vector(MASTER_OBJ * mp,
 FC_variance_pen_vector::FC_variance_pen_vector(const FC_variance_pen_vector & t)
     : FC(FC(t))
   {
+  masterp = t.masterp;
   tau2 = t.tau2;
   shelp = t.shelp;
   update_sigma2 = t.update_sigma2;
@@ -212,6 +219,7 @@ const FC_variance_pen_vector & FC_variance_pen_vector::operator=(
   if (this == &t)
     return *this;
   FC::operator=(FC(t));
+  masterp = t.masterp;
   tau2 = t.tau2;
   shelp = t.shelp;
   update_sigma2 = t.update_sigma2;
@@ -289,27 +297,27 @@ void FC_variance_pen_vector::update(void)
 
   // get current value of first regressionparameter
   double * workbeta = Cp->beta.getV();
-  
+
   // getcurrent value of sqrt(scale) parameter
   double sigma = sqrt(distrp->get_scale());
 
 //TEMP:BEGIN--------------------------------------------------------------------
   // ofstream outpenreg("c:/bayesx/test/outpenreg.txt", ios::out|ios::app);
-  // outpenreg << "beta ";    
+  // outpenreg << "beta ";
   // for(unsigned i=0; i<nrpen; i++,workbeta++) {outpenreg << *workbeta  << " ";}
   // outpenreg << "\n";
-  // outpenreg << "tau2 ";    
+  // outpenreg << "tau2 ";
   // for(unsigned i=0; i<nrpen; i++) {outpenreg << beta(i,0)  << " ";}
   // outpenreg << "\n";
-  // outpenreg << "lambda ";    
+  // outpenreg << "lambda ";
   // for(unsigned i=0; i<nrpen; i++,shrinkagep++) {outpenreg << *shrinkagep  << " ";}
   // outpenreg << "\n";
   // outpenreg << "sigma "<< sigma <<"\n";
-  
+
   // shrinkagep = FC_shrinkage.beta.getV();
   // workbeta = Cp->beta.getV();
   // sigma = sqrt(distrp->get_scale());
-//TEMP:END----------------------------------------------------------------------  
+//TEMP:END----------------------------------------------------------------------
 
 
 
@@ -370,7 +378,7 @@ void FC_variance_pen_vector::update(void)
       sumregcoeff = sumregcoeff + (*workbeta)*(*workbeta);
       }
     }
-    
+
   if (is_ridge == 1 && is_adaptive == true)   // Ridge L2-penalty adaptive
     {
     for(i=0; i<nrpen; i++, workbeta++, shrinkagep++)
@@ -461,23 +469,23 @@ void FC_variance_pen_vector::get_samples(const ST::string & filename,ofstream & 
 // TASK: - write results for varianceparameters to output window and files
 //______________________________________________________________________________
 
-void FC_variance_pen_vector::outresults(ofstream & out_stata, ofstream & out_R,
+void FC_variance_pen_vector::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
                              const ST::string & pathresults)
   {
- 
+
 //  int i;
-  vector<ST::string> vnames;   
+  vector<ST::string> vnames;
   vnames = Cp->datanames;
 
-  FC::outresults(out_stata,out_R,"");
+  FC::outresults(out_stata,out_R,out_R2BayesX,"");
   FC::outresults_help(out_stata,out_R,pathresults,vnames);
-  
+
   optionsp->out("\n");
   optionsp->out("    Results for variances are also stored in file\n");
   optionsp->out("    " + pathresults + "\n");
   optionsp->out("\n");
 
-  
+
   // outresults shrinkage
   ST::string shrinkage_pathresults = pathresults.substr(0,pathresults.length()-7) + "shrinkage.res";
   outresults_shrinkage(shrinkage_pathresults);
@@ -497,16 +505,17 @@ void FC_variance_pen_vector::outresults_shrinkage(const ST::string & pathresults
   if(is_fix==false)
     {
     optionsp->out("\n");
-    optionsp->out("  MAIN_REGRESSOIN: linear effects (shrinkage) \n");
+    optionsp->out("  MAIN_REGRESSION: linear effects (shrinkage) \n");
     optionsp->out("\n");
     ST::string shrinkage_pathresults = pathresults;
     vector<ST::string> vnames;
     vnames = Cp->datanames;
-   
+
     ofstream out1;
     ofstream out2;
-    
-    FC_shrinkage.outresults(out1,out2,"");
+    ofstream out3;
+
+    FC_shrinkage.outresults(out1,out2,out3,"");
     FC_shrinkage.outresults_help(out1,out2,shrinkage_pathresults,vnames);
 
     // unsigned nr;
@@ -514,12 +523,12 @@ void FC_variance_pen_vector::outresults_shrinkage(const ST::string & pathresults
       // {
       // FC_shrinkage.outresults_help(out1,out2,shrinkage_pathresults,vnames);
       // }
-    
+
     // if(is_adaptive==false)
       // {
       // FC_shrinkage.outresults_help(out1,out2,shrinkage_pathresults,vnames);
       // }
-    
+
     optionsp->out("\n");
     optionsp->out("    Results for shrinkage parameters are also stored in file\n");
     optionsp->out("    " + shrinkage_pathresults + "\n");
@@ -589,6 +598,491 @@ void FC_variance_pen_vector::outoptions(void)
     }
 
   }
+
+
+
+
+//--------------------------------------------------------------------------------------------------------------
+//-------------------------------------- FC_variance_pen_vector_ssvs -------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+
+
+
+void FC_variance_pen_vector_ssvs::add_variable(datamatrix & x,vector<ST::string> & op,
+                                               vector<ST::string> & vn)
+  {
+
+  int f;
+  double a,b,rhelp;
+  bool cpr;
+
+  f = op[53].strtodouble(a);
+  f = op[54].strtodouble(b);
+  f = op[41].strtodouble(rhelp);
+
+  if(op[57]=="true")
+     NBPSS = true;
+  else
+     NBPSS = false;
+
+  atau2.push_back(a);
+  btau2_orig.push_back(b);
+  btau2.push_back(masterp->level1_likep[equationnr]->trmult*b);
+  r.push_back(rhelp);
+
+  if (op[61] == "true")
+    {
+    cpr = true;
+    }
+  else
+    cpr = false;
+
+  cprior.push_back(cpr);
+  nrpen++;
+
+  delta = FC(optionsp,"",nrpen,2,"");
+  delta.setbeta(nrpen,1,0);
+  delta.setbeta(nrpen,2,0.5);
+  setbeta(nrpen,1,0.1);
+
+  FC_psi2 = FC(optionsp,"",nrpen,1,"");
+  FC_psi2.setbeta(nrpen,1,0.1);
+
+  FC_delta = FC(optionsp,"",nrpen,2,"");
+  FC_delta.setbeta(nrpen,1,0);
+  FC_delta.setbeta(nrpen,2,0.5);
+
+  Cp->tau2 = datamatrix(nrpen,1,0);
+  Cp->tau2oldinv = datamatrix(nrpen,1,0);
+  for(int i=0;i<nrpen;i++)
+    {
+    Cp->tau2(i,0) = beta(i,0);
+    }
+  }
+
+
+
+FC_variance_pen_vector_ssvs::FC_variance_pen_vector_ssvs(MASTER_OBJ * mp,
+                        unsigned & enr,
+                        GENERAL_OPTIONS * o, FC_linear_pen * p,
+                        DISTR * d,const ST::string & ti,
+                        const ST::string & fp)
+                        :FC(o,ti,1,1,fp)
+  {
+
+  masterp = mp;
+  equationnr = enr;
+
+  Cp = p;
+
+  distrp = d;
+
+  nrpen = 0;
+
+  theta = FC(optionsp,"",1,1,"");
+  theta.setbeta(1,1,0.5);
+
+  FC_omega = FC(optionsp,"",1,1,"");
+  FC_omega.setbeta(1,1,0.5);
+
+  atheta=1;
+  btheta=1;
+
+  }
+
+FC_variance_pen_vector_ssvs::FC_variance_pen_vector_ssvs(const FC_variance_pen_vector_ssvs & t)
+    : FC(FC(t))
+  {
+  masterp = t.masterp;
+  equationnr = t.equationnr;
+
+  cprior = t.cprior;
+  nrpen = t.nrpen;
+
+  distrp = t.distrp;
+  Cp = t.Cp;
+
+  delta = t.delta;
+  atau2 = t.atau2;
+  btau2 = t.btau2;
+  btau2_orig = t.btau2_orig;
+  theta = t.theta;
+  atheta = t.atheta;
+  btheta = t.btheta;
+
+  r = t.r;
+
+  FC_omega = t.FC_omega;
+  FC_psi2 =  t.FC_psi2;
+  FC_delta = t.FC_delta;
+
+  NBPSS = t.NBPSS;
+  }
+
+
+const FC_variance_pen_vector_ssvs & FC_variance_pen_vector_ssvs::operator=(const FC_variance_pen_vector_ssvs & t)
+  {
+  if (this == &t)
+    return *this;
+  FC::operator=(FC(t));
+  masterp = t.masterp;
+  equationnr = t.equationnr;
+
+  cprior = t.cprior;
+  nrpen = t.nrpen;
+
+  distrp = t.distrp;
+  Cp = t.Cp;
+
+  delta = t.delta;
+  atau2 = t.atau2;
+  btau2 = t.btau2;
+  btau2_orig = t.btau2_orig;
+  theta = t.theta;
+  atheta = t.atheta;
+  btheta = t.btheta;
+
+  r = t.r;
+
+  FC_omega = t.FC_omega;
+  FC_psi2 =  t.FC_psi2;
+  FC_delta = t.FC_delta;
+
+  NBPSS = t.NBPSS;
+
+  return *this;
+  }
+
+
+bool FC_variance_pen_vector_ssvs::posteriormode(void)
+  {
+
+  /*
+  shelp(1,0) = double(tau2.size());
+
+  datamatrix tau2inv(tau2.size(),1,0);
+  unsigned i;
+  for (i=0;i<tau2inv.rows();i++)
+    tau2inv(i,0) = 1/tau2[i];
+
+  setbeta(tau2inv);
+  */
+
+  return true;
+  }
+
+
+
+
+
+void FC_variance_pen_vector_ssvs::update(void)
+  {
+  if(NBPSS)
+    {
+    unsigned j;
+    double p, q, c, r_delta;
+    double anew, bnew;
+    double sumdelta=0.0;
+    for (j=0; j<nrpen; j++)
+      {
+      // update psi2_j
+      if(FC_delta.beta(j,0) > 0)
+        r_delta = 1.0;
+      else
+        r_delta = r[j];
+
+      anew = atau2[j] + 0.5;
+      bnew = btau2[j]+0.5*beta(j,0)/r_delta;
+      FC_psi2.beta(j,0) = rand_invgamma(anew, bnew);
+
+      // update delta_j
+
+      double u = uniform();
+      double L = 1/sqrt(r[j])*exp(- beta(j,0)/(2*FC_psi2.beta(j,0))*(1/r[j]-1));
+      double pr1 = 1/(1+ ((1-FC_omega.beta(0,0))/FC_omega.beta(0,0))*L);
+
+      if (u <= pr1)
+        {
+        FC_delta.beta(j,0) = 1;
+        r_delta = 1;
+        }
+      else
+        {
+        FC_delta.beta(j,0) = 0;
+        r_delta = r[j];
+        }
+
+      FC_delta.beta(j,1) = pr1;
+      sumdelta += FC_delta.beta(j,0);
+
+      // update tau^2_j
+
+      p = 0.0;
+      q = 1.0/(r_delta * FC_psi2.beta(j,0));
+      c = pow(Cp->beta(j,0),2);
+
+      double tau2 = randnumbers::GIG2(p, q, c);
+      beta(j,0) = tau2;
+
+      Cp->tau2(j,0) = beta(j,0);
+      if(cprior[j])
+        Cp->tau2(j,0) = beta(j,0)*distrp->get_scale();
+      }
+
+    // update omega
+
+    FC_omega.beta(0,0) = randnumbers::rand_beta(atheta+sumdelta,btheta+nrpen-sumdelta);
+
+    FC_omega.update();
+    FC_psi2.update();
+    FC_delta.update();
+
+    }
+  else
+  {
+  unsigned j;
+  double anew_tau2;
+  double bnew_tau2;
+  double beta2;
+  double thetanew;
+
+  double sumdelta=0;
+
+
+  for (j=0;j<nrpen;j++)
+    {
+
+    // update tau^2_j
+
+    anew_tau2 = atau2[j] + 0.5;
+    beta2 = pow(Cp->beta(j,0),2);
+
+    if (delta.beta(j,0) > 0)
+      {
+      bnew_tau2 = btau2[j]+0.5*beta2;
+      }
+    else
+      {
+      bnew_tau2 = btau2[j]+0.5*beta2/r[j];
+      }
+    double tau2help = rand_invgamma(anew_tau2,bnew_tau2);
+
+    if (delta.beta(j,0) > 0)
+      {
+      beta(j,0) = tau2help;
+      }
+    else
+      {
+      beta(j,0) = r[j]*tau2help;
+      }
+
+    Cp->tau2(j,0) = beta(j,0);
+    if(cprior[j])
+      {
+  //    cout << "j: " << j << endl;
+      Cp->tau2(j,0) = beta(j,0)*distrp->get_scale();
+      }
+
+ //   cout << "atau2: " << atau2[j] << endl;
+ //   cout << "btau2: " << btau2[j] << endl;
+    //cout << "sigma2: " << distrp->get_scale() << endl;
+
+    // update delta_j
+
+//    btau2_pow_atau2 = pow(btau2[j],atau2[j]);
+//    nu0btau2_pow_atau2 = pow(nu0*btau2[j],atau2[j]);
+
+
+//    helpIG1 = btau2_pow_atau2*exp(-btau2[j]/beta(j,0));
+//    helpIG2 = nu0btau2_pow_atau2*exp(-nu0*btau2[j]/beta(j,0));
+
+    double u = uniform();
+    double L = 1/sqrt(r[j])*exp(- beta2/(2*tau2help)*(1/r[j]-1));
+    double thetanew = 1/(1+ ((1-theta.beta(0,0))/theta.beta(0,0))*L);
+  //  thetanew = (theta.beta(0,0) * helpIG1)/(theta.beta(0,0) * helpIG1 + (1-theta.beta(0,0))*helpIG2);
+
+//    cout << "theta: " << thetanew << endl;
+    delta.beta(j,1) = thetanew;
+    if (u <= thetanew)
+      delta.beta(j,0) = 1;
+    else
+      delta.beta(j,0) = 0;
+
+
+    sumdelta += delta.beta(j,0);
+
+    }
+
+  delta.update();
+
+  // update theta
+
+  theta.beta(0,0) = randnumbers::rand_beta(atheta+sumdelta,btheta+nrpen-sumdelta);
+
+  /*cout << "atheta: " << atheta << endl;
+  cout << "btheta: " << btheta << endl;
+  cout << "nrpen: " << nrpen << endl;
+  cout << "theta: " << theta.beta(0,0) << endl;
+*/
+
+  theta.update();
+  }
+
+
+  FC::update();
+}
+
+
+void FC_variance_pen_vector_ssvs::get_samples(const ST::string & filename,ofstream & outg) const
+  {
+  FC::get_samples(filename, outg);
+
+  ST::string filename_delta = filename.substr(0,filename.length()-15) + "_delta_sample.raw";
+  delta.get_samples(filename_delta,outg);
+
+  ST::string filename_theta = filename.substr(0,filename.length()-15) + "_omega_sample.raw";
+  theta.get_samples(filename_theta,outg);
+  }
+
+
+void FC_variance_pen_vector_ssvs::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                                             const ST::string & pathresults)
+  {
+
+   optionsp->out("\n");
+   optionsp->out("    Variance parameters:\n");
+
+   FC::outresults(out_stata,out_R,out_R2BayesX,"");
+   FC::outresults_help(out_stata,out_R,pathresults,Cp->datanames);
+
+
+   optionsp->out("\n");
+   optionsp->out("    Results for linear effects variance parameters are also stored in file\n");
+   optionsp->out("    " + pathresults + "\n");
+   optionsp->out("\n");
+
+   optionsp->out("\n");
+   optionsp->out("    Inclusion probabilities:\n");
+
+   ST::string pathresults_delta = pathresults.substr(0,pathresults.length()-7)+"delta.res";
+   ST::string pathresults_delta_prob = pathresults.substr(0,pathresults.length()-7)+"delta_prob.res";
+
+   if(NBPSS)
+     {
+     FC_delta.outresults(out_stata,out_R,out_R2BayesX,"");
+     FC_delta.outresults_help(out_stata,out_R,pathresults_delta,Cp->datanames);
+     }
+   else
+     {
+     delta.outresults(out_stata,out_R,out_R2BayesX,"");
+     delta.outresults_help(out_stata,out_R,pathresults_delta,Cp->datanames);
+     }
+
+   optionsp->out("\n");
+   optionsp->out("    Results for delta parameters are also stored in file\n");
+   optionsp->out("    " + pathresults_delta + "\n");
+   optionsp->out("\n");
+   optionsp->out("\n");
+
+   optionsp->out("    Rao-Blackwellised inclusion probabilities:\n");
+
+   if(NBPSS)
+     {
+     FC_delta.outresults_help(out_stata,out_R,pathresults_delta_prob,Cp->datanames,1);
+     }
+   else
+     {
+     delta.outresults_help(out_stata,out_R,pathresults_delta_prob,Cp->datanames,1);
+     }
+   optionsp->out("\n");
+   optionsp->out("    Results for Rao-Blackwellised inclusion probabilities are also stored in file\n");
+   optionsp->out("    " + pathresults_delta + "\n");
+   optionsp->out("\n");
+   optionsp->out("\n");
+
+
+/*   unsigned j;
+   ofstream ou(pathresults_delta_prob.strtochar());
+
+   ou << "pmean_prob" << endl;
+   for(j=0;j<nrpen;j++)
+     {
+    ou  << " " << delta.betamean(j,1) << endl;
+     }*/
+
+   ST::string pathresults_theta = pathresults.substr(0,pathresults.length()-7)+"omega.res";
+
+   optionsp->out("    Inclusion probability parameter omega:\n");
+   optionsp->out("\n");
+
+   if(NBPSS)
+     {
+     FC_omega.outresults(out_stata,out_R,out_R2BayesX,"");
+     FC_omega.outresults_singleparam(out_stata,out_R,pathresults_theta);
+     }
+   else
+     {
+     theta.outresults(out_stata,out_R,out_R2BayesX,"");
+     theta.outresults_singleparam(out_stata,out_R,pathresults_theta);
+     }
+
+   optionsp->out("    Results for linear effects omega parameters are also stored in file\n");
+   optionsp->out("    " + pathresults_theta + "\n");
+   optionsp->out("\n");
+
+  }
+
+
+void FC_variance_pen_vector_ssvs::outoptions(void)
+  {
+  FC::outoptions();
+
+  int maxvarnamelength = 0;
+  int len;
+
+  for(unsigned i=0;i<Cp->datanames.size();i++)
+    {
+    len = Cp->datanames[i].length();
+
+    if (len > maxvarnamelength)
+      maxvarnamelength = len;
+    }
+
+  unsigned nsp, nsp2, nsp3;
+  if (maxvarnamelength  > 10)
+    nsp = 4 + maxvarnamelength - 8;
+  else
+    nsp = 4;
+  ST::string l(' ',nsp);
+
+  optionsp->out("  Hyperparameters for SSVS priors of linear effects:\n\n" );
+  optionsp->out("    Variable" + l +
+                "v1       " +
+                "v2       " +
+                "r        \n");
+
+  for(unsigned i=0; i< Cp->datanames.size(); i++)
+    {
+    if (maxvarnamelength  > 10)
+      nsp = 4 + maxvarnamelength - Cp->datanames[i].length();
+    else
+      nsp = 12-Cp->datanames[i].length();
+    ST::string ls(' ',nsp);
+
+    nsp2 = 9 - ST::doubletostring(atau2[i],6).length();
+    ST::string ls2(' ',nsp2);
+
+    nsp3 = 9 - ST::doubletostring(btau2[i],6).length();
+    ST::string ls3(' ',nsp3);
+
+    optionsp->out("    " + Cp->datanames[i] + ls +
+                  ST::doubletostring(atau2[i],6) + ls2 +
+                  ST::doubletostring(btau2[i],6) + ls3 +
+                  ST::doubletostring(r[i],10) + "\n");
+    }
+  optionsp->out("\n");
+  }
+
 
 
 } // end: namespace MCMC

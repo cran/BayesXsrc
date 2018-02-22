@@ -60,7 +60,7 @@ class __EXPORT_TYPE FC_nonp_variance_vec  : public FC_nonp_variance
   // t    : title of the full conditional (for example "fixed effects")
   // fp   : file path for storing sampled parameters
 
-  FC_nonp_variance_vec(MASTER_OBJ * mp,GENERAL_OPTIONS * o,DISTR * lp,
+  FC_nonp_variance_vec(MASTER_OBJ * mp,unsigned & enr, GENERAL_OPTIONS * o,DISTR * lp,
            const ST::string & t,
            const ST::string & fp,DESIGN * dp,FC_nonp * FCn,
            vector<ST::string> & op,vector<ST::string> & vn);
@@ -99,7 +99,7 @@ class __EXPORT_TYPE FC_nonp_variance_vec  : public FC_nonp_variance
   // FUNCTION: outresults
   // TASK: writes estimation results to logout or into a file
 
-  void outresults(ofstream & out_stata,ofstream & out_R,
+  void outresults(ofstream & out_stata,ofstream & out_R, ofstream & out_R2BayesX,
                   const ST::string & pathresults);
 
   // FUNCTION: reset
