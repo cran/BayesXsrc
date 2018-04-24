@@ -847,7 +847,7 @@ void FULLCOND_pspline_surf::compute_fc(const datamatrix & beta, const unsigned &
   {
   unsigned matnr = begin[bs-min]+ ((a-1)/bs );
   unsigned l = b-a+1;
-  register unsigned i,j;
+   unsigned i,j;
 
   double * fc_randwork = fc_random[b-a].getV();
   double * KABrootwork = KABroot[matnr].getV();

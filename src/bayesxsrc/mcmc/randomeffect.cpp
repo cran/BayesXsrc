@@ -176,7 +176,7 @@ void FULLCOND_random::compute_XWX(const datamatrix & weightmat,
                                   const unsigned & col)
   {
 
-  register unsigned j,i;
+   unsigned j,i;
 
   double * workXX = XX.getV();
   int *  workindex = index.getV();
@@ -216,7 +216,7 @@ double FULLCOND_random::compute_quadform(void)
   unsigned n;
   double sum = 0;
   double * workbeta = beta.getV();
-  register unsigned i;
+   unsigned i;
 
   if (randomslope && includefixed)
     n = nrpar-1;

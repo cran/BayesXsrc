@@ -65,7 +65,7 @@ class remlest_ordinal
 
   bool fisher;                                  // store final fisher infor-matrix?
 
-  double refcat;                                   // Referenz-Kategorie
+//  double refcat;                                   // Referenz-Kategorie
   unsigned nrcat;                                    // Anzahl Kategorien
   unsigned nrcat2;                                   // Anzahl nicht redundanter Kategorien
   statmatrix<double> cats;                         // Mögliche Kategorien

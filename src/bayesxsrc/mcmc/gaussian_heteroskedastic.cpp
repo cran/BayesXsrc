@@ -319,7 +319,7 @@ void DISTRIBUTION_gaussianh::compute_IWLS_weight_tildey(double * response,
 
 void DISTRIBUTION_gaussianh::compute_iwls(void)
   {
-    register unsigned i,j;
+     unsigned i,j;
     unsigned dim = response.cols(); //Der Wert zur Laufzeit müsste 2 sein
 
     double * worklin = (*linpred_current).getV();

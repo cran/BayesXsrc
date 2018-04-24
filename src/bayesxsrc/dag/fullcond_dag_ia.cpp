@@ -1715,7 +1715,7 @@ namespace MCMC
 	  if((optionsp->get_nriter() > optionsp->get_burnin()) &&
 		 (optionsp->get_nriter() % (optionsp->get_step()) == 0))
 	  {
-		  register unsigned i;
+		  unsigned i;
 
 		  std::vector<int>::iterator workocc;
 		  workocc = occurrence.begin();

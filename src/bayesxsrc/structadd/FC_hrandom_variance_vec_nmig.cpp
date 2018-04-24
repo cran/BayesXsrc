@@ -128,7 +128,7 @@ const FC_hrandom_variance_vec_nmig & m)
 void FC_hrandom_variance_vec_nmig::update(void)
   {
 
-  register unsigned i;
+   unsigned i;
   double * workbeta = beta.getV();               // psi
   double * workbetafcn = FCnonpp->beta.getV();   // beta, i.e. random effects
   double * workdelta = FC_delta.beta.getV();       // deltas

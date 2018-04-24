@@ -230,7 +230,7 @@ essfreq::essfreq(Matrix <unsigned> scel, vector< vector <unsigned> >  & imm, uns
 		datamatrix res(a.rows(),a.cols());
 
 		double * work = res.getV();
-		register unsigned i,j;
+		unsigned i,j;
 		for(i=0;i<res.rows();i++)
 			for(j=0;j<res.cols();j++,work++)
 				 *work = a(i,j);

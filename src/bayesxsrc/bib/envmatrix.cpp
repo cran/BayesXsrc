@@ -1560,7 +1560,7 @@ void envmatrix<T>::solveL(vector<T> & b)
     int iband;
     T s = T(0);
 
-    vector<unsigned>::iterator xei = xenv.begin()+ifirst;
+//    vector<unsigned>::iterator xei = xenv.begin()+ifirst;
 
     for(i=ifirst; i<dim; i++)
       {

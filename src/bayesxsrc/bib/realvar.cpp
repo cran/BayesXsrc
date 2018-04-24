@@ -229,7 +229,7 @@ realvar uniform(unsigned obs)
   {
 //  srand((unsigned)time(0));
   realvar h(obs);
-  register unsigned i;
+   unsigned i;
   realvar::iterator it = h.begin();
   for (i=0;i<obs;i++,++it)
 	 *it = randnumbers::uniform();
@@ -240,7 +240,7 @@ realvar uniform(unsigned obs)
 realvar cumulnorm(realvar & v)
   {
   realvar h(v.size());
-  register unsigned i;
+   unsigned i;
   realvar::iterator it = h.begin();
   realvar::iterator vit = v.begin();
   for (i=0;i<v.size();i++,++it,++vit)
@@ -253,7 +253,7 @@ realvar normal(unsigned obs)
   {
 //  srand((unsigned)time(0));
   realvar h(obs);
-  register unsigned i;
+   unsigned i;
   realvar::iterator it = h.begin();
   for (i=0;i<obs;i++,++it)
 	 *it = randnumbers::rand_normal();
@@ -361,7 +361,7 @@ realvar binomial(realvar & n,realvar & p)
 realvar gamma(realvar & mu, realvar & nu)
   {
 //  srand((unsigned)time(0));
-  register unsigned  i;
+   unsigned  i;
   realobs u;
   realvar h(mu.size());
 

@@ -216,7 +216,8 @@ void FC_linear::update_IWLS(void)
     diff.minus(linmode,*linoldp);
     add_linpred(diff);
 
-    double h = likep->compute_iwls(true,false);
+    double h = 0.0;
+    h = likep->compute_iwls(true,false);
 
     compute_XWXroot(XWXold);
 
@@ -369,7 +370,11 @@ void FC_linear::update(void)
     else
       {
       if(likep->gamlss)
-        double logold = likep->compute_iwls(true,false);
+        {
+        double logold = 0.0;
+        logold = likep->compute_iwls(true,false);
+        }
+
       update_gaussian();
       }
 
@@ -755,7 +760,8 @@ bool FC_linear::posteriormode(void)
       if (!initialize)
         create_matrices();
 
-      double h = likep->compute_iwls(true,false);
+      double h = 0.0;
+      h = likep->compute_iwls(true,false);
 
 
       compute_XWX(XWX);

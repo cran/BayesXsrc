@@ -284,7 +284,7 @@ class __EXPORT_TYPE remlreg : public statobject
 //-------------------------  for fixed effects ---------------------------------
 //------------------------------------------------------------------------------
 
-  FULLCOND_const * interceptpointer;
+//  FULLCOND_const * interceptpointer;
   vector<FULLCOND_const> fcconst;
 
   basic_termtype fixedeffects;

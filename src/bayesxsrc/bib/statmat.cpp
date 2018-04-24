@@ -37,7 +37,7 @@ template<class T>
 statmatrix<T>::statmatrix(const SparseMatrix & m)
                             : Matrix<T>(m.get_rows(),m.get_cols())
   {
-  register unsigned i,j;
+   unsigned i,j;
   double * work = getV();
   for(i=0;i<this->rows();i++)
     for(j=0;j<this->cols();j++,work++)
@@ -49,7 +49,7 @@ template<class T>
 statmatrix<T>::statmatrix(const vector<T> & v)
                             : Matrix<T>(v.size(),1)
   {
-  register unsigned i;
+   unsigned i;
   double * work = this->getV();
   for(i=0;i<this->rows();i++,work++)
     *work = v[i];
@@ -61,7 +61,7 @@ const statmatrix<T> & statmatrix<T>::operator=(const SparseMatrix & m)
   {
   statmatrix<T> res(m.get_rows(),m.get_cols());
   double * work = res.getV();
-  register unsigned i,j;
+   unsigned i,j;
   for(i=0;i<res.rows();i++)
     for(j=0;j<res.cols();j++,work++)
       *work = T(m(i,j));
@@ -76,7 +76,7 @@ const statmatrix<T> & statmatrix<T>::operator=(const SparseMatrix & m)
 		datamatrix res(a.rows(),a.cols());
 
 		double * work = res.getV();
-		register unsigned i,j;
+		 unsigned i,j;
 		for(i=0;i<res.rows();i++)
 			for(j=0;j<res.cols();j++,work++)
 				 *work = a(i,j);
@@ -148,7 +148,7 @@ void statmatrix<T>::assign(const statmatrix & A)
 
   T *workA = A.getV( );
   T *workR = this->getV( );
-  register unsigned i;
+   unsigned i;
   for ( i = 0;i < size;i++, workA++,workR++ )
     *workR = *workA;
   }
@@ -163,7 +163,7 @@ void statmatrix<T>::plus(const statmatrix & A,const statmatrix & B)
   T *workA = A.getV( );
   T *workB = B.getV( );
   T *workR = this->getV( );
-  register unsigned i;
+   unsigned i;
 
   for ( i = 0;i < size;i++, workA++, workB++, workR++ )
         *workR = *workA + *workB;
@@ -177,7 +177,7 @@ void statmatrix<T>::plus(const statmatrix & A)
 
   T *workA = A.getV( );
   T *workR = this->getV( );
-  register unsigned i;
+   unsigned i;
 
   for ( i = 0;i < size;i++, workA++, workR++ )
         *workR += *workA;
@@ -191,7 +191,7 @@ void statmatrix<T>::plus_mult(const statmatrix & A, const T & b)
 
   T *workA = A.getV( );
   T *workR = this->getV( );
-  register unsigned i;
+   unsigned i;
 
   for ( i = 0;i < size;i++, workA++, workR++ )
         *workR += b * *workA;
@@ -205,7 +205,7 @@ void statmatrix<T>::minus(const statmatrix & A,const statmatrix & B)
   T *workA = A.getV( );
   T *workB = B.getV( );
   T *workR = this->getV( );
-  register unsigned i;
+   unsigned i;
 
   for ( i = 0;i < size;i++, workA++, workB++, workR++ )
     *workR = *workA - *workB;
@@ -220,7 +220,7 @@ void statmatrix<T>::minus(const statmatrix & A,const statmatrix & B,
   unsigned size = this->rows();
   unsigned sizeA = A.cols();
   unsigned sizeB = B.cols();
-  register unsigned i;
+   unsigned i;
   T * workA = A.getV()+colA;
   T * workB = B.getV()+colB;
   T* workR = this->getV();
@@ -243,7 +243,7 @@ void statmatrix<T>::mult(const statmatrix & A,const statmatrix & B)
   T * workR = this->getV();
   unsigned n = this->cols();
   unsigned size = this->rows()*n;
-  register unsigned i, k;
+   unsigned i, k;
 
   for (i=0;i <size;i++,workR++)
     {
@@ -269,7 +269,7 @@ void statmatrix<T>::mult_scalar(const statmatrix & A, const T & b)
 
   unsigned size = A.rows()*A.cols();
 
-  register unsigned i;
+   unsigned i;
 
   T * workA = A.getV();
   T * workR = this->getV();
@@ -294,7 +294,7 @@ void statmatrix<T>::addmult(const statmatrix & A,const statmatrix & B)
   T * workR = this->getV();
   unsigned n = this->cols();
   unsigned size = this->rows()*n;
-  register unsigned i, k;
+   unsigned i, k;
 
   for (i=0;i <size;i++,workR++)
     {
@@ -324,7 +324,7 @@ void statmatrix<T>::addmultsym(const statmatrix & A,const statmatrix & B)
   unsigned n = this->cols();
   unsigned m = A.cols();
 
-  register unsigned i,j,k;
+   unsigned i,j,k;
 
   for (i=0;i<this->rows();i++)
     for(j=0;j<n;j++,workR++)
@@ -495,7 +495,7 @@ void statmatrix<T>::weightedsscp(const statmatrix<T> & X,
   T* xpointj;
   T* wpoint;
 
-  register unsigned i,j,k;
+   unsigned i,j,k;
   double sum;
 
   for(i=0; i<xcols; i++)
@@ -544,7 +544,7 @@ void statmatrix<T>::weightedsscp2(const statmatrix<T> & X, const statmatrix<T> &
   T* zpointj;
   T* wpoint;
 
-  register unsigned i,i1,j,j1,k;
+   unsigned i,i1,j,j1,k;
   double sum;
 
 // compute X'WX, X'WZ and Z'WX
@@ -632,7 +632,7 @@ void statmatrix<T>::weightedsscp_resp(const statmatrix & X, const statmatrix & y
   assert(w.rows()==n);
   assert(y.rows()==n);
 
-  register unsigned i,k;
+   unsigned i,k;
   double sum;
 
   T* wpoint=w.getV();
@@ -680,7 +680,7 @@ void statmatrix<T>::weightedsscp_resp2(const statmatrix<T> & X,
   assert(y.rows()==n);
   assert(X.rows()==n);
 
-  register unsigned i,k;
+   unsigned i,k;
   double sum;
 
   T* wpoint=w.getV();
@@ -922,7 +922,7 @@ T statmatrix<T>::sum (const unsigned & col) const
   assert(col < this->cols());
 
   T sum = 0;
-  register unsigned i;
+   unsigned i;
   T* work = this->getV()+col;
   for (i=0;i<this->rows();i++,work+=this->cols())
     sum += *work;
@@ -937,7 +937,7 @@ T statmatrix<T>::sum2 (const unsigned & col) const
   assert(col < this->cols());
 
   T sum = 0;
-  register unsigned i;
+   unsigned i;
   T* work = this->getV()+col;
   for (i=0;i<this->rows();i++,work+=this->cols())
     sum += *work * *work;
@@ -954,7 +954,7 @@ T  statmatrix<T>::sum2(const unsigned & col,const statmatrix<T> & weight) const
   T sum = 0;
   T* work = this->getV()+col;
   T* workweight = weight.getV();
-  register unsigned i;
+   unsigned i;
   for (i=0;i<this->rows();i++,work+=this->cols(),workweight++)
     {
     sum += *workweight* (*work) * (*work);
@@ -984,7 +984,7 @@ T statmatrix<T>::mean(const unsigned & col,
 
   T sum = 0;
   T sumweight = 0;
-  register unsigned i;
+   unsigned i;
   T* work = this->getV()+col;
   T* workweight = weight.getV();
   for (i=0;i<this->rows();i++,work+=this->cols(),workweight++)
@@ -1066,7 +1066,7 @@ T statmatrix<T>::max (void) const
 template<class T>
 T statmatrix<T>::sumcomplete(void) const
   {
-  register unsigned i;
+   unsigned i;
   unsigned size = this->rows()*this->cols();
   T* work = this->getV();
   T sum = 0;
@@ -1096,7 +1096,7 @@ const unsigned & colA) const
   assert(this->rows() == A.rows());
 
   T sum = 0;
-  register unsigned i;
+   unsigned i;
   T* work = this->getV()+col;
   T* workA = A.getV()+colA;
   for (i=0;i<this->rows();i++,work+=this->cols(),workA+=A.cols())

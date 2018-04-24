@@ -884,7 +884,7 @@ void FULLCOND::update(void)
     )
     {
 
-    register unsigned i;
+     unsigned i;
     double* workbeta = beta.getV();
     double* workbetamean = betamean.getV();
     double* workbetas2 = betas2.getV();
@@ -1058,7 +1058,7 @@ void FULLCOND::updatemult(void)
     )
     {
 
-    register unsigned i;
+     unsigned i;
     double* workbeta = beta.getV();
     double* workbetamean = betamean.getV();
     double* workbetas2 = betas2.getV();
@@ -1590,7 +1590,7 @@ double FULLCOND::lambda_from_df(double & df_wunsch, double & lambda_vorg)
 
 void FULLCOND::update_bootstrap(const bool & uncond)
   {
-  register unsigned i;
+   unsigned i;
   double* workbeta = beta.getV();
 
   unsigned samplesize = optionsp->get_nriter();
@@ -1650,7 +1650,7 @@ void FULLCOND::update_beta_average(unsigned & samplesize)
 
 void FULLCOND::save_betamean(void)
   {
-  register unsigned i;
+   unsigned i;
   double* workbeta = beta.getV();
   betaright = datamatrix(nrpar,1,0);
   double* workbetamean = betaright.getV();
@@ -1672,7 +1672,7 @@ void FULLCOND::update_bootstrap_betamean(void)
 
 void FULLCOND::update_bootstrap_df(void)
   {
-  register unsigned i;
+   unsigned i;
   double* workbeta = beta.getV();
 
   unsigned samplesize = optionsp->get_nriter();

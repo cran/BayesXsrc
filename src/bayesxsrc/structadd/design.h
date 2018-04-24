@@ -330,6 +330,8 @@ class __EXPORT_TYPE DESIGN
 
   void compute_partres(datamatrix & res,datamatrix & f,bool cwsum=false);
 
+  void compute_partres_multiplicative(datamatrix & res,datamatrix & f,bool cwsum=false);
+
   double compute_ZtZ(unsigned & i, unsigned & j);
 
 

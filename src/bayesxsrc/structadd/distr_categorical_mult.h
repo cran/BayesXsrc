@@ -231,7 +231,7 @@ class __EXPORT_TYPE DISTR_multgaussian : public DISTR_multinomprobit
 
   void compute_mu(const double * linpred,double * mu);
 
-  void compute_mu_mult(vector<double *> linpred,double * mu);
+  void compute_mu_mult(vector<double *> linpred, vector<double *> response, double * mu);
 
 
   void compute_deviance_mult(vector<double *> response,

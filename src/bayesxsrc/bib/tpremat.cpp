@@ -97,7 +97,7 @@ PreMatrix<T> PreMatrix<T>::operator+( const PreMatrix<T> &m ) const
 	//
 	// r_{ij} = a_{ij} + b_{ij}
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < rows( ); i++ )
 		for( j = 0; j < cols( ); j++ )
 			result( i, j ) = get( i, j ) + m.get( i, j );
@@ -115,7 +115,7 @@ PreMatrix<T> PreMatrix<T>::operator+( const PreMatrix<T> &m ) const
 	T *workA = this->getV( );
 	T *workB = m.getV( );
 	T *workR = result.getV( );
-	register unsigned i;
+	 unsigned i;
 
 	// NonRealMatrixaddition
 
@@ -182,7 +182,7 @@ PreMatrix<T> PreMatrix<T>::operator-( const PreMatrix<T> &m ) const
 	//
 	// r_{ij} = a_{ij} - b_{ij}
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < this->rows( ); i++ )
 		for( j = 0; j < this->cols( ); j++ )
 			result( i, j ) = this->get( i, j ) - m.get( i, j );
@@ -199,7 +199,7 @@ PreMatrix<T> PreMatrix<T>::operator-( const PreMatrix<T> &m ) const
 	T *workA = this->getV( );
 	T *workB = m.getV( );
 	T *workR = result.getV( );
-	register unsigned i;
+	 unsigned i;
 
 	// NonRealMatrixsubtraktion
 
@@ -267,7 +267,7 @@ PreMatrix<T> PreMatrix<T>::operator*( const PreMatrix<T> &m ) const
 	//
 	// r_{ij} = \sum_{k=1}^l a_{ik} * b_{kj}
 
-	register unsigned i, j, k;
+	 unsigned i, j, k;
 	for ( i = 0; i < result.rows( ); i++ )
 	{
 		for( j = 0; j < result.cols( ); j++ )
@@ -299,7 +299,7 @@ PreMatrix<T> PreMatrix<T>::operator*( const PreMatrix<T> &m ) const
 	// Elemente der Ergebnismatrix
 
 	unsigned size = result.rows( ) * n;
-	register unsigned i, k;
+	 unsigned i, k;
 
 	// Ergebnismatrix elementweise besetzen
 
@@ -375,7 +375,7 @@ PreMatrix<T> PreMatrix<T>::operator*( const T v ) const
 	//
 	// r_{ij} = a_{ik} * v
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < this->rows( ); i++ )
 		for( j = 0; j < this->cols( ); j++ )
 			result( i, j ) = this->get( i, j ) * v;
@@ -383,7 +383,7 @@ PreMatrix<T> PreMatrix<T>::operator*( const T v ) const
 #else
 
 	unsigned size = this->rows( ) * this->cols( );
-	register unsigned i;
+	 unsigned i;
 	T *work  = result.getV( );
 	T *workA = this->getV( );
 
@@ -432,7 +432,7 @@ PreMatrix<T> PreMatrix<T>::operator/( const T v ) const
 	//
 	// r_{ij} = a_{ik} * v
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < this->rows( ); i++ )
 		for( j = 0; j < this->cols( ); j++ )
 			result( i, j ) = this->get( i, j ) / v;
@@ -440,7 +440,7 @@ PreMatrix<T> PreMatrix<T>::operator/( const T v ) const
 #else
 
 	unsigned size = this->rows( ) * this->cols( );
-	register unsigned i;
+	 unsigned i;
 	T *work  = result.getV( );
 	T *workA = this->getV( );
 	for ( i = 0; i < size; i++, work++, workA++ )
@@ -471,7 +471,7 @@ const PreMatrix<T> &PreMatrix<T>::operator+=( const PreMatrix<T> &m )
 
 #if defined( SAVE_ALGORITHMS )
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < this->rows( ); i++ )
 		for ( j = 0; j < this->cols( ); j++ )
 			this->operator()( i, j ) += m.get( i, j );
@@ -479,7 +479,7 @@ const PreMatrix<T> &PreMatrix<T>::operator+=( const PreMatrix<T> &m )
 #else
 
 	unsigned size = this->rows( ) * this->cols( );
-	register unsigned i;
+	 unsigned i;
 	T * work = this->getV( );
 	T * workB = m.getV( );
 	for ( i = 0; i < size; i++ )
@@ -510,14 +510,14 @@ const PreMatrix<T> &PreMatrix<T>::operator-=( const PreMatrix<T> &m )
 
 #if defined( SAVE_ALGORITHMS )
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < this->rows( ); i++ )
 		for ( j = 0; j < this->cols( ); j++ )
 			this->operator()( i, j ) += m.get( i, j );
 #else
 
 	unsigned size = this->rows( ) * this->cols( );
-	register unsigned i;
+	 unsigned i;
 	T * work  = this->getV( );
 	T * workB = m.getV( );
 	for ( i = 0; i < size; i++ )
@@ -538,7 +538,7 @@ const PreMatrix<T> &PreMatrix<T>::operator*=( const T v )
 
 #if defined( SAVE_ALGORITHMS )
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < this->rows( ); i++ )
 		for ( j = 0; j < this->cols( ); j++ )
 			this->operator()( i, j ) *= v;
@@ -546,7 +546,7 @@ const PreMatrix<T> &PreMatrix<T>::operator*=( const T v )
 #else
 
 	unsigned size = this->rows( ) * this->cols( );
-	register unsigned i;
+	 unsigned i;
 	T * work  = this->getV( );
 	for ( i = 0; i < size; i++ )
 		*work++ *= v;
@@ -574,7 +574,7 @@ const PreMatrix<T> &PreMatrix<T>::operator/=( const T v )
 
 #if defined( SAVE_ALGORITHMS )
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < this->rows( ); i++ )
 		for ( j = 0; j < this->cols( ); j++ )
 			this->operator()( i, j ) /= v;
@@ -582,7 +582,7 @@ const PreMatrix<T> &PreMatrix<T>::operator/=( const T v )
 #else
 
 	unsigned size = this->rows( ) * this->cols( );
-	register unsigned i;
+	 unsigned i;
 	T * work  = this->getV( );
 	for ( i = 0; i < size; i++ )
 		*work++ /= v;
@@ -603,7 +603,7 @@ PreMatrix<T> PreMatrix<T>::transposed( void ) const
 	if ( !result )
 		return result;
 
-	register unsigned i, j;
+	 unsigned i, j;
 	for ( i = 0; i < this->rows( ); i++ )
 		for ( j = 0; j < this->cols( ); j++ )
 			result( j, i ) = this->get( i, j );
@@ -625,7 +625,7 @@ PreMatrix<T> PreMatrix<T>::sscp( void ) const
 
 #if defined( SAVE_ALGORITHMS )
 
-	register unsigned i, j, k;
+	 unsigned i, j, k;
 	for ( i = 0; i < this->cols( ); i++ )
 	{
 		for ( j = i; j < this->cols( ); j++ )
@@ -642,7 +642,7 @@ PreMatrix<T> PreMatrix<T>::sscp( void ) const
 #else
 
 	unsigned n = this->cols( );
-	register unsigned i, j, k;
+	 unsigned i, j, k;
 	for ( i = 0; i < n; i++ )
 	{
 		for ( j = i; j < n; j++ )
@@ -666,7 +666,7 @@ PreMatrix<T> PreMatrix<T>::sscp( void ) const
 template <class T>
 void PreMatrix<T>::prettyPrint( ostream &out)
 {
-	register unsigned int i, j;
+	 unsigned int i, j;
 
 	int *w = new int[ this->cols( ) ];
 	for ( j = 0; j < this->cols( ); j++ )
@@ -827,7 +827,7 @@ prettyScan( istream &in )
 		while(!inputBuffer.empty())
 		{
 			const Array<T> &curr = inputBuffer.top();
-			register unsigned j;
+			 unsigned j;
 			for ( j = 0; j < cols; j++ )
 				this->put( at, j, curr( j ) );
 			inputBuffer.remove();
@@ -843,9 +843,9 @@ prettyScan( istream &in )
 template <class T>
 void PreMatrix<T>::print( ostream& out, char delimiter ) const
 {
-  for ( register unsigned i=0; i<this->rows(); i++ )
+  for (  unsigned i=0; i<this->rows(); i++ )
   {
-    for ( register unsigned j=0; j<this->cols()-1; j++ )
+    for (  unsigned j=0; j<this->cols()-1; j++ )
       out << this->get(i,j) << delimiter;
     out << this->get(i, this->cols()-1) << endl;
   }
@@ -854,9 +854,9 @@ void PreMatrix<T>::print( ostream& out, char delimiter ) const
 template <class T>
 void PreMatrix<T>::print( ostream& out, char* delimiter ) const
 {
-  for ( register unsigned i=0; i<this->rows(); i++ )
+  for (  unsigned i=0; i<this->rows(); i++ )
   {
-    for ( register unsigned j=0; j<this->cols()-1; j++ )
+    for (  unsigned j=0; j<this->cols()-1; j++ )
       out << this->get(i,j) << delimiter;
     out << get(i, this->cols()-1) << endl;
   }
@@ -867,7 +867,7 @@ bool
 PreMatrix<T>::
 zero(const T epsilon) const
 {
-	register unsigned int i, j;
+	 unsigned int i, j;
 
    assert(!this->operator!());
    assert(epsilon >= T(0));
@@ -887,7 +887,7 @@ bool
 PreMatrix<T>::
 symmetric(const T epsilon) const
 {
-  register unsigned i, j;
+   unsigned i, j;
 
   assert(!this->operator!());
   assert(this->rows() == this->cols());
@@ -918,7 +918,7 @@ diag() const
 
 	PreMatrix<T> res(this->rows(), 1);
 
-	for (register unsigned int i = 0; i < this->rows(); ++i)
+	for ( unsigned int i = 0; i < this->rows(); ++i)
 		res.put(i, 0, this->get(i, i));
 
 	return res;
@@ -935,7 +935,7 @@ diag(unsigned int dim, const T v)
 
 	if (res)
 	{
-		for (register unsigned i = 0; i < dim; ++i)
+		for ( unsigned i = 0; i < dim; ++i)
 			res.put(i, i, v);
 	}
 	return res;
@@ -956,19 +956,19 @@ diag(const PreMatrix<T> &v)
 	if (v.cols() == v.rows())
 	{
 		T value = v.get(0,0);
-		for (register unsigned int i = 0; i < dim; ++i)
+		for ( unsigned int i = 0; i < dim; ++i)
 			res.put(i, i, value);
 	}
 	else if (v.cols() == 1)
 	{
 		assert(v.rows() == dim);
-		for (register unsigned int i = 0; i < v.rows(); ++i)
+		for ( unsigned int i = 0; i < v.rows(); ++i)
 			res.put(i, i, v.get(i, 0));
 	}
 	else if (v.rows() == 1)
 	{
 		assert(v.cols() == dim);
-		for (register unsigned int j = 0; j < v.cols(); ++j)
+		for ( unsigned int j = 0; j < v.cols(); ++j)
 			res.put(j, j, v.get(0, j));
 	}
 	return res;
@@ -994,7 +994,7 @@ tridiag(const PreMatrix<T> &m, const PreMatrix<T> &lm, const PreMatrix<T> &um)
 
 	PreMatrix<T> res(m.rows(), m.rows(), T(0));
 
-	for (register unsigned int i = 0; i < m.rows(); ++i)
+	for ( unsigned int i = 0; i < m.rows(); ++i)
 	{
 		res.put(i, i, m.get(i, 0));
 		if (i < m.rows() - 1)
@@ -1339,7 +1339,7 @@ luinverse() const
     delete [] index;
     return PreMatrix<T>( 0 );
     }
-  for ( register unsigned j = 0; j < this->cols( ); j++ )
+  for (  unsigned j = 0; j < this->cols( ); j++ )
     {
     PreMatrix<T> select( this->rows( ), 1, T( 0 ) );
     if ( !select )
@@ -1357,7 +1357,7 @@ luinverse() const
       return PreMatrix<T>( 0 );
       }
 
-    for ( register unsigned i = 0; i < this->rows( ); i++ )
+    for (  unsigned i = 0; i < this->rows( ); i++ )
       Inverse( i, j ) = colInverse( i, 0 );
     }
   delete [] index;

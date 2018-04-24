@@ -558,7 +558,7 @@ void FC_mult::reset(void)
 //------------ CLASS: FC_mult_pred implementation of member functions ----------
 //------------------------------------------------------------------------------
 
-void FC_mult_pred::set_effectp(DESIGN * d, FC_nonp * fp)
+/*void FC_mult_pred::set_effectp(DESIGN * d, FC_nonp * fp)
   {
   FCnp = fp;
   dp = d;
@@ -652,7 +652,7 @@ bool FC_mult_pred::posteriormode(void)
 
 void FC_mult_pred::reset(void)
   {
-  }
+  }*/
 
 } // end: namespace MCMC
 

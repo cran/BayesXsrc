@@ -197,6 +197,9 @@ const int & seed, const bool & computemode, const bool & skipfirst)
 
       for(j=0;j<equations[nrmodels-1-i].FCpointer.size();j++)
         {
+//        cout << "nrmodels-1-i: " << nrmodels-1-i << endl;
+//        cout << "j: " << j << endl;
+//        cout << equations[nrmodels-1-i].FCpointer[j]->title << endl;
         equations[nrmodels-1-i].FCpointer[j]->outoptions();
         }
       genoptions->out("\n");
@@ -219,7 +222,8 @@ const int & seed, const bool & computemode, const bool & skipfirst)
     genoptions->out("  COMPUTING STARTING VALUES (MAY TAKE SOME TIME)");
     genoptions->out("\n");
     ST::string h = "";
-    bool c = posteriormode(h,skipfirst,true);
+    bool c = false;
+    c = posteriormode(h,skipfirst,true);
     }
 
   //-------------- end: Compute posterior mode as starting value ---------------
@@ -280,78 +284,12 @@ const int & seed, const bool & computemode, const bool & skipfirst)
 
     for(i=0;i<nrmodels;i++)
       {
-
       equations[nrmodels-1-i].distrp->update();
-
       for(j=0;j<equations[nrmodels-1-i].FCpointer.size();j++)
          {
-//         cout << j << endl;
          equations[nrmodels-1-i].FCpointer[j]->update();
-
-/* SAMPLESEL TESTS
-          cout << equations[nrmodels-1-i].distrp->family << "; " << equations[nrmodels-1-i].distrp->equationtype << "; FC " << equations[nrmodels-1-i].FCpointer[j]->title << endl;
-          cout << "nrmodels-1-i: " << nrmodels-1-i << endl;
-          cout << "j: " << j << endl;
-
-          char str[100];
-          ST::string help = equations[nrmodels-1-i].distrp->family;
-          ST::string help2 = ST::inttostring(it);
-          strcpy(str, "c://temp//sampleselection2//");
-          strcat(str, help.strtochar());
-          strcat(str, "_it");
-          strcat(str, help2.strtochar());
-          strcat(str, "_weight.raw");
-          ofstream out1(str);
-          (equations[nrmodels-1-i].distrp->weight).prettyPrint(out1);
-          out1.close();
-
-          str[100];
-          strcpy(str, "c://temp//sampleselection2//");
-          strcat(str, help.strtochar());
-          strcat(str, "_it");
-          strcat(str, help2.strtochar());
-          strcat(str, "_workingweight.raw");
-          ofstream out2(str);
-          (equations[nrmodels-1-i].distrp->workingweight).prettyPrint(out2);
-          out2.close();
-
-          str[100];
-          strcpy(str, "c://temp//sampleselection2//");
-          strcat(str, help.strtochar());
-          strcat(str, "_it");
-          strcat(str, help2.strtochar());
-          strcat(str, "_response.raw");
-          ofstream out3(str);
-          (equations[nrmodels-1-i].distrp->response).prettyPrint(out3);
-          out3.close();
-
-          str[100];
-          strcpy(str, "c://temp//sampleselection2//");
-          strcat(str, help.strtochar());
-          strcat(str, "_it");
-          strcat(str, help2.strtochar());
-          strcat(str, "_workingresponse.raw");
-          ofstream out4(str);
-          (equations[nrmodels-1-i].distrp->workingresponse).prettyPrint(out4);
-          out4.close();
-
-          str[100];
-          strcpy(str, "c://temp//sampleselection2//");
-          strcat(str, help.strtochar());
-          strcat(str, "_it");
-          strcat(str, help2.strtochar());
-          strcat(str, "_linpred.raw");
-          ofstream out5(str);
-          if (equations[nrmodels-1-i].distrp->linpred_current==1)
-            (equations[nrmodels-1-i].distrp->linearpred1).prettyPrint(out5);
-          else
-            (equations[nrmodels-1-i].distrp->linearpred2).prettyPrint(out5);
-          out5.close();*/
-
          }
-
       equations[nrmodels-1-i].distrp->update_end();
-
       }
 
 
@@ -547,8 +485,7 @@ bool MCMCsim::posteriormode(ST::string & pathgraphs, const bool & skipfirst, con
 
   unsigned nrmodels = equations.size();
 
-  bool errors=false;
-
+//  bool errors=false;
 
   for (i=0;i<nrmodels;i++)
     {

@@ -81,6 +81,8 @@ DISTR::DISTR(GENERAL_OPTIONS * o, const datamatrix & r,
   maindistribution=true;
   predict_mult=false;
 
+  dgexists = false;
+
   option1 = "";
   offsetname = "";
 
@@ -100,8 +102,6 @@ DISTR::DISTR(GENERAL_OPTIONS * o, const datamatrix & r,
   response = r;
   workingresponse = r;
   responsename = "Y";
-
-  multintvar = datamatrix(1,1,0.0);
 
   nrobs = response.rows();
 
@@ -172,8 +172,6 @@ DISTR::DISTR(const DISTR & d)
   responsename = d.responsename;
   offsetname = d.offsetname;
 
-  multintvar = d.multintvar;
-
   weight = d.weight;
   weightname = d.weightname;
   nrzeroweights = d.nrzeroweights;
@@ -189,6 +187,9 @@ DISTR::DISTR(const DISTR & d)
   helpmat1 = d.helpmat1;
   helpmat2 = d.helpmat2;
   helpmat3 = d.helpmat3;
+  fx = d.fx;
+  dg = d.dg;
+  dgexists = d.dgexists;
 
   linpredp = d.linpredp;
 
@@ -268,14 +269,15 @@ const DISTR & DISTR::operator=(const DISTR & d)
   helpmat1 = d.helpmat1;
   helpmat2 = d.helpmat2;
   helpmat3 = d.helpmat3;
+  fx = d.fx;
+  dg = d.dg;
+  dgexists = d.dgexists;
 
   linpredp = d.linpredp;
 
   helpquantity1 = d.helpquantity1;
   helpquantity2 = d.helpquantity2;
   helpquantity3 = d.helpquantity3;
-
-  multintvar = d.multintvar;
 
   updateIWLS = d.updateIWLS;
   family = d.family;
@@ -496,7 +498,7 @@ double DISTR::compute_CRPS_mult(void)
 double DISTR::loglikelihood(const bool & current)
   {
 
-  register unsigned  i;
+   unsigned  i;
   double* workweight = weight.getV();
   double* workres = response.getV();
   double help = 0;
@@ -533,7 +535,7 @@ double DISTR::loglikelihood(const bool & current)
   }
 
 
-double DISTR::loglikelihood(int & begin,
+/*double DISTR::loglikelihood(int & begin,
 int & end, statmatrix<double *> & responsep,
 statmatrix<double *> & workingweightp, statmatrix<double *> & linpredp)
   {
@@ -550,10 +552,10 @@ statmatrix<double *> & workingweightp, statmatrix<double *> & linpredp)
   return help;
 
 
-  }
+  }*/
 
 
-double DISTR::compute_iwls_loglikelihood(int & begin,
+/*double DISTR::compute_iwls_loglikelihood(int & begin,
 int & end, statmatrix<double *> & responsep,
 statmatrix<double *> & workingresponsep,
 statmatrix<double *> & weightp,
@@ -580,11 +582,11 @@ statmatrix<double *> & workingweightp, statmatrix<double *> & linpredp
   return help;
 
 
-  }
+  }*/
 
 
 
-double DISTR::compute_iwls_loglikelihood_sumworkingweight(int & begin,
+/*double DISTR::compute_iwls_loglikelihood_sumworkingweight(int & begin,
 int & end, statmatrix<double *> & responsep,
 statmatrix<double *> & workingresponsep,
 statmatrix<double *> & weightp,
@@ -667,7 +669,7 @@ double & sumworkingweight)
 
   return help;
 
-  }
+  }*/
 
 
 void DISTR::compute_deviance(const double * response,
@@ -773,7 +775,8 @@ void DISTR::update_end(void)
 
 bool DISTR::posteriormode(void)
   {
-  double h = compute_iwls(true,false);
+  double h = 0.0;
+  h = compute_iwls(true,false);
   return true;
   }
 
@@ -790,7 +793,7 @@ void DISTR::update_scale_hyperparameters(datamatrix & h)
 double DISTR::compute_iwls(const bool & current, const bool & like)
   {
 
-  register unsigned  i;
+   unsigned  i;
 
   double * workweight = weight.getV();
   double * workresponse = response.getV();
@@ -907,7 +910,7 @@ void DISTR::compute_iwls(const bool & current,datamatrix & likelihood,
   // ind.prettyPrint(out);
   // TEST
 
-  register unsigned  i;
+   unsigned  i;
 
   double * workweight = weight.getV();
   double * workresponse = response.getV();
@@ -989,16 +992,6 @@ void DISTR::compute_iwls(const bool & current,datamatrix & likelihood,
       }
 
     }
-
-  // TEST
-  /*
-  ofstream out("c:\\bayesx\\test\\results\\workresponse.res");
-  workingresponse.prettyPrint(out);
-
-  ofstream out2("c:\\bayesx\\test\\results\\workweight.res");
-  workingweight.prettyPrint(out2);
-  */
-  // TEST
 
   }
 
@@ -1361,7 +1354,7 @@ void DISTR_gaussian::outresults_predictive_check(datamatrix & D,datamatrix & sr)
 void DISTR_gaussian::update(void)
   {
 
-  register unsigned i;
+   unsigned i;
 
   double help;
 
@@ -2491,7 +2484,7 @@ void DISTR_gaussian_exp::outoptions(void)
 void DISTR_gaussian_exp::update(void)
   {
 
-  register unsigned i;
+   unsigned i;
 
   double help;
 
@@ -2914,5 +2907,659 @@ void DISTR_gaussian_re::get_samples(const ST::string &
   {
   }
 
+//------------------------------------------------------------------------------
+//------------------ CLASS DISTRIBUTION_gaussian_multeffect --------------------
+//------------------------------------------------------------------------------
+
+DISTR_gaussian_multeffect::DISTR_gaussian_multeffect(const double & a,
+                                             const double & b,
+                                             GENERAL_OPTIONS * o,
+                                             const datamatrix & r,
+                                             const ST::string & ps,
+                                             const datamatrix & w)
+  : DISTR_gaussian(a,b,o,r,ps,w)
+  {
+  family = "Normal distribution for multiplicative effects";
+  updateIWLS = true;
+  dgexists = false;
+  if (check_weightsone())
+    wtype = wweightschange_weightsone;
+  else
+    wtype = wweightschange_weightsneqone;
+  }
+
+const DISTR_gaussian_multeffect & DISTR_gaussian_multeffect::operator=(
+                                      const DISTR_gaussian_multeffect & nd)
+  {
+  if (this==&nd)
+    return *this;
+  DISTR_gaussian::operator=(DISTR_gaussian(nd));
+  return *this;
+  }
+
+
+
+DISTR_gaussian_multeffect::DISTR_gaussian_multeffect(const DISTR_gaussian_multeffect & nd)
+   : DISTR_gaussian(DISTR_gaussian(nd))
+  {
+  }
+
+void DISTR_gaussian_multeffect::sample_responses(unsigned i,datamatrix & sr)
+  {
+/*
+  double * linpredp;
+
+  if (linpred_current==1)
+    linpredp = linearpred1.getV();
+  else
+    linpredp = linearpred2.getV();
+
+  double * rp = sr.getV()+i;
+
+  double * wweightp  = workingweight.getV();
+
+  unsigned j;
+  for (j=0;j<nrobs;j++,linpredp++,wweightp++,rp+=sr.cols())
+    *rp = *linpredp+sqrt(sigma2)/sqrt(*wweightp)*rand_normal();*/
+  }
+
+void DISTR_gaussian_multeffect::sample_responses_cv(unsigned i,datamatrix & linpred,
+                                         datamatrix & sr)
+  {
+/*
+  double * linpredp;
+
+  linpredp = linpred.getV();
+
+  double * rp = sr.getV()+i;
+
+  unsigned j;
+  for (j=0;j<nrobs;j++,linpredp++,rp+=sr.cols())
+    *rp = *linpredp + sqrt(sigma2)*rand_normal();
+*/
+  }
+
+
+  // FUNCTION: update_scale_hyperparameters
+  // TASK: updates parameters for lasso, ridge etc.
+  //       h(0,0) = type, 1 =ridge, 2=lasso
+  //       h(1,0) = nrridge/nrlasso
+  //       h(2,0) = lassosum/ridgesum
+
+void DISTR_gaussian_multeffect::update_scale_hyperparameters(datamatrix & h)
+  {
+/*   if (h(0,0) == 1)        //  ridge
+     {
+     nrridge = h(1,0);
+     ridgesum = h(2,0);
+     }
+   else if (h(0,0) == 2)   // lasso
+     {
+     nrlasso = h(1,0);
+     lassosum = h(2,0);
+     }*/
+  }
+
+void DISTR_gaussian_multeffect::outoptions(void)
+  {
+  DISTR_gaussian::outoptions();
+  }
+
+
+void DISTR_gaussian_multeffect::outresults_predictive_check(datamatrix & D,datamatrix & sr)
+  {
+//  DISTR::outresults_predictive_check(D,sr);
+  }
+
+void DISTR_gaussian_multeffect::update(void)
+  {
+/*
+   unsigned i;
+
+  double help;
+
+  double * worklin;
+  double * workresp;
+  double * workweight;
+
+  // scaleparameter
+
+  double sum = 0;
+
+  if (linpred_current==1)
+    worklin = linearpred1.getV();
+  else
+    worklin = linearpred2.getV();
+
+  workresp = workingresponse.getV();
+  workweight = weight.getV();
+
+  for (i=0;i<nrobs;i++,worklin++,workresp++,workweight++)
+    {
+    if (*workweight !=0)
+      {
+      help = *workresp - *worklin;
+      sum += *workweight*pow(help,2);
+      }
+    }
+
+  sigma2  = rand_invgamma(a_invgamma+0.5*((nrobs-nrzeroweights)+nrlasso+nrridge),
+                          b_invgamma+0.5*(sum+lassosum+ridgesum));
+
+
+  FCsigma2.beta(0,0) = sigma2;
+  FCsigma2.acceptance++;
+  FCsigma2.update();
+
+  DISTR::update();
+*/
+  }
+
+void DISTR_gaussian_multeffect::compute_mu(const double * linpred,double * mu)
+  {
+  *mu = (*linpred);
+  }
+
+double DISTR_gaussian_multeffect::get_intercept_start(void)
+  {
+  return response.mean(0);
+  }
+
+double DISTR_gaussian_multeffect::loglikelihood(const bool & current)
+  {
+
+   unsigned  i;
+  double* workweight = weight.getV();
+  double* workres = response.getV();
+  double help = 0;
+
+  double* worklin;
+  if (current)
+    {
+    if (dg->linpred_current==1)
+      worklin = dg->linearpred1.getV();
+    else
+      worklin = dg->linearpred2.getV();
+    }
+  else
+    {
+    if (dg->linpred_current==1)
+      worklin = dg->linearpred2.getV();
+    else
+      worklin = dg->linearpred1.getV();
+    }
+
+  if (weightsone==true)
+    {
+    for (i=0;i<nrobs;i++,worklin++,workres++)
+      help += loglikelihood_weightsone(workres,worklin);
+    }
+  else
+    {
+    for (i=0;i<nrobs;i++,workweight++,worklin++,workres++)
+      help += loglikelihood(workres,worklin,workweight);
+    }
+  return help;
+  }
+
+/*double DISTR_gaussian_multeffect::loglikelihood(int & begin,
+int & end, statmatrix<double *> & responsep,
+statmatrix<double *> & workingweightp, statmatrix<double *> & linpredp)
+  {
+  double help=0;
+  int i;
+
+  double * * workresponsep = responsep.getV()+begin;
+  double * * work_workingweightp = workingweightp.getV()+begin;
+  double * * work_linpredp  = linpredp.getV()+begin;
+
+  for (i=begin;i<=end;i++,work_workingweightp++,work_linpredp++,workresponsep++)
+    help += loglikelihood(*workresponsep,*work_linpredp,*work_workingweightp);
+
+  return help;
+  }*/
+
+double DISTR_gaussian_multeffect::loglikelihood(double * res, double * lin,
+                                     double * w)
+  {
+  //Note: lin has to point to the linear predictor of dg.
+  return dg->loglikelihood(res,lin,w);
+  }
+
+
+double DISTR_gaussian_multeffect::loglikelihood_weightsone(double * res, double * lin)
+  {
+  //Note: lin has to point to the linear predictor of dg.
+  return dg->loglikelihood_weightsone(res,lin);
+  }
+
+
+double DISTR_gaussian_multeffect::compute_iwls(const bool & current, const bool & like)
+  {
+
+   unsigned  i;
+
+  double * workweight = weight.getV();
+  double * workresponse = response.getV();
+
+  double * worklin;
+  double * worklintilde;
+  double * fxp = fx.getV();
+
+/*  ofstream out("c:/temp/fx.raw");
+  fx.prettyPrint(out);
+  out.close();*/
+
+  if (current)
+    {
+    if (dg->linpred_current == 1)
+      worklin = dg->linearpred1.getV();
+    else
+      worklin = dg->linearpred2.getV();
+
+    if (linpred_current == 1)
+      worklintilde = linearpred1.getV();
+    else
+      worklintilde = linearpred2.getV();
+    }
+  else  // use porposed
+    {
+    if (dg->linpred_current == 1)
+      worklin = dg->linearpred2.getV();
+    else
+      worklin = dg->linearpred1.getV();
+
+    if (linpred_current == 1)
+      worklintilde = linearpred2.getV();
+    else
+      worklintilde = linearpred1.getV();
+    }
+
+/*  ofstream out1("c:/temp/etatilde1.raw");
+  linearpred1.prettyPrint(out1);
+  out1.close();
+  ofstream out2("c:/temp/etatilde2.raw");
+  linearpred2.prettyPrint(out2);
+  out2.close();
+  ofstream out3("c:/temp/eta1.raw");
+  (dg->linearpred1).prettyPrint(out3);
+  out3.close();
+  ofstream out4("c:/temp/eta2.raw");
+  (dg->linearpred2).prettyPrint(out4);
+  out4.close();*/
+
+
+  double * work_workingresponse = workingresponse.getV();
+  double * work_workingweight = workingweight.getV();
+
+  double likelihood = 0;
+  double help;
+
+  if (wtype==wweightschange_weightsneqone)
+    {
+    for (i=0;i<nrobs;i++,workweight++,work_workingweight++,workresponse++,
+          work_workingresponse++,worklin++,worklintilde++,fxp++)
+      {
+      likelihood += compute_iwls(workresponse,worklin,
+                                 workweight,work_workingweight,
+                                 work_workingresponse,like);
+      help = (*fxp) * exp(*worklintilde);
+      *work_workingweight *= pow(help,2);
+      *work_workingresponse *= help;
+      }
+    }
+  else if (wtype==wweightschange_weightsone)
+    {
+    for (i=0;i<nrobs;i++,work_workingweight++,workresponse++,
+          work_workingresponse++,worklin++,worklintilde++,fxp++)
+      {
+      compute_iwls_wweightschange_weightsone(workresponse,worklin,
+                                 work_workingweight,work_workingresponse,
+                                 likelihood,like);
+      help = (*fxp) * exp(*worklintilde);
+      *work_workingweight *= pow(help,2);
+      *work_workingresponse *= help;
+      }
+    }
+  else if (wtype==wweightsnochange_constant)
+    {
+    for (i=0;i<nrobs;i++,work_workingweight++,workresponse++,
+          work_workingresponse++,worklin++,worklintilde++,fxp++)
+      {
+      compute_iwls_wweightsnochange_constant(workresponse,worklin,
+                                 work_workingweight,work_workingresponse,
+                                 likelihood,like);
+      help = (*fxp) * exp(*worklintilde);
+      *work_workingweight *= pow(help,2);
+      *work_workingresponse *= help;
+      }
+    }
+  else if (wtype==wweightsnochange_one)
+    {
+    for (i=0;i<nrobs;i++,workresponse++,
+          work_workingresponse++,worklin++,worklintilde++,fxp++)
+      {
+      compute_iwls_wweightsnochange_one(workresponse,worklin,
+                                        work_workingresponse,
+                                        likelihood,like);
+      help = (*fxp) * exp(*worklintilde);
+      *work_workingweight *= pow(help,2);
+      *work_workingresponse *= help;
+      }
+    }
+
+/*  ofstream out("c:/temp/workresponse.res");
+  workingresponse.prettyPrint(out);
+  our.close();
+
+  ofstream out2("c:/temp/workweight.res");
+  workingweight.prettyPrint(out2);
+  out2.close();
+
+  ofstream out3("c:/temp/linpred.res");
+  linearpred1.prettyPrint(out3);
+  out3.close();*/
+
+  return likelihood;
+  }
+
+
+
+
+void DISTR_gaussian_multeffect::compute_iwls(const bool & current,datamatrix & likelihood,
+                    statmatrix<unsigned> & ind)
+  {
+   unsigned  i;
+
+  double * workweight = weight.getV();
+  double * workresponse = response.getV();
+
+  double * worklin;
+  double * worklintilde;
+  double * fxp = fx.getV();
+
+  if (current)
+    {
+    if (dg->linpred_current == 1)
+      worklin = dg->linearpred1.getV();
+    else
+      worklin = dg->linearpred2.getV();
+
+    if (linpred_current == 1)
+      worklintilde = linearpred1.getV();
+    else
+      worklintilde = linearpred2.getV();
+    }
+  else  // use porposed
+    {
+    if (dg->linpred_current == 1)
+      worklin = dg->linearpred2.getV();
+    else
+      worklin = dg->linearpred1.getV();
+
+    if (linpred_current == 1)
+      worklintilde = linearpred2.getV();
+    else
+      worklintilde = linearpred1.getV();
+    }
+
+  double * work_workingresponse=workingresponse.getV();
+  double * work_workingweight = workingweight.getV();
+
+  unsigned * workind = ind.getV();
+  double * worklikelihood=likelihood.getV();
+  for (i=0;i<likelihood.rows();i++,worklikelihood++)
+    *worklikelihood=0;
+
+  double help;
+
+  if (wtype==wweightschange_weightsneqone)
+    {
+    for (i=0;i<nrobs;i++,workweight++,work_workingweight++,workresponse++,
+          work_workingresponse++,worklin++,workind++,worklintilde++,fxp++)
+      {
+      likelihood(*workind,0) += compute_iwls(workresponse,worklin,
+                                 workweight,work_workingweight,
+                                 work_workingresponse,true);
+      help = (*fxp) * exp(*worklintilde);
+      *work_workingweight *= pow(help,2);
+      *work_workingresponse *= help;
+      }
+    }
+  else if (wtype==wweightschange_weightsone)
+    {
+    for (i=0;i<nrobs;i++,work_workingweight++,workresponse++,
+          work_workingresponse++,worklin++,workind++,worklintilde++,fxp++)
+      {
+      compute_iwls_wweightschange_weightsone(workresponse,worklin,
+                                 work_workingweight,work_workingresponse,
+                                 likelihood(*workind,0),true);
+      help = (*fxp) * exp(*worklintilde);
+      *work_workingweight *= pow(help,2);
+      *work_workingresponse *= help;
+      }
+    }
+  else if (wtype==wweightsnochange_constant)
+    {
+    for (i=0;i<nrobs;i++,work_workingweight++,workresponse++,
+          work_workingresponse++,worklin++,workind++,worklintilde++,fxp++)
+      {
+      compute_iwls_wweightsnochange_constant(workresponse,worklin,
+                                 work_workingweight,work_workingresponse,
+                                 likelihood(*workind,0),true);
+      help = (*fxp) * exp(*worklintilde);
+      *work_workingweight *= pow(help,2);
+      *work_workingresponse *= help;
+      }
+    }
+  else if (wtype==wweightsnochange_one)
+    {
+    for (i=0;i<nrobs;i++,workresponse++,
+          work_workingresponse++,worklin++,workind++,worklintilde++,fxp++)
+      {
+      compute_iwls_wweightsnochange_one(workresponse,worklin,
+                                        work_workingresponse,
+                                        likelihood(*workind,0),true);
+      help = (*fxp) * exp(*worklintilde);
+      *work_workingweight *= pow(help,2);
+      *work_workingresponse *= help;
+      }
+    }
+/*  ofstream out("c:/temp/workresponse.res");
+  workingresponse.prettyPrint(out);
+  our.close();
+
+  ofstream out2("c:/temp/workweight.res");
+  workingweight.prettyPrint(out2);
+  out2.close();
+
+  ofstream out3("c:/temp/linpred.res");
+  linearpred1.prettyPrint(out3);
+  out3.close();*/
+  }
+
+double DISTR_gaussian_multeffect::compute_iwls(double * response, double * linpred,
+                              double * weight, double * workingweight,
+                              double * workingresponse, const bool & like)
+  {
+  //Note: linpred has to point to the linear predictor of dg.
+  return dg->compute_iwls(response,linpred,weight,workingweight,workingresponse,like);
+  }
+
+
+void DISTR_gaussian_multeffect::compute_iwls_wweightschange_weightsone(
+                                         double * response, double * linpred,
+                                         double * workingweight,
+                                         double * workingresponse,double & like,
+                                         const bool & compute_like)
+  {
+  //Note: linpred has to point to the linear predictor of dg.
+  dg->compute_iwls_wweightschange_weightsone(response,linpred,workingweight,workingresponse,like,compute_like);
+  }
+
+
+void DISTR_gaussian_multeffect::compute_iwls_wweightsnochange_constant(double * response,
+                                              double * linpred,
+                                              double * workingweight,
+                                              double * workingresponse,
+                                              double & like,
+                                              const bool & compute_like)
+  {
+  //Note: linpred has to point to the linear predictor of dg.
+  dg->compute_iwls_wweightsnochange_constant(response,linpred,workingweight,workingresponse,like,compute_like);
+  }
+
+
+void DISTR_gaussian_multeffect::compute_iwls_wweightsnochange_one(double * response,
+                                              double * linpred,
+                                              double * workingresponse,
+                                              double & like,
+                                              const bool & compute_like)
+  {
+  //Note: linpred has to point to the linear predictor of dg.
+  dg->compute_iwls_wweightsnochange_one(response,linpred,workingresponse,like,compute_like);
+  }
+
+
+bool DISTR_gaussian_multeffect::posteriormode(void)
+  {
+  return true;
+  }
+
+
+void DISTR_gaussian_multeffect::outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,
+                                ST::string pathresults)
+  {
+  }
+
+
+double DISTR_gaussian_multeffect::get_scalemean(void)
+  {
+// FIX!
+//  return (dg->FCsigma2).betamean(0,0);
+  return dg->sigma2;
+  }
+
+double DISTR_gaussian_multeffect::get_scale(void)
+  {
+  if(dgexists)
+    return dg->sigma2;
+  else
+    return sigma2;
+  }
+
+void DISTR_gaussian_multeffect::addmult(datamatrix & design, datamatrix & betadiff)
+  {
+
+  }
+
+void DISTR_gaussian_multeffect::add_linpred(datamatrix & l)
+  {
+
+  }
+
+void DISTR_gaussian_multeffect::add_linpred(datamatrix & l, const double & b)
+  {
+
+  }
+
+void DISTR_gaussian_multeffect::update_linpred(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind)
+  {
+  double * worklinp;
+  if (linpred_current==1)
+    worklinp = linearpred1.getV();
+  else
+    worklinp = linearpred2.getV();
+
+  double * worklinp_dg;
+  if (dg->linpred_current==1)
+    worklinp_dg = dg->linearpred1.getV();
+  else
+    worklinp_dg = dg->linearpred2.getV();
+
+  double * workintvar = intvar.getV();
+  double * fxp = fx.getV();
+
+  unsigned * indp = ind.getV();
+  unsigned i;
+
+  double help;
+
+  if (intvar.rows()==nrobs)   // varying coefficient
+    {
+    for (i=0;i<nrobs;i++,worklinp++,worklinp_dg++,workintvar++,indp++,fxp++)
+      {
+      help = exp(*worklinp);
+      *worklinp += (*workintvar) *  f(*indp,0);
+      *worklinp_dg += (exp(*worklinp)-help)*(*fxp);
+      }
+    }
+  else                              // additive
+    {
+    for (i=0;i<nrobs;i++,worklinp++,worklinp_dg++,indp++,fxp++)
+      {
+      help = exp(*worklinp);
+      *worklinp += f(*indp,0);
+      *worklinp_dg += (exp(*worklinp)-help)*(*fxp);
+      }
+    }
+
+
+  }
+
+bool DISTR_gaussian_multeffect::update_linpred_save(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind)
+  {
+  bool ok = true;
+  double max = linpredmaxlimit;
+  double min = linpredminlimit;
+
+  double * worklinp;
+  if (linpred_current==1)
+    worklinp = linearpred1.getV();
+  else
+    worklinp = linearpred2.getV();
+
+  double * worklinp_dg;
+  if (dg->linpred_current==1)
+    worklinp_dg = dg->linearpred1.getV();
+  else
+    worklinp_dg = dg->linearpred2.getV();
+
+  double * workintvar = intvar.getV();
+  double * fxp = fx.getV();
+
+  unsigned * indp = ind.getV();
+  unsigned i;
+
+  double help;
+
+  if (intvar.rows()==nrobs)   // varying coefficient
+    {
+    for (i=0;i<nrobs;i++,worklinp++,worklinp_dg++,workintvar++,indp++,fxp++)
+      {
+      help = exp(*worklinp);
+      *worklinp += (*workintvar) *  f(*indp,0);
+      *worklinp_dg += (exp(*worklinp)-help)*(*fxp);
+      if (((*worklinp) > max) || ((*worklinp_dg) > max))
+        ok = false;
+      if (((*worklinp) < min) || ((*worklinp_dg) < min))
+        ok = false;
+      }
+    }
+  else                              // additive
+    {
+    for (i=0;i<nrobs;i++,worklinp++,worklinp_dg++,indp++,fxp++)
+      {
+      help = exp(*worklinp);
+      *worklinp += f(*indp,0);
+      *worklinp_dg += (exp(*worklinp)-help)*(*fxp);
+      if (((*worklinp) > max) || ((*worklinp_dg) > max))
+        ok = false;
+      if (((*worklinp) < min) || ((*worklinp_dg) < min))
+        ok = false;
+      }
+    }
+  return ok;
+  }
 
 } // end: namespace MCMC

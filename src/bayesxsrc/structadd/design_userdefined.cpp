@@ -126,7 +126,7 @@ DESIGN_userdefined::DESIGN_userdefined(void) : DESIGN()
   }
 
 
-void DESIGN_userdefined::init_data(datamatrix & dm, datamatrix & iv)
+void DESIGN_userdefined::init_data(const datamatrix & dm, const datamatrix & iv)
   {
 
   unsigned j;
@@ -307,7 +307,7 @@ void DESIGN_userdefined::compute_basisNull(void)
       basisNull = datamatrix(nrpar-rankK,nrpar,1);
       datamatrix Kstat=Kdatamat;
       datamatrix vals(Kstat.rows(),1,0);
-      bool eigentest=eigen2(Kstat,vals);
+      // bool eigentest=eigen2(Kstat,vals);
       eigensort(vals,Kstat);
       unsigned j,k;
       for(j=0; j<vals.rows(); j++)
@@ -779,7 +779,7 @@ DESIGN_userdefined_tensor::DESIGN_userdefined_tensor(void) : DESIGN_userdefined(
   }
 
 
-void DESIGN_userdefined_tensor::init_data(datamatrix & dm, datamatrix & iv)
+void DESIGN_userdefined_tensor::init_data(const datamatrix & dm, const datamatrix & iv)
   {
 
   unsigned j;

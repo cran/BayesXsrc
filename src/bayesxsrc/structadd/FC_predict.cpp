@@ -641,7 +641,8 @@ void FC_predict::outresults(ofstream & out_stata, ofstream & out_R, ofstream & o
     double * responsep = likep->response.getV();
     double * weightp = likep->weight.getV();
 
-    double scalehelp = likep->get_scalemean();
+    double scalehelp = 0.0;
+    scalehelp = likep->get_scalemean();
 
     if (nosamplessave==false)
       {

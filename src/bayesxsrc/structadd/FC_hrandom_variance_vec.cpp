@@ -122,7 +122,7 @@ void FC_hrandom_variance_vec::update(void)
 
   b_invgamma = masterp->level1_likep[equationnr]->trmult*b_invgamma_orig;
 
-  register unsigned i;
+   unsigned i;
   double * workbeta = beta.getV();
   double * workbetafcn = FCnonpp->beta.getV();
 

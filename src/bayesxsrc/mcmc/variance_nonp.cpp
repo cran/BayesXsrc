@@ -489,7 +489,7 @@ void FULLCOND_variance_nonp::update(void)
 void FULLCOND_variance_nonp::update_stationary(void)
   {
 
-  double betaold = beta(0,0);
+//  double betaold = beta(0,0);
   beta(0,0) = rand_invgamma(a_invgamma+0.5*rankK,
                             b_invgamma+0.5*Kp->compute_quadform());
 
@@ -934,7 +934,7 @@ void FULLCOND_variance_nonp::outresults_lambda(void)
     optionsp->out("  (" + ST::doubletostring(Kp->compute_df(),6) + ")\n");
     }
   optionsp->out("\n");
-*/  
+*/
 /*
   ST::string file = pathresults.substr(0,pathresults.length()-7) + "lambda_sample.raw";
   fc_lambda.get_samples(file);

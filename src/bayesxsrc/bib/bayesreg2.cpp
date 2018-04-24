@@ -2908,7 +2908,7 @@ bool bayesreg::create_random_rw1rw2(const unsigned & collinpred)
   double ftune;
 //  unsigned updateW;
   ST::string proposal;
-  int f;
+  int f = 0;
 
   unsigned i;
   int j1,j2;

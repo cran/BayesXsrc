@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include "distr_categorical.h"
 
 #if defined(BayesX_gsl_included)
-#include "gsl/gsl_randist.h"
-#include "gsl/gsl_cdf.h"
+#include "gsl_randist.h"
+#include "gsl_cdf.h"
 #endif
 
 namespace MCMC
@@ -917,7 +917,7 @@ void DISTR_binomialprobit::update(void)
   double * weightwork;
   double * workingweightwork;
 
-  register unsigned i;
+   unsigned i;
 
 
   if (optionsp->nriter==1)
@@ -1215,7 +1215,7 @@ void DISTR_binomialsvm::update(void)
 
   double * wweightwork;
 
-  register unsigned i;
+   unsigned i;
 
   workwresp = workingresponse.getV();
   weightwork = weight.getV();
@@ -1597,10 +1597,10 @@ DISTR_poisson_ext::DISTR_poisson_ext(GENERAL_OPTIONS * o, const datamatrix & r,
   a=ap;
   b=bp;
   adapt = ada;
-  if (adapt)
-    {
-    double rmax = response.max(0);
-    }
+//  if (adapt)
+//    {
+//    double rmax = response.max(0);
+//    }
   }
 
 

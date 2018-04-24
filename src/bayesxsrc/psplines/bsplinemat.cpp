@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #ifdef BORLAND_OUTPUT_WINDOW
 #include <vcl.h>
 #endif
-#pragma hdrstop
+//#pragma hdrstop
 
 #include "bsplinemat.h"
 

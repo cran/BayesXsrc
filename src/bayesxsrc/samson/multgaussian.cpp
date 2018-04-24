@@ -363,7 +363,7 @@ void DISTRIBUTION_multgaussian::compute_sigmarmr(void)
 bool DISTRIBUTION_multgaussian::posteriormode(void)
   {
 
-  register unsigned i,j;
+  unsigned i,j;
 
   double help;
 

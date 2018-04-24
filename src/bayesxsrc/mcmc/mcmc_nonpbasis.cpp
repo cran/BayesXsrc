@@ -41,7 +41,7 @@ void FULLCOND_nonp_basis::updateK(const datamatrix & q)
   updateKenv(q);
 
 /*
-  register unsigned i;
+   unsigned i;
 
   if (type==RW1)
     {
@@ -146,7 +146,7 @@ void FULLCOND_nonp_basis::updateKenv(const datamatrix & q)
 //Kenv.print2(out1);
 //out1.close();
 
-  register unsigned i;
+   unsigned i;
 
   if (type==RW1)
     {
@@ -318,7 +318,7 @@ double FULLCOND_nonp_basis::getLogDet(void)
 
 void FULLCOND_nonp_basis::compute_u(datamatrix & u)
   {
-  register unsigned i;
+   unsigned i;
   if (type== RW1)
     {
     double * worku = u.getV()+1;
@@ -404,6 +404,7 @@ FULLCOND_nonp_basis::FULLCOND_nonp_basis(MCMCoptions * o, const ST::string & ti)
   : FULLCOND(o,ti)
   {
   // ASAN/UBSAN checks
+  adaptiv = false;
   changingweight = false;
   interaction=false;
   polex = false;

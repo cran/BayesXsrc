@@ -187,10 +187,10 @@ void spline_basis::get_effectmatrix(datamatrix & e, vector<ST::string> & enames,
 //  else
 //    workbeta = betaqu50.getV();
 
-  vector<int>::iterator itbeg = posbeg.begin();
-  vector<int>::iterator itend = posend.begin();
+//  vector<int>::iterator itbeg = posbeg.begin();
+//  vector<int>::iterator itend = posend.begin();
 
-  int j;
+//  int j;
   unsigned i;
 
   if (varcoeff)
@@ -2831,7 +2831,8 @@ void spline_basis::compute_XWtildey(const datamatrix & weight, const double & sc
           l++;
 // ASAN/UBSAN checks
           freqwork++;
-          workBS += BScols*(*freqwork - *(freqwork-1));
+          if(freqwork!=freq.end())
+            workBS += BScols*(*freqwork - *(freqwork-1));
           if (l<=stop)
             {
             workindex2++;
@@ -2898,7 +2899,8 @@ void spline_basis::compute_XWtildey(const datamatrix & weight, const datamatrix 
           l++;
 // ASAN/UBSAN checks
           freqwork++;
-          workBS += BScols*(*freqwork - *(freqwork-1));
+          if(freqwork!=freq.end())
+            workBS += BScols*(*freqwork - *(freqwork-1));
           if (l <= stop )
             {
             workindex2++;
@@ -4401,7 +4403,8 @@ void spline_basis::update_merror_varcoef(datamatrix & effmod, datamatrix & newin
 
 void spline_basis::update_merror(datamatrix & newdata)
   {
-  unsigned i,j,k;
+  unsigned i,k;
+  unsigned j=0;
   double value;
 
   freq = vector<int>();

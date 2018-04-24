@@ -20,9 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include "distr_gamlss.h"
 
 #if defined(BayesX_gsl_included)
-#include "gsl/gsl_randist.h"
-#include "gsl/gsl_cdf.h"
-#include "gsl/gsl_rng.h"
+#include "gsl_randist.h"
+#include "gsl_cdf.h"
+#include "gsl_rng.h"
 #endif
 
 namespace MCMC
@@ -493,8 +493,8 @@ double DISTR_negbin_mu::pdf_mult(vector<double *> response,
                           vector<double *> weight,
                           vector<datamatrix *> aux)
     {
-    double p =  (*param[1])/((*param[0])+(*param[1]));
-    double r = (*param[0]);
+  //  double p =  (*param[1])/((*param[0])+(*param[1]));
+  //  double r = (*param[0]);
   //  double u = gsl_ran_negative_binomial_pdf(*response[1], p, r);
    // return u;
       return 0;
@@ -507,8 +507,8 @@ double DISTR_negbin_mu::cdf_mult(vector<double *> response,
 
 
     {
-    double p =  (*param[1])/((*param[0])+(*param[1]));
-    double r = (*param[0]);
+  //  double p =  (*param[1])/((*param[0])+(*param[1]));
+  //  double r = (*param[0]);
   //  double u = gsl_cdf_negative_binomial_P(*response[1], p, r);
   //  return u;
       return 0;
@@ -1463,9 +1463,9 @@ double DISTR_negbinzip_mu::cdf_mult(vector<double *> response,
 
 
     {
-    double p =  (*param[2])/((*param[0])+(*param[2]));
-    double r = (*param[0]);
-    double kplusone = 1 + (*response[2]);
+//    double p =  (*param[2])/((*param[0])+(*param[2]));
+//    double r = (*param[0]);
+//    double kplusone = 1 + (*response[2]);
 
     return 0;
 //    return ( (*param[1])+(1-(*param[1]))*(1-randnumbers::incomplete_beta(kplusone,r,p)) );
@@ -2646,8 +2646,8 @@ double DISTR_ziplambda::cdf_mult(vector<double *> response,
                           vector<double *> weight,
                           vector<datamatrix *> aux)
     {
-    unsigned int y = int (*response[1]);
-  /*  double cl = (*param[0]) + (1-(*param[0]))*gsl_cdf_poisson_P(((*response[1])-1), *param[1]);
+  /*  unsigned int y = int (*response[1]);
+    double cl = (*param[0]) + (1-(*param[0]))*gsl_cdf_poisson_P(((*response[1])-1), *param[1]);
     if ((*response[1]) == 0)
     {
         cl = 0;
@@ -3311,7 +3311,7 @@ void DISTR_cnormal_sigma::compute_iwls_wweightschange_weightsone(
     double p = pow(*response - *worklin[0],2);
 
     double nu;
-    double ddist, pdist, mills, mu_sigma;
+    double ddist, pdist, mills;
 
 
      if (*response <= 0)
@@ -3606,7 +3606,6 @@ void DISTR_cnormal_mu::compute_iwls_wweightschange_weightsone(
   double p = *response - (*linpred);
   double nu;
   double ddist, pdist, mills;
-  double d1;
 
 /*
   cout << *worklin[0] << endl;

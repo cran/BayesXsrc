@@ -256,7 +256,7 @@ class __EXPORT_TYPE FC
   // TASK: writes batch files for STATA and R for visualizing results
 
   virtual void outgraphs(ofstream & out_stata, ofstream & out_R,
-                         const ST::string & path)
+                         ofstream & out_R2BayesX, const ST::string & path)
     {
     }
 

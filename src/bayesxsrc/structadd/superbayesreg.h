@@ -238,6 +238,7 @@ using MCMC::DISTR_sncp_sigma;
 using MCMC::DISTR_sncp_mu;
 
 using MCMC::DISTR_JM;
+using MCMC::DISTR_gaussian_multeffect;
 
 using MCMC::DESIGN_pspline;
 using MCMC::DESIGN_hrandom;
@@ -258,7 +259,6 @@ using MCMC::FC_nonp;
 using MCMC::FC_linear;
 using MCMC::FC_linear_pen;
 using MCMC::FC_mult;
-using MCMC::FC_mult_pred;
 using MCMC::FC_hrandom;
 using MCMC::FC_hrandom_distributional;
 using MCMC::FC_nonp_variance;
@@ -618,6 +618,7 @@ class __EXPORT_TYPE superbayesreg : public statobject
   vector<DISTR_gumbel_copula> distr_gumbel_copulas;
   vector<DISTR_binomialprobit_copula> distr_binomialprobit_copulas;
   vector<DISTR_JM> distr_JMs;
+  vector<DISTR_gaussian_multeffect> distr_gaussian_multeffects;
 
   bool create_distribution(void);
 
@@ -761,7 +762,6 @@ class __EXPORT_TYPE superbayesreg : public statobject
 //---------------------- multiplicative random effects -------------------------
 
   vector<FC_mult> FC_mults;
-  vector<FC_mult_pred> FC_mult_preds;
 
   bool create_multiplicative_pspline(unsigned i);
   bool create_random_pspline(unsigned i);

@@ -600,7 +600,8 @@ const remlreg & remlreg::operator=(const remlreg & b)
 
 int remlreg::parse(const ST::string & c)
   {
-  int u = statobject::parse(c);
+  int u = 0;
+  u = statobject::parse(c);
   int pos = statobject::parsecom(c,methods,globaloptions);
 
   if (pos >= 0)
@@ -1288,7 +1289,7 @@ bool remlreg::create_offset(datamatrix & o)
       if (o.rows() < D.rows())
         o = datamatrix(D.rows(),1,0);
 
-      register unsigned k;
+       unsigned k;
       double * worko = o.getV();
       double * workD = D.getV()+j;
       unsigned size = D.cols();

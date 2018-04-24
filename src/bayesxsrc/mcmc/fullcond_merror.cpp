@@ -829,7 +829,7 @@ namespace MCMC
   {
 
   unsigned l = b-a+1;
-  register unsigned i;
+   unsigned i;
 
   double * merror_randwork = merror_random.getV()+a-1;
   double * randnormwork = randnorm.getV()+a-1;

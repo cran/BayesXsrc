@@ -627,7 +627,8 @@ void FC_variance_pen_vector_ssvs::add_variable(datamatrix & x,vector<ST::string>
 
   atau2.push_back(a);
   btau2_orig.push_back(b);
-  btau2.push_back(masterp->level1_likep[equationnr]->trmult*b);
+  btau2.push_back(b);
+//  btau2.push_back(masterp->level1_likep[equationnr]->trmult*b);
   r.push_back(rhelp);
 
   if (op[61] == "true")
@@ -777,9 +778,13 @@ bool FC_variance_pen_vector_ssvs::posteriormode(void)
 
 void FC_variance_pen_vector_ssvs::update(void)
   {
+  unsigned j;
+  for(j=0; j<btau2.size(); j++)
+    btau2[j] = masterp->level1_likep[equationnr]->trmult*btau2[j];
+
+  acceptance++;
   if(NBPSS)
     {
-    unsigned j;
     double p, q, c, r_delta;
     double anew, bnew;
     double sumdelta=0.0;
@@ -844,7 +849,7 @@ void FC_variance_pen_vector_ssvs::update(void)
   double anew_tau2;
   double bnew_tau2;
   double beta2;
-  double thetanew;
+//  double thetanew;
 
   double sumdelta=0;
 
@@ -1069,16 +1074,16 @@ void FC_variance_pen_vector_ssvs::outoptions(void)
       nsp = 12-Cp->datanames[i].length();
     ST::string ls(' ',nsp);
 
-    nsp2 = 9 - ST::doubletostring(atau2[i],6).length();
+    nsp2 = 9 - ST::doubletostring(atau2[i],3).length();
     ST::string ls2(' ',nsp2);
 
-    nsp3 = 9 - ST::doubletostring(btau2[i],6).length();
+    nsp3 = 9 - ST::doubletostring(btau2[i],3).length();
     ST::string ls3(' ',nsp3);
 
     optionsp->out("    " + Cp->datanames[i] + ls +
-                  ST::doubletostring(atau2[i],6) + ls2 +
-                  ST::doubletostring(btau2[i],6) + ls3 +
-                  ST::doubletostring(r[i],10) + "\n");
+                  ST::doubletostring(atau2[i],3) + ls2 +
+                  ST::doubletostring(btau2[i],3) + ls3 +
+                  ST::doubletostring(r[i],3) + "\n");
     }
   optionsp->out("\n");
   }

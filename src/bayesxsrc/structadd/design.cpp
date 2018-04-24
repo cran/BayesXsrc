@@ -41,7 +41,8 @@ void DESIGN::compute_orthogonaldecomp(void)
 
   s = datamatrix(nrpar,1,0);
 
-  bool ecorrect = eigen2(RinvKRtinv,s);
+  bool ecorrect = true;
+  ecorrect = eigen2(RinvKRtinv,s);
   eigensort(s,RinvKRtinv);
 
   // TEST
@@ -1468,6 +1469,98 @@ void DESIGN::compute_partres(datamatrix & res, datamatrix & f,bool cwsum)
   }
 
 
+void DESIGN::compute_partres_multiplicative(datamatrix & res, datamatrix & f,bool cwsum)
+  {
+  double * workingresponsep = likep->workingresponse.getV();
+  double * worklinp;
+  if (likep->linpred_current==1)
+    worklinp = (likep->linearpred1).getV();
+  else
+    worklinp = (likep->linearpred2).getV();
+
+  double * worklinp_dg;
+  if (likep->dg->linpred_current==1)
+    worklinp_dg = (likep->dg->linearpred1).getV();
+  else
+    worklinp_dg = (likep->dg->linearpred2).getV();
+
+  double * workingweightp = likep->workingweight.getV();
+  unsigned * indp = ind.getV();
+
+  double * fxp = (likep->fx).getV();
+
+  unsigned i;
+  double * resp = res.getV();
+  for (i=0;i<res.rows();i++,resp++)
+    *resp =  0;
+
+  if (intvar.rows()==data.rows())   // varying coefficient
+    {
+    double * workintvar = intvar.getV();
+
+    if ((likep->wtype==wweightsnochange_one) && (cwsum==false) && (changingdesign==false))
+      {
+      for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++,workintvar++,fxp++,worklinp_dg++)
+        res(*indp,0) += *workintvar * (*workingresponsep - *worklinp_dg +
+                        exp(*worklinp) * (*fxp));
+      }
+    else
+      {
+      if ((likep->wtype==wweightsnochange_constant) && (cwsum==false) && (changingdesign==false))
+        {
+        for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++,
+                                workingweightp++,workintvar++,fxp++,worklinp_dg++)
+          res(*indp,0) +=  (*workingweightp) * (*workintvar) * (*workingresponsep - *worklinp_dg +
+                           exp(*worklinp) * (*fxp));
+        }
+      else  // wweightschange
+        {
+        double * Wsump = Wsum.getV();
+        for (i=0;i<Wsum.rows();i++,Wsump++)
+          *Wsump =  0;
+        double * workintvar2 = intvar2.getV();
+        for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++,
+                                workingweightp++,workintvar++,workintvar2++,fxp++,worklinp_dg++)
+          {
+          res(*indp,0) +=  (*workingweightp) * (*workintvar) * (*workingresponsep - *worklinp_dg +
+                            exp(*worklinp) * (*fxp));
+          Wsum(*indp,0) += *workingweightp * (*workintvar2);
+          }
+        }
+      }
+    }
+  else                              // additive
+    {
+    if ((likep->wtype==wweightsnochange_one) && (cwsum==false) && (changingdesign==false))
+      {
+      for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++,fxp++,worklinp_dg++)
+        res(*indp,0) += *workingresponsep - *worklinp_dg + exp(*worklinp) * (*fxp);
+      }
+    else
+      {
+      if ((likep->wtype==wweightsnochange_constant) && (cwsum==false) && (changingdesign==false))
+        {
+        for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++,
+                                workingweightp++,fxp++,worklinp_dg++)
+          res(*indp,0) +=  (*workingweightp) *
+                           (*workingresponsep - *worklinp_dg + exp(*worklinp) * (*fxp));
+        }
+      else  // wweightschange
+        {
+        double * Wsump = Wsum.getV();
+        for (i=0;i<Wsum.rows();i++,Wsump++)
+          *Wsump =  0;
+        for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++,
+                                workingweightp++,fxp++,worklinp_dg++)
+          {
+          res(*indp,0) +=  (*workingweightp) *
+                            (*workingresponsep - *worklinp_dg + exp(*worklinp) * (*fxp));
+          Wsum(*indp,0) += *workingweightp;
+          }
+        }
+      }
+    }
+  }
 
 
 

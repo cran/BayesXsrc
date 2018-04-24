@@ -1,4 +1,3 @@
-
 #if !defined (__BUILDING_GNU)
 #define __BUILDING_GNU
 #endif
@@ -15,7 +14,6 @@
 #define NO_TEMPLATE_FRIENDS
 #endif
 
-
 #include "clstring.h"
 #include "adminparse_gnu.h"
 #include <iostream>
@@ -29,8 +27,12 @@
 #if defined(__BUILDING_LINUX)
 #include <stdio.h>
 #include <stdlib.h>
+
+#if !defined (BUILD_FOR_BAYESXSRC)
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
+
 #endif
 
 int main(int argc, char *argv[])
@@ -42,8 +44,9 @@ int main(int argc, char *argv[])
   bool run=false;
   admin_gnu a;
 
+  char *ptr;
   char path[100] = "";
-  getcwd(path, 100);
+  ptr = getcwd(path, 100);
 
   srand((unsigned)time(NULL));
 
@@ -150,11 +153,11 @@ int main(int argc, char *argv[])
     std::cout << "Version 3.0.2 (17.07.2015)" << endl;
     while(!run)
       {
-      #if defined(__BUILDING_LINUX)
+      #if defined(__BUILDING_LINUX) && !defined(BUILD_FOR_BAYESXSRC)
 //      rl_bind_key('\t',rl_abort);
 
       char *buf;
-      buf = readline("BayesX>");
+      buf = readline("BayesX> ");
       if (buf == NULL) { // EOF
         std::cout << "exiting" << std::endl;
         exit(0);
@@ -168,9 +171,9 @@ int main(int argc, char *argv[])
      free(buf);
 
      #else
-      std::cout << "BayesX>";
+      std::cout << "BayesX> ";
 
-      char array[256];
+      char array[4096];
       std::cin.getline(array, sizeof(array), '\n');
       const char* p=array;
       ST::string* s=new ST::string(p);

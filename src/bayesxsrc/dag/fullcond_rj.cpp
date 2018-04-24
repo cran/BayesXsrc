@@ -2079,7 +2079,7 @@ void FULLCOND_rj::switch_version_2(unsigned v_i, unsigned v_j)
 	  if((optionsp->get_nriter() > optionsp->get_burnin()) &&
 		 (optionsp->get_nriter() % (optionsp->get_step()) == 0))
 	  {
-		  register unsigned i;
+		  unsigned i;
 
 		  unsigned * workzeta = zeta.getV();
 		  double * workzetamean = zetamean.getV();

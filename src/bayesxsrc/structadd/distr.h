@@ -155,8 +155,6 @@ class __EXPORT_TYPE DISTR
 
   double meaneffect;
 
-  datamatrix multintvar;           // for multiplicative psplines (contains interaction variable for level 2 effects)
-
   //----------------------------------------------------------------------------
   //---------------------- linpredlimits for save estimation -------------------
   //----------------------------------------------------------------------------
@@ -182,6 +180,10 @@ class __EXPORT_TYPE DISTR
   datamatrix helpmat1;              // Stores auxiliary quantities
   datamatrix helpmat2;              // Stores auxiliary quantities
   datamatrix helpmat3;              // Stores auxiliary quantities
+
+  datamatrix fx;                    // Auxiliary variable for multiplicative effects
+  DISTR * dg;
+  bool dgexists;
 
   double * linpredp;              // pointer to own linpred
 
@@ -408,17 +410,17 @@ class __EXPORT_TYPE DISTR
   // FUNCTION: loglikelihood
   // TASK: computes the complete loglikelihood for all observations
 
-  double loglikelihood(const bool & current=true);
+  virtual double loglikelihood(const bool & current=true);
 
   // FUNCTION: loglikelihood
   // TASK: computes the loglikelihood for observations between begin and end
   //       response, weights, predicor stored in responsep,workingweightp,
   //       linpredp
 
-  double loglikelihood(int & begin,
+/*  virtual double loglikelihood(int & begin,
                        int & end, statmatrix<double *> & responsep,
                        statmatrix<double *> & workingweightp,
-                       statmatrix<double *> & linpredp);
+                       statmatrix<double *> & linpredp);*/
 
 
   //----------------------------------------------------------------------------
@@ -427,7 +429,7 @@ class __EXPORT_TYPE DISTR
 
   virtual void compute_mu(const double * linpred,double * mu);
 
-  virtual void compute_mu_mult(vector<double *> linpred,vector<double *> response,double * mu);
+  virtual void compute_mu_mult(vector<double *> linpred, vector<double *> response, double * mu);
 
 
   //----------------------------------------------------------------------------
@@ -534,9 +536,9 @@ class __EXPORT_TYPE DISTR
   // FUNCTION: compute_IWLS (for the whole dataset
   // TASK:
 
-  double compute_iwls(const bool & current,const bool & like);
+  virtual double compute_iwls(const bool & current,const bool & like);
 
-  void compute_iwls(const bool & current,datamatrix & likelihood,
+  virtual void compute_iwls(const bool & current,datamatrix & likelihood,
                     statmatrix<unsigned> & ind);
 
   // FUNCTION: compute_IWLS (
@@ -545,19 +547,19 @@ class __EXPORT_TYPE DISTR
   //       the loglikelihood (will be returned) for the begin - end observation
   //       in the pointer vectors
 
-  double compute_iwls_loglikelihood(int & begin,
+/*  double compute_iwls_loglikelihood(int & begin,
                                  int & end, statmatrix<double *> & responsep,
                                  statmatrix<double *> & workingresponsep,
                                  statmatrix<double *> & weightp,
                                  statmatrix<double *> & workingweightp,
-                                 statmatrix<double *> & linpredp);
+                                 statmatrix<double *> & linpredp);*/
 
 
-  double compute_iwls_loglikelihood_sumworkingweight(
+/*  double compute_iwls_loglikelihood_sumworkingweight(
          int & begin,int & end, statmatrix<double *> & responsep,
          statmatrix<double *> & workingresponsep,statmatrix<double *> & weightp,
          statmatrix<double *> & workingweightp, statmatrix<double *> & linpredp,
-         datamatrix & intvar2,double & sumworkingweight);
+         datamatrix & intvar2,double & sumworkingweight);*/
 
 
   //----------------------------------------------------------------------------
@@ -674,8 +676,6 @@ class __EXPORT_TYPE DISTR_gaussian : public DISTR
                                         // parameter, i.e. sigma^2
   double b_invgamma;                    // hyperparameter b
 
-  FC FCsigma2;
-
   double nrlasso;
   double nrridge;
   double lassosum;
@@ -683,6 +683,7 @@ class __EXPORT_TYPE DISTR_gaussian : public DISTR
 
   public:
 
+  FC FCsigma2;
 
    // DEFAULT CONSTRUCTOR
 
@@ -1320,6 +1321,148 @@ class __EXPORT_TYPE DISTR_gaussian_re : public DISTR_gaussian
   };
 
 
+//------------------------------------------------------------------------------
+//------------- CLASS: DISTRIBUTION_gaussian_multeffect ------------------------
+//------------------------------------------------------------------------------
+
+class __EXPORT_TYPE DISTR_gaussian_multeffect : public DISTR_gaussian
+  {
+
+  protected:
+
+  public:
+
+   // DEFAULT CONSTRUCTOR
+
+   DISTR_gaussian_multeffect(void) : DISTR_gaussian()
+     {
+     }
+
+   // CONSTRUCTOR1
+
+   DISTR_gaussian_multeffect(const double & a,const double & b,GENERAL_OPTIONS * o,
+                  const datamatrix & r,const ST::string & ps,
+                         const datamatrix & w=datamatrix());
+
+   // COPY CONSTRUCTOR
+
+   DISTR_gaussian_multeffect(const DISTR_gaussian_multeffect & nd);
+
+   // OVERLOADED ASSIGNMENT OPERATOR
+
+   const DISTR_gaussian_multeffect & operator=(const DISTR_gaussian_multeffect & nd);
+
+   // DESTRUCTOR
+
+   ~DISTR_gaussian_multeffect() {}
+
+  void compute_mu(const double * linpred,double * mu);
+
+  double get_intercept_start(void);
+
+  // FUNCTION: loglikelihood
+  // TASK: computes the complete loglikelihood for all observations
+
+  double loglikelihood(const bool & current=true);
+
+  // FUNCTION: loglikelihood
+  // TASK: computes the loglikelihood for observations between begin and end
+  //       response, weights, predicor stored in responsep,workingweightp,
+  //       linpredp
+
+//  double loglikelihood(int & begin,
+//                       int & end, statmatrix<double *> & responsep,
+//                       statmatrix<double *> & workingweightp,
+//                       statmatrix<double *> & linpredp);
+
+  double loglikelihood(double * res,
+                       double * lin,
+                       double * w);
+
+  double loglikelihood_weightsone(double * res,double * lin);
+
+  // FUNCTION: compute_IWLS (for the whole dataset
+  // TASK:
+
+  double compute_iwls(const bool & current,const bool & like);
+
+  void compute_iwls(const bool & current,datamatrix & likelihood,
+                    statmatrix<unsigned> & ind);
+
+  double compute_iwls(double * response, double * linpred,
+                              double * weight, double * workingweight,
+                              double * workingresponse, const bool & like);
+
+  void compute_iwls_wweightschange_weightsone(
+                                         double * response, double * linpred,
+                                         double * workingweight,
+                                         double * workingresponse,double & like,
+                                         const bool & compute_like);
+
+  void compute_iwls_wweightsnochange_constant(double * response,
+                                              double * linpred,
+                                              double * workingweight,
+                                              double * workingresponse,
+                                              double & like,
+                                              const bool & compute_like);
+
+  void compute_iwls_wweightsnochange_one(double * response,
+                                              double * linpred,
+                                              double * workingresponse,
+                                              double & like,
+                                              const bool & compute_like);
+
+  void outoptions(void);
+
+  void update(void);
+
+  bool posteriormode(void);
+
+  void outresults(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,ST::string pathresults="");
+
+  double get_scalemean(void);
+
+  double get_scale(void);
+
+  void sample_responses(unsigned i,datamatrix & sr);
+
+  void sample_responses_cv(unsigned i,datamatrix & linpred, datamatrix & sr);
+
+  void outresults_predictive_check(datamatrix & D,datamatrix & sr);
+
+  // FUNCTION: update_scale_hyperparameters
+  // TASK: updates parameters for lasso, ridge etc.
+  //       h(0,0) = type, 1 =ridge, 2=lasso
+  //       h(1,0) = nrridge/nrlasso
+  //       h(2,0) = lassosum/ridgesum
+
+  void update_scale_hyperparameters(datamatrix & h);
+
+  // FUNCTION: addmult
+  // TASK: addmults design*betadiff to linpred
+
+  void addmult(datamatrix & design, datamatrix & betadiff);
+
+  // FUNCTION: add_linpred
+  // TASK: adds l to linpred
+
+  void add_linpred(datamatrix & l);
+
+  // FUNCTION: update_linpred
+  // TASK: updates linpred
+
+  void add_linpred(datamatrix & l, const double & b);
+
+  // FUNCTION: update_linpred
+  // TASK: updates linpred
+
+  void update_linpred(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind);
+
+  // FUNCTION: update_linpred_save
+  // TASK: updates linpred (safely)
+
+  bool update_linpred_save(datamatrix & f, datamatrix & intvar, statmatrix<unsigned> & ind);
+  };
 
 } // end: namespace MCMC
 

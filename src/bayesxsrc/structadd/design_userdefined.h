@@ -59,7 +59,7 @@ class __EXPORT_TYPE DESIGN_userdefined : public DESIGN
   void compute_Zout(datamatrix & Z);
   void compute_Zout_transposed_vector(void);
 
-  void init_data(datamatrix & dm, datamatrix & iv);
+  void init_data(const datamatrix & dm, const datamatrix & iv);
 
   void compute_basisNull(void);
 
@@ -162,7 +162,7 @@ class __EXPORT_TYPE DESIGN_userdefined_tensor : public DESIGN_userdefined
 
   const DESIGN_userdefined_tensor & operator=(const DESIGN_userdefined_tensor & m);
 
-  void init_data(datamatrix & dm, datamatrix & iv);
+  void init_data(const datamatrix & dm, const datamatrix & iv);
 
   void compute_precision(double l);
 

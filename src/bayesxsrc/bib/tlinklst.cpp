@@ -511,8 +511,8 @@ unsigned LinkedList<T>::newNode()
    //	mit einem unbelegten Knoten zu rechnen ist.
 
 
-	register unsigned i;
-	register ListNode<T> *work;
+	 unsigned i;
+	 ListNode<T> *work;
 
 	//	Jetzt muﬂ wirklich Speicher bereitgestellt sein, damit in
 	//	diesem Speicher nach einem freien Knoten gesucht werden
@@ -670,7 +670,7 @@ resize()
 
   ListNode<T> *workOld;
   ListNode<T> *workNew;
-  register unsigned i;
+   unsigned i;
 
   for (i = 0, workOld = m_nodeMemory, workNew = newMemory;
        i < m_memSize;

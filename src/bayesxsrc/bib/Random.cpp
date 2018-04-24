@@ -24,8 +24,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 #include "Random.h"
 #if defined(BAYESX_GSL_INCLUDED)
-  #include <gsl/gsl_cdf.h>
-  #include <gsl/gsl_sf_gamma.h>
+  #include <gsl_cdf.h>
+  #include <gsl_sf_gamma.h>
 #endif
 
 // BEGIN: DSB //

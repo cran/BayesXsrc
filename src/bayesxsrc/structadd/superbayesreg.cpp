@@ -347,6 +347,8 @@ void superbayesreg::create_hregress(void)
   families.push_back("dirichlet");
   families.push_back("gaussian_shared");
   families.push_back("quantreg_shared");
+  families.push_back("gaussian_multeffect");
+
   family = stroption("family",families,"normal");
   aresp = doubleoption("aresp",0.001,-1.0,500);
   bresp = doubleoption("bresp",0.001,0.0,500);
@@ -1061,6 +1063,9 @@ void superbayesreg::clear(void)
   distr_JMs.erase(distr_JMs.begin(),distr_JMs.end());
   distr_JMs.reserve(20);
 
+  distr_gaussian_multeffects.erase(distr_gaussian_multeffects.begin(),distr_gaussian_multeffects.end());
+  distr_gaussian_multeffects.reserve(20);
+
   FC_linears.erase(FC_linears.begin(),FC_linears.end());
   FC_linears.reserve(200);
 
@@ -1097,9 +1102,6 @@ void superbayesreg::clear(void)
   FC_mults.erase(FC_mults.begin(),FC_mults.end());
   FC_mults.reserve(200);
 
-  FC_mult_preds.erase(FC_mult_preds.begin(),FC_mult_preds.end());
-  FC_mult_preds.reserve(200);
-
   FC_nonp_variances.erase(FC_nonp_variances.begin(),FC_nonp_variances.end());
   FC_nonp_variances.reserve(400);
 
@@ -1118,6 +1120,9 @@ void superbayesreg::clear(void)
                                 FC_variance_pen_vectors.end());
   FC_variance_pen_vectors.reserve(200);
 
+  FC_variance_pen_vector_ssvss.erase(FC_variance_pen_vector_ssvss.begin(),
+                                FC_variance_pen_vector_ssvss.end());
+  FC_variance_pen_vector_ssvss.reserve(200);
 
   FC_hrandom_variances.erase(FC_hrandom_variances.begin(),
   FC_hrandom_variances.end());
@@ -1227,6 +1232,7 @@ superbayesreg::superbayesreg(const superbayesreg & b) : statobject(statobject(b)
   generaloptions = b.generaloptions;
 
   distr_gaussians = b.distr_gaussians;
+  distr_gaussian_multeffects = b.distr_gaussian_multeffects;
   distr_hetgaussians = b.distr_hetgaussians;
   distr_vargaussians = b.distr_vargaussians;
   distr_quantregs = b.distr_quantregs;
@@ -1459,6 +1465,7 @@ const superbayesreg & superbayesreg::operator=(const superbayesreg & b)
   generaloptions = b.generaloptions;
 
   distr_gaussians = b.distr_gaussians;
+  distr_gaussian_multeffects = b.distr_gaussian_multeffects;
   distr_hetgaussians = b.distr_hetgaussians;
   distr_vargaussians = b.distr_vargaussians;
   distr_quantregs = b.distr_quantregs;
@@ -1660,7 +1667,8 @@ const superbayesreg & superbayesreg::operator=(const superbayesreg & b)
 int superbayesreg::parse(const ST::string & c)
   {
 
-  int u = statobject::parse(c);
+  int u = 0;
+  u = statobject::parse(c);
 
   int pos = statobject::parsecom(c,methods,globaloptions);
 
@@ -2025,6 +2033,18 @@ bool superbayesreg::create_distribution(void)
       }
     }
 //-------------------------- END: Gaussian response ----------------------------
+
+//------------------------- Gaussian multiplicative response -------------------
+  else if ((family.getvalue() == "gaussian_multeffect") && (equationtype.getvalue()=="mu"))
+    {
+    computemodeforstartingvalues = true;
+    mainequation=false;
+    distr_gaussian_multeffects.push_back(DISTR_gaussian_multeffect(aresp.getvalue(),bresp.getvalue(),
+                                      &generaloptions,D.getCol(0),"",w) );
+    equations[modnr].distrp = &distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1];
+    }
+//-------------------------- END: Gaussian response ----------------------------
+
 
 //-------------------------------- normal sigma2 ---------------------------------
   else if ( ((family.getvalue() == "normal")) && equationtype.getvalue()=="sigma2")
@@ -10132,7 +10152,7 @@ bool superbayesreg::create_multiplicative_pspline(unsigned i)
   datamatrix datadummy = datamatrix(1,1,0.0);
   create_pspline(i, datadummy);
 
-  FC_nonp * fcnp_pspline = &FC_nonps[FC_nonps.size()-1];
+  // FC_nonp * fcnp_pspline = &FC_nonps[FC_nonps.size()-1];
   MCMC::DESIGN * dp_pspline = &design_psplines[design_psplines.size()-1];
 
   dp_pspline->changingdesign=true;
@@ -10140,16 +10160,13 @@ bool superbayesreg::create_multiplicative_pspline(unsigned i)
   dp_pspline->set_intvar(effect,0);
   dp_pspline->meaneffectintvar = 1;
 
-  FC_mult_preds.push_back(FC_mult_pred(true));
-  equations[modnr].add_FC(&FC_mult_preds[FC_mult_preds.size()-1],"");
-
   term helpt = terms[i];
   terms[i].varnames.erase(terms[i].varnames.begin(),terms[i].varnames.end());
   terms[i].varnames.push_back(helpt.varnames[1]);
   terms[i].varnames.push_back(helpt.varnames[0]);
 
   terms[i].options[12] = "true";
-  bool error=false;
+  // bool error=false;
 
   unsigned fnr;
   ST::string na = terms[i].varnames[terms[i].varnames.size()-1];
@@ -10161,21 +10178,16 @@ bool superbayesreg::create_multiplicative_pspline(unsigned i)
     return true;
     }
 
-  FC_mult_preds.push_back(FC_mult_pred(false));
+  FC_nonps[FC_nonps.size()-1].set_multiplicative(equations[fnr].distrp);
 
-  FC_mult_preds[FC_mult_preds.size()-2].set_effectp(dp_pspline,fcnp_pspline);
-  FC_mult_preds[FC_mult_preds.size()-2].set_distrp(equations[fnr].distrp);
-
-  FC_mult_preds[FC_mult_preds.size()-1].set_effectp(dp_pspline,fcnp_pspline);
-  FC_mult_preds[FC_mult_preds.size()-1].set_distrp(equations[fnr].distrp);
-
-  equations[modnr].add_FC(&FC_mult_preds[FC_mult_preds.size()-1],"");
+  (distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1]).dg = &(distr_gaussians[distr_gaussians.size()-1]);
+  (distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1]).dgexists = true;
 
   return false;
   }
 
 
-bool  superbayesreg::create_random_pspline(unsigned i)
+bool superbayesreg::create_random_pspline(unsigned i)
   {
 
   unsigned modnr = equations.size()-1;
@@ -11048,16 +11060,13 @@ bool superbayesreg::create_geokriging(unsigned i)
 
 bool superbayesreg::create_ridge_lasso(unsigned i)
   {
-  MCMC::shrinktype sh;
-
-
-  if (terms[i].options[0]=="ridge")
-    sh = MCMC::ridge;
-  else if (terms[i].options[0]=="lasso")
+  MCMC::shrinktype sh = MCMC::ridge;
+  if (terms[i].options[0]=="lasso")
     sh = MCMC::lasso;
-  else
+  else if (terms[i].options[0]=="ssvs")
     sh = MCMC::ssvs;
 
+  unsigned modnr = equations.size()-1;
 
   if ( ( (ridge == -1) && (terms[i].options[0] == "ridge")  ) ||
        ( (lasso == -1) && (terms[i].options[0] == "lasso")  ) ||
@@ -11065,7 +11074,6 @@ bool superbayesreg::create_ridge_lasso(unsigned i)
      )
     {
 
-    unsigned modnr = equations.size()-1;
 
     ST::string title;
     ST::string pathpen;
@@ -11082,105 +11090,79 @@ bool superbayesreg::create_ridge_lasso(unsigned i)
       {
 
       title = h + ": linear effects with ridge penalty";
+      pathpenres = outfile.getvalue() + "_" + h +
+                   "_LinearEffects_ridgepenalty.res";
+      pathpenresvar = outfile.getvalue() + "_" + h +
+                   "_LinearEffects_ridgepenalty_var.res";
+      titlevar = h + ": linear effects with ridge penalty (var)";
 
 #if defined(__BUILDING_LINUX)
       pathpen = defaultpath.to_bstr() + "/temp/" + name.to_bstr()
                              + "_LinearEffects_ridgepenalty"  +
                              "_" + h + ".raw";
-#else
-      pathpen = defaultpath.to_bstr() + "\\temp\\" + name.to_bstr()
-                             + "_LinearEffects_ridgepenalty"  +
-                             "_" + h + ".raw";
-#endif
-
-      pathpenres = outfile.getvalue() + "_" + h +
-                   "_LinearEffects_ridgepenalty.res";
-
-      titlevar = h + ": linear effects with ridge penalty (var)";
-
-#if defined(__BUILDING_LINUX)
       pathpenvar = defaultpath.to_bstr() + "/temp/" + name.to_bstr()
                              + "_LinearEffects_ridgepenalty_var"  +
                              "_" + h + ".raw";
 #else
+      pathpen = defaultpath.to_bstr() + "\\temp\\" + name.to_bstr()
+                             + "_LinearEffects_ridgepenalty"  +
+                             "_" + h + ".raw";
       pathpenvar = defaultpath.to_bstr() + "\\temp\\" + name.to_bstr()
                              + "_LinearEffects_ridgepenalty_var"  +
                              "_" + h + ".raw";
 #endif
-
-      pathpenresvar = outfile.getvalue() + "_" + h +
-                   "_LinearEffects_ridgepenalty_var.res";
-
       }
     else if (terms[i].options[0] == "lasso")
       {
       title = h + ": linear effects with lasso penalty";
+      pathpenres = outfile.getvalue() + "_" + h +
+                   "_LinearEffects_lassopenalty.res";
+      titlevar = h + ": linear effects with lasso penalty (var)";
+      pathpenresvar = outfile.getvalue() + "_" + h +
+                   "_LinearEffects_lassopenalty_var.res";
 
 #if defined(__BUILDING_LINUX)
       pathpen = defaultpath.to_bstr() + "/temp/" + name.to_bstr()
                              + "_LinearEffects_lassopenalty"  +
+                             "_" + h + ".raw";
+      pathpenvar = defaultpath.to_bstr() + "/temp/" + name.to_bstr()
+                             + "_LinearEffects_lassopenalty_var"  +
                              "_" + h + ".raw";
 #else
       pathpen = defaultpath.to_bstr() + "\\temp\\" + name.to_bstr()
                              + "_LinearEffects_lassopenalty"  +
                              "_" + h + ".raw";
-#endif
-
-      pathpenres = outfile.getvalue() + "_" + h +
-                   "_LinearEffects_lassopenalty.res";
-
-      titlevar = h + ": linear effects with lasso penalty (var)";
-
-#if defined(__BUILDING_LINUX)
-      pathpenvar = defaultpath.to_bstr() + "/temp/" + name.to_bstr()
-                             + "_LinearEffects_lassopenalty_var"  +
-                             "_" + h + ".raw";
-#else
       pathpenvar = defaultpath.to_bstr() + "\\temp\\" + name.to_bstr()
                              + "_LinearEffects_lassopenalty_var"  +
                              "_" + h + ".raw";
 #endif
-
-      pathpenresvar = outfile.getvalue() + "_" + h +
-                   "_LinearEffects_lassopenalty_var.res";
-
       }
-    else
+    else if (terms[i].options[0] == "ssvs")
       {
       title = h + ": linear effects with ssvs prior";
+      pathpenres = outfile.getvalue() + "_" + h +
+                   "_LinearEffects_ssvs.res";
+      pathpenresvar = outfile.getvalue() + "_" + h +
+                   "_LinearEffects_ssvs_var.res";
+      titlevar = h + ": variance of linear effects with ssvs prior";
+//      titlevar = "";
 
 #if defined(__BUILDING_LINUX)
       pathpen = defaultpath.to_bstr() + "/temp/" + name.to_bstr()
                              + "_LinearEffects_lassopenalty"  +
+                             "_" + h + ".raw";
+      pathpenvar = defaultpath.to_bstr() + "/temp/" + name.to_bstr()
+                             + "_LinearEffects_lassopenalty_var"  +
                              "_" + h + ".raw";
 #else
       pathpen = defaultpath.to_bstr() + "\\temp\\" + name.to_bstr()
                              + "_LinearEffects_ssvs"  +
                              "_" + h + ".raw";
-#endif
-
-      pathpenres = outfile.getvalue() + "_" + h +
-                   "_LinearEffects_ssvs.res";
-
-//      titlevar = h + ": variance of linear effects with ssvs prior";
-      titlevar = "";
-
-#if defined(__BUILDING_LINUX)
-      pathpenvar = defaultpath.to_bstr() + "/temp/" + name.to_bstr()
-                             + "_LinearEffects_lassopenalty_var"  +
-                             "_" + h + ".raw";
-#else
       pathpenvar = defaultpath.to_bstr() + "\\temp\\" + name.to_bstr()
                              + "_LinearEffects_ssvs_var"  +
                              "_" + h + ".raw";
 #endif
-
-      pathpenresvar = outfile.getvalue() + "_" + h +
-                   "_LinearEffects_ssvs_var.res";
-
       }
-
-
 
     if (pathpen.isvalidfile() == 1)
       {
@@ -11246,10 +11228,23 @@ bool superbayesreg::create_ridge_lasso(unsigned i)
       }
     else
       {
+//      cout << "begtest" << endl;
+//      cout << "modnr: "  << modnr << endl;
+//      int testsize = FC_variance_pen_vector_ssvss.size()-1;
+//      cout << "size (ssvs): " << testsize << endl;
+//      FC_variance_pen_vector_ssvss[testsize].outoptions();
+
       equations[modnr].add_FC(&FC_variance_pen_vector_ssvss[
       FC_variance_pen_vector_ssvss.size()-1],pathpenresvar);
-      }
 
+//      cout << "size (FCs): " << equations[modnr].FCpointer.size()-1 << endl;
+//      cout << "midtest" << endl;
+
+//      testsize = equations[modnr].FCpointer.size()-1;
+//      equations[modnr].FCpointer[testsize]->outoptions();
+
+//      cout << "endtest" << endl;
+      }
 
     }
   else
@@ -11274,6 +11269,20 @@ bool superbayesreg::create_ridge_lasso(unsigned i)
       FC_linear_pens[ssvs_linear].add_variable(d,terms[i].varnames[0]);
       FC_variance_pen_vector_ssvss[ssvs].add_variable(d,terms[i].options,
                                                   terms[i].varnames);
+
+//      cout << "begtest" << endl;
+//      cout << "modnr: "  << modnr << endl;
+//      int testsize = FC_variance_pen_vector_ssvss.size()-1;
+//      cout << "size: " << testsize << endl;
+//      FC_variance_pen_vector_ssvss[testsize].outoptions();
+//      cout << "size (FCs): " << equations[modnr].FCpointer.size()-1 << endl;
+
+//      cout << "midtest" << endl;
+
+//      testsize = equations[modnr].FCpointer.size()-1;
+//      equations[modnr].FCpointer[testsize]->outoptions();
+
+//      cout << "endtest" << endl;
       }
 
     }

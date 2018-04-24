@@ -2455,7 +2455,7 @@ double STEPMULTIrun::criterion_min(const double & df)
 
 double STEPMULTIrun::criterion_min(const double & df, const ST::string & auswahl)
   {
-  double kriterium;
+  double kriterium = 0.0;
 
   if(auswahl=="GCV")
     kriterium = likep_mult[0]->compute_gcv(df);

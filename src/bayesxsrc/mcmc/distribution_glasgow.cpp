@@ -432,7 +432,7 @@ void DISTRIBUTION::set_interceptsample(datamatrix & s,unsigned & column)
 double DISTRIBUTION::loglikelihood(const bool & current) const
   {
 
-  register unsigned  i;
+   unsigned  i;
   double* workweight = weight.getV();
   double* workres = response.getV();
   double help = 0;
@@ -529,7 +529,7 @@ void DISTRIBUTION::compute_weight(datamatrix & w,const unsigned & col,
                                   const bool & current) const
   {
 
-  register unsigned i;
+   unsigned i;
 
   double* workw = w.getV();
 
@@ -557,7 +557,7 @@ double DISTRIBUTION::compute_sumweight(const unsigned & col,
   {
   double sumw = 0;
 
-  register unsigned i;
+   unsigned i;
 
   double * worklin;
   if (current)
@@ -588,7 +588,7 @@ void DISTRIBUTION::compute_weight(datamatrix & w,const unsigned & beg,
                        const statmatrix<int> & index, const unsigned & col)
   {
 
-  register unsigned i;
+   unsigned i;
   int * workind = index.getV() + beg;
 
   for (i=beg;i<=end;i++,workind++)
@@ -608,7 +608,7 @@ double DISTRIBUTION::compute_sumweight(const unsigned & beg,
                                        const bool & current)
   {
 
-  register unsigned i;
+   unsigned i;
 
   int * workind = index.getV() + beg;
 
@@ -647,7 +647,7 @@ double DISTRIBUTION::compute_sumweight2(const unsigned & beg,
                                         const bool & current)
   {
 
-  register unsigned i;
+   unsigned i;
 
   int * workind = index.getV() + beg;
   int * workind2 = index2.getV() + beg;
@@ -683,7 +683,7 @@ double DISTRIBUTION::compute_sumweight2(const unsigned & beg,
 void DISTRIBUTION::fisher(datamatrix & XWX,datamatrix & data,
                           const unsigned & col) const
   {
-  register unsigned i;
+   unsigned i;
   unsigned p,k;
 
   unsigned nrconst = data.cols();
@@ -713,7 +713,7 @@ void DISTRIBUTION::fisher(datamatrix & XWX,datamatrix & w,datamatrix & data,
                           const unsigned & col,const bool & current) const
   {
 
-  register unsigned i;
+   unsigned i;
   unsigned p,k;
 
   unsigned nrconst = data.cols();
@@ -745,7 +745,7 @@ double DISTRIBUTION::fisher2(const unsigned & beg, const unsigned & end,
                             const bool & current) const
   {
 
-  register unsigned i;
+   unsigned i;
 
   double * workdata = data.getV()+beg;
 
@@ -785,7 +785,7 @@ void DISTRIBUTION::fisher(datamatrix & XWX,datamatrix & w,
   compute_weight(w,c);
 
 
-  register unsigned i;
+   unsigned i;
   unsigned p,k,l;
 
   unsigned nrconst = XWX.cols();
@@ -821,7 +821,7 @@ void DISTRIBUTION::fisher(datamatrix & XWX,datamatrix & w,
 
 void DISTRIBUTION::tilde_y(datamatrix & tildey,const bool & current)
   {
-  register unsigned i;
+   unsigned i;
 
   double * worklin;
   if (current == true)
@@ -843,7 +843,7 @@ void DISTRIBUTION::tilde_y(datamatrix & tildey,const bool & current)
 void DISTRIBUTION::tilde_y(datamatrix & tildey,datamatrix & m,
 const unsigned & col,const bool & current,const datamatrix & w)
   {
-  register unsigned i;
+   unsigned i;
   unsigned dim = linearpred.cols();
 
   double * worklin;
@@ -888,7 +888,7 @@ void DISTRIBUTION::compute_mu(const datamatrix & linpred, datamatrix & mu) const
 
 void DISTRIBUTION::substr_linearpred(const datamatrix & m,const bool & current)
   {
-  unsigned register i;
+  unsigned  i;
   double* workl;
   double* workm = m.getV();
   unsigned size=linearpred.rows()*linearpred.cols();
@@ -908,7 +908,7 @@ void DISTRIBUTION::substr_linearpred_m(const datamatrix & m,const unsigned & col
                            const bool & current)
   {
 
-  unsigned register i;
+  unsigned  i;
   double* workl;
   double* workm = m.getV();
   unsigned size=linearpred.cols();
@@ -930,7 +930,7 @@ void DISTRIBUTION::add_linearpred(const datamatrix & m,const bool & current)
   assert(m.rows() == linearpred.rows());
   assert(m.cols() == linearpred.cols());
 
-  unsigned register i;
+  unsigned  i;
   double* workl;
   double* workm = m.getV();
   unsigned size=linearpred.rows()*linearpred.cols();
@@ -962,7 +962,7 @@ void DISTRIBUTION::add_linearpred(const double & m, unsigned & row, unsigned & c
 void DISTRIBUTION::add_linearpred_m(const double & m,const unsigned & col,
                         const bool & current)
   {
-  unsigned register i;
+  unsigned  i;
   double* workl;
   unsigned size=linearpred.cols();
 
@@ -980,7 +980,7 @@ void DISTRIBUTION::add_linearpred_m(const double & m,const unsigned & col,
 void DISTRIBUTION::add_linearpred_m(const datamatrix & m,const unsigned & col,
                         const bool & current)
   {
-  unsigned register i;
+  unsigned  i;
   double* workl;
   double* workm = m.getV();
   unsigned size=linearpred.cols();
@@ -999,7 +999,7 @@ void DISTRIBUTION::add_linearpred_m(const datamatrix & m,const unsigned & col,
 void DISTRIBUTION::add_linearpred(const double & m,const bool & current)
   {
 
-  unsigned register i;
+  unsigned  i;
   double* workl;
 
   unsigned size=linearpred.rows()*linearpred.cols();
@@ -1021,7 +1021,7 @@ void DISTRIBUTION::add_linearpred(const datamatrix & m,const unsigned & beg,
                         const unsigned & end,const statmatrix<int> & index,
                         const unsigned & col, const bool & current)
   {
-  unsigned register i;
+  unsigned  i;
   int * workindex = index.getV()+beg;
   double * workm = m.getV();
   if (current)
@@ -1037,7 +1037,7 @@ void DISTRIBUTION::add_linearpred(const double & m,const unsigned & beg,
                          const unsigned & end,const statmatrix<int> & index,
                          const unsigned & col, const bool & current)
   {
-  unsigned register i;
+  unsigned  i;
   int * workindex = index.getV()+beg;
   if (current)
     for (i=beg;i<=end;i++,workindex++)
@@ -1053,7 +1053,7 @@ void DISTRIBUTION::add_linearpred2(const double & m,const unsigned & beg,
                          const unsigned & col,
                           const bool & current)
   {
-  unsigned register i;
+  unsigned  i;
   int * workindex2 = index2.getV()+beg;
 
   if (current)
@@ -1075,7 +1075,7 @@ void DISTRIBUTION::add_linearpred2(const double & m,const unsigned & beg,
 void DISTRIBUTION::addtocurrent(const datamatrix & m)
   {
 
-  unsigned register i;
+  unsigned  i;
   double* workc = (*linpred_current).getV();
   double * workp = (*linpred_proposed).getV();
 
@@ -1091,7 +1091,7 @@ void DISTRIBUTION::addtocurrent(const datamatrix & m)
 void DISTRIBUTION::addtocurrent(const double & m)
   {
 
-  unsigned register i;
+  unsigned  i;
   double* workc = (*linpred_current).getV();
   double * workp = (*linpred_proposed).getV();
 
@@ -1106,7 +1106,7 @@ void DISTRIBUTION::addtocurrent(const double & m)
 void DISTRIBUTION::addtocurrentcol(const datamatrix & m,const unsigned & col)
   {
 
-  unsigned register i,j;
+  unsigned  i,j;
   double* workc = (*linpred_current).getV();
   double * workp = (*linpred_proposed).getV();
 
@@ -1131,7 +1131,7 @@ void DISTRIBUTION::addtocurrentcol(const datamatrix & m,const unsigned & col)
 void DISTRIBUTION::addtocurrentcol(const double & m,const unsigned & col)
   {
 
-  unsigned register i,j;
+  unsigned  i,j;
   double* workc = (*linpred_current).getV();
   double * workp = (*linpred_proposed).getV();
 
@@ -1178,7 +1178,7 @@ void DISTRIBUTION::addtocurrentcol(const double & m,const unsigned & beg,
                                    const unsigned & col)
   {
 
-  unsigned register i,j;
+  unsigned  i,j;
   int * workindex = index.getV()+beg;
   unsigned size=linearpred.cols();
 
@@ -1202,7 +1202,7 @@ void DISTRIBUTION::addtocurrentcol(const double & m,const unsigned & beg,
 
 void DISTRIBUTION::assign(const bool & current)
   {
-  unsigned register i;
+  unsigned  i;
 
   double * workc;
   double * workp;
@@ -1229,7 +1229,7 @@ void DISTRIBUTION::assign(const bool & current)
 void DISTRIBUTION::assigncol(const unsigned & col,const bool & current)
   {
 
-  unsigned register i;
+  unsigned  i;
 
   double * workc;
   double * workp;
@@ -1257,7 +1257,7 @@ void DISTRIBUTION::assign(const unsigned & beg,const unsigned & end,
               const statmatrix<int> & index,const bool & current)
   {
 
-  unsigned register i;
+  unsigned  i;
   int * workindex = index.getV()+beg;
   if (current)
     {
@@ -1349,7 +1349,7 @@ void DISTRIBUTION::update_predict(void)
       )
       {
 
-      register unsigned i,j;
+       unsigned i,j;
       double * worklin = (*linpred_current).getV();
       double * workmean = linpredmean.getV();
       double * workmumean = mumean.getV();
@@ -1642,7 +1642,7 @@ void DISTRIBUTION::outresults(void)
 
 
 
-    register unsigned i,j;
+     unsigned i,j;
 
     optionsp->out("  Predicted values:\n",true);
     optionsp->out("\n");
@@ -2766,7 +2766,7 @@ void DISTRIBUTION_gamma::update(void)
 
 
 
-      register unsigned i;
+       unsigned i;
       double * worklin = (*linpred_current).getV();;
       double * workresp = response.getV();
       double * workweight = weight.getV();
@@ -3187,7 +3187,7 @@ void DISTRIBUTION_gamma::outresults(void)
 double DISTRIBUTION_gamma::phi_hat() const
   {
 
-  register unsigned i;
+   unsigned i;
   double* workweight = weight.getV();
   double* worklin = (*linpred_current).getV();
   double* workres = response.getV();
@@ -3321,7 +3321,7 @@ void DISTRIBUTION_gaussian::update(void)
     }
 
 
-  register unsigned i;
+   unsigned i;
 
   double help;
 
@@ -4111,7 +4111,7 @@ void DISTRIBUTION_binomial_latent::update(void)
   double * workresp;
   double * weightwork;
 
-  register unsigned i;
+   unsigned i;
 
   if (!tlink)
     {
@@ -4431,7 +4431,7 @@ void DISTRIBUTION_binomial_logit_latent::outresults(void)
       }
 
     mina=mina*100.0;
-    maxa=maxa*100.0;  
+    maxa=maxa*100.0;
     optionsp->out("  Minimum acceptance rate (scale): " +
     ST::doubletostring(mina,4) + "\%\n");
     optionsp->out("  Maximum acceptance rate (scale): " +
@@ -4449,7 +4449,7 @@ void DISTRIBUTION_binomial_logit_latent::update(void)
   double * workresp;
   double * weightwork;
 
-  register unsigned i;
+   unsigned i;
 
 
   worklin = (*linpred_current).getV();
@@ -4509,7 +4509,7 @@ bool DISTRIBUTION_binomial_logit_latent::posteriormode(void)
   {
 
   return true;
-  
+
   }
 
 
@@ -4732,7 +4732,7 @@ double DISTRIBUTION_multinom::compute_weight(double * linpred, double * weight,
                                              const unsigned & col) const
   {
 
-  register unsigned j;
+   unsigned j;
   double expcol;
   double sumexp=0;
   for (j=0;j<linearpred.cols();j++,linpred++)
@@ -4852,7 +4852,7 @@ void DISTRIBUTION_multinom::update(void)
 void DISTRIBUTION_multinom::compute_iwls(void)
   {
 
-  register unsigned i,j;
+   unsigned i,j;
   unsigned dim = response.cols();
 
   double * worklin = (*linpred_current).getV();
@@ -5392,7 +5392,7 @@ void DISTRIBUTION_cumulative_latent3::compute_deviance(const double * response,
 void DISTRIBUTION_cumulative_latent3::update(void)
   {
 
-  register unsigned i;
+   unsigned i;
 
   update_utilities();
 
@@ -5443,7 +5443,7 @@ void DISTRIBUTION_cumulative_latent3::update_predict(void)
       )
       {
 
-      register unsigned i,j;
+       unsigned i,j;
       double * worklin = (*linpred_current).getV();
       double * workmean = linpredmean.getV();
       double * workmumean = mumean.getV();

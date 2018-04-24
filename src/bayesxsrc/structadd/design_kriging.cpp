@@ -46,7 +46,8 @@ void DESIGN_kriging::compute_orthogonaldecomp(void)
 
   s = datamatrix(nrpar,1,0);
 
-  bool ecorrect = eigen2(RinvKRtinv,s);
+  bool ecorrect = true;
+  ecorrect = eigen2(RinvKRtinv,s);
   eigensort(s,RinvKRtinv);
 
   QtRinv = RinvKRtinv.transposed()*R.inverse();

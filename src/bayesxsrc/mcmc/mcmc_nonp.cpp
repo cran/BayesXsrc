@@ -656,7 +656,7 @@ void PenaltyMatrix::compute_proposal(const datamatrix & beta, const unsigned & b
   {
   unsigned matnr = begin[bs-min]+ ((a-1)/bs );
   unsigned l = b-a+1;
-  register unsigned i,j;
+   unsigned i,j;
 
   double * fc_randwork = fc_random[b-a].getV();
   double * KABrootwork = KABroot[matnr].getV();
@@ -719,7 +719,7 @@ double PenaltyMatrix::compute_quadform_prec(const datamatrix & beta,
 
 unsigned PenaltyMatrix::get_category(const double & v) const
   {
-  unsigned cat;
+  unsigned cat=0;
   unsigned i=0;
   double value;
 
@@ -1467,7 +1467,7 @@ void PenaltyMatrix::compute_fc(const datamatrix & beta, const unsigned & bs,
   {
   unsigned matnr = begin[bs-min]+ ((a-1)/bs );
   unsigned l = b-a+1;
-  register unsigned i,j;
+   unsigned i,j;
 
   double * fc_randwork = fc_random[b-a].getV();
   double * KABrootwork = KABroot[matnr].getV();
@@ -1537,7 +1537,7 @@ void PenaltyMatrix::compute_fc2(const datamatrix & beta,  datamatrix & res,
                                 const unsigned & v)
   {
 
-  register unsigned i,j;
+   unsigned i,j;
 
   unsigned matnr = begin[bs-min]+ ((a-1)/bs );
   unsigned l = b-a+1;

@@ -192,7 +192,11 @@ class __EXPORT_TYPE simpleoption : public option
 
   // DEFAULT CONSTRUCTOR
 
-  simpleoption(void) : option() {}
+  simpleoption(void) : option()
+    {
+    value = false;
+    defaultvalue = false;
+    }
 
   // CONSTRUCTOR
 

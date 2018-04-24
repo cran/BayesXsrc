@@ -478,7 +478,7 @@ void FC::update(void)
     )
     {
 
-    register unsigned i,j;
+     unsigned i,j;
     double* workbeta = beta.getV();
     double* workbetamean = betamean.getV();
     double* workbetas2 = betas2.getV();

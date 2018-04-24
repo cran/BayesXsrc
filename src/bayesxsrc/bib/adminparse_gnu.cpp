@@ -32,7 +32,8 @@ admin_gnu::admin_gnu(void)
 //  adminp = administrator_pointer();
 
   char path[100] = "";
-  getcwd(path, 100);
+  char *ptr;
+  ptr = getcwd(path, 100);
 
   defaultpath = ST::string(path);
 

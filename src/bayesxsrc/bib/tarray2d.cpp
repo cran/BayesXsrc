@@ -47,12 +47,13 @@ Array2D(unsigned rows, unsigned cols, const T init)
 {
 	m_rows = rows;
 	m_cols = cols;
+	m_row = new T*[ m_rows ];
 	create();
 	if (m_v)
 	{
-		register T *work;
+		 T *work;
 		unsigned size = m_rows * m_cols;
-		register unsigned i;
+		 unsigned i;
 
 		for(work = m_v, i = 0; i < size; i++, work++)
 			*work = init;
@@ -67,12 +68,13 @@ Array2D(unsigned rows, unsigned cols, const T init)
 //
 //	init - Initialisierer
 
-template <class T> 
+template <class T>
 Array2D<T>::
 Array2D(const Array2D<T> &init)
 {
 	m_rows = init.m_rows;
 	m_cols = init.m_cols;
+	m_row = new T*[ m_rows ];
 	create();
 	if (m_v)
 		copyContents(init);
@@ -99,6 +101,7 @@ operator=(const Array2D<T> &from)
 	discard();
 	m_rows = from.m_rows;
 	m_cols = from.m_cols;
+	m_row = new T*[ m_rows ];
 	create();
 	if (m_v)
 		copyContents(from);
@@ -166,12 +169,12 @@ hcat(const Array2D<T> &right) const
 // right - rechter Operand des join
 // pred - Kontrollierendes Predikat des joins
 //
-// Ergebnis: 
+// Ergebnis:
 
-template <class T>	
-Array2D<T> 
+template <class T>
+Array2D<T>
 Array2D<T>::
-join(const Array2D<T> &right, bool (* pred)(const Array2D<T> &, 
+join(const Array2D<T> &right, bool (* pred)(const Array2D<T> &,
                                            const Array2D<T>&,
                                            unsigned int il,
                                            unsigned int ir)) const
@@ -239,7 +242,7 @@ proj(bool (* pred)(const Array2D<T> &, unsigned int j)) const
       found.insert(column);
       }
     }
-   
+
   if (found.empty())
     return Array2D<T>(0, 0);
 
@@ -262,7 +265,7 @@ proj(bool (* pred)(const Array2D<T> &, unsigned int j)) const
 template <class T>
 Array2D<T>
 Array2D<T>::
-sel(bool (*pred)(const Array2D<T> &, unsigned int i)) const 
+sel(bool (*pred)(const Array2D<T> &, unsigned int i)) const
 {
   Stack< Array<T> > found;
   unsigned int i, j;
@@ -278,7 +281,7 @@ sel(bool (*pred)(const Array2D<T> &, unsigned int i)) const
       found.insert(row);
       }
     }
-   
+
   if (found.empty())
     return Array2D<T>(0, 0);
 
@@ -303,18 +306,18 @@ sel(bool (*pred)(const Array2D<T> &, unsigned int i)) const
 //	out - Stream, in den das Objekt geschrieben werden soll
 
 template <class T>
-void 
+void
 Array2D<T>::
 writeOn(ostream &out) const
 {
 	out << '[' << m_rows << ',' << m_cols << ']' << endl << '{' << endl;
 
 	unsigned i;
-	register T * work = m_v;
+	 T * work = m_v;
 
 	for (i = 0; i < m_rows; i++)
 	{
-		register unsigned j;
+		 unsigned j;
 
 		out << '{' << endl;
 		for (j = 0; j < m_cols; j++, work++)
@@ -365,8 +368,8 @@ void Array2D<T>::readFrom(istream &in)
 
 	//	Datenzeilen der Tafel einlesen
 
-	register T * work = m_v;
-	register unsigned i, j;
+	 T * work = m_v;
+	 unsigned i, j;
 	for (i = 0; i < m_rows; i++)
 	{
 		in >> ws;
@@ -430,9 +433,9 @@ void Array2D<T>::create()
 			m_row = new T*[ m_rows ];
 			if (m_row)
 			{
-				register T* work;
+				 T* work;
 				T **workRow;
-				register unsigned i;
+				 unsigned i;
 
 				//	Zeiger auf die Zeilen des 2D-Feldes besetzen:
 				//	die Elemente von m_row zeigen auf die Zeilen
@@ -492,9 +495,9 @@ void Array2D<T>::copyContents(const Array2D<T> &from)
 	assert(from.m_rows == m_rows);
 	assert(from.m_cols == m_cols);
 
-	register unsigned i;
-	register T *workTo;
-	register const T *workFrom;
+	 unsigned i;
+	 T *workTo;
+	 const T *workFrom;
 	unsigned size = m_rows * m_cols;
 
 	for(workTo = m_v, workFrom = from.m_v, i = 0;
@@ -520,13 +523,13 @@ Array2D<T> Array2D<T>::getCol (unsigned j) const
 	if (!result)
    	return Array2D<T>(0, 0);
 
-   for (register unsigned i = 0; i < rows(); i++)
+   for ( unsigned i = 0; i < rows(); i++)
          result (i, 0) = get(i, j);
 
    return result;
 }
 
- 
+
 template <class T>
 void Array2D<T>::putCol(unsigned j, const Array2D<T> &from)
 {
@@ -536,7 +539,7 @@ void Array2D<T>::putCol(unsigned j, const Array2D<T> &from)
 	assert(from.cols() == 1);
 	assert(from.rows() == rows() );
 
-   for (register unsigned i = 0; i < rows(); i++)
+   for ( unsigned i = 0; i < rows(); i++)
          put(i,j,  from.get(i, 0));
 }
 
@@ -546,11 +549,11 @@ template <class T>
 Array2D<T> Array2D<T>::applied(T (* f)(T)) const
 {
 	assert(!(operator!()));
-	
+
 	Array2D<T> result(rows(), cols());
 
-	for (register unsigned int i = 0; i < rows(); ++i)
-		for (register unsigned int j = 0; j < cols(); ++j)
+	for ( unsigned int i = 0; i < rows(); ++i)
+		for ( unsigned int j = 0; j < cols(); ++j)
 			result(i,j) = (*f)(get(i, j));
 	return result;
 }
@@ -567,8 +570,8 @@ Array2D<T> Array2D<T>::applied(const Array2D<T> &m, T (*f)(T, T)) const
 
 	Array2D<T> result(rows(), cols());
 
-	for (register unsigned int i = 0; i < rows(); ++i)
-		for (register unsigned int j = 0; j < cols(); ++j)
+	for ( unsigned int i = 0; i < rows(); ++i)
+		for ( unsigned int j = 0; j < cols(); ++j)
 			result(i,j) = (*f)(get(i, j), m.get(i, j));
 	return result;
 }
@@ -577,8 +580,8 @@ Array2D<T> Array2D<T>::applied(const Array2D<T> &m, T (*f)(T, T)) const
 //
 //	Die Indizierung erfogt im "C"-Stil.
 
-template <class T>	
-Array2D<T> 
+template <class T>
+Array2D<T>
 Array2D<T>::
 getBlock(unsigned int rl, unsigned int cl, unsigned int ru, unsigned int cu) const
 {
@@ -604,18 +607,18 @@ getBlock(unsigned int rl, unsigned int cl, unsigned int ru, unsigned int cu) con
 		return Array2D<T>(0,0);
 	}
 
-	for (register unsigned int i = rl; i < ru; ++i)
-		for (register unsigned int j = cl; j < cu; ++j)
+	for ( unsigned int i = rl; i < ru; ++i)
+		for ( unsigned int j = cl; j < cu; ++j)
 			result.put(i - rl, j - cl, get(i, j));
 	return result;
 }
-	
+
 //	Blockweises Einf"ugen in ein zweidimensionales Feld
 
 template <class T>
-void 
+void
 Array2D<T>::
-putBlock(const Array2D<T> & m, unsigned int rl, unsigned int cl, 
+putBlock(const Array2D<T> & m, unsigned int rl, unsigned int cl,
 		 unsigned int ru, unsigned int cu)
 {
 	assert(!(operator!()));
@@ -634,7 +637,7 @@ putBlock(const Array2D<T> & m, unsigned int rl, unsigned int cl,
 		if (ru - rl > m.rows())
 			ru = rl + m.rows();
 	}
-	if (cu == UINT_MAX)	
+	if (cu == UINT_MAX)
 	{
 		cu = cols();
 		if (cu - cl > m.cols())
@@ -647,13 +650,13 @@ putBlock(const Array2D<T> & m, unsigned int rl, unsigned int cl,
 	assert(cu - cl <= m.cols());
 
 
-	for (register unsigned int i = rl; i < ru; ++i)
-		for (register unsigned int j = cl; j < cu; ++j)
+	for ( unsigned int i = rl; i < ru; ++i)
+		for ( unsigned int j = cl; j < cu; ++j)
 			put(i, j, m.get(i - rl, j - cl));
 }
 
 template <class T>
-bool 
+bool
 Array2D<T>::
 operator==(const Array2D<T> &to)
 {
@@ -664,7 +667,7 @@ operator==(const Array2D<T> &to)
 
    if (rows() != to.rows() || cols() != to.cols())
       return false;
-	
+
    for (v = m_v, w = to.m_v; v < m_v + (m_rows * m_cols); ++v, ++w)
       if (*v != *w)
          return false;
@@ -672,7 +675,7 @@ operator==(const Array2D<T> &to)
 }
 
 template <class T>
-Array2D<T> 
+Array2D<T>
 Array2D<T>::
 strikedOut(unsigned int row, unsigned int col) const
 {
@@ -684,7 +687,7 @@ strikedOut(unsigned int row, unsigned int col) const
 
 	Array2D<T> result(rows() - 1, cols() - 1);
 
-	register unsigned int i, j, k, l;
+	 unsigned int i, j, k, l;
 
 	for (i = 0, k = 0; k < rows(); ++i, ++k )
 	{
@@ -718,7 +721,7 @@ strikedOutRow(unsigned int row) const
 
 	Array2D<T> result(rows() - 1, cols());
 
-	register unsigned int i, j, k;
+	 unsigned int i, j, k;
 
 	for (i = 0, k = 0; k < rows(); ++i, ++k )
 	{
@@ -744,7 +747,7 @@ strikedOutCol(unsigned int col) const
 
 	Array2D<T> result(rows(), cols() - 1);
 
-	register unsigned int i, j, l;
+	 unsigned int i, j, l;
 
 	for (i = 0; i < rows(); ++i)
 	{
@@ -774,10 +777,10 @@ purge(Array2D<T> &into)
 {
 	into.m_rows = m_rows;
 	into.m_cols = m_cols;
-	if (into.m_v) 
+	if (into.m_v)
 		delete [] into.m_v;
 	into.m_v = m_v;
-	if (into.m_row) 
+	if (into.m_row)
 		delete [] into.m_row;
 	into.m_row = m_row;
 	m_rows = m_cols = 0;

@@ -301,7 +301,7 @@ void FC_hrandom::update_IWLS(void)
     ok = designp->update_linpred_save(betadiff);
     if (!ok)
       {
-      int i = optionsp->nriter;
+//      int i = optionsp->nriter;
       outsidelinpredlimits++;
       }
     }
@@ -602,7 +602,8 @@ bool FC_hrandom::posteriormode_additive(void)
 
   set_rcoeff();
 
-  bool conv2 = FCrcoeff.posteriormode();
+  bool conv2 = true;
+  conv2 = FCrcoeff.posteriormode();
 
   if (simplerandom==false)
     {

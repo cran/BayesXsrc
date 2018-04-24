@@ -148,7 +148,7 @@ void symbandmatrix<T>::assign(const statmatrix<T> & de,const statmatrix<T> & ud,
     decomposedonly = true;
     }
 
-  register unsigned i;
+  unsigned i;
   for(i=0;i<dim;i++,workde++,workdiag++)
     *workdiag = *workde;
 
@@ -401,7 +401,7 @@ void symbandmatrix<T>::decomp(void)
       {
       D(0,0) = diagelem(0,0);                                        // 1.1
       R(0,0) = upperelem(0,0)/D(0,0);                                // 1.2
-      register unsigned i;
+      unsigned i;
       for(i=1;i<dim-1;i++)                                           // 1.3
         {
         D(i,0) = diagelem(i,0)-upperelem(i-1,0)*R(i-1,0);            // 1.3.1
@@ -448,7 +448,7 @@ void symbandmatrix<T>::decomp(void)
       workD++;
       workdiag++;
 
-      register unsigned i;
+      unsigned i;
       for(i=2;i<dim-2;i++,workD++,workdiag++)
         {
 //        D(i,0) = diagelem(i,0) - upperelem(i-2,1)*R(i-2,1) -
@@ -529,7 +529,7 @@ void symbandmatrix<T>::decomp(void)
       workupper0+=2;
       workupper1+=2;
 
-      register unsigned i;
+      unsigned i;
       for(i=2;i<dim-2;i++,workD++,workdiag++,workR0+=2,workR1+=2)
         {
 //        D(i,0) = diagelem(i,0) - upperelem(i-2,1)*R(i-2,1) -
@@ -580,7 +580,7 @@ void symbandmatrix<T>::decomp(void)
     else
       {      // bands > 2
 
-      register int k,i,j;
+      int k,i,j;
       unsigned p;
 
       double * workD = D.getV();
@@ -646,8 +646,8 @@ void symbandmatrix<T>::inverse(statmatrix<T> & res)
   if (!decomposed)
     decomp();
 
-   register int i;
-   register int j;
+   int i;
+   int j;
 
    T * workres;
 
@@ -942,7 +942,7 @@ void symbandmatrix<T>::solveL(const datamatrix & z,datamatrix & res)
   if (!decomposed)
     decomp();
 
-  register int i;
+  int i;
 
   if (bands==1)
     {
@@ -963,7 +963,7 @@ void symbandmatrix<T>::solveL(const datamatrix & z,datamatrix & res)
   else
     {
 
-    register int j;
+    int j;
     unsigned p;
 
     double * workres = res.getV()+dim-1;
@@ -1031,7 +1031,7 @@ void symbandmatrix<T>::solve(const statmatrix<T> & a, statmatrix<T> & res,
                              const unsigned & cola, const unsigned & colres)
   {
 
-  register int i;
+  int i;
 
   if (!decomposed)
     decomp();
@@ -1150,7 +1150,7 @@ void symbandmatrix<T>::solve(const statmatrix<T> & a, statmatrix<T> & res,
   else
     {
 
-    register int j;
+    int j;
     int p;
 
     double * workr;
@@ -1227,7 +1227,7 @@ void symbandmatrix<T>::addto(const symbandmatrix<T> & X,
                              const symbandmatrix<T> & K,
                              const T & f1,const T & f2)
   {
-  unsigned register i,j;
+  unsigned i,j;
   T * workK = K.diagelem.getV();
   T * workX = X.diagelem.getV();
   T * workres = diagelem.getV();
@@ -1253,7 +1253,7 @@ template<class T>
 void symbandmatrix<T>::addtodiag(const symbandmatrix<T> & X,
                                  const symbandmatrix<T> & K, const T & f)
   {
-  unsigned register i;
+  unsigned i;
   T * workK = K.diagelem.getV();
   T * workX = X.diagelem.getV();
   T * workres = diagelem.getV();
@@ -1273,7 +1273,7 @@ void symbandmatrix<T>::addtoblock(const symbandmatrix<T> & X,
                                   const T & f1,const T & f2,
                                   const unsigned & a,const unsigned & b)
   {
-  unsigned register i,j;
+  unsigned i,j;
   T * workK = K.diagelem.getV()+a;
   T * workX = X.diagelem.getV()+a;
   T * workres = diagelem.getV();
@@ -1302,7 +1302,7 @@ void symbandmatrix<T>::addtoblock2(const symbandmatrix<T> & X1,
                                   const T & f1,const T & f2,
                                   const unsigned & a,const unsigned & b)
   {
-  unsigned register i,j;
+  unsigned i,j;
   T * workX1 = X1.diagelem.getV()+a;
   T * workX2 = X2.diagelem.getV()+a;
   T * workres = diagelem.getV();
@@ -1369,7 +1369,7 @@ void symbandmatrix<T>::addto2(const symbandmatrix<T> & X,
                               const symbandmatrix<T> & K,
                               const T & f1,const T & f2)
   {
-  unsigned register i,j;
+  unsigned i,j;
   T * workK = K.diagelem.getV();
   T * workX = X.diagelem.getV();
   T * workres = diagelem.getV();
@@ -1406,7 +1406,7 @@ void symbandmatrix<T>::mult(const statmatrix<T> & X,statmatrix<T> & res) const
   int beg;
   int end;
 
-  register unsigned i,j,k;
+  unsigned i,j,k;
 
   for (i=0;i<dim;i++)
     for (j=0;j<X.cols();j++,workR++)

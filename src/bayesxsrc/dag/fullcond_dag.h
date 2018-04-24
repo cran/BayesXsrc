@@ -379,11 +379,11 @@ class __EXPORT_TYPE FULLCOND_dag : public FULLCOND
 	{
 	}
 
-	virtual void make_new_b (unsigned i, vector <vector <unsigned> > ia_new,
+/*	virtual void make_new_b (unsigned i, vector <vector <unsigned> > ia_new,
 							datamatrix & beta_new, datamatrix & xx_new,
 						datamatrix & b_new, datamatrix & x_new)
 	{
-	}
+	}*/
 
 
 

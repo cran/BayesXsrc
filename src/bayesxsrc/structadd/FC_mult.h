@@ -122,7 +122,7 @@ class __EXPORT_TYPE FC_mult  : public FC
 //--------------------------- CLASS: FC_mult_pred ------------------------------
 //------------------------------------------------------------------------------
 
-class __EXPORT_TYPE FC_mult_pred  : public FC
+/*class __EXPORT_TYPE FC_mult_pred  : public FC
   {
   protected:
 
@@ -173,7 +173,7 @@ class __EXPORT_TYPE FC_mult_pred  : public FC
 
   void set_distrp(DISTR * d);
 
-  };
+  };*/
 
 } // end: namespace MCMC
 

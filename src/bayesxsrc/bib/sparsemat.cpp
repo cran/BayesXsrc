@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 double norm(const datamatrix & v)
   {
   double* work = v.getV();
-  register unsigned i;
+   unsigned i;
   unsigned size = v.rows()*v.cols();
   double sum2=0;
   for(i=0;i<size;i++,work++)
@@ -38,7 +38,7 @@ double norm(const datamatrix & v)
 
 double norm (const datamatrix & v, const unsigned col)
   {
-  register unsigned i;
+   unsigned i;
   double sum=0;
   for(i=0;i<v.rows();i++)
     sum+= v(i,col)*v(i,col);
@@ -222,7 +222,7 @@ SparseMatrix SparseMatrix::reorder(const statmatrix<int> & index)
 
     }
 
-  return S;  
+  return S;
   }
 
 
@@ -230,7 +230,7 @@ double SparseMatrix::compute_quadform(const datamatrix & x,const unsigned & col)
   {
 
   double sum=0;
-  register unsigned i,j;
+   unsigned i,j;
   double * workx = x.getV()+col;
   unsigned v = x.cols();
   std::vector< vector<double> >::iterator valuesit = values.begin();

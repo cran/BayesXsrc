@@ -185,7 +185,7 @@ class __EXPORT_TYPE FC_nonp  : public FC
   // FUNCTION: outgraphs
   // TASK: writes batch files for STATA and R for visualizing results
 
-  void outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX,const ST::string & path);
+  void outgraphs(ofstream & out_stata, ofstream & out_R, ofstream & out_R2BayesX, const ST::string & path);
 
 
   double kernel_density(const double & x, const double & h);
@@ -226,7 +226,12 @@ class __EXPORT_TYPE FC_nonp  : public FC
 
   void get_effect(datamatrix & effect);
 
-  void set_multiplicative(void);
+  void set_multiplicative(DISTR * dp);
+  void get_multiplicative(void);
+
+  bool multiplicative;
+  DISTR * multlikep;
+  datamatrix expetatilde;
 
 /*  //return log-proposal density
   double compute_log_proposal(void);

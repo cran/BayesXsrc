@@ -18,8 +18,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
 #if defined(BayesX_gsl_included)
-#include <gsl/gsl_sf_lambert.h>
-#include <gsl/gsl_cdf.h>
+#include <gsl_sf_lambert.h>
+#include <gsl_cdf.h>
 #endif
 
 #include "distr_gamlss_copula.h"
@@ -1125,8 +1125,8 @@ vector<double> DISTR_clayton_copula::derivative(double & F1, double & F2, double
 
   double rho = exp(*linpred);
 
-  double logu = log(F1);
-  double logv = log(F2);
+//  double logu = log(F1);
+//  double logv = log(F2);
 
   double arg = pow(F1, -rho) + pow(F2, -rho) - 1;
   // first derivative

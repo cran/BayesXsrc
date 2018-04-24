@@ -22,7 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #if defined(BORLAND_OUTPUT_WINDOW)
 #include <vcl.h>
 #endif
-#pragma hdrstop
 
 #include "fullcond_pspline_surf_gaussian.h"
 
@@ -258,7 +257,7 @@ void FULLCOND_pspline_surf_gaussian::create(const datamatrix & v1, const datamat
     muyhelp = datamatrix(nrpar1dim,1,0);
     beta_ab = datamatrix(nrpar1dim,1,0);
     prop_ab = datamatrix(nrpar1dim,1,0);
-    beta_mode_ab = datamatrix(nrpar1dim,1,0);    
+    beta_mode_ab = datamatrix(nrpar1dim,1,0);
     }  // end if(!singleblock)
 
   mu = datamatrix(likep->get_nrobs(),1,0);

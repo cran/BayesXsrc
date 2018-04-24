@@ -54,8 +54,8 @@ Array<T>::Array( unsigned size, const T init )
 	create( );
 	if ( m_v )
 	{
-		register T *work;
-		register unsigned i;
+		 T *work;
+		 unsigned i;
 
 		for( work = m_v, i = 0; i < m_size; i++, work++ )
 			*work = init;
@@ -83,9 +83,9 @@ Array<T>::Array( unsigned size, const T *init )
 	create( );
 	if ( m_v )
 	{
-		register T *workTo;
+		 T *workTo;
 		const T *workFrom;
-		register unsigned i;
+		 unsigned i;
 
 		for ( workTo = m_v, workFrom = init, i = 0; i < m_size;
 			 i++, workTo++, workFrom++ )
@@ -146,8 +146,8 @@ void Array<T>::writeOn( ostream &out ) const
 {
 	out << '[' << m_size << ']' << endl << '{' << endl;
 
-	register T *work;
-	register unsigned i;
+	 T *work;
+	 unsigned i;
 
 	for ( work = m_v, i = 0; i < m_size; i++, work++ )
 		out << *work << endl;
@@ -171,8 +171,8 @@ void Array<T>::readFrom( istream &in )
 
 	create( );
 
-	register T *work;
-	register unsigned i;
+	 T *work;
+	 unsigned i;
 
 	for ( work = m_v, i = 0; i < m_size; i++, work++ )
 		in >> ws >> *work;
@@ -203,9 +203,9 @@ template <class T> void Array<T>::copyContents( const Array<T> &from )
 	assert( from != 0 );
 	assert( from.m_size == m_size );
 
-	register unsigned int i;
-	register T *workTo;
-	register const T *workFrom;
+	 unsigned int i;
+	 T *workTo;
+	 const T *workFrom;
 
 	for( workTo = m_v, workFrom = from.m_v, i = 0; i < m_size;
 		i++, workTo++, workFrom++ )
@@ -234,8 +234,8 @@ template <class T> int Array<T>::operator==(const Array<T> &other) const
 		assert(other.m_v != 0);
 	}
 
-	register T *work;
-	register const T *workOther;
+	 T *work;
+	 const T *workOther;
 
 	for (work = m_v, workOther = other.m_v;
 	     work < m_v + m_size;

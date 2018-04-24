@@ -48,7 +48,7 @@ void FULLCOND_tvariance::update(void)
   {
 
 
-  register unsigned i;
+   unsigned i;
 
 
   Kp->compute_u(u);

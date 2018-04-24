@@ -140,7 +140,7 @@ double FC_hrandom_variance::compute_quadform(void)
   unsigned n;
   double sum = 0;
   double * workbeta = FCnonpp->beta.getV();
-  register unsigned i;
+   unsigned i;
 
   n = FCnonpp->beta.rows();
 
@@ -303,7 +303,7 @@ const FC_hrandom_variance_ssvs & m)
 void FC_hrandom_variance_ssvs::update(void)
   {
 
-  register unsigned i;
+   unsigned i;
 
   double * workbetafcn = FCnonpp->beta.getV();
   double * workdelta = FC_delta.beta.getV();

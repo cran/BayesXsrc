@@ -126,7 +126,7 @@ void DISTR_multgaussian::compute_mu(const double * linpred,double * mu)
   *mu = *linpred;
   }
 
-void DISTR_multgaussian::compute_mu_mult(vector<double *> linpred,double * mu)
+void DISTR_multgaussian::compute_mu_mult(vector<double *> linpred, vector<double *> response, double * mu)
   {
   *mu = *linpred[catnr];
   }
@@ -327,7 +327,7 @@ void DISTR_multgaussian::compute_offset(void)
   vector<double *> workresp;
   vector<double *> worklin;
 
-  double * workresp_c;
+  double * workresp_c = workingresponse.getV();
   double * workrespcat = response.getV();
 
   for (j=0;j<nrcat;j++)
@@ -343,11 +343,6 @@ void DISTR_multgaussian::compute_offset(void)
       workresp.push_back(othercat[j]->response.getV());
 
       }
-    else
-      {
-      workresp_c = workingresponse.getV();
-      }
-
     }
 
   double o;
@@ -491,7 +486,7 @@ bool DISTR_multgaussian::posteriormode(void)
 
   if (master)
     {
-    register unsigned i,j;
+     unsigned i,j;
 
     double * worklin;
     double * workresp;

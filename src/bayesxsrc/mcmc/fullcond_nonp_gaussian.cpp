@@ -3117,7 +3117,10 @@ void FULLCOND_nonp_gaussian::update(void)
 
 // Multiplikative Effekte: Zentrieren des Effekts
     if (notransform)
-      double m = centerbeta();
+      {
+      double m = 0.0;
+      m = centerbeta();
+      }
 
     update_linpred(true);
 
@@ -3529,14 +3532,15 @@ bool FULLCOND_nonp_gaussian::posteriormode(void)
   precenv.solve(beta);
 
 // Multiplikative Effekte: Zentrieren des Effekts
+  double m = 0.0;
   if (notransform)
-    double m = centerbeta();
+    m = centerbeta();
 
   update_linpred(true);
 
   if (center)
     {
-    double m = centerbeta();
+    m = centerbeta();
     if (varcoeff)
       fcconst->posteriormode_fix_varcoeff(m,datanames[1]);
     else
