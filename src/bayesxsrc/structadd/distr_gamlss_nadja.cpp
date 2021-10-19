@@ -19413,8 +19413,8 @@ double DISTR_bivprobit2_rho::loglikelihood_weightsone(double * response,
     set_worklin();
     }
 
-  vector<double> lower(2);
-  vector<double> upper(2);
+  vector<double> lower(3);
+  vector<double> upper(3);
   lower[1] = -DBL_MAX;
   lower[2] = -DBL_MAX;
   upper[1] = (*worklin[1]);
@@ -19483,8 +19483,8 @@ void DISTR_bivprobit2_rho::compute_iwls_wweightschange_weightsone(
     set_worklin();
     }
 
-  vector<double> lower(2);
-  vector<double> upper(2);
+  vector<double> lower(3);
+  vector<double> upper(3);
   lower[1] = -DBL_MAX;
   lower[2] = -DBL_MAX;
   upper[1] = (*worklin[1]);
@@ -19682,8 +19682,8 @@ void DISTR_bivprobit2_mu::compute_deviance_mult(vector<double *> response,
      double mu_2 = (*linpred[1]);
      double mu_1 = (*linpred[2]);
 
-     vector<double> lower(2);
-    vector<double> upper(2);
+     vector<double> lower(3);
+    vector<double> upper(3);
     lower[1] = -DBL_MAX;
     lower[2] = -DBL_MAX;
     upper[1] = mu_1;
@@ -19805,8 +19805,8 @@ double DISTR_bivprobit2_mu::loglikelihood_weightsone(double * response,
     set_worklin();
     }
 
-  vector<double> lower(2);
-  vector<double> upper(2);
+  vector<double> lower(3);
+  vector<double> upper(3);
   lower[1] = -DBL_MAX;
   lower[2] = -DBL_MAX;
   upper[1] = (*linpred);
@@ -19869,8 +19869,8 @@ void DISTR_bivprobit2_mu::compute_iwls_wweightschange_weightsone(
     set_worklin();
     }
 
-  vector<double> lower(2);
-  vector<double> upper(2);
+  vector<double> lower(3);
+  vector<double> upper(3);
   lower[1] = -DBL_MAX;
   lower[2] = -DBL_MAX;
   upper[1] = (*linpred);

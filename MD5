@@ -1,4 +1,4 @@
-1680f91aa41a5290dfcb62061846a483 *DESCRIPTION
+4b24953979a0f1f240e535769f225107 *DESCRIPTION
 1a04e3007170bf5a9af1e51a9060acc7 *NAMESPACE
 eebbcc4c38c155d87dc207d72feb3a6f *NEWS
 cba21fc7e2d39608d0241d8cedc4fd43 *R/run.bayesx.R
@@ -319,7 +319,7 @@ b1c021d5bfeea6b0059faa5f3fd4fe54 *src/bayesxsrc/structadd/distr_categorical.h
 4acbf26370856269dab1cf52489326f5 *src/bayesxsrc/structadd/distr_gamlss.h
 f50a982815d111f9276f6e423bf98d8e *src/bayesxsrc/structadd/distr_gamlss_copula.cpp
 efa186a81108b534c9d6e2a5a6c3c03e *src/bayesxsrc/structadd/distr_gamlss_copula.h
-e789c24f165e8255626423efea3369da *src/bayesxsrc/structadd/distr_gamlss_nadja.cpp
+49cb768d3a5638dfdaa5ff093cf669e6 *src/bayesxsrc/structadd/distr_gamlss_nadja.cpp
 67ea158ed4b39f25258e693b4729921d *src/bayesxsrc/structadd/distr_gamlss_nadja.h
 339b5235fd8c5460e04030bb69b43b86 *src/bayesxsrc/structadd/distr_mixture.cpp
 d36f195f1160997808fe2a69738cf75e *src/bayesxsrc/structadd/distr_mixture.h
