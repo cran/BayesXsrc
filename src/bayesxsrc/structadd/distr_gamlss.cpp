@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -20,9 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include "distr_gamlss.h"
 
 #if defined(BayesX_gsl_included)
-#include "gsl_randist.h"
-#include "gsl_cdf.h"
-#include "gsl_rng.h"
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_cdf.h>
+#include <gsl/gsl_rng.h>
 #endif
 
 namespace MCMC

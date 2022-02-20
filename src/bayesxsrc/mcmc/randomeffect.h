@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -80,13 +80,6 @@ class __EXPORT_TYPE FULLCOND_random : public FULLCOND
 
   FULLCOND ftotal;
 
-  // BEGIN: DSB //
-  #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  bool mscheck;
-  void update_linpred_mscheck(datamatrix & priorSamples, datamatrix & posteriorSamples);
-  #endif
-  // END: DSB //
-
   void init_spatialtotal(vector<ST::string> & ev, const ST::string & pnt,
                          const ST::string & prt);
 
@@ -99,12 +92,6 @@ class __EXPORT_TYPE FULLCOND_random : public FULLCOND
   void update_linpred_diff(datamatrix & b1,datamatrix & b2);
 
   public:
-
-// Begin: DSB
-  #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  void set_mscheck(const bool & val);
-  #endif
-// End: DSB
 
   // DEFAULT CONSTRUCTOR:
 

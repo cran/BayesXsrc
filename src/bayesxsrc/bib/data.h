@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -31,10 +31,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include"statmat.h"
 #include"vectorn.h"
 #include<list>
-
-#if defined(JAVA_OUTPUT_WINDOW)
-#include"adminparse_basic.h"
-#endif
 
 
 //typedef statmatrix<double> __EXPORT_TYPE datamatrix;
@@ -272,10 +268,6 @@ class __EXPORT_TYPE filter : public vector<bool>
 class __EXPORT_TYPE dataset
   {
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adminb_p;
-  #endif
-
   protected:
 
 
@@ -306,9 +298,6 @@ class __EXPORT_TYPE dataset
   //------------------------- PROTECTED FUNCTIONS ------------------------------
 
   void filldata(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adminb_p,
-  #endif
   istream & in, ST::string & m,const unsigned & maxobs);
 
   // FUNCTION: checkvarnames
@@ -334,15 +323,8 @@ class __EXPORT_TYPE dataset
 
   // CONSTRUCTOR
 
-#if defined(JAVA_OUTPUT_WINDOW)
-  dataset(const ST::string & n,administrator_basic * adb)
-#else
   dataset(const ST::string & n)
-#endif
 	 {
-     #if defined(JAVA_OUTPUT_WINDOW)
-     adminb_p = adb;
-     #endif
 	 datarep = data();
 	 name = n;
 	 nrobs = 0;
@@ -376,9 +358,6 @@ class __EXPORT_TYPE dataset
   // - maximal linesize: 8192 byte
 
   void read(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adminb_p,
-  #endif
   ifstream & in,ST::string & missing,const unsigned & maxobs,
             const list<ST::string> & names = list<ST::string>());
 
@@ -393,9 +372,6 @@ class __EXPORT_TYPE dataset
   //   file
 
   unsigned write (
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adminb_p,
-  #endif
   ostream & out,list<ST::string> & names, // = list<ST::string>(),
 				  const bool header = false, const realvar & v0 = realvar());
 

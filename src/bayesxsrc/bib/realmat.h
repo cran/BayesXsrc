@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -41,10 +41,10 @@ public :
    // Konstruktor fuer eine uninitalisierte Matrix
 
    realMatrix(unsigned rows, unsigned cols = 1) : Matrix<real>(rows, cols) { }
-  
+
    // Konstruktor fuer eine mit einem festen Wert initialisierte Matrix
 
-   realMatrix(unsigned rows, unsigned cols, const real init) : 
+   realMatrix(unsigned rows, unsigned cols, const real init) :
    Matrix<real>(rows, cols, init) { }
 
   // Kopierkonstruktor
@@ -76,7 +76,7 @@ public :
       { realMatrix res; Matrix<real>::operator&(m).purge(res); return res; }
 
    // Einstellige Operatoren
-	
+
    realMatrix operator+()
       { realMatrix res; Matrix<real>::operator+().purge(res); return res; }
    realMatrix operator-()
@@ -134,10 +134,10 @@ public :
       { realMatrix res; Matrix<real>::sscp().purge(res);  return res; }
 
    // Anwendung von Funktionen auf Matrizen
-		
+
    realMatrix applied(real (*f)(real)) const
       { realMatrix res; Array2D<real>::applied( f ).purge(res);  return res; }
-      	
+
    realMatrix applied(const realMatrix &m, real (* f)(real, real)) const
       { realMatrix res; Array2D<real>::applied( m, f ).purge(res);  return res; }
 
@@ -168,7 +168,7 @@ public :
       { realMatrix res; Matrix<real>::diag(dim, v).purge(res); return res; }
    static realMatrix diag(const realMatrix &m)
       { realMatrix res; Matrix<real>::diag(m).purge(res); return res; }
-   static realMatrix tridiag(const realMatrix &m, const realMatrix &lm, 
+   static realMatrix tridiag(const realMatrix &m, const realMatrix &lm,
 			 const realMatrix &um)
       { realMatrix res; Matrix<real>::tridiag(m,lm,um).purge(res); return res; }
 
@@ -180,7 +180,7 @@ public :
    realMatrix cinverse() const
       { realMatrix res; Matrix<real>::cinverse().purge(res); return res; }
    realMatrix root () const
-      { realMatrix res; Matrix<real>::root().purge(res); return res; } 
+      { realMatrix res; Matrix<real>::root().purge(res); return res; }
 
    realMatrix vcat(const realMatrix &bottom) const
       { realMatrix res; Matrix<real>::vcat(bottom).purge(res); return res; }
@@ -194,7 +194,7 @@ public :
 
    // L"ost ein lineares Gleichungssystem: *this * x = b mit Cholesky-
    // Zerlegung
-   
+
    realMatrix csolve(const realMatrix &bIn) const
       { realMatrix res; Matrix<real>::csolve(bIn).purge(res); return res; }
 protected:
@@ -207,22 +207,22 @@ protected:
 
   // nur fuer realMatrix
 public:
-  
+
   bool containsNaNs() const;
 
   realMatrix eigenvalSym() const;
   realMatrix eigenvecSym() const;
-		
+
 };
 
 
-inline 
+inline
 realMatrix
 realMatrix::
-getBlock(unsigned int rl, unsigned int ru, unsigned int cl, unsigned int cu) 
+getBlock(unsigned int rl, unsigned int ru, unsigned int cl, unsigned int cu)
 const
-{ 
-   realMatrix res; 
+{
+   realMatrix res;
 
    Array2D<real>::getBlock(rl, ru, cl, cu).purge(res);
    return res;
@@ -233,9 +233,9 @@ inline
 realMatrix
 realMatrix::
 strikedOutRow(unsigned int row) const
-{ 
+{
    realMatrix res;
-		
+
    Array2D<real>::strikedOutRow(row).purge(res);
    return res;
 }

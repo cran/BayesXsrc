@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -29,19 +29,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include"option.h"
 #include"command.h"
 
-#if defined(JAVA_OUTPUT_WINDOW)
-#include "adminparse_basic.h"
-#endif
 
 
 class __EXPORT_TYPE statobject
   {
 
   protected:
-
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adminb_p;
-  #endif
 
   //------------------------- PROTECTED VARIABLES ------------------------------
 
@@ -130,13 +123,8 @@ class __EXPORT_TYPE statobject
   // - input = in
   // - defaultpath = p
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  statobject(administrator_basic * adb,const ST::string & n,
-             const ST::string t,ofstream * lo,istream * in,ST::string p = "");
-  #else
   statobject(const ST::string & n,const ST::string t,ofstream * lo,istream * in,
 				 ST::string p = "");
-  #endif
 
   // COPY CONSTRUCTOR
 

@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -58,9 +58,9 @@ FULLCOND_variance_nonp_vector::FULLCOND_variance_nonp_vector(MCMCoptions * o,
                          const ST::string & fr, const vector<double> & shrinkagestart,
                          const vector<double> & ashrinkage, const vector<double> & bshrinkage,
                          const vector<bool> & shrinkagefix, const vector<double> & shrinkageweight,
-//                         const datamatrix start_data, 
+//                         const datamatrix start_data,
                          const vector<bool> & shrinkageadaptive,
-                         const bool & isridge, const vector<unsigned> & ct, 
+                         const bool & isridge, const vector<unsigned> & ct,
                          const unsigned & c)
                          : FULLCOND(o,datamatrix(1,1),ti,1,1,fp)
     {
@@ -90,7 +90,7 @@ FULLCOND_variance_nonp_vector::FULLCOND_variance_nonp_vector(MCMCoptions * o,
       helpvariances.putRowBlock(cut[i],cut[i+1],Cp[i]->get_variances());
       }
     setbeta(helpvariances);
-    
+
     // Startwerte setzen aus Option
 //    startdata = start_data;      // Kontrolle der uebergebenen Startwerte
     lassosum = 0;
@@ -112,7 +112,7 @@ FULLCOND_variance_nonp_vector::FULLCOND_variance_nonp_vector(MCMCoptions * o,
     // Set the variablenames of the fullcond object
     vector<ST::string> varnam(nrpar);
     vector<ST::string> helpvarnam;
-  
+
     for(unsigned j=0; j<cut.size()-1; j++)
       {
       helpvarnam = Cp[j]->get_datanames();
@@ -141,32 +141,32 @@ FULLCOND_variance_nonp_vector::FULLCOND_variance_nonp_vector(MCMCoptions * o,
 //TEMP:BEGIN--------------------------------------------------------------------
 // Kontrolle der uebergebenen Werte
   // vector<ST::string> vnam = fc_shrinkage.get_datanames();
-  // double * helpshrinkagep = fc_shrinkage.getbetapointer(); 
-  
+  // double * helpshrinkagep = fc_shrinkage.getbetapointer();
+
   // ofstream outstartvectors_vnv("c:/bayesx/test/startvectors_vnv.txt", ios::trunc|ios::app);
   // outstartvectors_vnv << "datamatrix with starting values"<< "\n";
-  // outstartvectors_vnv << "effect lambda shrinkage weight a b shrinkagefix adaptive\n";    
+  // outstartvectors_vnv << "effect lambda shrinkage weight a b shrinkagefix adaptive\n";
   // outstartvectors_vnv << "\n";
   // outstartvectors_vnv << "vektoren"<< "\n" << "varnam lambda tau2 shrinkagep shrinkage weight a b shrinkagefix adaptive" << "\n";
   // for(unsigned i=0; i<shrinkageweight.size(); i++, helpshrinkagep++)
     // {
-    // outstartvectors_vnv << varnam[i]  << "  " 
-                        // << 1/helpvariances(i,0) << "  " 
-                        // << helpvariances(i,0) << "  " 
-                        // << * helpshrinkagep  << "  " 
-                        // << shrinkagestart[i] << "  " 
-                        // << shrinkageweight[i] << "  " 
+    // outstartvectors_vnv << varnam[i]  << "  "
+                        // << 1/helpvariances(i,0) << "  "
+                        // << helpvariances(i,0) << "  "
+                        // << * helpshrinkagep  << "  "
+                        // << shrinkagestart[i] << "  "
+                        // << shrinkageweight[i] << "  "
                         // << ashrinkage[i] << "  "
-                        // << bshrinkage[i] << "  " 
-                        // << shrinkagefix[i] << "  " 
-                        // << shrinkageadaptive[i] << "  " 
+                        // << bshrinkage[i] << "  "
+                        // << shrinkagefix[i] << "  "
+                        // << shrinkageadaptive[i] << "  "
                         // << "\n";
     // }
 
-//TEMP:END----------------------------------------------------------------------  
+//TEMP:END----------------------------------------------------------------------
 
   }
-    
+
 //______________________________________________________________________________
 //
 // COPY CONSTRUCTOR
@@ -242,10 +242,10 @@ void FULLCOND_variance_nonp_vector::update(void)
   {
   acceptance++;
   unsigned i, j, k;
-  
+
   double rand_invgaussian = 0;
   double helpshrinkage;
-    
+
   // variables for summs
   lassosum = 0;
   ridgesum = 0;
@@ -256,7 +256,7 @@ void FULLCOND_variance_nonp_vector::update(void)
   // get current value of (first)
   int iteration = optionsp->get_nriter();                  // Iteration
   double * shrinkagep = fc_shrinkage.getbetapointer();     // shrinkagearameter
-  
+
 //TEMP:BEGIN--------------------------------------------------------------------
 //ofstream outputl("c:/bayesx/test/test_lasso_vnv.txt", ios::out|ios::app);
 // ofstream outputr("c:/bayesx/test/test_ridge_vnv.txt", ios::out|ios::app);
@@ -266,7 +266,7 @@ void FULLCOND_variance_nonp_vector::update(void)
 // int nrlasso = distrp->get_lasso();
 //TEMP:END----------------------------------------------------------------------
 
-  
+
   double * workbeta;                                       // regressioncoefficients
   double * workvariance;                                   // variance
   double sigma2 = distrp->get_scale(column);                // scale parameter
@@ -276,7 +276,7 @@ void FULLCOND_variance_nonp_vector::update(void)
   //------------------------------
   if(iteration==1)
     {
-    get_startvalues(); 
+    get_startvalues();
     }
 
 
@@ -297,13 +297,13 @@ void FULLCOND_variance_nonp_vector::update(void)
         {
         if (*workbeta>0 && *shrinkagep>0)
           {
-          rand_invgaussian = rand_inv_gaussian((sqrt(sigma2) * *shrinkagep)/(*workbeta), 
+          rand_invgaussian = rand_inv_gaussian((sqrt(sigma2) * *shrinkagep)/(*workbeta),
                                                (*shrinkagep * *shrinkagep));
           beta(k,0) = 1.0/rand_invgaussian;
           }
         if (*workbeta<0 && *shrinkagep>0)
           {
-          rand_invgaussian = rand_inv_gaussian(-1.0 * (sqrt(sigma2) * *shrinkagep)/(*workbeta), 
+          rand_invgaussian = rand_inv_gaussian(-1.0 * (sqrt(sigma2) * *shrinkagep)/(*workbeta),
                                               (*shrinkagep * *shrinkagep));
           beta(k,0) = 1.0/(rand_invgaussian);
           }
@@ -316,7 +316,7 @@ void FULLCOND_variance_nonp_vector::update(void)
         sumvariances = sumvariances + beta(k,0);        // sum(tau^2) of current variances
         }
       }
-     
+
     // transfer lassosum to scale update
     distrp->update_lasso(lassosum);
     }
@@ -329,7 +329,7 @@ void FULLCOND_variance_nonp_vector::update(void)
     for(j=0; j<cut.size()-1; j++)
       {
       workbeta = Cp[j]->getbetapointer();               // current value of first regressionparameter
-      for(k=cut[j]; k<cut[j+1]; k++, workbeta++, shrinkagep++)   
+      for(k=cut[j]; k<cut[j+1]; k++, workbeta++, shrinkagep++)
         {
 
          beta(k,0) = 1/(2 * *shrinkagep);
@@ -340,7 +340,7 @@ void FULLCOND_variance_nonp_vector::update(void)
     // transfer ridgesum to scale update
     distrp->update_ridge(ridgesum);
     }
-    
+
 
 
   // Gibbs-Update of Shrinkageparameter with Gammadistribution
@@ -349,7 +349,7 @@ void FULLCOND_variance_nonp_vector::update(void)
     {
     // reset shrinkagepointer
     shrinkagep = fc_shrinkage.getbetapointer();
-    
+
     if(is_ridge == 0 && shrinkage_adaptive == false)            // L1-penalty
       {
       //helpshrinkage = rand_gamma(nrpar + a_shrinkage[0], b_shrinkage[0] + sumabsregcoeff/sqrt(sigma2));//Armagan+Dunson
@@ -373,7 +373,7 @@ void FULLCOND_variance_nonp_vector::update(void)
           }
         }
       }
-      
+
     if(is_ridge == 1 && shrinkage_adaptive == false)            // L2-penalty
       {
       helpshrinkage = rand_gamma(0.5*nrpar + a_shrinkage[0], b_shrinkage[0] + sumregcoeff/sigma2);
@@ -383,7 +383,7 @@ void FULLCOND_variance_nonp_vector::update(void)
         }
       }
     if(is_ridge == 1 && shrinkage_adaptive == true)            // L2-penalty adaptive
-      {  
+      {
       k = 0;
       for(j=0; j<cut.size()-1; j++)
         {
@@ -396,7 +396,7 @@ void FULLCOND_variance_nonp_vector::update(void)
         }
       }
     }
-    
+
   // Transfer of the updates
   //------------------------
   k = 0;
@@ -426,7 +426,7 @@ void FULLCOND_variance_nonp_vector::update(void)
 void FULLCOND_variance_nonp_vector::outresults(void)
   {
   FULLCOND::outresults();
-  
+
   unsigned int i,j,k;
   vector<ST::string> vnames(nrpar);
   vector<ST::string> helpvarnames;
@@ -456,7 +456,7 @@ void FULLCOND_variance_nonp_vector::outresults(void)
   // Kopfzeile Dateiausgabe
   if (pathresults.isvalidfile() != 1)
     outp << "paramnr varname pmean pstd pqu" << l1 << " pqu" << l2 <<
-           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 << 
+           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 <<
            " pcat" << level2 << endl;
 
   optionsp->out("\n");
@@ -512,7 +512,7 @@ void FULLCOND_variance_nonp_vector::outresults(void)
       stddouble = 0;
     else
       stddouble = sqrt(betavar(i,0));
-     
+
     // Dateiausgabe
     if (pathresults.isvalidfile() != 1)
       {
@@ -570,7 +570,7 @@ void FULLCOND_variance_nonp_vector::outresults_shrinkage(void)
   if(shrinkage_fix==false)
   {
   fc_shrinkage.outresults();
-  
+
   ST::string shrinkage_pathresults = pathresults.substr(0,pathresults.length()-7) + "shrinkage.res";
 
   unsigned nr;
@@ -585,7 +585,7 @@ void FULLCOND_variance_nonp_vector::outresults_shrinkage(void)
   unsigned i;
 
   vector<ST::string> vnames = fc_shrinkage.get_datanames();
-  
+
   ST::string l1 = ST::doubletostring(lower1,4);
   ST::string l2 = ST::doubletostring(lower2,4);
   ST::string u1 = ST::doubletostring(upper1,4);
@@ -601,7 +601,7 @@ void FULLCOND_variance_nonp_vector::outresults_shrinkage(void)
   // Kopfzeile Dateiausgabe
   if (shrinkage_pathresults.isvalidfile() != 1)
     outp << "paramnr varname pmean pstd pqu" << l1 << " pqu" << l2 <<
-           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 << 
+           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 <<
            " pcat" << level2 << endl;
 
   optionsp->out("\n");
@@ -658,7 +658,7 @@ void FULLCOND_variance_nonp_vector::outresults_shrinkage(void)
       stddouble = 0;
     else
       stddouble = sqrt(fc_shrinkage.get_betavar(i,0));
-     
+
     // Dateiausgabe
     if (shrinkage_pathresults.isvalidfile() != 1)
       {
@@ -712,7 +712,7 @@ void FULLCOND_variance_nonp_vector::outresults_shrinkage(void)
 
 void FULLCOND_variance_nonp_vector::outoptions(void)
   {
-  
+
   vector<ST::string> varnames(nrpar);
   vector<ST::string> helpvarnames;
 
@@ -726,15 +726,15 @@ void FULLCOND_variance_nonp_vector::outoptions(void)
       }
     }
 
-  
+
   vector <ST::string> helppath;
   for(unsigned j=0; j<cut.size()-1; j++)
     {
     helppath.push_back(Cp[j]->get_title());
-    }  
+    }
   optionsp->out("  OPTIONS FOR SHRINKAGE EFFECTS: " + helppath[0] + "\n",true);
   if(helppath.size()>1)
-    { 
+    {
     for(unsigned j=1; j<helppath.size(); j++)
       {
        optionsp->out( ST::string(' ',33) + helppath[j] + "\n",true);
@@ -758,13 +758,13 @@ void FULLCOND_variance_nonp_vector::outoptions(void)
     optionsp->out("  Hyperparameter b for shrinkage: " +
                      ST::doubletostring(b_shrinkage[0]) + "\n" );
     }
-    
+
   if(shrinkage_adaptive == false && shrinkage_fix==true)
     {
     optionsp->out("  Shrinkage is fixed at value: " +
                      ST::doubletostring(fc_shrinkage.getbeta(0,0)) + "\n" );
     }
-    
+
   if(shrinkage_adaptive == true && shrinkage_fix==false)
     {
     for(unsigned i=0; i<nrpar; i++)
@@ -776,7 +776,7 @@ void FULLCOND_variance_nonp_vector::outoptions(void)
       optionsp->out("\n");
       }
     }
-    
+
   if(shrinkage_adaptive == true && shrinkage_fix==true)
     {
     for(unsigned i=0; i<nrpar; i++)
@@ -785,10 +785,10 @@ void FULLCOND_variance_nonp_vector::outoptions(void)
                        ST::doubletostring(fc_shrinkage.getbeta(i,0)) + "\n" );
       }
     }
-    
+
     optionsp->out("\n");
   }
-  
+
 //______________________________________________________________________________
 //
 // FUNCTION: get_samples
@@ -806,7 +806,7 @@ void FULLCOND_variance_nonp_vector::get_samples(const ST::string & filename,
   optionsp->out("\n");
   fc_shrinkage.get_samples(pathhelp);
   }
-  
+
 //______________________________________________________________________________
 //
 // FUNCTION: get_startvalues
@@ -816,19 +816,19 @@ void FULLCOND_variance_nonp_vector::get_samples(const ST::string & filename,
 void FULLCOND_variance_nonp_vector::get_startvalues(void)
   {
   unsigned i, j, k;
-    
+
   // Hilfsvariablen
 //  double * helpbeta;
   double * helpvariance;
   double * helpshrinkage = fc_shrinkage.getbetapointer();
   vector<ST::string> helpvarname_variance;
   vector<ST::string> helpvarname_shrinkage = fc_shrinkage.get_datanames();
-  
+
   // Variances
   ST::string variance_pathstartdata = pathresults.substr(0,pathresults.length()-7) + "variance_startdata.raw";
   ofstream variance_outoutstartdata(variance_pathstartdata.strtochar());
   variance_outoutstartdata << "varname startvalue" << endl;
-  
+
   // Shrinkageparameter
   ST::string shrinkage_pathstartdata = pathresults.substr(0,pathresults.length()-7) + "shrinkage_startdata.raw";
   ofstream shrinkage_outoutstartdata(shrinkage_pathstartdata.strtochar());
@@ -838,7 +838,7 @@ void FULLCOND_variance_nonp_vector::get_startvalues(void)
   ST::string hyperpar_pathstartdata = pathresults.substr(0,pathresults.length()-7) + "hyperpar_startdata.raw";
   ofstream hyperpar_outoutstartdata(hyperpar_pathstartdata.strtochar());
   hyperpar_outoutstartdata << "varname weight a b shrinkagefix adptive" << endl;
-  
+
   for(j=0; j<cut.size()-1; j++)
     {
     helpvariance = Cp[j]->getvariancespointer();
@@ -848,16 +848,16 @@ void FULLCOND_variance_nonp_vector::get_startvalues(void)
       {
       variance_outoutstartdata  << helpvarname_variance[i] << " " << *helpvariance << endl;
       shrinkage_outoutstartdata << helpvarname_variance[i] << " " << *helpshrinkage << "  " << endl;
-      hyperpar_outoutstartdata  << helpvarname_variance[i]  << " " 
-                                << weight[k]  << " " 
-                                << a_shrinkage[k] << " " 
-                                << b_shrinkage[k] << " " 
-                                << shrinkage_fix << " " 
+      hyperpar_outoutstartdata  << helpvarname_variance[i]  << " "
+                                << weight[k]  << " "
+                                << a_shrinkage[k] << " "
+                                << b_shrinkage[k] << " "
+                                << shrinkage_fix << " "
                                 << shrinkage_adaptive << endl;
       }
     }
   }
-  
+
 } // end: namespace MCMC
 
 

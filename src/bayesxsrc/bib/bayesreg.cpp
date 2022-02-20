@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,19 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
-
-
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<StatwinFrame.h>
-#include<statwin_haupt.h>
-
-#endif
 
 #include"bayesreg.h"
 #include"dataobj.h"
@@ -77,11 +64,8 @@ bool bayesreg::check_gaussian(const unsigned & collinpred)
      (family.getvalue() == "multinomialprobit") ||
      ((family.getvalue() == "gaussianh") && (collinpred==0)) ||
      (family.getvalue() == "cumprobit") ||
-     (family.getvalue() == "aft")
-#if !defined (__BUILDING_THE_DLL)
-     ||
+     (family.getvalue() == "aft") ||
      (family.getvalue() == "quantreg")
-#endif
      )
      return true;
   else
@@ -332,15 +316,10 @@ void bayesreg::create(void)
   families.push_back("multistate");
   families.push_back("gaussianh");
   families.push_back("aft");
-#if !defined (__BUILDING_THE_DLL)
   families.push_back("quantreg");
-#endif
   family = stroption("family",families,"binomial");
-
-#if !defined (__BUILDING_THE_DLL)
   quantile = doubleoption("quantile",0.5,0.001,0.999);
   mscheck = simpleoption("mscheck",false);
-#endif
 
   aresp = doubleoption("aresp",0.001,-1.0,500);
   bresp = doubleoption("bresp",0.001,0.0,500);
@@ -424,10 +403,8 @@ void bayesreg::create(void)
   regressoptions.push_back(&family);
   regressoptions.push_back(&aresp);
   regressoptions.push_back(&bresp);
-#if !defined (__BUILDING_THE_DLL)
   regressoptions.push_back(&quantile);
   regressoptions.push_back(&mscheck);
-#endif
   regressoptions.push_back(&gamvar);
   regressoptions.push_back(&cit);
   regressoptions.push_back(&scalevalue);
@@ -751,10 +728,8 @@ void bayesreg::initpointers(void)
       distr.push_back(&distr_multistatemodel);
     else if (distrstring[i] == "aft")
       distr.push_back(&distr_aft);
-#if !defined (__BUILDING_THE_DLL)
     else if (distrstring[i] == "quantreg")
       distr.push_back(&distr_quantreg);
-#endif
     }
 
 
@@ -972,21 +947,6 @@ void bayesreg::clear(void)
   }
 
 
-#if defined(JAVA_OUTPUT_WINDOW)
-bayesreg::bayesreg(
-administrator_basic * adb, administrator_pointer * adp,
-const ST::string & n,ofstream * lo,istream * in,
-						 ST::string p,vector<statobject*> * st)
-						 : statobject(adb,n,"bayesreg",lo,in,p)
-  {
-  adminp_p = adp;
-  statobj = st;
-  create();
-  resultsyesno = false;
-  posteriormode = false;
-  describetext.push_back("CURRENT REGRESSION RESULTS: none\n");
-  }
-#else
 bayesreg::bayesreg(const ST::string & n,ofstream * lo,istream * in,
 						 ST::string p,vector<statobject*> * st)
 						 : statobject(n,"bayesreg",lo,in,p)
@@ -997,15 +957,11 @@ bayesreg::bayesreg(const ST::string & n,ofstream * lo,istream * in,
   posteriormode = false;
   describetext.push_back("CURRENT REGRESSION RESULTS: none\n");
   }
-#endif
 
 
 bayesreg::bayesreg(const bayesreg & b) : statobject(statobject(b))
   {
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = b.adminp_p;
-  #endif
   statobj = b.statobj;
   D = b.D;
   distrstring = b.distrstring;
@@ -1021,9 +977,7 @@ bayesreg::bayesreg(const bayesreg & b) : statobject(statobject(b))
   distr_zip = b.distr_zip;
   distr_cox = b.distr_cox;
   distr_aft = b.distr_aft;
-#if !defined (__BUILDING_THE_DLL)
   distr_quantreg = b.distr_quantreg;
-#endif
   distr_gaussianh = b.distr_gaussianh;
   terms = b.terms;
   normalconst = b.normalconst;
@@ -1052,9 +1006,6 @@ const bayesreg & bayesreg::operator=(const bayesreg & b)
 	 return *this;
   statobject::operator=(statobject(b));
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = b.adminp_p;
-  #endif
   statobj = b.statobj;
   D = b.D;
   distrstring = b.distrstring;
@@ -1070,9 +1021,7 @@ const bayesreg & bayesreg::operator=(const bayesreg & b)
   distr_zip = b.distr_zip;
   distr_cox = b.distr_cox;
   distr_aft = b.distr_aft;
-#if !defined (__BUILDING_THE_DLL)
   distr_quantreg = b.distr_quantreg;
-#endif
   distr_gaussianh = b.distr_gaussianh;
   terms = b.terms;
   normalconst = b.normalconst;
@@ -1127,9 +1076,6 @@ bool bayesreg::create_generaloptions(void)
 
 
   generaloptions.push_back(MCMCoptions(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p,
-  #endif
   iterations.getvalue(),burnin.getvalue(),
                                step.getvalue(),logout,
                                level1.getvalue(),level2.getvalue()));
@@ -1557,7 +1503,6 @@ bool bayesreg::create_distribution(void)
 //----------------------------------- END: AFT ---------------------------------
 
 //----------------------------------- quantreg ---------------------------------
-#if !defined (__BUILDING_THE_DLL)
   else if (family.getvalue() == "quantreg")
     {
     ST::string path2 = outfile.getvalue() + add_name + "_scale.res";
@@ -1613,7 +1558,6 @@ bool bayesreg::create_distribution(void)
     nrcategories = 1;
     }
 //-------------------------------- END: quantreg -------------------------------
-#endif
 //---------------------------- Gaussian response RE  ---------------------------
   else if (family.getvalue() == "gaussian_re")
     {
@@ -3943,10 +3887,6 @@ bool bayesreg::create_pspline(const unsigned & collinpred)
   return false;
   }
 
-#if defined(BORLAND_OUTPUT_WINDOW)
-//------------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif
 
 
 

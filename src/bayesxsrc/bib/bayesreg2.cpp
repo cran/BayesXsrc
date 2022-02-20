@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -18,23 +18,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
 
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<StatwinFrame.h>
-#include<statwin_haupt.h>
-
-#endif
-
 #include"bayesreg.h"
 #include"bayesreg2.h"
-
-// Vorschlag:
-//#include<typeinfo.h>
 
 #include<stddef.h>
 
@@ -793,12 +778,6 @@ bool bayesreg::create_randomslope(const unsigned & collinpred)
                                                         inclf,collinpred
                                                         )
                           );
-// Begin: DSB
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-        if(mscheck.getvalue()==true)
-          fcrandomgaussian[fcrandomgaussian.size()-1].set_mscheck(true);
-#endif
-// End: DSB
         vector<ST::string> na;
         na.push_back(terms[i].varnames[1]);
         na.push_back(terms[i].varnames[0]);
@@ -845,12 +824,6 @@ bool bayesreg::create_randomslope(const unsigned & collinpred)
                                                         collinpred
                                                         )
                           );
-// Begin: DSB
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-        if(mscheck.getvalue()==true)
-          fcrandom[fcrandom.size()-1].set_mscheck(true);
-#endif
-// End: DSB
 
         vector<ST::string> na;
         na.push_back(terms[i].varnames[1]);
@@ -969,12 +942,6 @@ bool bayesreg::create_random(const unsigned & collinpred)
                                                         lambda,collinpred
                                                         )
                           );
-// Begin: DSB
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-        if(mscheck.getvalue()==true)
-          fcrandomgaussian[fcrandomgaussian.size()-1].set_mscheck(true);
-#endif
-// End: DSB
         if (structured==1)
           {
 #if defined(__BUILDING_LINUX)
@@ -1080,12 +1047,6 @@ bool bayesreg::create_random(const unsigned & collinpred)
                                                         collinpred
                                                         )
                           );
-// Begin: DSB
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-        if(mscheck.getvalue()==true)
-          fcrandom[fcrandom.size()-1].set_mscheck(true);
-#endif
-// End: DSB
 
        if  ( ( (structured1==1) && (structured2==0) ) ||
              ( (structured1==0) && (structured2==1) )

@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 //
 // Der Typ T muss ein "numerischer" Datentyp sein, der neben
 // Vergleichen und einfachen arithmetischen Operationen auch
-// bestimmte Funktionen kennt. 
+// bestimmte Funktionen kennt.
 
 #if !defined(TPREMAT_H_INCLUDED)
 #define TPREMAT_H_INCLUDED
@@ -43,18 +43,18 @@ public :
 
    // Konstruktor fuer eine uninitalisierte PreMatrix
 
-   PreMatrix(unsigned rows, unsigned cols = 1) : 
+   PreMatrix(unsigned rows, unsigned cols = 1) :
    Array2D<T>(rows, cols) { }
 
    // Konstruktor fuer eine mit einem festen Wert initialisierte
    // PreMatrix
 
-   PreMatrix(unsigned rows, unsigned cols, const T init) : 
+   PreMatrix(unsigned rows, unsigned cols, const T init) :
    Array2D<T>(rows, cols, init) { }
 
    // Kopierkonstruktor
 
-   PreMatrix(const PreMatrix &init) : 
+   PreMatrix(const PreMatrix &init) :
    Array2D<T>(Array2D<T>(init)) { }
 
    // Destruktor
@@ -70,7 +70,7 @@ public :
    PreMatrix operator/(const T v) const;
 
    // Concatenation
-		
+
    PreMatrix operator&(const PreMatrix &m) const;
    PreMatrix operator|(const PreMatrix &m) const;
 
@@ -80,7 +80,7 @@ public :
    PreMatrix vech() const;
 
    // unaere Operatoren
-		
+
    PreMatrix operator+();
    PreMatrix operator-();
 
@@ -105,14 +105,14 @@ public :
 
    PreMatrix transposed(void) const;
    PreMatrix sscp(void) const;
-	
+
    // Lesbare Ausgabe
 
    void prettyPrint(ostream &out);
    int prettyScan(istream &in);
 
    // Ausgabe mit einem bestimmten Delimiter
-	
+
    void print(ostream& out, char delimiter) const;
    void print(ostream& out, char* delimiter) const;
 
@@ -123,7 +123,7 @@ public :
    bool zero(const T epsilon = T(0)) const;
 
    // Elementtypwertige Funktionen
-		
+
    T det() const;
    T trace() const;
 
@@ -131,12 +131,12 @@ public :
       { PreMatrix<T> res; Array2D<T>::getRow(i).purge(res); return res; }
    PreMatrix getCol (unsigned j) const
       { PreMatrix<T> res; Array2D<T>::getCol(j).purge(res); return res; }
-   PreMatrix getBlock(unsigned int rl, unsigned int ru, unsigned int cl, 
+   PreMatrix getBlock(unsigned int rl, unsigned int ru, unsigned int cl,
 			 unsigned int cu) const;
 
    PreMatrix getRowBlock(unsigned int rl, unsigned int ru) const;
    PreMatrix getColBlock(unsigned int cl, unsigned int cu) const;
-									 
+
    PreMatrix strikedOut(unsigned int row, unsigned int col)	const
       { PreMatrix<T> res; Array2D<T>::strikedOut(row, col).purge(res); return res; }
    PreMatrix strikedOutRow(unsigned int row)	const
@@ -155,15 +155,15 @@ public :
 
    // Erzeugen einer Tridiagonalmatrix
 
-   static PreMatrix tridiag(const PreMatrix &m, const PreMatrix &lm, 
+   static PreMatrix tridiag(const PreMatrix &m, const PreMatrix &lm,
 			    const PreMatrix &um);
 
    PreMatrix blockdiag(const PreMatrix &m);
-   
+
    const PreMatrix &operator=(const PreMatrix &from);
 
    // Anwenden einer Funktion
-		
+
    PreMatrix applied(const PreMatrix &m, T (* f)(T, T)) const;
    PreMatrix applied(T (* f)(T)) const;
 
@@ -184,7 +184,7 @@ public :
 protected :
 
    PreMatrix decompLU(int *Index, int *IsEven = 0, int unique = 0) const;
-   static PreMatrix backsubstLU(const PreMatrix &LU, const PreMatrix &bIn, 
+   static PreMatrix backsubstLU(const PreMatrix &LU, const PreMatrix &bIn,
                                 int *Index );
 };
 
@@ -193,10 +193,10 @@ inline
 PreMatrix<T>
 PreMatrix<T>::
 getBlock(unsigned int rl, unsigned int ru, unsigned int cl, unsigned int cu) const
-{ 
-   PreMatrix<T> res; 
+{
+   PreMatrix<T> res;
 
-   Array2D<T>::getBlock(rl, ru, cl, cu).purge(res); 
+   Array2D<T>::getBlock(rl, ru, cl, cu).purge(res);
    return res;
 }
 
@@ -224,12 +224,6 @@ getRowBlock(unsigned int rl, unsigned int ru) const
 	return res;
 }
 
-#if defined(TEMPL_INCL_DEF)
-#	if defined(CC_SOURCE)
-#		include <tpremat.cc>
-#	else
-#		include "tpremat.cpp"
-#	endif
-#endif
+#include "tpremat.cpp"
 
 #endif

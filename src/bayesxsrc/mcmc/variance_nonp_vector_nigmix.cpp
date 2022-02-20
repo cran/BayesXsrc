@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -54,19 +54,19 @@ using randnumbers::rand_beta;
 // aomega;           : Hyperparameter for Prameter w
 // bomega;           : Hyperparameter for Prameter w
 // omegas            : Starting value for omega
-// omegaf            : Should the omega be fixed at the value "omegas"    
+// omegaf            : Should the omega be fixed at the value "omegas"
 // ct                : blocks of regression coefficients
 // c                 : reference to responsecategory (important in the case of multivariate response)
 //______________________________________________________________________________
 
 FULLCOND_variance_nonp_vector_nigmix::FULLCOND_variance_nonp_vector_nigmix(MCMCoptions * o,
                          vector<FULLCOND_const*> & p,DISTRIBUTION * d,
-                         const ST::string & ti, const ST::string & fp,const ST::string & fr, 
+                         const ST::string & ti, const ST::string & fp,const ST::string & fr,
                          const vector<unsigned long> & indicators, const vector<double> & v0, const vector<double> & v1,
                          const vector<double> & t2s, const vector<double> & at2, const vector<double> & bt2,
                          const vector<double> & omegas, const vector<double> & aomega, const vector<double> & bomega,
                          const vector<bool> & omegaf,
-//                         const datamatrix start_data, 
+//                         const datamatrix start_data,
                          const vector<bool> & omegaad,
                          const vector<unsigned> & ct, const unsigned & c)
                          : FULLCOND(o,datamatrix(1,1),ti,1,1,fp)
@@ -96,8 +96,8 @@ FULLCOND_variance_nonp_vector_nigmix::FULLCOND_variance_nonp_vector_nigmix(MCMCo
     helpvariances.putRowBlock(cut[i],cut[i+1],Cp[i]->get_variances());
     }
   setbeta(helpvariances);
-  
-  // Set the starting values 
+
+  // Set the starting values
 //  startdata = start_data;      // Kontrolle der uebergebenen Startwerte
   nigmixsum = 0;
   omega_fix = omegaf[0];
@@ -108,8 +108,8 @@ FULLCOND_variance_nonp_vector_nigmix::FULLCOND_variance_nonp_vector_nigmix(MCMCo
   b_t2 = bt2;
   a_omega = aomega;
   b_omega = bomega;
-  
-    
+
+
   // Set pathes for the fullcond objects
   ST::string path1 = pathresults.substr(0,pathresults.length()-4)+"_shrinkage.raw";
   ST::string path2 = pathresults.substr(0,pathresults.length()-4)+"_indicator.raw";
@@ -126,7 +126,7 @@ FULLCOND_variance_nonp_vector_nigmix::FULLCOND_variance_nonp_vector_nigmix(MCMCo
   fc_indicator.setflags(MCMC::norelchange);
   fc_t2 = FULLCOND(o,datamatrix(nrpar,1),title+"_t2",nrpar,1,path3);
   fc_t2.setflags(MCMC::norelchange);
-  
+
   // Set the variablenames of the fullcond objects
   unsigned int i, k  = 0;
   vector<ST::string> varnames1(nrpar);
@@ -135,10 +135,10 @@ FULLCOND_variance_nonp_vector_nigmix::FULLCOND_variance_nonp_vector_nigmix(MCMCo
 
   for(unsigned j=0; j<cut.size()-1; j++)
     {
-    helpvarnames = Cp[j]->get_datanames(); 
-    i = 0;   
+    helpvarnames = Cp[j]->get_datanames();
+    i = 0;
     for(k=cut[j]; k<cut[j+1]; k++, i++)
-      { 
+      {
       varnames1[k] = helpvarnames[i];
       if(omega_adaptive==true)
         {
@@ -150,16 +150,16 @@ FULLCOND_variance_nonp_vector_nigmix::FULLCOND_variance_nonp_vector_nigmix(MCMCo
         }
       }
     }
-    
+
     fc_t2.init_names(varnames1);
-    fc_indicator.init_names(varnames1); 
-    fc_shrinkage.init_names(varnames2); 
+    fc_indicator.init_names(varnames1);
+    fc_shrinkage.init_names(varnames2);
 
     // Get current value of shrinkageparameter omega and variancecomponents
     double * workomega = fc_shrinkage.getbetapointer();
     double * workindicator = fc_indicator.getbetapointer();
     double * workt2 = fc_t2.getbetapointer();
-    
+
 
     for(unsigned int i=0; i<nrpar; i++, workindicator++, workt2++, workomega++)
       {
@@ -171,28 +171,28 @@ FULLCOND_variance_nonp_vector_nigmix::FULLCOND_variance_nonp_vector_nigmix(MCMCo
 // Kontrolle der uebergebenen Werte
   // ofstream outstartvectors_vnv("c:/bayesx/test/startvectors_nigmix_vnv.txt", ios::trunc|ios::app);
   // outstartvectors_vnv << "datamatrix with starting values"<< "\n";
-  // outstartvectors_vnv << "effect I t2 w v0 v1 a b aw bw wfix \n";    
+  // outstartvectors_vnv << "effect I t2 w v0 v1 a b aw bw wfix \n";
   // outstartvectors_vnv << "\n";
   // outstartvectors_vnv << "vektoren"<< "\n" << "varnam lambda tau2 I t2 w v0 v1 a b aw bw wfix " << "\n";
   // for(i=0; i<indicators.size(); i++)
     // {
-    // outstartvectors_vnv << varnames1[i]  << "  " 
-                        // << 1/helpvariances(i,0) << "  " 
-                        // << helpvariances(i,0) << "  " 
-                        // << indicators[i] << "  " 
-                        // << t2s[i] << "  " 
-                        // << omegas[i] << "  " 
+    // outstartvectors_vnv << varnames1[i]  << "  "
+                        // << 1/helpvariances(i,0) << "  "
+                        // << helpvariances(i,0) << "  "
+                        // << indicators[i] << "  "
+                        // << t2s[i] << "  "
+                        // << omegas[i] << "  "
                         // << v0[i] << "  "
-                        // << v1[i] << "  " 
-                        // << at2[i] << "  " 
-                        // << bt2[i] << "  " 
-                        // << aomega[i] << "  " 
-                        // << bomega[i] << "  " 
-                        // << omegaf[i] << "  " 
+                        // << v1[i] << "  "
+                        // << at2[i] << "  "
+                        // << bt2[i] << "  "
+                        // << aomega[i] << "  "
+                        // << bomega[i] << "  "
+                        // << omegaf[i] << "  "
                         // << "\n";
     // }
 
-//TEMP:END----------------------------------------------------------------------  
+//TEMP:END----------------------------------------------------------------------
     }
 //______________________________________________________________________________
 //
@@ -248,7 +248,7 @@ const FULLCOND_variance_nonp_vector_nigmix & FULLCOND_variance_nonp_vector_nigmi
   b_t2 = t.b_t2;
   a_omega = t.a_omega;
   b_omega = t.b_omega;
-  omega_fix = t.omega_fix;    
+  omega_fix = t.omega_fix;
   omega_adaptive = t.omega_adaptive;
   fc_indicator = t.fc_indicator;
   fc_t2 = t.fc_t2;
@@ -277,7 +277,7 @@ void FULLCOND_variance_nonp_vector_nigmix::update(void)
   {
   acceptance++;
   unsigned i, j, k;
-  
+
   double probv1;
   double rand_bernoulli;
   double helpomega;
@@ -305,7 +305,7 @@ void FULLCOND_variance_nonp_vector_nigmix::update(void)
     }
 
 
-    
+
 //TEMP:BEGIN--------------------------------------------------------------------
 //ofstream output_beta("c:/bayesx/test/nigmix_beta.txt", ios::out|ios::app);
 //ofstream output_scale("c:/bayesx/test/nigmix_scale.txt", ios::out|ios::app);
@@ -317,7 +317,7 @@ void FULLCOND_variance_nonp_vector_nigmix::update(void)
 // Sacling of the Kovariates:
 //output_beta << distrp->get_trmult(column)<< "\n" ;
 //output_var << "\n" ;
-//output_scale << sigma2 <<   "\n" ; 
+//output_scale << sigma2 <<   "\n" ;
 //TEMP:END----------------------------------------------------------------------
 
 
@@ -325,10 +325,10 @@ void FULLCOND_variance_nonp_vector_nigmix::update(void)
   // Gibbs-Update of varianceparameters t2 with Inverse Gammadistribution and
   // indicator with Binomialdistribution
   //---------------------------------------------------------------------------
-  workt2 = fc_t2.getbetapointer(); 
+  workt2 = fc_t2.getbetapointer();
   workindicator = fc_indicator.getbetapointer();
   workomega = fc_shrinkage.getbetapointer();
-  
+
   k = 0;
   for(j=0; j<cut.size()-1; j++)
     {
@@ -376,12 +376,12 @@ void FULLCOND_variance_nonp_vector_nigmix::update(void)
   // Transfer of nigmixsum to the distribution objekt
   //-------------------------------------------------
   distrp->update_nigmix(nigmixsum);
-  
-  
+
+
   // Gibbs-Update of Shrinkageparameter omega with Betadistribution
   //----------------------------------------------------------------
   if(omega_fix==false && omega_adaptive==false)
-    { 
+    {
     workomega = fc_shrinkage.getbetapointer();
     helpomega = rand_beta(a_omega[0] + sumindicatorv1, b_omega[0] + sumindicatorv0);
     for(i=0;i<nrpar;i++,workomega++)
@@ -390,7 +390,7 @@ void FULLCOND_variance_nonp_vector_nigmix::update(void)
       }
     }
   if(omega_fix==false && omega_adaptive==true)
-    { 
+    {
     workomega = fc_shrinkage.getbetapointer();
     for(i=0;i<nrpar;i++,workomega++)
       {
@@ -411,7 +411,7 @@ void FULLCOND_variance_nonp_vector_nigmix::update(void)
 //______________________________________________________________________________
 //
 // FUNCTION: outresults
-// TASK: - write results for varianceparameters=idicator*t2 
+// TASK: - write results for varianceparameters=idicator*t2
 //         to output window and files
 //______________________________________________________________________________
 
@@ -436,7 +436,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults(void)
   // Kopfzeile Dateiausgabe
   if (pathresults.isvalidfile() != 1)
     outp << "paramnr varname pmean pstd pqu" << l1 << " pqu" << l2 <<
-           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 << 
+           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 <<
            " pcat" << level2 << endl;
 
   optionsp->out("\n");
@@ -492,7 +492,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults(void)
       stddouble = 0;
     else
       stddouble = sqrt(betavar(i,0));
-     
+
     // Dateiausgabe
     if (pathresults.isvalidfile() != 1)
       {
@@ -527,7 +527,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults(void)
       }
 
     }
-  
+
   optionsp->out("\n");
   optionsp->out("  Results for the variances are stored in file\n");
   optionsp->out("  " + pathresults + "\n");
@@ -537,7 +537,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults(void)
   outresults_indicator();
   outresults_t2();
   outresults_shrinkage();
-  
+
   }
 
 
@@ -569,7 +569,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_indicator(void)
   // Kopfzeile Dateiausgabe
   if (indicator_pathresults.isvalidfile() != 1)
     outp << "paramnr varname pmean pstd pqu" << l1 << " pqu" << l2 <<
-           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 << 
+           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 <<
            " pcat" << level2 << endl;
 
   optionsp->out("\n");
@@ -625,7 +625,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_indicator(void)
       stddouble = 0;
     else
       stddouble = sqrt(fc_indicator.get_betavar(i,0));
-     
+
     // Dateiausgabe
     if (indicator_pathresults.isvalidfile() != 1)
       {
@@ -663,7 +663,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_indicator(void)
 
     }
 
-    
+
   optionsp->out("\n");
   optionsp->out("  Results for the variance component I are also stored in file\n");
   optionsp->out("  " + indicator_pathresults + "\n");
@@ -698,7 +698,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_t2(void)
   // Kopfzeile Dateiausgabe
   if (t2_pathresults.isvalidfile() != 1)
     outp << "paramnr varname pmean pstd pqu" << l1 << " pqu" << l2 <<
-           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 << 
+           " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 <<
            " pcat" << level2 << endl;
 
   optionsp->out("\n");
@@ -754,7 +754,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_t2(void)
       stddouble = 0;
     else
       stddouble = sqrt(fc_t2.get_betavar(i,0));
-     
+
     // Dateiausgabe
     if (t2_pathresults.isvalidfile() != 1)
       {
@@ -791,8 +791,8 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_t2(void)
       }
 
     }
- 
-  
+
+
   optionsp->out("\n");
   optionsp->out("  Results for the variance component t2 are also stored in file\n");
   optionsp->out("  " + t2_pathresults + "\n");
@@ -815,7 +815,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_shrinkage(void)
       {
       nr = 1;
       }
-   
+
     fc_shrinkage.outresults();
     ST::string shrinkage_pathresults = pathresults.substr(0,pathresults.length()-7) + "shrinkage.res";
     vector<ST::string> vnames = fc_shrinkage.get_datanames();
@@ -828,39 +828,39 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_shrinkage(void)
     l2 = l2.replaceallsigns('.','p');
     u1 = u1.replaceallsigns('.','p');
     u2 = u2.replaceallsigns('.','p');
-  
+
     // Dateiausgabe
     ofstream outp(shrinkage_pathresults.strtochar());
-  
+
     // Kopfzeile Dateiausgabe
     if (shrinkage_pathresults.isvalidfile() != 1)
       outp << "paramnr varname pmean pstd pqu" << l1 << " pqu" << l2 <<
-             " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 << 
+             " pmed pqu" << u1 << " pqu" << u2 << " pcat" << level1 <<
              " pcat" << level2 << endl;
-  
+
     optionsp->out("\n");
-  
+
     ST::string l;
     int maxvarnamelength = 0;
     int len;
-  
+
     for(i=0;i<nr;i++)
       {
       len = vnames[i].length();
       if (len > maxvarnamelength)
         maxvarnamelength = len;
       }
-  
+
     if (maxvarnamelength>10)
       l = ST::string(' ',maxvarnamelength-4);
     else
       l = "  ";
-  
+
     ST::string help =  ST::doubletostring(lower1,4) + "% quant.";
     ST::string levell = help + ST::string(' ',15-help.length());
     help = ST::doubletostring(upper2,4) + "% quant.";
     ST::string levelu = help + ST::string(' ',15-help.length());
-  
+
     // Kopfzeile Bildschirmausgabe
     optionsp->out("    Variable" + l +
                       "mean           " +
@@ -868,30 +868,30 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_shrinkage(void)
                       levell +
                       "median         " +
                       levelu + "\n");
-  
+
     ST::string mean;
     ST::string std;
     ST::string qu10;
     ST::string qu50;
     ST::string qu90;
-  
+
     double m,stddouble;
     unsigned nsp;
-  
+
     for (i=0;i<nr;i++)
       {
       if (maxvarnamelength  > 10)
         nsp = 4+maxvarnamelength-vnames[i].length();
       else
         nsp = 10-vnames[i].length();
-  
+
       m = fc_shrinkage.get_betamean(i,0);
-  
+
       if (fc_shrinkage.get_betavar(i,0) == 0)
         stddouble = 0;
       else
         stddouble = sqrt(fc_shrinkage.get_betavar(i,0));
-       
+
       // Dateiausgabe
       if (shrinkage_pathresults.isvalidfile() != 1)
         {
@@ -899,7 +899,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_shrinkage(void)
         outp << vnames[i] << "   ";
         outp << m << "   ";
         outp << stddouble << "   ";
-  
+
         outp << fc_shrinkage.get_beta_lower1(i,0) << "   ";
         outp << fc_shrinkage.get_beta_lower2(i,0) << "   ";
         outp << fc_shrinkage.get_betaqu50(i,0) << "   ";
@@ -918,15 +918,15 @@ void FULLCOND_variance_nonp_vector_nigmix::outresults_shrinkage(void)
         else
           outp << "0   ";
         outp << endl;
-  
+
         // Bildschirmausgabe
         optionsp->out(ST::outresults(nsp,vnames[i],m,stddouble,
                       fc_shrinkage.get_beta_lower1(i,0),
                       fc_shrinkage.get_betaqu50(i,0),
                       fc_shrinkage.get_beta_upper1(i,0)) + "\n");
-  
+
         }
-  
+
       }
     optionsp->out("\n");
     optionsp->out("  Results for the shrinkage parameter omega are also stored in file\n");
@@ -962,10 +962,10 @@ void FULLCOND_variance_nonp_vector_nigmix::outoptions(void)
   for(unsigned j=0; j<cut.size()-1; j++)
     {
     helppath.push_back(Cp[j]->get_title());
-    }  
+    }
   optionsp->out("  OPTIONS FOR SHRINKAGE EFFECTS: " + helppath[0] + "\n",true);
   if(helppath.size()>1)
-    { 
+    {
     for(unsigned j=1; j<helppath.size(); j++)
       {
        optionsp->out( ST::string(' ',33) + helppath[j] + "\n",true);
@@ -974,7 +974,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outoptions(void)
   optionsp->out("\n");
   optionsp->out("  Priors: NIGMIX shrinkage priors\n");
   optionsp->out("\n");
-  
+
   if(omega_adaptive == false)
     {
     optionsp->out("  Hyperparameter v0 for variance component I: " +
@@ -1001,7 +1001,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outoptions(void)
       }
     optionsp->out("\n");
     }
- 
+
   if(omega_adaptive == true)
     {
     for(unsigned i=0; i<nrpar; i++)
@@ -1029,7 +1029,7 @@ void FULLCOND_variance_nonp_vector_nigmix::outoptions(void)
       optionsp->out("\n");
       }
     }
-    
+
   optionsp->out("\n");
 
   }
@@ -1068,12 +1068,12 @@ void FULLCOND_variance_nonp_vector_nigmix::get_samples(const ST::string & filena
 // TASK: - write startvalues to files
 //______________________________________________________________________________
 
-  
+
 void FULLCOND_variance_nonp_vector_nigmix::get_startvalues(void)
   {
-  
+
     unsigned i, j, k;
-   
+
     // Hilfsvariablen
     double * helpvariance;
     double * helpindicator = fc_indicator.getbetapointer();
@@ -1095,12 +1095,12 @@ void FULLCOND_variance_nonp_vector_nigmix::get_startvalues(void)
     ST::string variance_pathstartdata = pathresults.substr(0,pathresults.length()-7) + "variance_startdata.raw";
     ofstream variance_outoutstartdata(variance_pathstartdata.strtochar());
     variance_outoutstartdata << "varname startvalue" << endl;
-    
+
     // Shrinkageparameter omega
     ST::string shrinkage_pathstartdata = pathresults.substr(0,pathresults.length()-7) + "shrinkage_startdata.raw";
     ofstream shrinkage_outoutstartdata(shrinkage_pathstartdata.strtochar());
     shrinkage_outoutstartdata << "varname startvalue" << endl;
-    
+
     // Hyperparameter
     ST::string hyperpar_pathstartdata = pathresults.substr(0,pathresults.length()-7) + "hyperpar_startdata.raw";
     ofstream hyperpar_outoutstartdata(hyperpar_pathstartdata.strtochar());
@@ -1117,9 +1117,9 @@ void FULLCOND_variance_nonp_vector_nigmix::get_startvalues(void)
       t2_outoutstartdata << helpvarname_t2[k] << " " << *helpt2 << endl;
       variance_outoutstartdata << helpvarname_variance[i] << " " << *helpvariance << endl;
       shrinkage_outoutstartdata << helpvarname_t2[k] << " " << *helpshrinkage << "  " << endl;
-      hyperpar_outoutstartdata << helpvarname_t2[k]  << " " << v_0[0] << " " << v_1[0] << " " 
-                               << a_t2[0] << " " << b_t2[0] << " " 
-                               << a_omega[0] << " " << b_omega[0] << " " 
+      hyperpar_outoutstartdata << helpvarname_t2[k]  << " " << v_0[0] << " " << v_1[0] << " "
+                               << a_t2[0] << " " << b_t2[0] << " "
+                               << a_omega[0] << " " << b_omega[0] << " "
                                << omega_fix  << " " << omega_adaptive << endl;
       }
     }

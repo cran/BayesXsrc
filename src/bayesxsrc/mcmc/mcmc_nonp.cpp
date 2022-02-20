@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -1025,15 +1025,10 @@ double FULLCOND_nonp::centerbeta(vector<double> & weight)
   double sum=0;
   double * workbeta = beta.getV();
 
-#if defined(MICROSOFT_VISUAL)
-  for (i=0;i<nrpar;i++,workbeta++)
-    sum+= weight[i] * *workbeta;
-#else
   vector<double>::iterator weightwork = weight.begin();
 
   for (i=0;i<nrpar;i++,workbeta++,++weightwork)
     sum+= *weightwork * *workbeta;
-#endif
 
   workbeta = beta.getV();
 
@@ -1294,38 +1289,12 @@ void FULLCOND_nonp::outresults(void)
   optionsp->out("\n");
   if (Pmatrix->get_type() == MCMC::mrf)
     {
-    #if defined(JAVA_OUTPUT_WINDOW)
-
-    if (Pmatrix->get_polex() == true)
-      {
-      optionsp->out("  Postscript file is stored in file\n");
-      ST::string psfile = pathcurrent.substr(0,pathcurrent.length()-4) + ".ps";
-      optionsp->out("  " + psfile + "\n");
-      optionsp->out("\n");
-      }
-
-    optionsp->out("  Results may be visualized using method 'drawmap'\n");
-    optionsp->out("  Type for example: objectname.drawmap " +
-    ST::inttostring(fcnumber) + "\n");
-    optionsp->out("\n");
-    #else
     optionsp->out("  Results may be visualized using the R function");
     optionsp->out(" 'drawmap'\n");
     optionsp->out("\n");
-    #endif
     }
   else
     {
-    #if defined(JAVA_OUTPUT_WINDOW)
-    optionsp->out("  Postscript file is stored in file\n");
-    ST::string psfile = pathcurrent.substr(0,pathcurrent.length()-4) + ".ps";
-    optionsp->out("  " + psfile + "\n");
-    optionsp->out("\n");
-    optionsp->out("  Results may be visualized in BayesX using method 'plotnonp'\n");
-    optionsp->out("  Type for example: objectname.plotnonp " +
-    ST::inttostring(fcnumber) + "\n");
-    optionsp->out("\n");
-    #else
     ST::string doublebackslash = "/";
     ST::string pathresultsplus = pathcurrent.insert_string_char('\\',doublebackslash);
     optionsp->out("  Results may be visualized using the R function 'plotnonp'");
@@ -1334,7 +1303,6 @@ void FULLCOND_nonp::outresults(void)
     optionsp->out("\n");
     optionsp->out("  plotnonp(\""+ pathresultsplus + "\")\n");
     optionsp->out("\n");
-    #endif
     }
   optionsp->out("\n");
 

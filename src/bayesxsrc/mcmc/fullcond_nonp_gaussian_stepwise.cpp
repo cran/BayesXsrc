@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -1790,50 +1790,9 @@ if(matrixnumber == 1 || kombimatrix == false)
 
       if (type == MCMC::mrf)
         {
-        #if defined(JAVA_OUTPUT_WINDOW)
-
-        if (polex == true)
-          {
-          optionsp->out("  Postscript file is stored in file\n");
-          ST::string psfile = pathcurrent.substr(0,pathcurrent.length()-4) + ".ps";
-          optionsp->out("  " + psfile + "\n");
-          optionsp->out("\n");
-          }
-
-        optionsp->out("  Results may be visualized in BayesX using method 'drawmap'\n");
-        optionsp->out("  Type for example: objectname.drawmap " +
-        ST::inttostring(fcnumber) + "\n");
-        optionsp->out("\n");
-        #else
-        optionsp->out("  Results may be visualized using the R function");
-        optionsp->out(" 'drawmap'\n");
-        optionsp->out("\n");
-        #endif
         }
       else
         {
-        #if defined(JAVA_OUTPUT_WINDOW)
-        optionsp->out("  Postscript file is stored in file\n");
-        ST::string psfile = pathcurrent.substr(0,pathcurrent.length()-4) + ".ps";
-        optionsp->out("  " + psfile + "\n");
-        optionsp->out("\n");
-        optionsp->out("  Results may be visualized in BayesX using method 'plotnonp'\n");
-        optionsp->out("  Type for example: objectname.plotnonp " +
-        ST::inttostring(fcnumber) + "\n");
-        optionsp->out("\n");
-        #else
-        char hchar = '\\';
-        ST::string hstring = "/";
-        ST::string pathresultsplus = pathcurrent.insert_string_char(hchar,hstring);
-        ST::string psfile = pathresultsplus.substr(0,pathresultsplus.length()-4)
-        + ".ps";
-        optionsp->out("  Results may be visualized using the R function 'plotnonp'");
-        optionsp->out("\n");
-        optionsp->out("  Type for example:\n");
-        optionsp->out("\n");
-        optionsp->out("  plotnonp(\""+ pathresultsplus + "\")\n");
-        optionsp->out("\n");
-        #endif
         }
       optionsp->out("\n");
 
@@ -1922,13 +1881,7 @@ if(matrixnumber == 1 || kombimatrix == false)
       ST::string pathgraph = pathmap.substr(0, pathmap.length()-4);
       pathgraph = pathgraph + "gra";
       optionsp->out("  Corresponding graph-file is stored in " + pathgraph + "\n");
-      #if defined(JAVA_OUTPUT_WINDOW)
-      optionsp->out("  Results may be visualized using method 'drawmap'\n");
-      optionsp->out("  Type for example: objectname.drawmap " +
-      ST::inttostring(fcnumber) + "\n");
-      #else
       optionsp->out("  Results may be visualized using the R function 'drawmap'\n");
-      #endif
       optionsp->out("\n");
 
       unsigned i;

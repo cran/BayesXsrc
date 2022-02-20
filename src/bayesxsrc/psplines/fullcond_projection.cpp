@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -1040,21 +1040,6 @@ void FULLCOND_projection::outresults(void)
   optionsp->out("  Results are stored in file\n");
   optionsp->out("  " + pathcurrent + "\n");
   optionsp->out("\n");
-  #if defined(BORLAND_OUTPUT_WINDOW)
-  optionsp->out("  Results may be visualized using the S-Plus function 'plotnonp'\n");
-  ST::string doublebackslash = "\\\\";
-  ST::string spluspath = pathcurrent.insert_string_char('\\',doublebackslash);
-  optionsp->out("  Type for example:\n");
-  optionsp->out("  plotnonp(\"" + spluspath + "\")");
-  optionsp->out("\n");
-  #elif defined(JAVA_OUTPUT_WINDOW)
-  optionsp->out("  Postscript file is stored in file\n");
-  ST::string psfile = pathcurrent.substr(0,pathcurrent.length()-4) + ".ps";
-  optionsp->out("  " + psfile + "\n");
-  optionsp->out("\n");
-  optionsp->out("  Results may be visualized using method 'plotnonp'\n");
-  optionsp->out("  Type for example: objectname.plotnonp " + ST::inttostring(fcnumber) + "\n");
-  #endif
   optionsp->out("\n");
 
   unsigned i;

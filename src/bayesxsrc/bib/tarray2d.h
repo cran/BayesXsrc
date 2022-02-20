@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -315,12 +315,6 @@ protected :
    		{ return m_v; }
 };
 
-#if defined(TEMPL_INCL_DEF)
-#	if defined(CC_SOURCE)
-#		include <tarray2d.cc>
-#	else
-#		include "tarray2d.cpp"
-#	endif
-#endif
+#include "tarray2d.cpp"
 
 #endif

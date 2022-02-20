@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -24,21 +24,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 #include "Random.h"
 #if defined(BAYESX_GSL_INCLUDED)
-  #include <gsl_cdf.h>
-  #include <gsl_sf_gamma.h>
+  #include <gsl/gsl_cdf.h>
+  #include <gsl/gsl_sf_gamma.h>
 #endif
 
 // BEGIN: DSB //
 
 // define what is NAN, and how we determine whether a double is infinite.
-#if defined(MICROSOFT_VISUAL)
-#include <limits>
-    bool
-    infinite(double x)
-    {
-        return ABS(x) > DBL_MAX;
-    }
-#elif defined(__BUILDING_GNU)
+#if defined(__BUILDING_GNU)
     bool
     infinite(double x)
     {
@@ -2155,7 +2148,7 @@ double incomplete_gamma (double a, double x)
 
 double gamma_cdf(double y, double mu, double sigma)
   {
-  const double p = 0.0;
+  double p = 0.0;
   #if defined(BAYESX_GSL_INCLUDED)
   p = gsl_cdf_gamma_P(y, sigma, mu/sigma);
   #endif

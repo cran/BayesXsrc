@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -62,7 +62,7 @@ FULLCOND_rj_mix::FULLCOND_rj_mix (ST::string fix, const ST::string & rp, unsigne
 
 
 FULLCOND_rj_mix::FULLCOND_rj_mix (ST::string fix, const ST::string & rp, unsigned int lim,
-								  double alph , ST::string switch_t, ST::string print_mod, 
+								  double alph , ST::string switch_t, ST::string print_mod,
 								  unsigned & ty, vector < FULLCOND_dag_ia_mixed * > dagp,
 								  MCMCoptions * o, const datamatrix & d, const ST::string & t,
 								  const unsigned & r, const unsigned & c, const ST::string & fp)
@@ -75,11 +75,11 @@ FULLCOND_rj_mix::FULLCOND_rj_mix (ST::string fix, const ST::string & rp, unsigne
 
  // COPY CONSTRUCTOR
 
-  FULLCOND_rj_mix::FULLCOND_rj_mix(const FULLCOND_rj_mix & fc) 
+  FULLCOND_rj_mix::FULLCOND_rj_mix(const FULLCOND_rj_mix & fc)
 									: FULLCOND_rj_int(FULLCOND_rj_int(fc))
   {
   }
-  
+
 
 
   // OVERLOADED ASSIGNMENT OPERATOR
@@ -90,7 +90,7 @@ FULLCOND_rj_mix::FULLCOND_rj_mix (ST::string fix, const ST::string & rp, unsigne
 		  return *this;
 
      FULLCOND_rj_int::operator=(FULLCOND_rj_int(fc));
-	  
+
 	  return *this;
   }
 
@@ -102,10 +102,10 @@ FULLCOND_rj_mix::FULLCOND_rj_mix (ST::string fix, const ST::string & rp, unsigne
 		  step_aborted = true;
 
 
-		/*********	in principle like FULLCOND_rj::rj_step, but now 
-					depending on the var_type functions of 
+		/*********	in principle like FULLCOND_rj::rj_step, but now
+					depending on the var_type functions of
 					FULLCOND_rj or FULLCOND_rj_int are used **********************/
-		
+
 		  while (step_aborted==true)
 		  {
 				// two variables are randomly chosen
@@ -128,7 +128,7 @@ FULLCOND_rj_mix::FULLCOND_rj_mix (ST::string fix, const ST::string & rp, unsigne
 						 else
 							if(conditions_okay_d(i,j) ==true)
 								FULLCOND_rj_int::death_step(i,j);
-							
+
 
 					 }
 					 else
@@ -137,28 +137,28 @@ FULLCOND_rj_mix::FULLCOND_rj_mix (ST::string fix, const ST::string & rp, unsigne
 							FULLCOND_rj::death_step(i,j);
 						 else
 							if(conditions_okay_d(i,j) ==true)
-							
+
 								FULLCOND_rj::death_step(i,j);
 
 					 }
 				}
-				else if (zeta(j,i)==1)	
+				else if (zeta(j,i)==1)
 				{
 					if(preg_mods[j]->tell_var_type()=='d' ||
 						preg_mods[i]->tell_var_type()=='d')
 					{
 						if(conditions == false)
 							FULLCOND_rj_int::switch_step(i,j);
-						
+
 						 else
 							if(conditions_okay_s(i,j) ==true)
 							{
 								FULLCOND_rj_int::switch_step(i,j);
 								//cout<<"s_int: "<<i<<" "<<j<<endl;
 							}
-						 
+
 					}
-					else  if(preg_mods[j]->tell_var_type()=='c' && 
+					else  if(preg_mods[j]->tell_var_type()=='c' &&
 								preg_mods[i]->tell_var_type()=='c')
 					{
                           if(conditions == false)
@@ -196,7 +196,7 @@ FULLCOND_rj_mix::FULLCOND_rj_mix (ST::string fix, const ST::string & rp, unsigne
 		  update_zeta();
 
 
-		  
+
 		  //std::set < ST::string, unsigned int> freq;
 
 		  if((optionsp->get_nriter() > optionsp->get_burnin()) &&

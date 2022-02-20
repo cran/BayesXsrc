@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -33,14 +33,14 @@ class Tmapform : public TForm
 {
 __published:	// Komponenten, die von der IDE verwaltet werdenvoid __fastcall FormShow(TObject *Sender);void __fastcall FormResize(TObject *Sender);void __fastcall FormResize(TObject *Sender);
     void __fastcall FormPaint(TObject *Sender);
-    
+
     void __fastcall FormResize(TObject *Sender);
 private:	// Benutzerdeklarationen
 public:		// Benutzerdeklarationen
 MAP::map * mapinfo;
 ST::string mapname;
     __fastcall Tmapform(TComponent* Owner);
-void drawmap(void);    
+void drawmap(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tmapform *mapform;

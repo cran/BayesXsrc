@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -1469,7 +1469,7 @@ void DESIGN::compute_partres(datamatrix & res, datamatrix & f,bool cwsum)
   }
 
 
-void DESIGN::compute_partres_multiplicative(datamatrix & res, datamatrix & f,bool cwsum)
+/*void DESIGN::compute_partres_multiplicative(datamatrix & res, datamatrix & f, bool cwsum)
   {
   double * workingresponsep = likep->workingresponse.getV();
   double * worklinp;
@@ -1553,14 +1553,14 @@ void DESIGN::compute_partres_multiplicative(datamatrix & res, datamatrix & f,boo
         for (i=0;i<ind.rows();i++,workingresponsep++,indp++,worklinp++,
                                 workingweightp++,fxp++,worklinp_dg++)
           {
-          res(*indp,0) +=  (*workingweightp) *
-                            (*workingresponsep - *worklinp_dg + exp(*worklinp) * (*fxp));
+          res(*indp,0) +=  (*workingweightp) * (*workingresponsep - *worklinp + f(*indp,0));
+//                            (*workingresponsep - *worklinp_dg + exp(*worklinp) * (*fxp));
           Wsum(*indp,0) += *workingweightp;
           }
         }
       }
     }
-  }
+  }*/
 
 
 

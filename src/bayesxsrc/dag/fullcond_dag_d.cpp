@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@ namespace MCMC
 
 	// constructor 1
 
-	FULLCOND_dag_d::FULLCOND_dag_d (double s_i, unsigned int num, 
+	FULLCOND_dag_d::FULLCOND_dag_d (double s_i, unsigned int num,
 							MCMCoptions * o,
 							const datamatrix & d, const ST::string & t,
 							const unsigned & r, const unsigned & c,
@@ -42,20 +42,20 @@ namespace MCMC
 
 
 	// constructor 2
-	FULLCOND_dag_d::FULLCOND_dag_d (double v_a, double v_b, ST::string prio_s, 
-							bool d_all, const datamatrix & res, 
-							double s_i, unsigned int num, 
+	FULLCOND_dag_d::FULLCOND_dag_d (double v_a, double v_b, ST::string prio_s,
+							bool d_all, const datamatrix & res,
+							double s_i, unsigned int num,
 							MCMCoptions * o,
 							const datamatrix & d, const ST::string & t,
 							const unsigned & r, const unsigned & c,
 							const ST::string & fp)
-							: FULLCOND_dag(v_a, v_b, prio_s, d_all, res, s_i,num, 
+							: FULLCOND_dag(v_a, v_b, prio_s, d_all, res, s_i,num,
 											o,d,t,r,c,fp)
 	{
 		ini_dag_d();
 	}
 
-	
+
 
 
   ST::string FULLCOND_dag_d::get_family(void)
@@ -73,14 +73,14 @@ namespace MCMC
 		double * workdata;
 
 		y_true = datamatrix(nobs,1,0);
-		
+
 		worky_true = y_true.getV();
 		workdata = data.getV() + self;
 
 		for(i=0; i<nobs; i++, worky_true++)
 		{
 			*worky_true = *workdata;
-			workdata = workdata + nvar; 
+			workdata = workdata + nvar;
 		}
 	}
 
@@ -89,9 +89,9 @@ void FULLCOND_dag_d::draw_utilities(void)
 {
 	unsigned i;
 
-	 double * worky_true = y_true.getV(); 
+	 double * worky_true = y_true.getV();
 	 double * worky = y.getV();
-	 double * worklinp = lin.getV(); 
+	 double * worklinp = lin.getV();
 
 	 for(i=0; i<nobs; i++, worky_true++, worky++, worklinp++)
 	 {

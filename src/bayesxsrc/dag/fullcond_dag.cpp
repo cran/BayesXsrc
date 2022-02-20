@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -73,14 +73,14 @@ namespace MCMC
 		 }
 		 sigma_i = s_i;
 		 sigma_prop =1;
-		 
+
 		 print_dags = false;
  }
 
 
 	// constructor 2
-	FULLCOND_dag::FULLCOND_dag (double value_a, double value_b, ST::string prio_sig, 
-							bool dags_all, const datamatrix & res, 
+	FULLCOND_dag::FULLCOND_dag (double value_a, double value_b, ST::string prio_sig,
+							bool dags_all, const datamatrix & res,
 							double s_i, unsigned int num,
 							MCMCoptions * o,
 							const datamatrix & d, const ST::string & t,
@@ -106,14 +106,14 @@ namespace MCMC
 		 xx = datamatrix(ncoef,ncoef,0);
          beta_help = datamatrix(ncoef,1,1);
 		 Sigma = datamatrix(ncoef,ncoef,0);
-		 
+
 		 alpha=nvar;
 
 		 create_matrices();
 
 		 priori_sigma= prio_sig;
 		 priori_beta= "non_inf";
-		 
+
 		 if(priori_sigma=="non_inf")
 		 {
 			 a_invg = 1;
@@ -161,7 +161,7 @@ void FULLCOND_dag::calc_xx(void)
 
 	double * workxx;
 	double * workx1;
-	double * workx2; 
+	double * workx2;
 
 	workxx = xx.getV();
 
@@ -180,7 +180,7 @@ void FULLCOND_dag::calc_xx(void)
 				workx2 = workx2 + ncoef;
 			}
 			*workxx = value;
-		}	
+		}
 	}
 }
 
@@ -189,7 +189,7 @@ void FULLCOND_dag::calc_xx(void)
 
 void FULLCOND_dag::calc_Sigma (void)
 {
-	
+
 
 	if(priori_beta == "inf")
 	{
@@ -204,7 +204,7 @@ void FULLCOND_dag::calc_Sigma (void)
 	}
 	else
 		Sigma.assign(xx.cinverse());
-	
+
 }
 
 
@@ -224,9 +224,9 @@ void FULLCOND_dag::calc_Sigma (void)
 
 
 
-		for(k=0; k<nvar; k++)	
+		for(k=0; k<nvar; k++)
 			adcol(k,0) = unsigned(zeta(k,j));
-		
+
 		ncoef_m=1;
 		for(i=0; i<nvar; i++)
 		{
@@ -236,8 +236,8 @@ void FULLCOND_dag::calc_Sigma (void)
 
 		ncoef_ia = 0;
 
-		initialize_ia(zeta,j); 
-		
+		initialize_ia(zeta,j);
+
 		ncoef=ncoef_ia+ncoef_m;
 
 
@@ -246,7 +246,7 @@ void FULLCOND_dag::calc_Sigma (void)
 		xx = datamatrix(ncoef, ncoef);
 		Sigma = datamatrix(ncoef,ncoef,0);
 		beta_mean = datamatrix(ncoef,1,1);
-		
+
 		write_to_x(zeta);	// writes the data of the main effects to x
 
 		write_ia_to_x();
@@ -278,7 +278,7 @@ void FULLCOND_dag::calc_Sigma (void)
 
 
 
-  
+
 
 
   void FULLCOND_dag::create_matrices (void)
@@ -322,21 +322,21 @@ void FULLCOND_dag::calc_Sigma (void)
 
 
   // FUNCTION calc_kq_est
-  // TASK: sets beta_n equal to the kq-estimator for given x, xx  
+  // TASK: sets beta_n equal to the kq-estimator for given x, xx
   // where beta_n denotes ALL  regression coefficions of the models (old ones and added)
-	void FULLCOND_dag::calc_kq_est (datamatrix & beta_n, const datamatrix & x_new, 
+	void FULLCOND_dag::calc_kq_est (datamatrix & beta_n, const datamatrix & x_new,
 														 const datamatrix & xx_new)
 	{
 		unsigned coef_n=xx_new.cols();
 		datamatrix sigma (coef_n, coef_n);
-        
+
 		sigma.assign(xx_new.cinverse());
 
 		unsigned i,j,k;
 
 		double sum1, sum2;
 
-		double * worky; 
+		double * worky;
 		double * workx;
 		double * worksigma;
 		double * workbeta_n;
@@ -346,7 +346,7 @@ void FULLCOND_dag::calc_Sigma (void)
 		for(k=0; k<coef_n; k++, workbeta_n++)
 		{
 			worksigma = sigma.getV() + k;
-			
+
 			sum1 = 0;
 			for(i=0; i<coef_n; i++)
 			{
@@ -363,7 +363,7 @@ void FULLCOND_dag::calc_Sigma (void)
 				sum1 = sum1 + (*worksigma) * sum2;
 				worksigma = worksigma + coef_n;
 			}
-			
+
 			*workbeta_n = sum1;
 		}
 	}
@@ -371,7 +371,7 @@ void FULLCOND_dag::calc_Sigma (void)
 
 
   // FUNCTION calc_kq_est
-  // TASK: sets beta_n equal to the kq-estimator for given x_ia, xx_ia  
+  // TASK: sets beta_n equal to the kq-estimator for given x_ia, xx_ia
   // where beta_n denotes ONLY the regression coefficions of the added covariables
 	void FULLCOND_dag::calc_kq_est (datamatrix & beta_n, const datamatrix & x_ia,
 									const datamatrix & xx_ia, const datamatrix & y_ia)
@@ -396,12 +396,12 @@ void FULLCOND_dag::calc_Sigma (void)
 		cout<<endl<<endl;
 		*******************************/
 
-		
+
 		sigma.assign(xx_ia.cinverse());
-		
+
 		double sum1, sum2;
 
-		double * worky; 
+		double * worky;
 		double * workx;
 		double * worksigma;
 		double * workbeta_n;
@@ -411,7 +411,7 @@ void FULLCOND_dag::calc_Sigma (void)
 		for(k=0; k<coef_n; k++, workbeta_n++)
 		{
 			worksigma = sigma.getV() + k;
-			
+
 			sum1 = 0;
 			for(i=0; i<coef_n; i++)
 			{
@@ -428,7 +428,7 @@ void FULLCOND_dag::calc_Sigma (void)
 				sum1 = sum1 + (*worksigma) * sum2;
 				worksigma = worksigma + coef_n;
 			}
-			
+
 			*workbeta_n = sum1;
 		}
 	}
@@ -441,11 +441,11 @@ void FULLCOND_dag::calc_Sigma (void)
 
 		double sum1, sum2;
 
-		double * worky; 
+		double * worky;
 		double * workx;
 		double * worksigma;
 		double * workbeta_mean;
-		
+
 		workbeta_mean = beta_mean.getV();
 
 		if(priori_beta == "non_inf")
@@ -455,7 +455,7 @@ void FULLCOND_dag::calc_Sigma (void)
 			for(k=0; k<ncoef; k++, workbeta_mean++)
 			{
 				worksigma = Sigma.getV() + k;
-				
+
 				sum1 = 0;
 				for(i=0; i<ncoef; i++)
 				{
@@ -470,9 +470,9 @@ void FULLCOND_dag::calc_Sigma (void)
 					sum1 = sum1 + (*worksigma) * sum2;
 					worksigma = worksigma + ncoef;
 				}
-				
+
 				*workbeta_mean = sum1;
-			}		
+			}
 		}
 		else if (priori_beta == "inf")
 		{
@@ -484,7 +484,7 @@ void FULLCOND_dag::calc_Sigma (void)
 				{
 					worky = y.getV();
 					workx = x.getV()+i;
-					sum2 = 0;	
+					sum2 = 0;
 
 					for(j=0; j<nobs; j++, worky++)
 					{
@@ -495,7 +495,7 @@ void FULLCOND_dag::calc_Sigma (void)
 					sum1 = sum1 + (*worksigma) * sum2;
 				}
 				*workbeta_mean = sum1/sigma_i;
-			} 
+			}
 		}
 	}
 
@@ -503,16 +503,16 @@ void FULLCOND_dag::calc_Sigma (void)
 
 
 
-	double FULLCOND_dag::log_p_x(void) 
+	double FULLCOND_dag::log_p_x(void)
   {
 	  return -1/(2*sigma_i) * get_SQT_x();
   }
-	
+
 
 
 
 double FULLCOND_dag::calc_yXb( const datamatrix & yy, const datamatrix & XX,
-							  const datamatrix & bb) 
+							  const datamatrix & bb)
 {
 		// (yy-Xb)' (yy-Xb);
 
@@ -546,7 +546,7 @@ double FULLCOND_dag::calc_yXb( const datamatrix & yy, const datamatrix & XX,
 
 
 
-double FULLCOND_dag::calc_yXb( const datamatrix & XX, const datamatrix & bb) 
+double FULLCOND_dag::calc_yXb( const datamatrix & XX, const datamatrix & bb)
 {
 		// (y-Xb)' (y-Xb);
 
@@ -580,14 +580,14 @@ double FULLCOND_dag::calc_yXb( const datamatrix & XX, const datamatrix & bb)
 
 
 
-		
-  double FULLCOND_dag::log_p_x(const datamatrix & b_new, const datamatrix & x_new) 
+
+  double FULLCOND_dag::log_p_x(const datamatrix & b_new, const datamatrix & x_new)
   {
 	  // (y - x_new*b_new)' (y-x_new*b_new);
 
 		unsigned i;
 		double value, help;
-		
+
 		double * worky = y.getV();
 		double * worklin = lin_prop.getV();
 
@@ -599,20 +599,20 @@ double FULLCOND_dag::calc_yXb( const datamatrix & XX, const datamatrix & bb)
 			value = value + help*help;
 		}
 
-		return -1/(2*sigma_i) * value; 
+		return -1/(2*sigma_i) * value;
   }
 
 
 
 
 
-  double FULLCOND_dag::log_p_x(const datamatrix & b_new, const datamatrix & x_new, double sig_i_new) 
+  double FULLCOND_dag::log_p_x(const datamatrix & b_new, const datamatrix & x_new, double sig_i_new)
   {
 	  // -(y-x_new*b_new)' (y-x_new*b_new) / 2sig;
 
 		unsigned i;
 		double value, help;
-		
+
 		double * worky = y.getV();
 		double * worklin = lin_prop.getV();
 
@@ -624,7 +624,7 @@ double FULLCOND_dag::calc_yXb( const datamatrix & XX, const datamatrix & bb)
 			value = value + help*help;
 		}
 
-	  return -1/(2*sig_i_new) * value; 
+	  return -1/(2*sig_i_new) * value;
   }
 
 
@@ -673,7 +673,7 @@ double FULLCOND_dag::log_p_b1(const datamatrix & b_n)
 	  return  -0.5*(ncoef*log(sigma_i) + get_SQT_b()/sigma_i);
   }
 
-	  
+
 
 
 
@@ -686,7 +686,7 @@ double FULLCOND_dag::log_p_b1(const datamatrix & b_n)
 	   workb_new = b_new.getV();
 
 	   double value = 0;
-	   double help; 
+	   double help;
 
 	   for(i=0; i<b_new.rows(); i++, workb_new++)
 	   {
@@ -714,9 +714,9 @@ double FULLCOND_dag::log_p_b1(const datamatrix & b_n)
 	}
 
 
-   
 
-	
+
+
 	// FUNCTION: p_prop()
 	// TARGET: returns the log-density of the proposal u, which is normaldistributed
 	double FULLCOND_dag::p_prop(double prop, double mu, double sigma)
@@ -733,14 +733,14 @@ double FULLCOND_dag::log_p_b1(const datamatrix & b_n)
 	}
 
 
-	
+
 	// FUNCTION: p_prop()
 	// TARGET: returns the log-density of the proposal u, which is normaldistributed
 	double FULLCOND_dag::p_prop(const datamatrix & prop, const datamatrix & mu, double sigma)
 	{
-		unsigned t; 
+		unsigned t;
 		double sum;
-		
+
 
 		double * workprop;
 		double * workmu;
@@ -773,7 +773,7 @@ double FULLCOND_dag::log_p_b1(const datamatrix & b_n)
 		help2.mult(vec.transposed(), concentration);
 		help3.mult(help2,vec);
 
-		return help3(0,0);	
+		return help3(0,0);
 	}
 
 
@@ -803,7 +803,7 @@ double FULLCOND_dag::log_p_b1(const datamatrix & b_n)
 
 
     // FUNCTION: p_prop()
-	// TARGET: returns the log-density of beta_help, which is normaldistributed 
+	// TARGET: returns the log-density of beta_help, which is normaldistributed
 	// with mean beta_mean and variance sigma_i
 	double FULLCOND_dag::p_prop(void)
 	{
@@ -851,7 +851,7 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 		unsigned i,j;
 		double diff1, diff2, sum1, sum2, help1a, help1, help2, help2a;
 
-		double * workxx; 
+		double * workxx;
 		double * workbeta_h1;
 		double * workbeta_m1;
 
@@ -894,17 +894,17 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 
 
 
-	 double FULLCOND_dag::log_u(const datamatrix & mean, const datamatrix & beta, 
+	 double FULLCOND_dag::log_u(const datamatrix & mean, const datamatrix & beta,
 								const datamatrix & Sigma, unsigned int ncoef)
 	{
         double help1a = 2*3.14159;
 		double help1 = -0.5*ncoef*log(help1a);
 		double help2 = - (ncoef * log(Sigma.det()));
-        
+
 		datamatrix help3 (1,1,1);
 
 		datamatrix help4 = beta-mean;
-		
+
 	//	help3.mult(help4.transposed(), Sigma.inverse()*help4));
 
 		return help1+help2-0.5*help3;
@@ -924,7 +924,7 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 	   lin.assign(lin_prop);
 	   beta_help = beta_help_new;
 
-	   x = x_new;	
+	   x = x_new;
 	   xx = xx_new;
 
 	   if(ncoef_new>ncoef)
@@ -938,14 +938,14 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
        //ncoef_ia is changed in change_current
 
 	   ncoef = ncoef_new;
-	   SQT_x = calc_SQT_x();					
+	   SQT_x = calc_SQT_x();
 	   SQT_b = calc_SQT_b();
 
-	   Sigma = datamatrix (ncoef, ncoef,0); 
+	   Sigma = datamatrix (ncoef, ncoef,0);
 	   calc_Sigma ();
-							
+
 	   beta_mean = datamatrix (ncoef,1);
-	   calc_beta_mean ();	
+	   calc_beta_mean ();
 
 	   create_matrices();  //has to stand AFTER the changing of ncoef!!!
    }
@@ -959,7 +959,7 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 
 
 
-	double FULLCOND_dag::new_comp_xx(unsigned int m, unsigned int n, unsigned int i, 
+	double FULLCOND_dag::new_comp_xx(unsigned int m, unsigned int n, unsigned int i,
 										unsigned int t)
 	{
 		assert( (t==m) || (t==n));
@@ -973,7 +973,7 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 
 		if( m < t)
 		{
-			workdata = data.getV()+i;	
+			workdata = data.getV()+i;
 			workx = x.getV()+m;
 
 			for(k=0; k<nobs; k++)
@@ -986,7 +986,7 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 
 		else if( m > t)
 		{
-			workdata = data.getV()+i;	
+			workdata = data.getV()+i;
 			workx = x.getV()+m-1;
 
 			for(k=0; k<nobs; k++)
@@ -997,9 +997,9 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 			}
 		}
 
-		else if( n < t) 
+		else if( n < t)
 		{
-			workdata = data.getV()+i;	
+			workdata = data.getV()+i;
 			workx = x.getV()+n;
 
 			for(k=0; k<nobs; k++)
@@ -1010,9 +1010,9 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 			}
 		}
 
-		else if( n > t) 
-		{ 
-			workdata = data.getV()+i;	
+		else if( n > t)
+		{
+			workdata = data.getV()+i;
 			workx = x.getV()+n-1;
 
 			for(k=0; k<nobs; k++)
@@ -1024,11 +1024,11 @@ double FULLCOND_dag::calc_SQT_b(const datamatrix & b_n)
 		}
 
 		else //m=n=t
-		{		
-			workdata = data.getV()+i;	
+		{
+			workdata = data.getV()+i;
 			for(k=0; k<nobs; k++)
 			{
-				sum = sum + (*workdata) * (*workdata);		// data(k,i)*data(k,i); 
+				sum = sum + (*workdata) * (*workdata);		// data(k,i)*data(k,i);
 				workdata = workdata + nvar;
 			}
 		}
@@ -1049,13 +1049,13 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 	{
 		unsigned i,j;
 
-		double value; 
+		double value;
 		double * workx = x_prop.getV();
 		double * worklin = lin_prop.getV();
 		double * workbeta_help;
 		double intercept = *(b_prop.getV());
 
-		if(b_prop.rows()==1) // so linpred=intercept 
+		if(b_prop.rows()==1) // so linpred=intercept
 		{
 			for(i=0; i<nobs; i++, worklin++)
             {
@@ -1064,9 +1064,9 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 		}
 		else
 		{
-			for(i=0; i<nobs; i++, worklin++)  
+			for(i=0; i<nobs; i++, worklin++)
 			{
-				value = intercept;				// intercept is everywhere the same 
+				value = intercept;				// intercept is everywhere the same
 				workbeta_help = b_prop.getV();
 				workbeta_help++;
 				workx++;
@@ -1083,7 +1083,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 
 
-	
+
 
 
 
@@ -1091,7 +1091,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 	{
 		unsigned i,j;
 
-		double value; 
+		double value;
 		double * workx = x.getV();
 		double * worklinp = lin.getV();
 		double * workbeta_help;
@@ -1099,7 +1099,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 		double intercept= beta_help(0,0);
 
-		if(beta_help.rows()==1)  // so linpred=intercept 
+		if(beta_help.rows()==1)  // so linpred=intercept
 		{
 			for(i=0; i<nobs; i++, worklinp++)
 				*worklinp = intercept;
@@ -1108,7 +1108,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 		{
 			for(i=0; i<nobs; i++, worklinp++)
 			{
-				value = intercept; // intercept is everywhere the same 
+				value = intercept; // intercept is everywhere the same
 				workbeta_help = beta_help.getV();
 				workbeta_help++;
 				workx++;
@@ -1122,7 +1122,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 	}
 
-		
+
 
 
 
@@ -1133,12 +1133,12 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 
 	double FULLCOND_dag::calc_SQT_x(void)
-	{	
+	{
 		// (Xb-y)' (Xb-y)
 
 		unsigned i;
 		double value, help;
-		
+
 		double * worky = y.getV();
 		double * worklinp = lin.getV();
 
@@ -1149,7 +1149,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 			help = *worklinp - (*worky);
 			value = value + help*help;
 		}
-		
+
 		return value;
 	}
 
@@ -1157,7 +1157,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 
 	double FULLCOND_dag::calc_SQT_x(const datamatrix & X_n, const datamatrix & b_n)
-	{	
+	{
 		// (X_n*b_n -y)' (X_n*b_n-y)  calculates the SQT_x for the proposed X and b
 
 		unsigned i;
@@ -1165,12 +1165,12 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 		//calculate the linear predictor for the proposed values
 		calc_lin_prop(X_n, b_n);
-		
+
 		double * worky = y.getV();
 		double * worklinp = lin_prop.getV();
 
 		value=0;
-        
+
 		for(i=0; i<nobs; i++, worky++, worklinp++)
 		{
             help = *worklinp - (*worky);
@@ -1206,7 +1206,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 
 
-	
+
 
 
 
@@ -1234,7 +1234,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 		// corresponding updating of beta
 		write_to_beta();
-		
+
 		calc_lin();
 
 		SQT_x = calc_SQT_x();
@@ -1243,7 +1243,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 		update_sigma_i();
 
 
-		
+
 		if(print_dags==true)
 			  FULLCOND::update();		// this command should be included (at the end of the
 								// function) to update automatically the curent
@@ -1283,7 +1283,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 					workbeta_help ++;
 					l++ ;
 				}
-				else 
+				else
 				{
 					if (m==self)
 					{
@@ -1313,9 +1313,9 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 		double *workdata;
 		double *workx;
 
-		
-		
-		l=1; 
+
+
+		l=1;
 		for(m=0; m<nvar; m++)
 		{
 			if(zeta(m,self) ==1)
@@ -1327,7 +1327,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 				{
 					*workx= *workdata; // AENDERUNG  x(k,l)= data(k,m);
 					workdata = workdata+nvar;
-					workx = workx+ncoef; 
+					workx = workx+ncoef;
 				}
 
 				l++;  // increase column of x
@@ -1343,7 +1343,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 	{
 		double * workuti =  uti.getV() + self;
 		double * worky = y.getV();
-		unsigned i; 
+		unsigned i;
 
 		for(i=0; i<nobs; i++, worky++)
 		{
@@ -1351,7 +1351,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 			workuti = workuti + nvar;
 		}
 	}
-			
+
 
 
 
@@ -1360,10 +1360,10 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 	void FULLCOND_dag::write_to_x(const adja & zeta, const datamatrix & uti)
 	{
-		unsigned l=1; 
+		unsigned l=1;
 		unsigned m,k ;
 		double * workuti;
-		double * workx; 
+		double * workx;
 
 		unsigned *workzeta = zeta.getV() + self;
 
@@ -1397,7 +1397,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 	void FULLCOND_dag::outresults(void)
     {
-		
+
 		if(print_dags==true)
 		{
 		FULLCOND::outresults(); // this command should be included at the beginning
@@ -1432,7 +1432,7 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 		for(unsigned r=0; r<nvar; r++)
 		{
-			
+
 			/*
 			optionsp->out(ST::doubletostring(flags[0]) + " "
                         + ST::doubletostring(flags[1]) + " "
@@ -1461,14 +1461,14 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 					optionsp->out("mean: "		+  ST::doubletostring(betamean(r,0),5) + "\n");
 
-					optionsp->out(l1 + "% quantile: " 
+					optionsp->out(l1 + "% quantile: "
 									 + ST::doubletostring(betaqu_l1_lower(r,0),5) + "\n");
-					optionsp->out(l2 + "% quantile: " 
+					optionsp->out(l2 + "% quantile: "
 									 + ST::doubletostring(betaqu_l2_lower(r,0),5) + "\n");
 					optionsp->out("50% quantile: " +  ST::doubletostring(betaqu50(r,0),5) + "\n");
-					optionsp->out(u1 + "% quantile: " 
+					optionsp->out(u1 + "% quantile: "
 									 + ST::doubletostring(betaqu_l2_upper(r,0),5) + "\n");
-					optionsp->out(u2 + "% quantile: " 
+					optionsp->out(u2 + "% quantile: "
 									 + ST::doubletostring(betaqu_l1_upper(r,0),5) + "\n");
 					optionsp->out("\n");
 				}
@@ -1559,8 +1559,8 @@ void FULLCOND_dag::calc_lin_prop(const datamatrix & x_prop, const datamatrix & b
 
 
     }
-	
-	
+
+
 	// FUNCTION: outoptions
     // TASK: writes estimation options (hyperparameters, etc.) to outputstream
 	  void FULLCOND_dag::outoptions(void)

@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -449,6 +449,8 @@ class __EXPORT_TYPE superbayesreg : public statobject
 
   simpleoption forceIWLS;
 
+  simpleoption highspeedon;
+
   simpleoption importance;
   // end: OPTIONS for method regress
 
@@ -809,10 +811,6 @@ class __EXPORT_TYPE superbayesreg : public statobject
   void create_autocorr(void);
   void create_getsample(void);
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_pointer * adminp_p;
-  #endif
-
   public:
 
 
@@ -836,14 +834,8 @@ class __EXPORT_TYPE superbayesreg : public statobject
   // ADDITIONAL INFORMATION:
   // - name = n
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  superbayesreg (administrator_basic * adb, administrator_pointer * adp,
-                 const ST::string & n,ofstream * lo,istream * i,
-                                ST::string p,vector<statobject*> * st);
-  #else
   superbayesreg (const ST::string & n,ofstream * lo,istream * i,
                  ST::string p,vector<statobject*> * st);
-  #endif
 
   // COPY CONSTRUCTOR
 

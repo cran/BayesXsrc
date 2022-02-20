@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,15 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include "StatwinFrame.h"
-#endif
 
 #include "spline_basis_surf.h"
 
@@ -448,12 +439,12 @@ spline_basis_surf::spline_basis_surf(MCMCoptions * o, const datamatrix & intact,
   make_xy_v(v1,v2);
   }
 
-  
+
 spline_basis_surf::spline_basis_surf(const spline_basis_surf & sp)
   : FULLCOND_nonp_basis(FULLCOND_nonp_basis(sp))
   {
 
-  interactvar = sp.interactvar;  
+  interactvar = sp.interactvar;
 
   fcconst = sp.fcconst;
 
@@ -578,7 +569,7 @@ const spline_basis_surf & spline_basis_surf::operator=(const spline_basis_surf &
 
   beta1 = sp.beta1;
   beta2 = sp.beta2;
-  beta_uncentered = sp.beta_uncentered;  
+  beta_uncentered = sp.beta_uncentered;
   he1 = sp.he1;
   he2 = sp.he2;
 
@@ -1187,22 +1178,7 @@ void spline_basis_surf::outresults(void)
 
 if(mapexisting)
   {
-  #if defined(JAVA_OUTPUT_WINDOW)
-  optionsp->out("  Postscript files are stored in files\n");
-  ST::string psfile;
-  psfile = pathcurrent.substr(0,pathcurrent.length()-4) + ".ps";
-  optionsp->out("  " + psfile + "\n");
-  psfile = pathcurrent.substr(0,pathcurrent.length()-4) + "_pcatbig" + ".ps";
-  optionsp->out("  " + psfile + "\n");
-  psfile = pathcurrent.substr(0,pathcurrent.length()-4) + "_pcatsmall" + ".ps";
-  optionsp->out("  " + psfile + "\n");
-  optionsp->out("\n");
-  optionsp->out("  Results may be visualized using method 'drawmap'\n");
-  optionsp->out("  Type for example:\n");
-  optionsp->out("  objectname.drawmap " + ST::inttostring(fcnumber) + "\n");
-  #else
   optionsp->out("  Results may be visualized using the R function 'drawmap' \n");
-  #endif
   optionsp->out("\n");
   }
 else
@@ -2389,30 +2365,7 @@ void spline_basis_surf::set_lambdaconst(double la)
 
 bool spline_basis_surf::breakpause(void)
   {
-#if defined(BORLAND_OUTPUT_WINDOW)
-    Application->ProcessMessages();
-
-    if (Frame->pause)
-      {
-      optionsp->out("\n");
-      optionsp->out("SIMULATION PAUSED\n");
-      optionsp->out("Click CONTINUE to proceed\n");
-      optionsp->out("\n");
-
-      while (Frame->pause)
-        {
-        Application->ProcessMessages();
-        }
-
-      optionsp->out("SIMULATION CONTINUED\n");
-      optionsp->out("\n");
-      }
-
-    return Frame->stop;
-#elif defined(JAVA_OUTPUT_WINDOW)
-    return optionsp->adminb_p->breakcommand();
-#endif
-    return true;
+  return true;
   }
 
 
@@ -2924,22 +2877,7 @@ double spline_basis_surf::outresultsreml(datamatrix & X,datamatrix & Z,
 
   if(mapexisting)
     {
-#if defined(JAVA_OUTPUT_WINDOW)
-    optionsp->out("  Postscript files are stored in files\n");
-    ST::string psfile;
-    psfile = outest.substr(0,outest.length()-4) + ".ps";
-    optionsp->out("  " + psfile + "\n");
-    psfile = outest.substr(0,outest.length()-4) + "_pcatbig" + ".ps";
-    optionsp->out("  " + psfile + "\n");
-    psfile = outest.substr(0,outest.length()-4) + "_pcatsmall" + ".ps";
-    optionsp->out("  " + psfile + "\n");
-    optionsp->out("\n");
-    optionsp->out("  Results may be visualized using method 'drawmap'\n");
-    optionsp->out("  Type for example:\n");
-    optionsp->out("  objectname.drawmap " + ST::inttostring(plotpos) + "\n");
-#else
     optionsp->out("  Results may be visualized using the R function 'drawmap' \n");
-#endif
     optionsp->out("\n");
     }
   else

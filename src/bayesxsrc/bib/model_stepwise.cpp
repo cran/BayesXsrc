@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -699,7 +699,7 @@ bool term_pspline_stepwise::check(term & t)
     else
        t.options[21] = "true";
     t.options[22] = ST::doubletostring(spmonotone.getvalue());
-      
+
    if (lambda.getvalue() < 0)
      {
      setdefault();
@@ -791,7 +791,7 @@ term_spatial_stepwise::term_spatial_stepwise(void)
   df_accuracy = doubleoption("df_accuracy",0.05,0.01,0.5);
   center = simpleoption("center",false);
   nofixed = simpleoption("nofixed",false);
-  map2=stroption("map2");  
+  map2=stroption("map2");
   }
 
 void term_spatial_stepwise::setdefault(void)
@@ -811,7 +811,7 @@ void term_spatial_stepwise::setdefault(void)
   df_accuracy.setdefault();
   center.setdefault();
   nofixed.setdefault();
-  map2.setdefault();  
+  map2.setdefault();
   }
 
 
@@ -855,7 +855,7 @@ bool term_spatial_stepwise::check(term & t)
     optlist.push_back(&df_accuracy);
     optlist.push_back(&center);
     optlist.push_back(&nofixed);
-    optlist.push_back(&map2);    
+    optlist.push_back(&map2);
 
     unsigned i;
     bool rec = true;
@@ -2036,7 +2036,7 @@ bool term_projection_stepwise::check(term & t)
        t.options[19] = "true";
    t.options[20] = ST::inttostring(nterms.getvalue());
 
-      
+
    if (lambda.getvalue() < 0)
      {
      setdefault();

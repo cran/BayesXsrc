@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -31,12 +31,12 @@ namespace MCMC
 
 
 
-class IA_MIXED  : public IA 
+class IA_MIXED  : public IA
 {
 
 	protected:
 
-		
+
 
 
 	public:
@@ -50,7 +50,7 @@ class IA_MIXED  : public IA
 		IA_MIXED(const datamatrix & d);
 
 		// CONSTRUCTOR_2
-		// for interactions of order>2 (some day in future....) 
+		// for interactions of order>2 (some day in future....)
 		IA_MIXED(unsigned order, const datamatrix & d);
 
 		// COPY CONSTRUCTOR
@@ -61,11 +61,11 @@ class IA_MIXED  : public IA
 
 
 		// DESTRUCTOR
-		~IA_MIXED() {}  
+		~IA_MIXED() {}
 
 
 /*		// FUNCTION: make_list
-		// TASK: represents adja-matrix m as a list 
+		// TASK: represents adja-matrix m as a list
 		// vector < list <unsigned int> > make_list (const adja & m) const;
 
 
@@ -73,15 +73,15 @@ class IA_MIXED  : public IA
 		// TASK: creates a new interaction term
 		void make_ia (vector<unsigned> terms);
 
-		
+
 	  // FUNCTION: choose_ia_term
-      // TASK: chooses a new interaction term of order ord 
+      // TASK: chooses a new interaction term of order ord
       // which is NOT already in current_ia
-		vector<unsigned> IA::choose_ia (const Matrix<unsigned> & col, 
+		vector<unsigned> IA::choose_ia (const Matrix<unsigned> & col,
 									 vector <vector <unsigned> > & current_ia);
 
 	  // FUNCTION: choose_ia_term
-      // TASK: chooses a new interaction term of order ord 
+      // TASK: chooses a new interaction term of order ord
       // regardless if it is already in current_ia or not
 		vector<unsigned> IA::choose_ia ( const  Matrix<unsigned>  & col);
 
@@ -89,13 +89,13 @@ class IA_MIXED  : public IA
 
 
 	   // FUNCTION: already_there (vec_ia, current_ia)
-       // TASK: returns true if the interaction vec_ia is already in the current model 
-		bool already_there ( const vector<unsigned> & vec_ia, 
+       // TASK: returns true if the interaction vec_ia is already in the current model
+		bool already_there ( const vector<unsigned> & vec_ia,
 						vector <vector <unsigned> > & current_ia);
 
 
 		// FUNCTION: already_there (vec_ia)
-       // TASK: returns true if the interaction vec_ia is already in ia_var 
+       // TASK: returns true if the interaction vec_ia is already in ia_var
 		bool already_there ( const vector<unsigned> & vec_ia);
 
 
@@ -112,7 +112,7 @@ class IA_MIXED  : public IA
 		void add_ia(interact ia) ;
 
 
-		
+
 
 		// FUNCTION: add_ia
 		// TASK: adds datamatix ia.ia_dat to interaction at ia_var[pos]
@@ -142,7 +142,7 @@ class IA_MIXED  : public IA
 		// TASK: returns pointer to the first element of the matrix of interaction ia
 		// regardless if it has already existed before or not
 		double * get_ia(vector<unsigned> ia);
-		
+
 
 
 
@@ -158,17 +158,17 @@ class IA_MIXED  : public IA
 
 
 		// FUNCTION: get_pos
-		// TASK: gives position of ia if all possible interactions of order 2 
-		// of nvar variables are stored in an ordered vector 
+		// TASK: gives position of ia if all possible interactions of order 2
+		// of nvar variables are stored in an ordered vector
 		unsigned get_pos(vector<unsigned> ia);
 
 
 */
 
 
-	
 
-  
+
+
 
 };    // class
 

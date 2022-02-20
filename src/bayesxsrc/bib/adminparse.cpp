@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -67,7 +67,7 @@ administrator::administrator(void)
         error = true;
         }
       }
-  
+
     if(DirectoryExists((defaultpath+"/output").strtochar()))
       {
       AnsiString output = (defaultpath+"/output/test").strtochar();
@@ -115,7 +115,7 @@ administrator::administrator(void)
         error = true;
         }
       }
-  
+
     if(DirectoryExists((defaultpath+"\\output").strtochar()))
       {
       AnsiString output = (defaultpath+"\\output\\test").strtochar();
@@ -176,13 +176,7 @@ void administrator::out(const ST::string & c,
   sh = sh.replaceallsigns('\n',' ');
   sh = sh+"\n";
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  if (!adminb.suppressoutput)
-    adminb.Java->CallVoidMethod(adminb.BayesX_obj, adminb.javaoutput, adminb.Java->NewStringUTF(sh.strtochar()),
-    thick, italic, size,r,g,b);
-  #else
-    std::cout << c << flush;
-  #endif
+  std::cout << c << flush;
   if (logout.is_open())
     logout << c << flush;
   }
@@ -625,14 +619,6 @@ bool administrator::parse(ST::string & in)
 		  }
 
 		input = &cin;
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-        if (!Frame->stop)
-		  outerror(errormessages);
-#elif defined (JAVA_OUTPUT_WINDOW)
-        if(!adminb.get_stop())
-          outerror(errormessages);
-#endif
         errormessages.clear();
 		return false;
 
@@ -666,22 +652,6 @@ bool administrator::parse(ST::string & in)
             }
 		  else
             {
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-            if (type.getvalue() == "rtf")
-              Results->ResultsRichEdit->PlainText = false;
-            else
-              Results->ResultsRichEdit->PlainText = true;
-
-            Results->ResultsRichEdit->Lines->SaveToFile(uw.getPath().strtochar());
-            Results->ResultsRichEdit->Modified = false;
-            Results->ResultsRichEdit->Tag = true;
-            Results->Caption = uw.getPath().strtochar();
-#elif defined (JAVA_OUTPUT_WINDOW)
-            jmethodID javasaveoutput = adminb.Java->GetMethodID(adminb.BayesX_cls, "JavaSaveOutput", "()V");
-            adminb.Java->CallVoidMethod(adminb.BayesX_obj, javasaveoutput);
-#endif
-
             }
           }
         else
@@ -693,12 +663,6 @@ bool administrator::parse(ST::string & in)
         }
      else if (firsttoken == "clearoutput")
        {
-#if defined(BORLAND_OUTPUT_WINDOW)
-       Results->ResultsRichEdit->Clear();
-#elif defined (JAVA_OUTPUT_WINDOW)
-       jmethodID clearoutput = adminb.Java->GetMethodID(adminb.BayesX_cls, "ClearOutput", "()V");
-       adminb.Java->CallVoidMethod(adminb.BayesX_obj, clearoutput);
-#endif
        }
 	 else if (firsttoken == "logopen")
 		{

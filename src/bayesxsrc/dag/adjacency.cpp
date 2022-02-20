@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -455,17 +455,7 @@ essfreq::essfreq(Matrix <unsigned> scel, vector< vector <unsigned> >  & imm, uns
 
 		list <unsigned int> new_pot_i;
 
-		#if defined(MICROSOFT_VISUAL)
-		{
-			limit = __min(nedge+1, nvar);
-		}
-		#else
-		{
-// Vorschlag:
-//			limit = min(nedge+1, nvar);
-			limit = std::min(nedge+1, nvar);
-		}
-		#endif
+        limit = std::min(nedge+1, nvar);
 
 		for(l=0; l<limit; l++)
 		{
@@ -524,17 +514,7 @@ essfreq::essfreq(Matrix <unsigned> scel, vector< vector <unsigned> >  & imm, uns
 
 		list <unsigned int> new_pot_i;
 
-		#if defined(MICROSOFT_VISUAL)
-		{
-			limit = __min(nedge+1, nvar);
-		}
-		#else
-		{
-// Vorschlag:
-//			limit = min(nedge+1, nvar);
-			limit = std::min(nedge+1, nvar);
-		}
-		#endif
+		limit = std::min(nedge+1, nvar);
 
 		for(l=0; l<limit; l++)
 		{

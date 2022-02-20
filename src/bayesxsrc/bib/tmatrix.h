@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -47,10 +47,10 @@ public :
    // Konstruktor fuer eine uninitalisierte Matrix
 
    Matrix(unsigned rows, unsigned cols = 1) : PreMatrix<T>(rows, cols) { }
-  
+
    // Konstruktor fuer eine mit einem festen Wert initialisierte Matrix
 
-   Matrix(unsigned rows, unsigned cols, const T init) : 
+   Matrix(unsigned rows, unsigned cols, const T init) :
    PreMatrix<T>(rows, cols, init) { }
 
    // Kopierkonstruktor
@@ -79,7 +79,7 @@ public :
       { Matrix<T> res; PreMatrix<T>::operator&(m).purge(res); return res; }
 
    // Einstellige Operatoren
-	
+
    Matrix operator+()
       { Matrix<T> res; PreMatrix<T>::operator+().purge(res); return res; }
    Matrix operator-()
@@ -137,7 +137,7 @@ public :
       { Matrix<T> res; PreMatrix<T>::sscp().purge(res);  return res; }
 
    // Anwendung von Funktionen auf Matrizen
-		
+
    Matrix applied(T (*f)(T)) const
 		{ Matrix<T> res; Array2D<T>::applied(f).purge(res); return res; }
    Matrix applied(const Matrix &m, T (* f)(T, T)) const
@@ -167,19 +167,19 @@ public :
       { Matrix<T> res; PreMatrix<T>::blockdiag(m).purge(res); return res; }
 
    static Matrix diag(unsigned int dim, const T v)
-	   { Matrix<T> res; PreMatrix<T>::diag(dim, v).purge(res); return res; } 
+	   { Matrix<T> res; PreMatrix<T>::diag(dim, v).purge(res); return res; }
    static Matrix diag(const Matrix<T> &m)
 	   { Matrix<T> res; PreMatrix<T>::diag(m).purge(res); return res; }
-   static Matrix tridiag(const Matrix<T> &m, const Matrix<T> &lm, 
+   static Matrix tridiag(const Matrix<T> &m, const Matrix<T> &lm,
 			 const Matrix<T> &um)
 	   { Matrix<T> res; PreMatrix<T>::tridiag(m,lm,um).purge(res); return res; }
 
    Matrix luinverse() const;
-		
+
    Matrix inverse(const T epsilon = T(0)) const;
 
    Matrix cinverse() const;
-   Matrix root () const; 
+   Matrix root () const;
 
    Matrix vcat(const Matrix &bottom) const
 	   { Matrix<T> res; PreMatrix<T>::vcat(bottom).purge(res); return res; }
@@ -193,7 +193,7 @@ public :
 
    // L"ost ein lineares Gleichungssystem: *this * x = b mit Cholesky-
    // Zerlegung
-   
+
    Matrix csolve(const Matrix &bIn) const;
 protected:
 
@@ -202,13 +202,13 @@ protected:
 };
 
 template <class T>
-inline 
+inline
 Matrix<T>
 Matrix<T>::
-getBlock(unsigned int rl, unsigned int ru, unsigned int cl, unsigned int cu) 
+getBlock(unsigned int rl, unsigned int ru, unsigned int cl, unsigned int cu)
 const
-{ 
-   Matrix<T> res; 
+{
+   Matrix<T> res;
 
    Array2D<T>::getBlock(rl, ru, cl, cu).purge(res);
    return res;
@@ -219,9 +219,9 @@ inline
 Matrix<T>
 Matrix<T>::
 strikedOutRow(unsigned int row) const
-{ 
+{
    Matrix<T> res;
-		
+
    Array2D<T>::strikedOutRow(row).purge(res);
    return res;
 }
@@ -238,12 +238,6 @@ strikedOutCol(unsigned int col) const
    return res;
 }
 
-#if defined( TEMPL_INCL_DEF )
-#	if defined( CC_SOURCE )
-#		include <tmatrix.cc>
-#	else
-#		include "tmatrix.cpp"
-#	endif
-#endif
+#include "tmatrix.cpp"
 
 #endif

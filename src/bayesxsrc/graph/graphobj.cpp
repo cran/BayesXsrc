@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,14 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-#endif
-
 
 #include"graphobj.h"
 
@@ -206,17 +198,6 @@ void graphobj::create (void)
   }
 
 
-#if defined(JAVA_OUTPUT_WINDOW)
-graphobj::graphobj(administrator_basic * adb, administrator_pointer * adp,
-                   const ST::string & n,ofstream * lo,istream * in,
-                   vector<statobject*> * st)
-			 : statobject(adb,n,"graph",lo,in)
-  {
-  adminp_p=adp;
-  statobj = st;
-  create();
-  }
-#else
 graphobj::graphobj(const ST::string & n,
                    ofstream * lo,istream * in,
                    vector<statobject*> * st)
@@ -225,15 +206,10 @@ graphobj::graphobj(const ST::string & n,
   statobj = st;
   create();
   }
-#endif
-
 
 graphobj::graphobj(const graphobj & o) : statobject(statobject(o))
   {
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = o.adminp_p;
-  #endif
   statobj = o.statobj;
   mapinfo = o.mapinfo;
   D = o.D;
@@ -248,9 +224,6 @@ const graphobj & graphobj::operator=(const graphobj & o)
     return *this;
   statobject::operator=(statobject(o));
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = o.adminp_p;
-  #endif
   statobj = o.statobj;
   mapinfo = o.mapinfo;
   D = o.D;
@@ -431,36 +404,6 @@ if(drawonlyboundaries)
         o.outerror("ERROR: file " + path + " is already existing\n");
         error = true;
         }
-
-#if defined(JAVA_OUTPUT_WINDOW)
-    o.adminp_p->set_Dp(&o.D);
-    o.adminp_p->set_mapinfo(&o.mapinfo);
-
-    if(drawonlyboundaries)
-      {
-      jmethodID javashowmap = o.adminb_p->Java->GetMethodID(o.adminb_p->BayesX_cls, "JavaShowMap", "(ZILjava/lang/String;)V");
-      o.adminb_p->Java->CallVoidMethod(o.adminb_p->BayesX_obj, javashowmap, o.drawnames.getvalue(),
-                                       o.fontsize.getvalue(),
-                                       o.adminb_p->Java->NewStringUTF(o.psname.getvalue().strtochar()));
-      }
-    else
-      {
-      jmethodID javadrawmap = o.adminb_p->Java->GetMethodID(o.adminb_p->BayesX_cls, "Javadrawmap",
-                                                    "(ZZZZZDDSZILjava/lang/String;Ljava/lang/String;)V");
-      o.adminb_p->Java->CallVoidMethod(o.adminb_p->BayesX_obj, javadrawmap, false, false, false, o.drawnames.getvalue(),
-                               false, 0.0, 1.0, 0, false, o.fontsize.getvalue(),
-                               o.adminb_p->Java->NewStringUTF(o.psname.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.title.getvalue().strtochar()));
-      }
-    bool stop=o.adminb_p->breakcommand();
-#endif
-
-/*
-    admin.set_mapinfo(&o.mapinfo);
-
-    jmethodID javashowmap = o.adminb_p->Java->GetMethodID(o.adminb_p->BayesX_cls, "JavaShowMap", "(Z)V");
-    o.adminb_p->Java->CallVoidMethod(o.adminb_p->BayesX_obj, javashowmap, o.drawnames.getvalue());
-*/
     }
 
   }
@@ -604,28 +547,6 @@ else
         o.out("NOTE: 'upperlimit' is below maximum value (maximum value is " + ST::doubletostring(o.D.max(0)) + ")\n");
         }
 
-#if defined(JAVA_OUTPUT_WINDOW)
-    o.adminp_p->set_Dp(&o.D);
-    o.adminp_p->set_mapinfo(&o.mapinfo);
-
-    bool legend;
-    if(o.nolegend.getvalue())
-      legend = false;
-    else
-      legend = true;
-
-    jmethodID javadrawmap = o.adminb_p->Java->GetMethodID(o.adminb_p->BayesX_cls, "Javadrawmap",
-                                                    "(ZZZZZDDSZILjava/lang/String;Ljava/lang/String;D)V");
-    o.adminb_p->Java->CallVoidMethod(o.adminb_p->BayesX_obj, javadrawmap, o.color.getvalue(), legend,
-                               o.swapcolors.getvalue(), o.drawnames.getvalue(), o.hclcolors.getvalue(),
-                               lowerlim, upperlim, o.nrcolors.getvalue(), o.pcat.getvalue(),
-                               o.fontsize.getvalue(),
-                               o.adminb_p->Java->NewStringUTF(o.psname.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.title.getvalue().strtochar()),
-                               o.titlescale.getvalue());
-
-    bool stop=o.adminb_p->breakcommand();
-#endif
     }
 
   } // END: if(drawonlyboundaries)
@@ -773,36 +694,6 @@ void plotnonprun(graphobj & o)
       }
 
     }
-
-  if (error == false)
-    {
-
-#if defined(JAVA_OUTPUT_WINDOW)
-    o.adminp_p->set_Dp(&o.D);
-
-    jmethodID javaplotnonp = o.adminb_p->Java->GetMethodID(o.adminb_p->BayesX_cls, "Javaplotnonp",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IIDDDDDDDDIIIIID)V");
-    o.adminb_p->Java->CallVoidMethod(o.adminb_p->BayesX_obj, javaplotnonp,
-                               o.adminb_p->Java->NewStringUTF(o.psname.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.title.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.xlab.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.ylab.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.connect.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.linecolor.getvalue().strtochar()),
-                               o.height.getvalue(),o.width.getvalue(),
-                               o.xlimtop.getvalue(),o.xlimbottom.getvalue(),
-                               o.ylimtop.getvalue(),o.ylimbottom.getvalue(),
-                               o.xstep.getvalue(),o.xstart.getvalue(),
-                               o.ystep.getvalue(),o.ystart.getvalue(),
-                               o.year.getvalue(),o.month.getvalue(),
-                               o.linewidth.getvalue(),o.pointsize.getvalue(),
-                               o.fontsize.getvalue(),o.titlescale.getvalue()
-                               );
-
-    bool stop=o.adminb_p->breakcommand();
-#endif
-    }
-
   }
 
 
@@ -875,25 +766,6 @@ void plotsamplerun(graphobj & o)
         error = true;
         }
     }
-
-
-  if (error == false)
-    {
-
-#if defined(JAVA_OUTPUT_WINDOW)
-    o.adminp_p->set_Dp(&o.D);
-
-    jmethodID javaplotsample = o.adminb_p->Java->GetMethodID(o.adminb_p->BayesX_cls, "Javaplotsample",
-                "(Ljava/lang/String;Ljava/lang/String;)V");
-    o.adminb_p->Java->CallVoidMethod(o.adminb_p->BayesX_obj, javaplotsample,
-                               o.adminb_p->Java->NewStringUTF(o.psname.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.connect.getvalue().strtochar())
-                               );
-
-    bool stop=o.adminb_p->breakcommand();
-#endif
-    }
-
   }
 
 
@@ -997,27 +869,6 @@ void plotautocorrun(graphobj & o)
         error = true;
         }
     }
-
-
-  if (error == false)
-    {
-
-#if defined(JAVA_OUTPUT_WINDOW)
-    o.adminp_p->set_Dp(&o.D);
-    o.adminp_p->set_varnamesp(&o.varnames);
-
-    jmethodID javaplotautocor = o.adminb_p->Java->GetMethodID(o.adminb_p->BayesX_cls, "Javaplotautocor",
-                "(Ljava/lang/String;Ljava/lang/String;Z)V");
-    o.adminb_p->Java->CallVoidMethod(o.adminb_p->BayesX_obj, javaplotautocor,
-                               o.adminb_p->Java->NewStringUTF(o.psname.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.connect.getvalue().strtochar()),
-                               o.mean.getvalue()
-                               );
-
-    bool stop=o.adminb_p->breakcommand();
-#endif
-    }
-
   }
 
 
@@ -1117,39 +968,6 @@ void plotsurfrun(graphobj & o)
         error = true;
         }
     }
-
-  if (error == false)
-    {
-
-#if defined(JAVA_OUTPUT_WINDOW)
-    o.adminp_p->set_Dp(&o.D);
-
-    jmethodID javaplotsurf = o.adminb_p->Java->GetMethodID(o.adminb_p->BayesX_cls, "Javaplotsurf",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;DDDLjava/lang/String;IIDDDDDDDDDDDDIIIID)V");
-    o.adminb_p->Java->CallVoidMethod(o.adminb_p->BayesX_obj, javaplotsurf,
-                               o.adminb_p->Java->NewStringUTF(o.psname.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.title.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.xlab.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.ylab.getvalue().strtochar()),
-                               o.adminb_p->Java->NewStringUTF(o.zlab.getvalue().strtochar()),
-                               o.xrot.getvalue(),o.yrot.getvalue(),o.zrot.getvalue(),
-                               o.adminb_p->Java->NewStringUTF(o.linecolor.getvalue().strtochar()),
-                               o.height.getvalue(),o.width.getvalue(),
-                               o.xlimtop.getvalue(),o.xlimbottom.getvalue(),
-                               o.ylimtop.getvalue(),o.ylimbottom.getvalue(),
-                               o.zlimtop.getvalue(),o.zlimbottom.getvalue(),
-                               o.xstep.getvalue(),o.xstart.getvalue(),
-                               o.ystep.getvalue(),o.ystart.getvalue(),
-                               o.zstep.getvalue(),o.zstart.getvalue(),
-                               o.gridsize.getvalue(),
-                               o.linewidth.getvalue(),o.pointsize.getvalue(),
-                               o.fontsize.getvalue(),o.titlescale.getvalue()
-                               );
-
-    bool stop=o.adminb_p->breakcommand();
-#endif
-    }
-
   }
 
 

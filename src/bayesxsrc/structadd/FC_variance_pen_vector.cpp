@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -780,7 +780,11 @@ void FC_variance_pen_vector_ssvs::update(void)
   {
   unsigned j;
   for(j=0; j<btau2.size(); j++)
-    btau2[j] = masterp->level1_likep[equationnr]->trmult*btau2[j];
+    btau2[j] = masterp->level1_likep[equationnr]->trmult*btau2_orig[j];
+
+//  cout << masterp->level1_likep[equationnr]->trmult << endl;
+//  cout << distrp->family << endl;
+//  cout << endl;
 
   acceptance++;
   if(NBPSS)
@@ -799,6 +803,14 @@ void FC_variance_pen_vector_ssvs::update(void)
       anew = atau2[j] + 0.5;
       bnew = btau2[j]+0.5*beta(j,0)/r_delta;
       FC_psi2.beta(j,0) = rand_invgamma(anew, bnew);
+
+//cout << "r_delta: " << r_delta << endl;
+//cout << "beta(j,0): " << beta(j,0) << endl;
+//cout << "atau2[j]: " << atau2[j] << endl;
+//cout << "btau2[j]: " << btau2[j] << endl;
+//cout << "anew: " << anew << endl;
+//cout << "bnew: " << bnew << endl;
+//cout << "FC_psi2.beta(j,0): " << FC_psi2.beta(j,0) << endl;
 
       // update delta_j
 
@@ -826,8 +838,16 @@ void FC_variance_pen_vector_ssvs::update(void)
       q = 1.0/(r_delta * FC_psi2.beta(j,0));
       c = pow(Cp->beta(j,0),2);
 
+//cout << "r_delta: " << r_delta << endl;
+//cout << "p: " << p << endl;
+//cout << "q: " << q << endl;
+//cout << "c: " << c << endl;
+
       double tau2 = randnumbers::GIG2(p, q, c);
       beta(j,0) = tau2;
+
+//cout << "tau2: " << tau2 << endl;
+//cout << endl;
 
       Cp->tau2(j,0) = beta(j,0);
       if(cprior[j])
@@ -942,11 +962,22 @@ void FC_variance_pen_vector_ssvs::get_samples(const ST::string & filename,ofstre
   {
   FC::get_samples(filename, outg);
 
-  ST::string filename_delta = filename.substr(0,filename.length()-15) + "_delta_sample.raw";
-  delta.get_samples(filename_delta,outg);
+  if(NBPSS)
+     {
+     ST::string filename_delta = filename.substr(0,filename.length()-15) + "_delta_sample.raw";
+     FC_delta.get_samples(filename_delta,outg);
 
-  ST::string filename_theta = filename.substr(0,filename.length()-15) + "_omega_sample.raw";
-  theta.get_samples(filename_theta,outg);
+     ST::string filename_omega = filename.substr(0,filename.length()-15) + "_omega_sample.raw";
+     FC_omega.get_samples(filename_omega,outg);
+     }
+  else
+     {
+     ST::string filename_delta = filename.substr(0,filename.length()-15) + "_delta_sample.raw";
+     delta.get_samples(filename_delta,outg);
+
+     ST::string filename_theta = filename.substr(0,filename.length()-15) + "_omega_sample.raw";
+     theta.get_samples(filename_theta,outg);
+     }
   }
 
 

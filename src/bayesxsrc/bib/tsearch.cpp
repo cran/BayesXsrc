@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
 
-// tsearcht.cc 3.1 97/08/05 01:57:40 
+// tsearcht.cc 3.1 97/08/05 01:57:40
 //
 // AVL-Suchbaum
 
@@ -28,7 +28,7 @@ template <class T>
 TreeNode<T>::
 TreeNode( T init ) :
 nodeCount(0),
-nodeData(init) 
+nodeData(init)
 {
    leftTree  = 0;
    rightTree = 0;
@@ -48,16 +48,16 @@ print( unsigned h, ostream &out )
 }
 
 template <class T>
-void 
+void
 TreeNode<T>::
 deleteTree( )
 {
-   if ( leftTree  ) 
-   { 
+   if ( leftTree  )
+   {
       leftTree->deleteTree( );
       delete leftTree;
    }
-   if ( rightTree ) 
+   if ( rightTree )
    {
       rightTree->deleteTree( );
       delete rightTree;
@@ -76,7 +76,7 @@ height( ) const
 }
 
 template <class T>
-int 
+int
 TreeNode<T>::
 compare( const T &x )
 {
@@ -89,7 +89,7 @@ compare( const T &x )
 }
 
 template <class T>
-void 
+void
 TreeNode<T>::
 set( const TreeNode<T> &to )
 {
@@ -108,12 +108,12 @@ AVLNode( T Init )
 
 // Der rechte Unterbaum des linken Unterbaus wird zum linken
 // Unterbaum der Wurzel.
-//   
+//
 // Die Wurzel wird zum rechten Unterbaum ihres bisherigen
 // linken Unterbaumes.
 
 template <class T>
-void 
+void
 TreeNode<T>::
 rotateLL( )
 {
@@ -191,7 +191,7 @@ rotateRLRL( )
 }
 
 template <class T>
-void 
+void
 TreeNode<T>::foreach(void (* f)(void *, void *), void *data)
 {
 	if (leftTree != 0)
@@ -218,7 +218,7 @@ SearchTree<T>::
 
 
 template <class T>
-void 
+void
 SearchTree<T>::
 foreach(void (* f)(void *, void *), void *)
 {
@@ -226,7 +226,7 @@ foreach(void (* f)(void *, void *), void *)
 }
 
 template <class T>
-void 
+void
 SearchTree<T>::
 ins( const T &x, TreeNode<T> *&node )
 {
@@ -247,7 +247,7 @@ ins( const T &x, TreeNode<T> *&node )
 
 
 template <class T>
-void 
+void
 SearchTree<T>::
 del( TreeNode<T> *&node, TreeNode<T> *&branch )
 {
@@ -262,7 +262,7 @@ del( TreeNode<T> *&node, TreeNode<T> *&branch )
 }
 
 template <class T>
-void 
+void
 SearchTree<T>::
 rm( const T &x,TreeNode<T> *&node )
 {
@@ -281,7 +281,7 @@ rm( const T &x,TreeNode<T> *&node )
       else
       {
          TreeNode<T> *temp = node;
-      
+
          if ( temp->count( ) > 0 )
          {
             temp->decCount( );
@@ -293,7 +293,7 @@ rm( const T &x,TreeNode<T> *&node )
          else if ( temp->left( ) == 0 )
             node = temp->right( );
          else
-            del( temp, temp->left( ) );   
+            del( temp, temp->left( ) );
          delete temp;
       }
    }
@@ -302,7 +302,7 @@ rm( const T &x,TreeNode<T> *&node )
 // AVL-ausgeglichener sortierter Binaerbaum
 
 template <class T>
-void 
+void
 AVLTree<T>::
 rebalanceLeft( AVLNode<T> *&node )
 {
@@ -311,7 +311,7 @@ rebalanceLeft( AVLNode<T> *&node )
    if ( leftTree->balance( ) == -1 )
    {
       // Einfache LL - Rotation
-      
+
       node->rotateLL( );
       node->setBalance( );
 
@@ -328,7 +328,7 @@ rebalanceLeft( AVLNode<T> *&node )
       node->rotateLRLR( );
       node->setBalance( subTree->balance( ) == -1 ?  1 : 0 );
       leftTree->setBalance( subTree->balance( ) ==  1 ? -1 : 0 );
-      
+
       // Der bisherige rechte Unterbaum des linken Unterbaumes
       // wird zur neuen Wurzel.
 
@@ -337,7 +337,7 @@ rebalanceLeft( AVLNode<T> *&node )
 }
 
 template <class T>
-void 
+void
 AVLTree<T>::
 rebalanceRight( AVLNode<T> *&node )
 {
@@ -346,7 +346,7 @@ rebalanceRight( AVLNode<T> *&node )
    if ( rightTree->balance( ) == 1 )
    {
       // Einfache RR - Rotation :
-      
+
       node->rotateRR( );
       node->setBalance( );
 
@@ -363,16 +363,16 @@ rebalanceRight( AVLNode<T> *&node )
       node->rotateRLRL( );
       node->setBalance( subTree->balance( )  ==  1 ? -1 : 0 );
       rightTree->setBalance( subTree->balance( ) == -1 ?  1 : 0 );
-      
+
       // Der bisherige linke Unterbaum des rechten Unterbaumes
       // wird zur neuen Wurzel.
-     
+
       node = subTree;
    }
-} 
+}
 
 template <class T>
-void 
+void
 AVLTree<T>::
 rebalance( AVLNode<T> *&node, int &change, int sign )
 {
@@ -389,7 +389,7 @@ rebalance( AVLNode<T> *&node, int &change, int sign )
    {
       if ( sign == 1 )
          rebalanceLeft( node );
-      else 
+      else
          rebalanceRight( node );
       node->setBalance( );
       change = 0;
@@ -399,7 +399,7 @@ rebalance( AVLNode<T> *&node, int &change, int sign )
 #if !defined( NDEBUG )
 
 template <class T>
-int 
+int
 AVLTree<T>::
 isAVL( AVLNode<T> *&node )
 {
@@ -411,7 +411,7 @@ isAVL( AVLNode<T> *&node )
       {
     int hLeft = node->left( ) ? node->left( )->height( ) : 0;
     int hRight = node->right( ) ? node->right( )->height( ) : 0;
-         int diff = hLeft - hRight; 
+         int diff = hLeft - hRight;
          return int( diff > -2 && diff < 2 );
       }
       else
@@ -420,9 +420,9 @@ isAVL( AVLNode<T> *&node )
 }
 
 #endif
-  
+
 template <class T>
-void 
+void
 AVLTree<T>::
 ins( const T &x, AVLNode<T> *&node, int &change )
 {
@@ -450,7 +450,7 @@ ins( const T &x, AVLNode<T> *&node, int &change )
       else
          node->incCount( );
    }
-} 
+}
 
 /************************************************************************/
 /*                                                                      */
@@ -463,9 +463,9 @@ ins( const T &x, AVLNode<T> *&node, int &change )
 /* x     - Schluessel, der eingefuegt werden soll                       */
 /*                                                                      */
 /************************************************************************/
- 
+
 template <class T>
-void 
+void
 AVLTree<T>::
 insert( const T &x )
 {
@@ -487,8 +487,8 @@ insert( const T &x )
 /*                                                                      */
 /************************************************************************/
 
-template <class T> 
-void 
+template <class T>
+void
 AVLTree<T>::
 balanceLeft( AVLNode<T> *&node, int &change )
 {
@@ -529,7 +529,7 @@ balanceLeft( AVLNode<T> *&node, int &change )
 
          AVLNode<T> *sub = rightTree->left( );
          int subBalance = sub->balance( );
-         
+
          node->rotateRLRL( );
 
          node->setBalance( subBalance ==  1 ? -1 : 0 );
@@ -639,7 +639,7 @@ rmNode( AVLNode<T> *&node, int &change )
    }
 
    // Andernfalls wird der Knoten echt geloescht. Dabei wird er
-   // durch seinen linken Teilbaum ersetzt, wenn der rechte 
+   // durch seinen linken Teilbaum ersetzt, wenn der rechte
    // Teilbaum leer ist, bzw. durch seinen rechten Teilbaum,
    // wenn sein linker Teilbaum leer ist.
 
@@ -663,12 +663,12 @@ rmNode( AVLNode<T> *&node, int &change )
 }
 
 template <class T>
-void 
+void
 AVLTree<T>::
 rm( const T &x, AVLNode<T> *&node, int &change )
 {
    if  ( node == 0 )
-   { 
+   {
       return;
    }
    else
@@ -702,7 +702,7 @@ rm( const T &x, AVLNode<T> *&node, int &change )
 }
 
 template <class T>
-void 
+void
 AVLTree<T>::
 remove( const T &x )
 {

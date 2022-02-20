@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,20 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
-
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include <describe_map.h>
-#endif
-
-
 #include"mapobject.h"
-
 
 void mapobject::create(void)
   {
@@ -138,19 +125,6 @@ void mapobject::create(void)
 
   }
 
-#if defined(JAVA_OUTPUT_WINDOW)
-mapobject::mapobject(administrator_basic * adb, administrator_pointer * adp,
-const ST::string & n,ofstream * lo,istream * in,ST::string p,
-                     vector<statobject*> * st)
-	                 : statobject(adb,n,"map",lo,in,p)
-  {
-  adminp_p = adp;
-  statobj = st;
-  create();
-  mapexisting = false;
-  describetext.push_back("Number of polygones currently in memory: none \n");
-  }
-#else
 mapobject::mapobject(const ST::string & n,ofstream * lo,istream * in,ST::string p,
                      vector<statobject*> * st)
 	                 : statobject(n,"map",lo,in,p)
@@ -161,16 +135,11 @@ mapobject::mapobject(const ST::string & n,ofstream * lo,istream * in,ST::string 
   mapexisting = false;
   describetext.push_back("Number of polygones currently in memory: none \n");
   }
-#endif
-
 
 mapobject::mapobject(const mapobject & m) : statobject(statobject(m))
   {
   statobj = m.statobj;
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = m.adminp_p;
-  #endif
   mapinfo = m.mapinfo;
   mapexisting = m.mapexisting;
   }
@@ -183,9 +152,6 @@ const mapobject & mapobject::operator=(const mapobject & m)
   statobject::operator=(statobject(m));
   statobj = m.statobj;
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = m.adminp_p;
-  #endif
   mapexisting = m.mapexisting;
   mapinfo = m.mapinfo;
   return *this;
@@ -229,11 +195,7 @@ void infilerun(mapobject & m)
       errormessages.push_back(g.geterrormessage());
     else
       {
-      #if defined(JAVA_OUTPUT_WINDOW)
-      m.mapinfo = MAP::map(m.adminb_p,g);
-      #else
       m.mapinfo = MAP::map(g);
-      #endif
 
       if (g.get_nrgraphs() > 1)
         m.out("NOTE: The graph is disconnected (" +
@@ -242,19 +204,11 @@ void infilerun(mapobject & m)
     }
   else if (m.centroids.getvalue() == true)
     {
-    #if defined(JAVA_OUTPUT_WINDOW)
-    m.mapinfo = MAP::map(m.adminb_p,path);
-    #else
     m.mapinfo = MAP::map(path);
-    #endif
     }
   else
     {
-    #if defined(JAVA_OUTPUT_WINDOW)
-    m.mapinfo = MAP::map(m.adminb_p,path,weightmode);
-    #else
     m.mapinfo = MAP::map(path,weightmode);
-    #endif
     }
 
   if (errormessages.size() == 0)
@@ -368,11 +322,7 @@ void createmaprun(mapobject & m)
 
   if (failure == false)
     {
-    #if defined(JAVA_OUTPUT_WINDOW)
-    m.mapinfo = MAP::map(m.adminb_p,X,m.maxdif.getvalue(),weightmode);
-    #else
     m.mapinfo = MAP::map(X,m.maxdif.getvalue(),weightmode);
-    #endif
 //    m.errormessages = m.mapinfo.get_errormessages();
 //    if (!m.errormessages.empty())
 //      {
@@ -518,12 +468,6 @@ void mapobject::describe(const optionlist & globaloptions)
   {
   if(mapexisting)
     {
-#if defined (BORLAND_OUTPUT_WINDOW)
-    mapform->mapinfo = &mapinfo;
-    mapform->mapname = getname();
-#elif defined (JAVA_OUTPUT_WINDOW)
-    adminp_p->set_mapinfo(&mapinfo);
-#endif
     out("\n");
     out("\n");
     out("MAP " + name + "\n",true,false,16);
@@ -534,19 +478,6 @@ void mapobject::describe(const optionlist & globaloptions)
     out("\n");
     if (mapinfo.polygones_existing())
       {
-#if defined (BORLAND_OUTPUT_WINDOW)
-      mapform->ShowModal();
-#elif defined (JAVA_OUTPUT_WINDOW)
-
-      int fontsize = 0;
-      ST::string psname="";
-      jmethodID javashowmap = adminb_p->Java->GetMethodID(adminb_p->BayesX_cls, "JavaDescribeMap", "(Z)V");
-      adminb_p->Java->CallVoidMethod(adminb_p->BayesX_obj, javashowmap, false);
-
-//      jmethodID javashowmap = adminb_p->Java->GetMethodID(
-//      adminb_p->BayesX_cls, "JavaShowMap", "(Z)V");
-//      adminb_p->Java->CallVoidMethod(adminb_p->BayesX_obj, javashowmap, false);
-#endif
       }
     else
       out("NOTE: map object does not contain any data\n");
@@ -554,14 +485,4 @@ void mapobject::describe(const optionlist & globaloptions)
   else
     out("NOTE: map object does not contain any data\n");
   }
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif
-
-
-
-
 

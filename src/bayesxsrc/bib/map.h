@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -24,11 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #define MAP_INCLUDED
 
 #include"../export_type.h"
-#if defined(MICROSOFT_VISUAL)
-#include<limits>
-#else
 #include "../values.h"
-#endif
 #include<fstream>
 #include "clstring.h"
 #include<assert.h>
@@ -38,23 +34,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include "statmat.h"
 #include "graph.h"
 
-#if defined(JAVA_OUTPUT_WINDOW)
-#include"adminparse_basic.h"
-#endif
-
-
 using std::endl;
 
 namespace MAP
 {
 
-//#if defined(JAVA_OUTPUT_WINDOW)
- #if defined(MICROSOFT_VISUAL)
- const double NA = DBL_MAX;
- #else
  const double NA = MAXDOUBLE;
- #endif
-//#endif
+
 //#if defined(__BUILDING_GNU)
 // const double NA = MAXDOUBLE;
 //#endif
@@ -562,10 +548,6 @@ class __EXPORT_TYPE map
 
   private:
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adminb_p;
-  #endif
-
   metric weightmode;                       // metric according to which the
                                            // weights are computed
 
@@ -646,9 +628,6 @@ class __EXPORT_TYPE map
   //       weights = number of neighbors
 
   map(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * abp,
-  #endif
   const ST::string & path,const metric & m /*= adjacent*/);
 
   // CONSTRUCTOR 2
@@ -657,9 +636,6 @@ class __EXPORT_TYPE map
   //       weights = number of neighbors
 
   map(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * abp,
-  #endif
   const ST::string & bpath,const ST::string & npath,
       const metric & m = adjacent);
 
@@ -668,9 +644,6 @@ class __EXPORT_TYPE map
   //
 
   map(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * abp,
-  #endif
   const ST::string & path);
 
   // CONSTRUCTOR 4
@@ -680,18 +653,12 @@ class __EXPORT_TYPE map
   // IMPORTANT: metric=combnd is invalid
 
   map(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * abp,
-  #endif
   const datamatrix & x,const double & md, const metric & m);
 
   // CONSTRUCTOR 5
   // TASK: reads in the stored in graph 'g'
 
   map(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * abp,
-  #endif
   const graph & g);
 
   // COPY CONSTRUCTOR

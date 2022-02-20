@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -21,12 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 #include "remlest_multi2.h"
 
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include "StatResults.h"
-#include "statwinframe.h"
-
-#endif
-
 using std::ofstream;
 using std::flush;
 
@@ -39,9 +33,6 @@ using std::flush;
 //------------------------------------------------------------------------------
 
 remlest_ordinal::remlest_ordinal(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adb,
-#endif
 vector<MCMC::FULLCOND*> & fc,datamatrix & re,
                 const ST::string & family, const ST::string & ofile,
                 const int & maxiter, const double & lowerlimit,
@@ -63,10 +54,6 @@ vector<MCMC::FULLCOND*> & fc,datamatrix & re,
       nrobspos--;
       }
     }
-
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = adb;
-  #endif
 
   fisher=fi;
 
@@ -2761,14 +2748,6 @@ void remlest_ordinal::make_plots(ofstream & outtex,ST::string path_batch,
              << "source(\"'directory'\\\\sfunctions\\\\drawmap.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\readbndfile.r\")\n" << endl;*/
 
-#if defined(JAVA_OUTPUT_WINDOW)
-    out("  --------------------------------------------------------------------------- \n");
-    out("\n");
-    out("  Batch file for visualizing effects of nonlinear functions is stored in file \n");
-    out("  " + path_batch + "\n");
-    out("\n");
-#endif
-
     bool stil2 = true;
     for(j=0;j<fullcond.size();j++)  //Schleife überprüft, ob es map-Objekt gibt
       {
@@ -3247,60 +3226,15 @@ void remlest_ordinal::make_graphics(const ST::string & title,
 
 bool remlest_ordinal::check_pause()
   {
-#if defined(BORLAND_OUTPUT_WINDOW)
-  Application->ProcessMessages();
-  if (Frame->stop)
-    {
-    return true;
-    }
-
-  if (Frame->pause)
-    {
-    out("\n");
-    out("ESTIMATION PAUSED\n");
-    out("Click CONTINUE to proceed\n");
-    out("\n");
-
-    while (Frame->pause)
-      {
-      Application->ProcessMessages();
-      }
-
-    out("ESTIMATION CONTINUED\n");
-    out("\n");
-    }
   return false;
-#elif defined(JAVA_OUTPUT_WINDOW)
-  return adminb_p->breakcommand();
-#else
-  return false;
-#endif
   }
 
 void remlest_ordinal::out(const ST::string & s,bool thick,bool italic,
                       unsigned size,int r,int g, int b)
   {
-#if defined(BORLAND_OUTPUT_WINDOW)
-  ST::string sh = s;
-  sh = sh.replaceallsigns('\n',' ');
-  if (!Frame->suppoutput)
-    Results->ResultsRichEdit->Lines->Append(sh.strtochar());
- if (!(logout->fail()))
-    (*logout) << s << flush;
-#elif defined(JAVA_OUTPUT_WINDOW)
-  ST::string sh = s;
-  sh = sh.replaceallsigns('\n',' ');
-  sh = sh+"\n";
-  if (!adminb_p->get_suppressoutput())
-    adminb_p->Java->CallVoidMethod(adminb_p->BayesX_obj, adminb_p->javaoutput,
-    adminb_p->Java->NewStringUTF(sh.strtochar()),thick,italic,size,r,g,b);
-  if (!(logout->fail()))
-    (*logout) << s << flush;
-#else
   cout << s << flush;
   if (!(logout->fail()))
     (*logout) << s << flush;
-#endif
   }
 
 

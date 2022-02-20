@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -74,12 +74,6 @@ class __EXPORT_TYPE DISTR
   bool copula; //bool only true if copula model specified
   bool copularotate; // bool only true if copula is rotated
 
-  // FUNCTION: check_workingweights_one
-  // TASK: checks if all workingweights are one (returns true if this is the
-  //       case)
-
-  bool check_weightsone(void);
-
   // FUNCTION: compute_nrzeroweights
   // TASK: determines the number of zero weights and returns the result
 
@@ -92,6 +86,7 @@ class __EXPORT_TYPE DISTR
   public:
 
   unsigned counter;
+  bool highspeedon;
 
   vector<DISTR*> distrp;  //pointer to other distributions
 
@@ -134,6 +129,7 @@ class __EXPORT_TYPE DISTR
 
   datamatrix workingweight;       // Working weight (workingweight = weight
                                   // in the constructor)
+                                  // in the constructor)
 
   weighttype wtype;               // weight type: default is
                                   // wweightschange_weightsneqone, i.e.
@@ -154,6 +150,13 @@ class __EXPORT_TYPE DISTR
   unsigned predstart_mumult;
 
   double meaneffect;
+
+  // FUNCTION: check_workingweights_one
+  // TASK: checks if all workingweights are one (returns true if this is the
+  //       case)
+
+  bool check_weightsone(void);
+
 
   //----------------------------------------------------------------------------
   //---------------------- linpredlimits for save estimation -------------------
@@ -184,6 +187,7 @@ class __EXPORT_TYPE DISTR
   datamatrix fx;                    // Auxiliary variable for multiplicative effects
   DISTR * dg;
   bool dgexists;
+  void set_multiplicative(DISTR * d);
 
   double * linpredp;              // pointer to own linpred
 
@@ -1329,6 +1333,8 @@ class __EXPORT_TYPE DISTR_gaussian_multeffect : public DISTR_gaussian
   {
 
   protected:
+
+  datamatrix helpmat;
 
   public:
 

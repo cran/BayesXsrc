@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -41,11 +41,11 @@ public:
      { return arithm(-m_v); }
 
    int operator==(const arithm &other) const
-      { return m_v == other.m_v; } 
+      { return m_v == other.m_v; }
    int operator<(const arithm &other)
-     { return m_v < other.m_v; } 
+     { return m_v < other.m_v; }
    int operator<=(const arithm &other)
-     { return m_v <= other.m_v; } 
+     { return m_v <= other.m_v; }
    arithm operator=(const arithm &from)
       { m_v = from.m_v; return *this; }
    arithm operator+=(const arithm &from)
@@ -55,9 +55,9 @@ public:
    arithm operator*=(const arithm &from)
       { m_v *= from.m_v; return *this; }
    friend ostream &operator << (ostream &os, const arithm &ob)
-      { os.precision(3); os << ob.m_v; return os; } 
+      { os.precision(3); os << ob.m_v; return os; }
    friend istream &operator >> (istream &is, arithm &ob)
-      { is >> ob.m_v; return is; } 
+      { is >> ob.m_v; return is; }
 
  private:
    arithm(double v) : m_v(v) {}

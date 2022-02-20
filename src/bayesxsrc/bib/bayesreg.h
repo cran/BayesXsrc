@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -104,9 +104,7 @@ using MCMC::DISTRIBUTION_cumulative_latent3;
 using MCMC::DISTRIBUTION_coxmodel;
 using MCMC::DISTRIBUTION_multistatemodel;
 using MCMC::DISTRIBUTION_AFT;
-#if !defined (__BUILDING_THE_DLL)
 using MCMC::DISTRIBUTION_QUANTREG;
-#endif
 using MCMC::FULLCOND;
 using MCMC::FULLCOND_const;
 using MCMC::FULLCOND_const_gaussian;
@@ -413,10 +411,8 @@ class __EXPORT_TYPE bayesreg : public statobject
                                         // (Gaussian response)
   doubleoption bresp;                   // Hyperparameter b of overal variance
                                         // (Gaussian response)
-#if !defined (__BUILDING_THE_DLL)
   doubleoption quantile;                // quantile for quantile regression
   simpleoption mscheck;                 // Marshall-Spiegelhalter model checking
-#endif
   stroption knots;                      // equidistant knots or non equidistant
                                         // knots (P-splines)
   vector<ST::string> knotsdef;
@@ -464,9 +460,8 @@ class __EXPORT_TYPE bayesreg : public statobject
   DISTRIBUTION_multistatemodel distr_multistatemodel;
   DISTRIBUTION_gaussianh distr_gaussianh;
   DISTRIBUTION_AFT distr_aft;
-#if !defined (__BUILDING_THE_DLL)
   DISTRIBUTION_QUANTREG distr_quantreg;
-#endif
+
   doubleoption reference;
 
   vector<DISTRIBUTION *> distr;              // Pointer to distribution objects
@@ -634,10 +629,6 @@ class __EXPORT_TYPE bayesreg : public statobject
 
   void create(void);
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_pointer * adminp_p;
-  #endif
-
   public:
 
 
@@ -655,14 +646,8 @@ class __EXPORT_TYPE bayesreg : public statobject
   // ADDITIONAL INFORMATION:
   // - name = n
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  bayesreg (administrator_basic * adb, administrator_pointer * adp,
-            const ST::string & n,ofstream * lo,istream * i,
-                                ST::string p,vector<statobject*> * st);
-  #else
   bayesreg (const ST::string & n,ofstream * lo,istream * i,
                                 ST::string p,vector<statobject*> * st);
-  #endif
 
   // COPY CONSTRUCTOR
 

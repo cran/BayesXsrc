@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,18 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<StatwinFrame.h>
-#include<statwin_haupt.h>
-#endif
 
 #include"map.h"
 
@@ -585,15 +573,8 @@ double region::distance(const region & r,const metric & m) const
 
 
 map::map(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adbp,
-#endif
 const ST::string & path,const metric & m)
   {
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = adbp,
-  #endif
-
   nopolygones = false;
   weightmode = m;
   infile(path);
@@ -612,14 +593,8 @@ const ST::string & path,const metric & m)
 
 
 map::map(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adbp,
-#endif
 const ST::string & bpath,const ST::string & npath,const metric & m)
   {
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = adbp,
-  #endif
   nopolygones = false;
   weightmode = m;
   infile(bpath);
@@ -634,16 +609,8 @@ const ST::string & bpath,const ST::string & npath,const metric & m)
 
 
 map::map(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adbp,
-  #endif
   const ST::string & path)
   {
-
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = adbp,
-  #endif
-
   nopolygones = true;
 
 //  weightmode = adjacent;
@@ -675,17 +642,8 @@ map::map(
 
 
 map::map(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adbp,
-#endif
 const graph & g)
   {
-
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = adbp;
-  #endif
-
-
   unsigned i;
 
   nocentroids = true;
@@ -709,16 +667,8 @@ const graph & g)
 
 
 map::map(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adbp,
-#endif
 const datamatrix & xo,const double & md, const metric & m)
   {
-
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = adbp;
-  #endif
-
   datamatrix x = xo;
 
   assert(m!=combnd);
@@ -922,21 +872,10 @@ const datamatrix & xo,const double & md, const metric & m)
 
   //-------------------- computing polygones of regions ------------------------
 
-  #if defined(MICROSOFT_VISUAL)
-    {
-    minX = DBL_MAX;
-    maxX = -DBL_MAX;
-    minY = DBL_MAX;
-    maxY = -DBL_MAX;
-    }
-  #else
-    {
-    minX = MAXDOUBLE;
-    maxX = -MAXDOUBLE;
-    minY = MAXDOUBLE;
-    maxY = -MAXDOUBLE;
-    }
-  #endif
+  minX = MAXDOUBLE;
+  maxX = -MAXDOUBLE;
+  minY = MAXDOUBLE;
+  maxY = -MAXDOUBLE;
 
   polygone help;
 
@@ -970,9 +909,6 @@ const datamatrix & xo,const double & md, const metric & m)
 
 map::map(const map & m)
   {
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = m.adminb_p,
-  #endif
   weightmode = m.weightmode;
   errormessages = m.errormessages;
   regions = m.regions;
@@ -996,9 +932,6 @@ const map & map::operator=(const map & m)
   {
   if (this == &m)
 	 return *this;
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = m.adminb_p,
-  #endif
   weightmode = m.weightmode;
   errormessages = m.errormessages;
   regions = m.regions;
@@ -1315,21 +1248,10 @@ void map::infile(const ST::string & path)
   line lhelp;
   bool first=false;
 
-#if defined(MICROSOFT_VISUAL)
-  {
-  minX = DBL_MAX;
-  maxX = -DBL_MAX;
-  minY = DBL_MAX;
-  maxY = -DBL_MAX;
-  }
-#else
-  {
   minX = MAXDOUBLE;
   maxX = -MAXDOUBLE;
   minY = MAXDOUBLE;
   maxY = -MAXDOUBLE;
-  }
-#endif
 
   while ( (!fin.eof()) && (stop == false) )
 	 {
@@ -1447,16 +1369,8 @@ void map::infile(const ST::string & path)
 		  }
         }
 
-     if (stop==false)
-       {
-       #if defined(BORLAND_OUTPUT_WINDOW)
-       stop = hauptformular->breakcommand();
-       #elif defined(JAVA_OUTPUT_WINDOW)
-       stop = adminb_p->breakcommand();
-       #endif
-       if (stop)
-         errormessages.push_back("ERROR: reading map info not completed due to user break\n");
-       }
+     if (stop)
+       errormessages.push_back("ERROR: reading map info not completed due to user break\n");
 
 	 }  // end:  while (!fin.eof())
 
@@ -1473,23 +1387,11 @@ void map::infile(const ST::string & path)
     minn = 0;
     maxn = 0;
 
-   #if defined(MICROSOFT_VISUAL)
-	{
-    minX = DBL_MAX;
-    maxX = -DBL_MAX;
-    minY = DBL_MAX;
-    maxY = -DBL_MAX;
-	}
-  #else
-	{
     minX = MAXDOUBLE;
     maxX = -MAXDOUBLE;
     minY = MAXDOUBLE;
     maxY = -MAXDOUBLE;
-	}
-  #endif
-   }
-
+    }
   }
 
 
@@ -1500,22 +1402,10 @@ void map::reset(void)
   minn = 0;
   maxn = 0;
 
-#if defined(MICROSOFT_VISUAL)
-  {
-  minX = DBL_MAX;
-  maxX = -DBL_MAX;
-  minY = DBL_MAX;
-  maxY = -DBL_MAX;
-  }
-#else
-  {
   minX = MAXDOUBLE;
   maxX = -MAXDOUBLE;
   minY = MAXDOUBLE;
   maxY = -MAXDOUBLE;
-  }
-#endif
-
 
   bandsize = 0;
 
@@ -1584,12 +1474,6 @@ void map::computeneighbors(void)
           bshelp = abs(i-j);
           }
         }
-
-      #if defined(BORLAND_OUTPUT_WINDOW)
-      stop = hauptformular->breakcommand();
-      #elif defined(JAVA_OUTPUT_WINDOW)
-      stop = adminb_p->breakcommand();
-      #endif
       if (stop)
         errormessages.push_back("ERROR: reading map info not completed due to user break\n");
       if (stop)
@@ -2069,14 +1953,6 @@ void map::compute_reg(const datamatrix & d,vector<int> & posbeg,
 
 
 } // end: namespace map
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif
-
-
 
 
 

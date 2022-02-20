@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -43,12 +43,12 @@ namespace MCMC
 	{
 		unsigned i,j;
 
-		data = d; 
+		data = d;
 		nobs = d.rows();
 		nvar = d.cols();
 
 		max_ia_order = 2;
-		max_num = nvar*(nvar-1)/2; 
+		max_num = nvar*(nvar-1)/2;
 
 		std::vector<interact> test;
 		ia_var = test;
@@ -73,7 +73,7 @@ namespace MCMC
 
 
 	// CONSTRUCTOR_2
-	// for interactions of order>2 (some day in future....) 
+	// for interactions of order>2 (some day in future....)
 	IA::IA(unsigned order, const datamatrix & d)
 	{
 		max_ia_order = order;
@@ -81,7 +81,7 @@ namespace MCMC
 		std::vector<interact> test;
 		ia_var = test;
 
-		data = d; 
+		data = d;
 		nobs = d.rows();
 		nvar = d.cols();
 	}
@@ -96,9 +96,9 @@ namespace MCMC
 		data = a.nvar;
 		ia_var = a.ia_var;
 		occurred = a.occurred;
-		
-		max_ia_order = a.max_ia_order;			
-		max_num = a.max_num;	
+
+		max_ia_order = a.max_ia_order;
+		max_num = a.max_num;
 	}
 
 
@@ -113,11 +113,11 @@ namespace MCMC
 		data = a.nvar;
 		ia_var = a.ia_var;
 		occurred = a.occurred;
-		
 
 
-		max_ia_order = a.max_ia_order;			
-		max_num = a.max_num;	
+
+		max_ia_order = a.max_ia_order;
+		max_num = a.max_num;
 
 		return *this;
 	}
@@ -126,7 +126,7 @@ namespace MCMC
 
 
 
-	
+
 
   // FUNCTION: make_ia
   // TASK: creates a new interaction term and adds it to ia_var
@@ -140,7 +140,7 @@ namespace MCMC
 	  double * pvar0;
 	  double * pvar1;
 
-  
+
 	  pvar_new = var_new.getV();
 	  pvar0 = data.getV() + terms[0];
 	  pvar1 = data.getV() + terms[1];
@@ -167,7 +167,7 @@ namespace MCMC
   // FUNCTION: choose_ia_term
   // TASK: chooses a new interaction term of order 2
   // which is NOT already in current_ia
-	vector<unsigned> IA::choose_ia ( const Matrix<unsigned> & col, 
+	vector<unsigned> IA::choose_ia ( const Matrix<unsigned> & col,
 									 vector <vector <unsigned> > & current_ia)
   {
         unsigned i;
@@ -216,7 +216,7 @@ namespace MCMC
 					already_there=true;
 				}
 			}
-			
+
 			// "sort"
 			if(vec_ia[0]>vec_ia[1])
 			{
@@ -227,7 +227,7 @@ namespace MCMC
 
 
 			// check if this ia is already in the model
-			std:: vector < vector <unsigned > > :: iterator it_i; 
+			std:: vector < vector <unsigned > > :: iterator it_i;
 			it_i = current_ia.begin();
 
 			while (*it_i <= vec_ia)
@@ -239,17 +239,17 @@ namespace MCMC
 			}
 		} //while
 
-		return vec_ia; 
+		return vec_ia;
   }
 
 
-  
+
 
 
 
 
 	// FUNCTION: choose_ia_term
-	// TASK: chooses a new interaction term of order ord 
+	// TASK: chooses a new interaction term of order ord
 	// regardless if it is already in current_ia or not
 	vector<unsigned> IA::choose_ia ( const Matrix<unsigned>  & col)
 	{
@@ -257,7 +257,7 @@ namespace MCMC
 		bool already_there;					// help variable
 		unsigned var;				// help variable
 		unsigned num;				// number of main effects in the regression model
-		vector<unsigned> vec_ia (2);	// vector which represents the interaction	 
+		vector<unsigned> vec_ia (2);	// vector which represents the interaction
 
 		num = 0;
 
@@ -267,7 +267,7 @@ namespace MCMC
 			if(col(i,0) ==1)
 				num++;
 		}
-		
+
 		assert(num>1);
 
 
@@ -299,7 +299,7 @@ namespace MCMC
 				already_there=true;
 			}
 		}
-		
+
 		// "sort"
 		if(vec_ia[0]>vec_ia[1])
 		{
@@ -308,7 +308,7 @@ namespace MCMC
 			vec_ia[0] = var;
 		}
 
-		return vec_ia; 
+		return vec_ia;
 	}
 
 
@@ -319,24 +319,24 @@ namespace MCMC
 
 
    // FUNCTION: already_there
-   // TASK: returns true if the interaction vec_ia is already in the current model 	
+   // TASK: returns true if the interaction vec_ia is already in the current model
    // which are represented by current_ia
-	bool IA::already_there ( const vector<unsigned> & vec_ia, 
+	bool IA::already_there ( const vector<unsigned> & vec_ia,
 					vector <vector <unsigned> > & current_ia)
 	{
-		
-		bool already_there; 
+
+		bool already_there;
 		already_there=false;
 		unsigned size = current_ia.size();
 
 		if(size>0 )
 		{
-			
+
 			if(current_ia[size-1]>vec_ia)
 			{
 				unsigned i;
 				std::vector <vector <unsigned> > :: iterator it_i;
-				
+
 				i=0;
 				it_i= current_ia.begin();
 
@@ -385,12 +385,12 @@ namespace MCMC
 
 
 	// FUNCTION: already_there (vec_ia)
-    // TASK: returns true if the interaction vec_ia is already in ia_var 
+    // TASK: returns true if the interaction vec_ia is already in ia_var
 	bool IA::already_there (const vector<unsigned> & vec_ia)
 	{
 		if(occurred[get_pos(vec_ia)] ==1)
 			return true;
-		else 
+		else
 			return false;
 	}
 
@@ -424,21 +424,21 @@ namespace MCMC
 
 	// FUNCTION: add_ia
 	// TASK: adds datamatix ia.ia_dat to the corresponding entry of ia_var
-	void IA::add_ia(interact ia) 
+	void IA::add_ia(interact ia)
 	{
 		unsigned pos;
 
-		pos = get_pos(ia.ia_term);	
-		ia_var[pos].ia_dat = ia.ia_dat;	
+		pos = get_pos(ia.ia_term);
+		ia_var[pos].ia_dat = ia.ia_dat;
 		occurred[pos] =1 ;
 	}
 
 
 
-	
+
 	// FUNCTION: add_ia
 	// TASK: adds datamatix ia to interaction at ia_var[pos]
-	void IA::add_ia(datamatrix & data, unsigned pos) 
+	void IA::add_ia(datamatrix & data, unsigned pos)
 	{
 		ia_var[pos].ia_dat = data;
 		occurred[pos] = 1 ;
@@ -446,15 +446,15 @@ namespace MCMC
 
 
 	// FUNCTION: get_pos
-	// TASK: gives position of ia if all possible interactions of order 2 
-	// of nvar variables are stored in an ordered vector 
+	// TASK: gives position of ia if all possible interactions of order 2
+	// of nvar variables are stored in an ordered vector
 	unsigned  IA::get_pos(vector<unsigned> ia)
 	{
-		
+
 		unsigned k;
 		unsigned i = ia[0];
 		unsigned j = ia[1];
-		unsigned position; 
+		unsigned position;
 
 
 		assert(ia.size()==2);
@@ -464,14 +464,14 @@ namespace MCMC
 			position = j-1;
 		else
 		{
-			position = 0; 
+			position = 0;
 			for(k=1; k<i+1; k++)
 				position = position + (nvar-k);
 
 			position = position + (j-i)-1;
 		}
 
-		return position; 
+		return position;
 	}
 
 
@@ -512,7 +512,7 @@ namespace MCMC
 
 
 
-		
+
 
 
 

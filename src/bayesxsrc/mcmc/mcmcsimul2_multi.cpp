@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,15 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<StatwinFrame.h>
-#endif
 
 #include"mcmcsimul2_multi.h"
 #include<time.h>
@@ -159,33 +150,6 @@ bool STEPMULTIrun::posteriormode(const vector<ST::string> & header,
 
       if (allconverged && it>1)
         converged = true;
-
-      #if defined(BORLAND_OUTPUT_WINDOW)
-      Application->ProcessMessages();
-      if (Frame->stop)
-        {
-        break;
-        }
-      if (Frame->pause)
-        {
-        genoptions_mult[0]->out("\n");
-        genoptions_mult[0]->out("SIMULATION PAUSED\n");
-        genoptions_mult[0]->out("Click CONTINUE to proceed\n");
-        genoptions_mult[0]->out("\n");
-        while (Frame->pause)
-          {
-          Application->ProcessMessages();
-          }
-        genoptions_mult[0]->out("SIMULATION CONTINUED\n");
-        genoptions_mult[0]->out("\n");
-        }
-
-      #elif defined(JAVA_OUTPUT_WINDOW)
-      bool stop = genoptions_mult[0]->adminb_p->breakcommand();
-      if(stop)
-        break;
-      #endif
-
       it++;
 
       } // end:   while ((!converged) && (it <= 100))
@@ -240,12 +204,6 @@ bool STEPMULTIrun::posteriormode(const vector<ST::string> & header,
 
   if (!presim)
     {
-    #if defined(BORLAND_OUTPUT_WINDOW)
-    if (!Frame->stop)
-    #elif defined(JAVA_OUTPUT_WINDOW)
-    if (!genoptions_mult[0]->adminb_p->get_stop())
-    #endif
-      {
       genoptions_mult[0]->out("\n");
       genoptions_mult[0]->out("ESTIMATION RESULTS:\n",true);
       genoptions_mult[0]->out("\n");
@@ -265,45 +223,6 @@ bool STEPMULTIrun::posteriormode(const vector<ST::string> & header,
         fullcondp[j]->outresults();
 
 //        return false;
-
-      } // end: if Frame->stop
-
-    #if defined(BORLAND_OUTPUT_WINDOW)
-    else
-      {
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out(
-      "ESTIMATION TERMINATED BY USER BREAK\n");
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("Estimation results: none\n");
-      genoptions_mult[0]->out("\n");
-
-      if (likepexisting)
-        likep_mult[0]->reset();
-
-      for(j=begin[0];j<=end[0];j++)
-          fullcondp[j]->reset();
-
-      errors=true;
-//        return true;
-      }
-    #elif defined(JAVA_OUTPUT_WINDOW)
-    else
-      {
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("Estimation results: none\n");
-      genoptions_mult[0]->out("\n");
-
-      if (likepexisting)
-        likep_mult[0]->reset();
-
-      for(j=begin[0];j<=end[0];j++)
-        fullcondp[j]->reset();
-
-      errors=true;
-//        return true;
-      }
-    #endif
     } // end: if (!presim)
 
   return errors;
@@ -4135,50 +4054,6 @@ int STEPMULTIrun::column_for_fix(const ST::string & name)
 
 bool STEPMULTIrun::make_pause(void)
   {
-  #if defined(BORLAND_OUTPUT_WINDOW)
-  Application->ProcessMessages();
-
-  if (Frame->stop)
-    {
-    //break;
-    genoptions_mult[0]->out("\n");
-    genoptions_mult[0]->out("STEPWISE PROCEDURE TERMINATED BY USER BREAK\n");
-    genoptions_mult[0]->out("\n");
-    genoptions_mult[0]->out("Estimation results: none\n");
-    genoptions_mult[0]->out("\n");
-    return true;
-    }
-
-  if (Frame->pause)
-    {
-    genoptions_mult[0]->out("\n");
-    genoptions_mult[0]->out("STEPWISE PROCEDURE PAUSED\n");
-    genoptions_mult[0]->out("Click CONTINUE to proceed\n");
-    genoptions_mult[0]->out("\n");
-
-    while (Frame->pause)
-      {
-      Application->ProcessMessages();
-      }
-
-    genoptions_mult[0]->out("STEPWISE PROCEDURE CONTINUED\n");
-    genoptions_mult[0]->out("\n");
-    }
-
-  #elif defined(JAVA_OUTPUT_WINDOW)
-  bool stop = genoptions_mult[0]->adminb_p->breakcommand();
-  if(stop)
-    {
-    genoptions_mult[0]->out("\n");
-    genoptions_mult[0]->out("STEPWISE PROCEDURE TERMINATED BY USER BREAK\n");
-    genoptions_mult[0]->out("\n");
-    genoptions_mult[0]->out("Estimation results: none\n");
-    genoptions_mult[0]->out("\n");
-    //break;
-    return true;
-    }
-  #endif
-
   return false;
   }
 
@@ -5554,95 +5429,10 @@ bool STEPMULTIrun::simulate(const vector<ST::string> & header, const int & seed,
         likep_mult[nrmodels-1-i]->update_predict();
       }
 
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-    Application->ProcessMessages();
-
-    if (Frame->stop)
-      {
-//      genoptions->out("USER BREAK\n");
-      break;
-      }
-
-    if (Frame->pause)
-      {
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("SIMULATION PAUSED\n");
-      genoptions_mult[0]->out("Click CONTINUE to proceed\n");
-      genoptions_mult[0]->out("\n");
-
-      while (Frame->pause)
-        {
-        Application->ProcessMessages();
-        }
-
-      genoptions_mult[0]->out("SIMULATION CONTINUED\n");
-      genoptions_mult[0]->out("\n");
-      }
-#elif defined(JAVA_OUTPUT_WINDOW)
-      bool stop = genoptions_mult[0]->adminb_p->breakcommand();
-      if(stop)
-        break;
-#endif
-
     } // end: for (i=1;i<=genoptions->iterations;i++)
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-    if (!Frame->stop)
-#elif defined(JAVA_OUTPUT_WINDOW)
-    if (!genoptions_mult[0]->adminb_p->get_stop())
-#endif
-      {
-      return false;
-      } // end: if Frame->stop
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-    else
-      {
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("SIMULATION TERMINATED BY USER BREAK\n");
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("Estimation results: none\n");
-      genoptions_mult[0]->out("\n");
-
-      for(i=0;i<nrmodels;i++)
-        {
-        if (likepexisting)
-          likep_mult[i]->reset();
-        }
-
-      for(j=0;j<fullcondp.size();j++)
-        fullcondp[j]->reset();
-
-      return true;
-      }
-#elif defined(JAVA_OUTPUT_WINDOW)
-    else
-      {
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("Estimation results: none\n");
-      genoptions_mult[0]->out("\n");
-
-
-      for(i=0;i<nrmodels;i++)
-        {
-        if (likepexisting)
-          likep_mult[i]->reset();
-        }
-
-      for(j=0;j<fullcondp.size();j++)
-        fullcondp[j]->reset();
-
-      return true;
-      }
-#endif
-
   } // end: no errors
 
   return true;
   }
 
-
 }
-

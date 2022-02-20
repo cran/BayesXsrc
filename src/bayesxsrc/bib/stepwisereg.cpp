@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,19 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<StatwinFrame.h>
-#include<statwin_haupt.h>
-#endif
-
 
 #include"stepwisereg.h"
 #include"fullcond.h"
@@ -682,15 +669,9 @@ void stepwisereg::clear(void)
 
 
 stepwisereg::stepwisereg(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adb, administrator_pointer * adp,
-#endif
 const ST::string & n,ofstream * lo,istream * in,ST::string p,
 vector<statobject*> * st)
 : statobject(
-#if defined(JAVA_OUTPUT_WINDOW)
-adb,
-#endif
 n,"stepwisereg",lo,in,p)
   {
   hierarchical_model_yesno = false;
@@ -704,9 +685,6 @@ n,"stepwisereg",lo,in,p)
 stepwisereg::stepwisereg(const stepwisereg & b) : statobject(statobject(b))
   {
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = b.adminp_p;
-  #endif
   statobj = b.statobj;
   D = b.D;
   distrstring = b.distrstring;
@@ -734,9 +712,6 @@ const stepwisereg & stepwisereg::operator=(const stepwisereg & b)
 	 return *this;
   statobject::operator=(statobject(b));
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = b.adminp_p;
-  #endif
   statobj = b.statobj;
   D = b.D;
   distrstring = b.distrstring;
@@ -789,9 +764,6 @@ bool stepwisereg::create_generaloptions(void)
     }
 
   generaloptions.push_back(MCMCoptions(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p,
-  #endif
   iterations.getvalue(),burnin.getvalue(),step.getvalue(),logout,
                                level1.getvalue(),level2.getvalue()));
   generaloptions[generaloptions.size()-1].set_nrout(iterations.getvalue());
@@ -3198,311 +3170,20 @@ bool stepwisereg::create_random(const unsigned & collinpred)
 
 void drawmaprun(stepwisereg & b)
   {
-#if !defined(JAVA_OUTPUT_WINDOW)
-
   b.outerror("ERROR: method drawmap is not available in this version\n");
-
-#else
-
-  bool error = false;
-
-  vector<ST::string> varnames = b.mdrawmap.getModelVarnamesAsVector();
-  if (varnames.size() != 1)
-    {
-    b.outerror("ERROR: syntax error for method drawmap\n");
-    error = true;
-    }
-
-  long nr;
-  if (varnames[0].strtolong(nr) != 0)
-    {
-    b.outerror("ERROR: syntax error for method drawmap\n");
-    error = true;
-    }
-
-  if (nr < 0 || nr >= b.fullcond.size())
-    {
-    b.outerror("ERROR: syntax error for method drawmap\n");
-    error = true;
-    }
-
-  if (error == false)
-    {
-    if (b.fullcond[nr]->get_plotstyle() != MCMC::drawmap
-                       && b.fullcond[nr]->get_plotstyle() != MCMC::drawmapgraph)
-      {
-      error = true;
-      b.outerror("ERROR: results cannot be visualized with method drawmap\n");
-      }
-    else if (b.fullcond[nr]->get_plotstyle() == MCMC::drawmapgraph)
-      {
-      error = true;
-      b.outerror("ERROR: boundaries of the regions are not available from the graph-file \n");
-      }
-    }
-
-  if (error==false)
-    {
-
-    ST::string path = b.fullcond[nr]->get_pathresult();
-
-    vector<ST::string> vnames;
-    ifstream in(path.strtochar());
-    ST::string h;
-    ST::getline(in,10000,h);
-    h = h.eatallcarriagereturns();
-    vnames = 	h.strtoken(" ");
-
-    ST::string graphname = "_" + b.name + "_graph";
-    b.newcommands.push_back("graph " + graphname);
-
-    ST::string datasetname = "_" + b.name + "_r0";
-    b.newcommands.push_back("dataset " + datasetname);
-    b.newcommands.push_back(datasetname + ".infile , nonote using " + path);
-
-    ST::string plotvar;
-      plotvar = b.plotvar.getvalue() + " " + vnames[1] + " ";
-
-    ST::string ot="map=" + b.fullcond[nr]->getinfo() + " ";
-
-    ot = ot + "nrcolors="+b.nrcolors.getValueAsString()+" ";
-    ot = ot + "title=\""+b.title2.getvalue() + "\" ";
-    if (b.outfile4.getvalue().length() > 0)
-      ot = ot + "outfile=\""+b.outfile4.getvalue() + "\" ";
-    if (b.nolegend.getvalue() == true)
-      ot = ot + "nolegend ";
-    if (b.color.getvalue() == true)
-      ot = ot + "color ";
-    if (b.swapcolors.getvalue() == true)
-      ot = ot + "swapcolors ";
-    if (b.replace.getvalue() == true)
-      ot = ot + "replace ";
-    if (b.lowerlimit.changed() == true)
-      ot = ot + "lowerlimit="  + b.lowerlimit.getValueAsString() + " ";
-    if (b.upperlimit.changed() == true)
-      ot = ot + "upperlimit=" + b.upperlimit.getValueAsString() + " ";
-    if (b.pcat.getvalue() == true)
-      ot = ot + "pcat ";
-    if (b.drawnames.getvalue() == true)
-      ot = ot + "drawnames ";
-    if (b.fontsize.changed() == true)
-      ot = ot + "fontsize=" + b.fontsize.getValueAsString() + " ";
-    if (b.titlescale.changed() == true)
-      ot = ot + "titlesize=" + b.titlescale.getValueAsString() + " ";
-
-    if (ot.length() == 0)
-      b.newcommands.push_back(graphname + ".drawmap " + plotvar + " using " + datasetname);
-    else
-      b.newcommands.push_back(graphname + ".drawmap " + plotvar + "," + ot + " using "
-      + datasetname);
-
-    b.newcommands.push_back("drop " + graphname + " " + datasetname);
-    }
-
-#endif
-
   }
 
 
 void plotnonprun(stepwisereg & b)
   {
-
-#if !defined(JAVA_OUTPUT_WINDOW)
-
   b.outerror("ERROR: method plotnonp is not available in this version\n");
-
-#else
-
-  bool error = false;
-
-  vector<ST::string> varnames = b.mplotnonp.getModelVarnamesAsVector();
-  if (varnames.size() != 1)
-    {
-    b.outerror("ERROR: syntax error for method plotnonp\n");
-    error = true;
-    }
-
-  long nr;
-  if (varnames[0].strtolong(nr) != 0)
-    {
-    b.outerror("ERROR: syntax error for method plotnonp\n");
-    error = true;
-    }
-
-  if (nr < 0 || nr >= b.fullcond.size())
-    {
-    b.outerror("ERROR: syntax error for method plotnonp\n");
-    error = true;
-    }
-
-  if (error == false)
-    {
-    if (b.fullcond[nr]->get_plotstyle() != MCMC::plotnonp)
-      {
-      error = true;
-      b.outerror("ERROR: results cannot be visualized with method plotnonp\n");
-      }
-    }
-
-  if (error==false)
-    {
-
-    ST::string path = b.fullcond[nr]->get_pathresult();
-
-    vector<ST::string> vnames;
-    ifstream in(path.strtochar());
-    ST::string h;
-    ST::getline(in,10000,h);
-    h = h.eatallcarriagereturns();
-    vnames = 	h.strtoken(" ");
-
-    ST::string graphname = "_" + b.name + "_graph";
-     b.newcommands.push_back("graph " + graphname);
-
-    ST::string datasetname = "_" + b.name + "_r0";
-    b.newcommands.push_back("dataset " + datasetname);
-    b.newcommands.push_back(datasetname + ".infile , nonote using " + path);
-
-    ST::string plotvar;
-    if (b.levels.getvalue()=="all")
-      {
-      plotvar = vnames[1] + " ";
-      if (b.median.getvalue() == true)
-        plotvar = plotvar + vnames[5] + " ";
-      else
-        plotvar = plotvar + vnames[2] + " ";
-      plotvar = plotvar + vnames[3] + " " +
-                         vnames[4] + " " +
-                         vnames[6] + " " +
-                         vnames[7] + " ";
-      }
-    else if (b.levels.getvalue()=="none")
-      {
-      if (b.median.getvalue() == true)
-        plotvar = vnames[1] + " " + vnames[5];
-      else
-        plotvar = vnames[1] + " " + vnames[2];
-
-      }
-    else if (b.levels.getvalue()=="1")
-      {
-      if (b.median.getvalue() == true)
-        plotvar = vnames[1] + " " + vnames[5] + " " + vnames[3] + " " +
-                  vnames[7] + " ";
-      else
-        plotvar = vnames[1] + " " + vnames[2] + " " + vnames[3] + " " +
-                  vnames[7] + " ";
-      }
-    else
-      {
-      if (b.median.getvalue() == true)
-        plotvar = vnames[1] + " " + vnames[5] + " " + vnames[4] + " " +
-                  vnames[6] + " ";
-      else
-        plotvar = vnames[1] + " " + vnames[2] + " " + vnames[4] + " " +
-                  vnames[6] + " ";
-      }
-
-
-    ST::string ot;
-     ot = "xlab=\""+b.xlab.getvalue() + "\" ";
-    ot = ot + "ylab=\""+b.ylab.getvalue() + "\" ";
-    ot = ot + "title=\""+b.title0.getvalue() + "\" ";
-    if (b.outfile2.getvalue().length() > 0)
-      ot = ot + "outfile=\""+b.outfile2.getvalue() + "\" ";
-    ot = ot + "height="+b.height.getValueAsString() + " ";
-    ot = ot + "width="+b.width.getValueAsString() + " ";
-    if (b.replace2.getvalue() == true)
-      ot = ot + " replace ";
-    if (b.connect.changed() == true)
-      ot = ot + "connect="+b.connect.getvalue() + " ";
-    if (b.ylimbottom.changed() == true)
-      ot = ot + "ylimbottom="+b.ylimbottom.getValueAsString() + " ";
-    if (b.ylimtop.changed() == true)
-      ot = ot + "ylimtop="+b.ylimtop.getValueAsString() + " ";
-    if (b.ystep.changed() == true)
-      ot = ot + "ystep="+b.ystep.getValueAsString() + " ";
-    if (b.ystart.changed() == true)
-      ot = ot + "ystart="+b.ystart.getValueAsString() + " ";
-    if (b.xlimbottom.changed() == true)
-      ot = ot + "xlimbottom="+b.xlimbottom.getValueAsString() + " ";
-    if (b.xlimtop.changed() == true)
-      ot = ot + "xlimtop="+b.xlimtop.getValueAsString() + " ";
-    if (b.xstep.changed() == true)
-      ot = ot + "xstep="+b.xstep.getValueAsString() + " ";
-    if (b.xstart.changed() == true)
-      ot = ot + "xstart="+b.xstart.getValueAsString() + " ";
-    if (b.linewidth.changed() == true)
-      ot = ot + "linewidth="+b.linewidth.getValueAsString() + " ";
-    if (b.fontsize.changed() == true)
-      ot = ot + "fontsize="+b.fontsize.getValueAsString() + " ";
-    if (b.pointsize.changed() == true)
-      ot = ot + "pointsize="+b.pointsize.getValueAsString() + " ";
-    if (b.linecolor.changed() == true)
-      ot = ot + "linecolor="+b.linecolor.getValueAsString() + " ";
-    if (b.titlescale.changed() == true)
-      ot = ot + "titlesize="+b.titlescale.getValueAsString() + " ";
-
-    if (ot.length() == 0)
-      b.newcommands.push_back(graphname + ".plot " + plotvar + " using " + datasetname);
-    else
-      b.newcommands.push_back(graphname + ".plot " + plotvar + "," + ot + " using "
-      + datasetname);
-
-    b.newcommands.push_back("drop " + graphname + " " + datasetname);
-    }
-
-
-
-#endif
-
   b.plotnonpoptions.setdefault();
-
   }
 
 
 void texsummaryrun(stepwisereg & b)
   {
-
-#if !defined(JAVA_OUTPUT_WINDOW)
-
   b.outerror("ERROR: method texsummary is not available in this version\n");
-
-#else
-
-  bool error = false;
-
-  if (error==false)
-    {
-
-    //ST::string path = b.fullcond[nr]->get_pathresult();
-    ST::string path = b.outfiles[0];
-    ST::string path2 = path;
-
-    int i = path2.length()-1;
-    bool gefunden = false;
-    while(i>=0 && gefunden == false)
-      {
-      if(path2[i] == '\\' || path2[i]=='/')
-        gefunden = true;
-      path2 = path2.substr(0,i);
-      i--;
-      }
-
-    ST::string helpbat = path + "_latexcommands.bat";
-    ofstream outbat(helpbat.strtochar());
-    outbat << "cd " << path2 << endl;
-    outbat << path.substr(0,1) << ":" << endl;
-    outbat << "latex " << path << "_model_summary.tex" << endl;
-    //if(FileExists((path + "_model_summary.dvi").strtochar()))
-    outbat << "dvips " << path << "_model_summary.dvi" << endl;
-    outbat.close();
-    system(helpbat.strtochar());
-    remove(helpbat.strtochar());
-    }
-
-#endif
-
   }
 
 
@@ -3512,12 +3193,7 @@ void getsamplerun(stepwisereg & b)
     {
     if (b.bootyesno == true)
       {
-      #if defined(JAVA_OUTPUT_WINDOW)
-
-      b.runobj.get_samples(b.newcommands,b.outfile.getvalue() + "_");
-      #else
       b.runobj.get_samples(b.outfile.getvalue() + "_");
-      #endif
       }
     else
       b.outerror("ERROR: no Bootstrap simulation results\n");
@@ -3672,71 +3348,7 @@ void regressrun(stepwisereg & b)
                        boot,uncond,b.D,b.modelvarnamesv,name,fullcond_z,path2,CI,
                        hier,prop);
      }
-
-    if(!failure)
-      {
-
-#if defined(JAVA_OUTPUT_WINDOW)
-
-      //if(CI == true && b.nrcategories == 1)
-      //  {
-      //  b.newcommands.push_back("drop " + b.name);
-      //  b.newcommands.push_back("bayesreg " + b.name);
-      //  b.newcommands.push_back(b.name + ".outfile = " + path);
-      //  double level1 = b.level1.getvalue();
-      //  double level2 = b.level2.getvalue();
-      //  ST::string data = " level1=" + ST::doubletostring(int(level1))
-      //       + " level2=" + ST::doubletostring(int(level2)) + " using " + b.udata.getusingtext();
-      //  b.newcommands.push_back(path2 + data);
-      //  }
-      //else
-      //  {
-        b.fullcond = fullcond_z;
-        for(unsigned j=0;j<b.fullcond.size();j++)
-           {
-           MCMC::plotstyles plst = b.fullcond[j]->get_plotstyle();
-           if(plst != MCMC::noplot)
-             {
-             vector<ST::string> varnames = b.fullcond[j]->get_datanames();
-             ST::string xvar = varnames[0];
-             ST::string pathresult = b.fullcond[j]->get_pathresult();
-             ST::string pathps = pathresult.substr(0, pathresult.length()-4);
-             if(plst == MCMC::plotnonp)
-               {
-               b.newcommands.push_back(b.name + ".plotnonp " + ST::inttostring(j)
-               + ", title = \"Effect of " + xvar +"\" xlab = " + xvar
-               + " ylab = \" \" outfile = " + pathps + ".ps replace");
-               }
-
-             if(plst==MCMC::drawmap)  // || plst==MCMC::drawmapgraph)
-               {
-               b.newcommands.push_back(b.name + ".drawmap " + ST::inttostring(j)
-               + ", color outfile = " + pathps + "_pmean.ps replace");
-               if(CI != "none")
-                 {
-                 double u = b.fullcond[j]->get_level1();
-                 double o = b.fullcond[j]->get_level2();
-                 ST::string u_str = ST::doubletostring(u,0);
-                 ST::string o_str = ST::doubletostring(o,0);
-                 b.newcommands.push_back(b.name + ".drawmap " + ST::inttostring(j)
-                 + ", plotvar = pcat" + u_str + " nolegend  pcat outfile = " + pathps
-                 + "_pcat" + u_str + ".ps replace");
-                 b.newcommands.push_back(b.name + ".drawmap " + ST::inttostring(j)
-                 + ", plotvar = pcat" + o_str + " nolegend  pcat outfile = " + pathps
-                 + "_pcat" + o_str + ".ps replace");
-                 }
-               }
-             }
-        //   }
-
-       // b.newcommands.push_back(b.name + ".texsummary");
-       }
-
-#endif
-
-     }
-
-    }
+   }
 
   if (!failure)
     {
@@ -3896,56 +3508,6 @@ void mregressrun(stepwisereg & b)
                        hier,prop);
 
    //  }
-
-    if(!failure)
-      {
-
-#if defined(JAVA_OUTPUT_WINDOW)
-
-      b.fullcond = fullcond_z;
-      for(unsigned j=0;j<b.fullcond.size();j++)
-         {
-         MCMC::plotstyles plst = b.fullcond[j]->get_plotstyle();
-         if(plst != MCMC::noplot)
-           {
-           vector<ST::string> varnames = b.fullcond[j]->get_datanames();
-           ST::string xvar = varnames[0];
-           ST::string pathresult = b.fullcond[j]->get_pathresult();
-           ST::string pathps = pathresult.substr(0, pathresult.length()-4);
-           if(plst == MCMC::plotnonp)
-             {
-             b.newcommands.push_back(b.name + ".plotnonp " + ST::inttostring(j)
-             + ", title = \"Effect of " + xvar +"\" xlab = " + xvar
-             + " ylab = \" \" outfile = " + pathps + ".ps replace");
-             }
-
-           if(plst==MCMC::drawmap)  // || plst==MCMC::drawmapgraph)
-             {
-             b.newcommands.push_back(b.name + ".drawmap " + ST::inttostring(j)
-             + ", color outfile = " + pathps + "_pmean.ps replace");
-             if(CI != "none")
-               {
-               double u = b.fullcond[j]->get_level1();
-               double o = b.fullcond[j]->get_level2();
-               ST::string u_str = ST::doubletostring(u,0);
-               ST::string o_str = ST::doubletostring(o,0);
-               b.newcommands.push_back(b.name + ".drawmap " + ST::inttostring(j)
-               + ", plotvar = pcat" + u_str + " nolegend  pcat outfile = " + pathps
-               + "_pcat" + u_str + ".ps replace");
-               b.newcommands.push_back(b.name + ".drawmap " + ST::inttostring(j)
-               + ", plotvar = pcat" + o_str + " nolegend  pcat outfile = " + pathps
-               + "_pcat" + o_str + ".ps replace");
-               }
-             }
-           }
-
-        b.newcommands.push_back(b.name + ".texsummary");
-       }
-
-#endif
-
-     }
-
     }
 
   if (!failure)
@@ -5038,14 +4600,6 @@ void stepwisereg::describe(const optionlist & globaloptions)
   {
   statobject::describe(globaloptions);
   }
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-//------------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif
-
-
 
 
 

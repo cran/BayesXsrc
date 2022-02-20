@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -232,7 +232,7 @@ datamatrix FULLCOND_surf_gaussian::make_categories(const datamatrix & moddata,
     if (diff > 0)
       {
       weight.push_back(diff);
-//      weight.push_back(1.0);  
+//      weight.push_back(1.0);
       effvalues.push_back(ST::doubletostring(moddata(index(j,0),0),6));
       posbeg.push_back(j);
       posend.push_back(j-1);
@@ -341,7 +341,7 @@ FULLCOND_surf_gaussian::FULLCOND_surf_gaussian(MCMCoptions * o,DISTRIBUTION * dp
   sizeK = sizeK1*sizeK2;
 
   sumx1 = datamatrix(sizeK1,1,0);
-  sumx2 = datamatrix(sizeK2,1,0); 
+  sumx2 = datamatrix(sizeK2,1,0);
 
   make_moddata(d1kat,d2kat);
 
@@ -701,7 +701,7 @@ void FULLCOND_surf_gaussian::update(void)
           *workbetahelp = *workbeta + *workbeta1 + *workbeta2;
         }
 
-      fchelp.update();  
+      fchelp.update();
 
       }
 

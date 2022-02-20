@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -63,7 +63,7 @@ DISTRIBUTION_coxmodel::DISTRIBUTION_coxmodel(const datamatrix & offset,
                    MCMCoptions * o, const datamatrix & r, const datamatrix & t,
                    const datamatrix & dbeg,
                         const datamatrix & w)
-  : DISTRIBUTION(datamatrix(offset.rows(),1,0),o,r,w)                        
+  : DISTRIBUTION(datamatrix(offset.rows(),1,0),o,r,w)
 {
      unsigned i;
 
@@ -71,7 +71,7 @@ DISTRIBUTION_coxmodel::DISTRIBUTION_coxmodel(const datamatrix & offset,
 
      ti = t;
      relrisk = offset;
-     
+
      int_ti=datamatrix(2*t.rows(),1,0.0);
      for(i=0;i<t.rows();i++)
      {
@@ -307,7 +307,7 @@ void DISTRIBUTION_coxmodel::compute_deviance(const double * response, const doub
       }
     else
       {
-      *deviance = -2.0 * *weight *( *response * log(relrisk(i,0)+ *mu) - help); 
+      *deviance = -2.0 * *weight *( *response * log(relrisk(i,0)+ *mu) - help);
       }
     }
 

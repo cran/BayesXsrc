@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,16 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<StatwinFrame.h>
-#include<statwin_haupt.h>
-
-#endif
 
 #include"superbayesreg.h"
 #include <mapobject.h>
@@ -361,6 +351,8 @@ void superbayesreg::create_hregress(void)
   equationtypes.push_back("main");
   equationtypes.push_back("servant");
   equationtypes.push_back("mu");
+	equationtypes.push_back("mu1");
+	equationtypes.push_back("mu2");
   equationtypes.push_back("pi");
   equationtypes.push_back("tau");
   equationtypes.push_back("lambda");
@@ -375,6 +367,7 @@ void superbayesreg::create_hregress(void)
   equationtypes.push_back("nu");
   equationtypes.push_back("df");
   equationtypes.push_back("rho");
+  equationtypes.push_back("rhofz");
   equationtypes.push_back("alpha");
   equationtypes.push_back("alpha1");
   equationtypes.push_back("alpha2");
@@ -473,6 +466,7 @@ void superbayesreg::create_hregress(void)
   ssvsvarlimit = doubleoption("ssvsvarlimit",0.0000000001,0,0.1);
   IWLSlineff = simpleoption("IWLSlineff", false);
   forceIWLS = simpleoption("forceIWLS", false);
+  highspeedon = simpleoption("highspeedon", false);
 
   importance = simpleoption("importance", false);
 
@@ -528,6 +522,7 @@ void superbayesreg::create_hregress(void)
   regressoptions.push_back(&ssvsvarlimit);
   regressoptions.push_back(&IWLSlineff);
   regressoptions.push_back(&forceIWLS);
+  regressoptions.push_back(&highspeedon);
   regressoptions.push_back(&importance);
 
   // methods 0
@@ -1161,25 +1156,6 @@ void superbayesreg::clear(void)
   }
 
 
-#if defined(JAVA_OUTPUT_WINDOW)
-superbayesreg::superbayesreg(
-administrator_basic * adb, administrator_pointer * adp,
-const ST::string & n,ofstream * lo,istream * in,
-						 ST::string p,vector<statobject*> * st)
-						 : statobject(adb,n,"mcmcreg",lo,in,p)
-  {
-  clear();
-  adminp_p = adp;
-  statobj = st;
-  master = MASTER_OBJ();
-  create();
-  resultsyesno = false;
-  run_yes = false;
-  posteriormode = false;
-  computemodeforstartingvalues = true;
-  describetext.push_back("CURRENT REGRESSION RESULTS: none\n");
-  }
-#else
 superbayesreg::superbayesreg(const ST::string & n,ofstream * lo,istream * in,
 						 ST::string p,vector<statobject*> * st)
 						 : statobject(n,"mcmcreg",lo,in,p)
@@ -1197,15 +1173,11 @@ superbayesreg::superbayesreg(const ST::string & n,ofstream * lo,istream * in,
   firstvarselection = true;
   describetext.push_back("CURRENT REGRESSION RESULTS: none\n");
   }
-#endif
 
 
 superbayesreg::superbayesreg(const superbayesreg & b) : statobject(statobject(b))
   {
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = b.adminp_p;
-  #endif
 
   firstvarselection = b.firstvarselection;
 
@@ -1437,9 +1409,6 @@ const superbayesreg & superbayesreg::operator=(const superbayesreg & b)
 	 return *this;
   statobject::operator=(statobject(b));
   create();
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = b.adminp_p;
-  #endif
 
   firstvarselection = b.firstvarselection;
 
@@ -1697,14 +1666,11 @@ bool superbayesreg::create_generaloptions(void)
 
 
     generaloptions = MCMC::GENERAL_OPTIONS(
-    #if defined(JAVA_OUTPUT_WINDOW)
-    adminb_p,
-    #endif
     iterations.getvalue(),burnin.getvalue(),
                                 step.getvalue(),saveestimation.getvalue(),
                                 copula.getvalue(),rotation.getvalue(),
                                 samplesel.getvalue(), sampleselval.getvalue(),
-                                forceIWLS.getvalue(),
+                                forceIWLS.getvalue(), highspeedon.getvalue(),
                                 logout,
                                 level1.getvalue(),level2.getvalue());
 
@@ -1833,13 +1799,20 @@ void hregressrun(superbayesreg & b)
 
         ST::string pathgraphs = b.outfile.getvalue();
 
+        bool skipfirst = b.shared;
+
+        if(b.generaloptions.samplesel)
+          {
+          skipfirst=true;
+          }
+
         if (b.modeonly.getvalue())
           {
-          failure = b.simobj.posteriormode(pathgraphs,b.shared,false);
+          failure = b.simobj.posteriormode(pathgraphs,skipfirst,false);
           }
         else
           failure = b.simobj.simulate(pathgraphs,b.setseed.getvalue(),
-          b.computemodeforstartingvalues, b.shared);
+          b.computemodeforstartingvalues, skipfirst);
         }
 
       if (!failure)
@@ -1995,7 +1968,8 @@ bool superbayesreg::create_distribution(void)
   else
     w = datamatrix(1,1);
 
-
+  if(generaloptions.samplesel && distr_binomialprobit_copulas.size()>0)
+    w = distr_binomialprobit_copulas[0].responseorig;
 
   describetext.push_back("Response distribution: "
                            + family.getvalue() + "\n");
@@ -3116,19 +3090,19 @@ bool superbayesreg::create_distribution(void)
      equations[modnr].distrp = &distr_bivt_sigmas[distr_bivt_sigmas.size()-1];
      equations[modnr].pathd = "";
 
-     if (distr_bivt_sigmas.size() == 2)
+/*     if (distr_bivt_sigmas.size() == 2)
        {
        distr_bivt_sigmas[distr_bivt_sigmas.size()-2].response2 = distr_bivt_sigmas[distr_bivt_sigmas.size()-1].response;
        distr_bivt_sigmas[distr_bivt_sigmas.size()-1].response2 = distr_bivt_sigmas[distr_bivt_sigmas.size()-2].response;
        }
-
+*/
 
      }
  //------------------------------ END: bivt_sigma -------------------------------
-
+ 
 
  // ----------------------------------- bivt_mu ----------------------------------
-   else if ((family.getvalue() == "bivt") && ((equationtype.getvalue()=="mu"))
+   else if ((family.getvalue() == "bivt") && ((equationtype.getvalue()=="mu") || (equationtype.getvalue()=="mu1") || (equationtype.getvalue()=="mu2"))
            )
      {
 
@@ -3184,6 +3158,8 @@ bool superbayesreg::create_distribution(void)
        distr_bivt_mus[distr_bivt_mus.size()-1].response2 = distr_bivt_mus[distr_bivt_mus.size()-2].response;
        distr_bivt_rhos[distr_bivt_rhos.size()-1].response2 = distr_bivt_mus[distr_bivt_mus.size()-2].response;
        distr_bivt_dfs[distr_bivt_dfs.size()-1].response2 = distr_bivt_mus[distr_bivt_mus.size()-2].response;
+			 distr_bivt_sigmas[distr_bivt_sigmas.size()-2].response2 = distr_bivt_mus[distr_bivt_mus.size()-1].response;
+       distr_bivt_sigmas[distr_bivt_sigmas.size()-1].response2 = distr_bivt_mus[distr_bivt_mus.size()-2].response;
     //   distr_bivt_dfs[distr_bivt_dfs.size()-1].response = distr_bivt_mus[distr_bivt_mus.size()-1].response;
 
        distr_bivt_dfs[distr_bivt_dfs.size()-1].distrp.push_back(
@@ -9058,7 +9034,7 @@ bool superbayesreg::create_distribution(void)
     return true;
     }
 
-  datamatrix sampleselweight;
+/*  datamatrix sampleselweight;
   if(generaloptions.samplesel)
     {
     sampleselweight = distr_binomialprobit_copulas[0].responseorig;
@@ -9095,7 +9071,7 @@ bool superbayesreg::create_distribution(void)
       {
       distr_gumbel_copulas[0].weight = sampleselweight;
       }
-    }
+    }*/
 
 
 
@@ -10150,6 +10126,7 @@ bool superbayesreg::create_multiplicative_pspline(unsigned i)
   terms[i].options[12] = "true";
 
   datamatrix datadummy = datamatrix(1,1,0.0);
+  // creates the penalized spline for f(x) in exp(etatilde)*f(x)
   create_pspline(i, datadummy);
 
   // FC_nonp * fcnp_pspline = &FC_nonps[FC_nonps.size()-1];
@@ -10180,8 +10157,28 @@ bool superbayesreg::create_multiplicative_pspline(unsigned i)
 
   FC_nonps[FC_nonps.size()-1].set_multiplicative(equations[fnr].distrp);
 
-  (distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1]).dg = &(distr_gaussians[distr_gaussians.size()-1]);
-  (distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1]).dgexists = true;
+  equations[fnr].distrp->set_multiplicative(equations[modnr].distrp);
+
+//  equations[fnr].distrp->dgexists = true;
+//  equations[fnr].distrp->dg = equations[modnr].distrp;
+
+//  equations[fnr].distrp->dg = &(distr_gaussians[distr_gaussians.size()-1]);
+
+//  (distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1]).dg = &(distr_gaussians[distr_gaussians.size()-1]);
+//  (distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1]).dgexists = true;
+
+/*  ofstream out("c:/temp/dg_linpred1.raw");
+  (distr_gaussians[distr_gaussians.size()-1]).linearpred1.prettyPrint(out);
+  out.close();
+  ofstream out1("c:/temp/dg_linpred2.raw");
+  (distr_gaussians[distr_gaussians.size()-1]).linearpred2.prettyPrint(out1);
+  out1.close();
+  ofstream out2("c:/temp/mult_linpred1.raw");
+  (distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1]).linearpred1.prettyPrint(out2);
+  out2.close();
+  ofstream out3("c:/temp/mult_linpred2.raw");
+  (distr_gaussian_multeffects[distr_gaussian_multeffects.size()-1]).linearpred2.prettyPrint(out3);
+  out3.close();*/
 
   return false;
   }
@@ -11390,16 +11387,7 @@ void getsamplerun(superbayesreg & b)
     ST::string pathgraphs = b.outfile.getvalue();
     if (b.posteriormode == false)
       {
-      #if defined(JAVA_OUTPUT_WINDOW)
-
-// STEFAN: CHECKEN
-// zweites Argument sollte ein Vektor sein.
-      // b.simobj.get_samples(b.newcommands,b.outfile.getvalue() + "_");
-      ST::string aString( b.outfile.getvalue() + "_" );
-      b.simobj.get_samples(aString, b.newcommands);
-      #else
       b.simobj.get_samples(pathgraphs);
-      #endif
       }
     else
       b.outerror("ERROR: no MCMC simulation results\n");
@@ -11415,8 +11403,3 @@ void superbayesreg::describe(const optionlist & globaloptions)
   statobject::describe(globaloptions);
   }
 
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-//------------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif

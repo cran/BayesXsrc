@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,18 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<StatwinFrame.h>
-#include<statwin_haupt.h>
-#endif
 
 #include"data.h"
 #include<time.h>
@@ -296,9 +284,6 @@ filter filter::operator+(realvar & v)
 
 dataset::dataset(const dataset & d)
   {
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = d.adminb_p;
-  #endif
   name = d.name;
   nrobs = d.nrobs;
   datarep = d.datarep;
@@ -311,9 +296,6 @@ const dataset & dataset::operator=(const dataset & d)
   {
   if (this == &d)
 	 return *this;
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = d.adminb_p;
-  #endif
   name = d.name;
   nrobs = d.nrobs;
   datarep = d.datarep;
@@ -324,9 +306,6 @@ const dataset & dataset::operator=(const dataset & d)
 
 
 void dataset::filldata(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adminb_p,
-#endif
 istream & in,ST::string & m,const unsigned & maxobs)
   {
   datarep.variables = list<realvar>(datarep.varnames.size());
@@ -373,13 +352,7 @@ istream & in,ST::string & m,const unsigned & maxobs)
 		i++;
 		}  // end: while ....
 
-     #if defined(BORLAND_OUTPUT_WINDOW)
-     stop = hauptformular->breakcommand();
-     #elif defined(JAVA_OUTPUT_WINDOW)
-     stop = adminb_p->breakcommand();
-     #else
      stop = false;
-     #endif
      if (stop)
        errormessages.push_back("ERROR: No observations read\n");
      if (stop)
@@ -418,9 +391,6 @@ void dataset::checkvarnames(void)
 
 
 void dataset::read(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adminb_p,
-#endif
 ifstream & in,ST::string & missing,
                    const unsigned & maxobs, const list<ST::string> & names)
   {
@@ -442,9 +412,6 @@ ifstream & in,ST::string & missing,
 
   if (errormessages.empty())
 	 filldata(
-     #if defined(JAVA_OUTPUT_WINDOW)
-     adminb_p,
-     #endif
      in,missing,maxobs);
 
 
@@ -462,9 +429,6 @@ ifstream & in,ST::string & missing,
 
 
 unsigned dataset::write (
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * adminb_p,
-#endif
 ostream & out, list<ST::string> & names,const bool header,const realvar & v0)
   {
   errormessages.clear();
@@ -508,13 +472,7 @@ ostream & out, list<ST::string> & names,const bool header,const realvar & v0)
 			  out << (*itl[j])[datarep.index[n]] << "   ";
 			out << endl;
 			}
-#if defined(BORLAND_OUTPUT_WINDOW)
-         stop = hauptformular->breakcommand();
-#elif defined(JAVA_OUTPUT_WINDOW)
-         stop = adminb_p->breakcommand();
-#else
          stop = false;
-#endif
          if (stop)
            {
            errormessages.push_back("ERROR: no observations written to external file\n");
@@ -744,20 +702,7 @@ realvar dataset::eval_exp(ST::string  expression, bool clearerrors)
 		{
 		if (argument.length() == 0)
           {
-#if defined(JAVA_OUTPUT_WINDOW)
-          realvar h(nrobs);
-          unsigned i;
-          realvar::iterator it = h.begin();
-
-          jmethodID javauniform = adminb_p->Java->GetMethodID(
-          adminb_p->BayesX_cls, "juniform", "()D");
-
-          for (i=0;i<nrobs;i++,++it)
-        	 *it = adminb_p->Java->CallDoubleMethod(adminb_p->BayesX_obj, javauniform);
-          return h;
-#else
 		  return realob::uniform(nrobs);
-#endif
           }
 		else
 		  {
@@ -770,20 +715,7 @@ realvar dataset::eval_exp(ST::string  expression, bool clearerrors)
 		{
 		if (argument.length() == 0)
           {
-#if defined(JAVA_OUTPUT_WINDOW)
-          realvar h(nrobs);
-          unsigned i;
-          realvar::iterator it = h.begin();
-
-          jmethodID javanormal = adminb_p->Java->GetMethodID(
-          adminb_p->BayesX_cls, "jnormal", "()D");
-
-          for (i=0;i<nrobs;i++,++it)
-        	 *it = adminb_p->Java->CallDoubleMethod(adminb_p->BayesX_obj, javanormal);
-          return h;
-#else
 		  return realob::normal(nrobs);
-#endif
           }
 		else
 		  {
@@ -811,25 +743,7 @@ realvar dataset::eval_exp(ST::string  expression, bool clearerrors)
 		else
           {
    		  valuevek = eval_exp(arglist[0],false);
-#if defined(JAVA_OUTPUT_WINDOW)
-          realvar h(nrobs);
-          unsigned i;
-          realvar::iterator it = h.begin();
-
-          jmethodID javaexponential = adminb_p->Java->GetMethodID(
-          adminb_p->BayesX_cls, "jexponential", "(D)D");
-
-          for (i=0;i<nrobs;i++,++it)
-            {
-            if(valuevek[i]<=0 || valuevek[i]==NA)
-              *it =  NA;
-            else
-              *it = adminb_p->Java->CallDoubleMethod(adminb_p->BayesX_obj, javaexponential, valuevek[i].getvalue());
-            }
-          return h;
-#else
 		  return exponential(valuevek);
-#endif
           }
 		}   // end: exponential
 	 else if (functionname == "poisson")
@@ -851,26 +765,8 @@ realvar dataset::eval_exp(ST::string  expression, bool clearerrors)
 		else
           {
    		  valuevek = eval_exp(arglist[0],false);
-#if defined(JAVA_OUTPUT_WINDOW)
-          realvar h(nrobs);
-          unsigned i;
-          realvar::iterator it = h.begin();
-
-          jmethodID javapoisson = adminb_p->Java->GetMethodID(
-          adminb_p->BayesX_cls, "jpoisson", "(D)D");
-
-          for (i=0;i<nrobs;i++,++it)
-            {
-            if(valuevek[i]<=0 || valuevek[i]==NA)
-              *it = NA;
-            else
-        	  *it = adminb_p->Java->CallDoubleMethod(adminb_p->BayesX_obj, javapoisson, valuevek[i].getvalue());
-            }
-          return h;
-#else
 		  errormessages.push_back("ERROR: Function 'poisson' not available in this version.\n");
 		  return realvar(nrobs);
-#endif
           }
   		}   // end: poisson
 	 else if (functionname == "weibull")
@@ -893,26 +789,8 @@ realvar dataset::eval_exp(ST::string  expression, bool clearerrors)
           {
 		  valuevek = eval_exp(arglist[0],false);
 		  valuevek2 = eval_exp(arglist[1],false);
-#if defined(JAVA_OUTPUT_WINDOW)
-          realvar h(nrobs);
-          unsigned i;
-          realvar::iterator it = h.begin();
-
-          jmethodID javaweibull = adminb_p->Java->GetMethodID(
-          adminb_p->BayesX_cls, "jweibull", "(DD)D");
-
-          for (i=0;i<nrobs;i++,++it)
-            {
-            if(valuevek[i]<=0 || valuevek[i]==NA || valuevek2[i]<=0 || valuevek2[i]==NA)
-              *it =  NA;
-            else
-              *it = adminb_p->Java->CallDoubleMethod(adminb_p->BayesX_obj, javaweibull, valuevek[i].getvalue(), valuevek2[i].getvalue());
-            }
-          return h;
-#else
 		  errormessages.push_back("ERROR: Function 'weibull' not available in this version.\n");
 		  return realvar(nrobs);
-#endif
           }
   		}   // end: weibull
 	 else if (functionname == "bernoulli")
@@ -934,25 +812,7 @@ realvar dataset::eval_exp(ST::string  expression, bool clearerrors)
 		else
           {
           valuevek = eval_exp(arglist[0],false);
-#if defined(JAVA_OUTPUT_WINDOW)
-          realvar h(nrobs);
-          unsigned i;
-          realvar::iterator it = h.begin();
-
-          jmethodID javabernoulli = adminb_p->Java->GetMethodID(
-          adminb_p->BayesX_cls, "jbernoulli", "(D)D");
-
-          for (i=0;i<nrobs;i++,++it)
-            {
-            if(valuevek[i]<0 || valuevek[i]>1 || valuevek[i]==NA)
-              *it =  NA;
-            else
-              *it = adminb_p->Java->CallDoubleMethod(adminb_p->BayesX_obj, javabernoulli, valuevek[i].getvalue());
-            }
-          return h;
-#else
           return bernoulli(valuevek);
-#endif
           }
 		}   // end: bernoulli
 	 else if (functionname == "binomial")
@@ -975,26 +835,7 @@ realvar dataset::eval_exp(ST::string  expression, bool clearerrors)
 		  {
 		  valuevek = eval_exp(arglist[0],false);
 		  valuevek2 = eval_exp(arglist[1],false);
-#if defined(JAVA_OUTPUT_WINDOW)
-          realvar h(nrobs);
-          unsigned i;
-          realvar::iterator it = h.begin();
-
-          jmethodID javabinomial = adminb_p->Java->GetMethodID(
-          adminb_p->BayesX_cls, "jbinomial", "(DD)D");
-
-          for (i=0;i<nrobs;i++,++it)
-            {
-            if(valuevek2[i]<0 || valuevek2[i]>1 || valuevek2[i]==NA
-                              || valuevek[i]<1 || valuevek[i]==NA)
-              *it = NA;
-            else
-      	      *it = adminb_p->Java->CallDoubleMethod(adminb_p->BayesX_obj, javabinomial, valuevek[i].getvalue(), valuevek2[i].getvalue());
-            }
-          return h;
-#else
 		  return binomial(valuevek,valuevek2);
-#endif
 		  }
 		}   // end: binomial
       else if (functionname == "gamma")
@@ -1018,25 +859,7 @@ realvar dataset::eval_exp(ST::string  expression, bool clearerrors)
 		  {
 		  valuevek = eval_exp(arglist[0],false);
 		  valuevek2 = eval_exp(arglist[1],false);
-#if defined(JAVA_OUTPUT_WINDOW)
-          realvar h(nrobs);
-          unsigned i;
-          realvar::iterator it = h.begin();
-
-          jmethodID javagamma = adminb_p->Java->GetMethodID(
-          adminb_p->BayesX_cls, "jgamma", "(DD)D");
-
-          for (i=0;i<nrobs;i++,++it)
-            {
-            if(valuevek[i]<=0 || valuevek[i]==NA || valuevek2[i]<=0 || valuevek2[i]==NA)
-              *it = NA;
-            else
-      	      *it = adminb_p->Java->CallDoubleMethod(adminb_p->BayesX_obj, javagamma, valuevek[i].getvalue(), valuevek2[i].getvalue());
-            }
-          return h;
-#else
 		  return gamma(valuevek,valuevek2);
-#endif
 		  }
 
         }
@@ -2071,13 +1894,6 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
      }                                        //Ende ‰uﬂere while-Schleife
   }
 
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif
 
 
 

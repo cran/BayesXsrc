@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -923,38 +923,12 @@ double FULLCOND_nonp_gaussian::outresultsreml(datamatrix & X,datamatrix & Z,
 
   if (fctype == MCMC::spatial)
     {
-    #if defined(JAVA_OUTPUT_WINDOW)
-
-    if (polex == true)
-      {
-      optionsp->out("  Postscript file is stored in file\n");
-      ST::string psfile = outest.substr(0,outest.length()-4) + ".ps";
-      optionsp->out("  " + psfile + "\n");
-      optionsp->out("\n");
-      }
-
-    optionsp->out("  Results may be visualized in BayesX using method 'drawmap'\n");
-    optionsp->out("  Type for example: objectname.drawmap " +
-    ST::inttostring(plotpos) + "\n");
-    optionsp->out("\n");
-    #else
     optionsp->out("  Results may be visualized using the R function");
     optionsp->out(" 'drawmap'\n");
     optionsp->out("\n");
-    #endif
     }
   else
     {
-    #if defined(JAVA_OUTPUT_WINDOW)
-    optionsp->out("  Postscript file is stored in file\n");
-    ST::string psfile = outest.substr(0,outest.length()-4) + ".ps";
-    optionsp->out("  " + psfile + "\n");
-    optionsp->out("\n");
-    optionsp->out("  Results may be visualized in BayesX using method 'plotnonp'\n");
-    optionsp->out("  Type for example: objectname.plotnonp " +
-    ST::inttostring(plotpos) + "\n");
-    optionsp->out("\n");
-    #else
     char hchar = '\\';
     ST::string hstring = "/";
     ST::string pathresultsplus = outest.insert_string_char(hchar,hstring);
@@ -966,7 +940,6 @@ double FULLCOND_nonp_gaussian::outresultsreml(datamatrix & X,datamatrix & Z,
     optionsp->out("\n");
     optionsp->out("  plotnonp(\""+ pathresultsplus + "\")\n");
     optionsp->out("\n");
-    #endif
     }
   optionsp->out("\n");
 
@@ -1617,9 +1590,6 @@ FULLCOND_nonp_gaussian::FULLCOND_nonp_gaussian(MCMCoptions * o,
     }
 
   MAP::map m(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  optionsp->adminb_p,
-  #endif
   X,md,MAP::adjacent);
 
   if (m.isconnected()==false)
@@ -3679,13 +3649,7 @@ void FULLCOND_nonp_gaussian::outresults(void)
     ST::string pathgraph = pathmap.substr(0, pathmap.length()-4);
     pathgraph = pathgraph + "gra";
     optionsp->out("  Corresponding graph-file is stored in " + pathgraph + "\n");
-    #if defined(JAVA_OUTPUT_WINDOW)
-    optionsp->out("  Results may be visualized using method 'drawmap'\n");
-    optionsp->out("  Type for example: objectname.drawmap " +
-    ST::inttostring(fcnumber) + "\n");
-    #else
     optionsp->out("  Results may be visualized using the R function 'drawmap'\n");
-    #endif
     optionsp->out("\n");
 
     unsigned i;

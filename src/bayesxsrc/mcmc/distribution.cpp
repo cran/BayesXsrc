@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -26,105 +26,6 @@ namespace MCMC
 
 using randnumbers::rand_inv_gaussian;
 
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-// initialize mschecking with a given path for the output
-void
-DISTRIBUTION::initialise_mscheck(const ST::string & path,
-      const statmatrix<int> & index, const unsigned & nrpar,
-      const vector<unsigned> & posbeg, const vector<unsigned> & posend)
-{
-    // only initialize if we have not yet a full predchange container
-    if (predchange.rows() < nrobs)
-    {
-        // activate mscheck
-        mscheck = true;
-
-        msnrind = nrpar;
-        msindex = index;
-        msposbeg = posbeg;
-        msposend = posend;
-
-        // initialize predictor change vector into which the
-        // random effects objects put their individual changes
-        predchange = datamatrix(nrobs, 1, 0);
-
-        // initialize the full conditional object for the mscheck predictor
-        ST::string path1 = path + "_mscheck_pred.raw";
-        msc_pred = FULLCOND(optionsp, datamatrix(1, 1), "mscheck_pred",
-                            nrobs, 1, path1);
-        msc_pred.setflags(MCMC::norelchange | MCMC::nooutput);
-
-        // initialize the full conditional object for the mscheck likelihood contributions
-        ST::string path2 = path + "_mscheck_like.raw";
-        msc_like = FULLCOND(optionsp, datamatrix(1, 1), "mscheck_like",
-                            msnrind, 1, path2);
-        msc_like.setflags(MCMC::norelchange | MCMC::nooutput);
-
-        // initialize the full conditional object for the mscheck predictive observation samples
-        ST::string path3 = path + "_mscheck_obssamples.raw";
-        msc_obssamples = FULLCOND(optionsp, datamatrix(1, 1), "mscheck_obssamples",
-                            nrobs, 1, path3);
-        msc_obssamples.setflags(MCMC::norelchange | MCMC::nooutput);
-    }
-}
-
-// add the double "m" to the position "row" of "predchange"
-void
-DISTRIBUTION::add_linearpred_mscheck(const double m, const unsigned int row)
-{
-    // only if mscheck is activated
-    if (mscheck)
-    {
-        // then go to the position "row" of "predchange" and add the double "m"
-        double * workl = predchange.getV() + row;
-        * workl += m;
-    }
-}
-
-// add the double "m" to the range "index"["beg":"end"] of "predchange".
-// This is an analogue to the function
-// DISTRIBUTION::add_linearpred(const double & m,const unsigned & beg,
-//                              const unsigned & end,const statmatrix<int> & index,
-//                              const unsigned & col, const bool & current)
-void
-DISTRIBUTION::add_linearpred_mscheck(const double m,
-                                     const unsigned int beg,
-                                     const unsigned int end,
-                                     const statmatrix<int> & index)
-{
-    // only if mscheck is activated
-    if (mscheck)
-    {
-        // then get the start position given by the "beg" element of "index"
-        int * workindex = index.getV() + beg;
-
-        // and add the "m" to "predchange" until the "end" of the "index" range
-        for (unsigned  i = beg; i <= end; i++, workindex++)
-        {
-            predchange(* workindex, 0) += m;
-        }
-    }
-}
-
-void DISTRIBUTION::get_mssamples()
-  {
-  ST::string pathhelp =
-        pathresultsscale.substr(0, pathresultsscale.length() - 10)
-                        + "_mscheck_like_sample.raw";
-  optionsp->out(pathhelp + "\n\n");
-  msc_like.get_samples(pathhelp);
-  pathhelp = pathresultsscale.substr(0, pathresultsscale.length()
-                - 10) + "_mscheck_pred_sample.raw";
-  optionsp->out(pathhelp + "\n\n");
-  msc_pred.get_samples(pathhelp);
-  pathhelp = pathresultsscale.substr(0, pathresultsscale.length() - 10)
-                       + "_mscheck_obssamples_sample.raw";
-  optionsp->out(pathhelp + "\n\n");
-  msc_obssamples.get_samples(pathhelp);
-  }
-#endif
-// END: DSB
 
 
 void DISTRIBUTION::compute_overall_deviance(double & deviance,double & deviancesat)
@@ -559,11 +460,6 @@ DISTRIBUTION::DISTRIBUTION(MCMCoptions * o, const datamatrix & r,
                            const ST::string & ps)
   {
   nosamples = false;
-// Begin: DSB //
-  #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  mscheck=false;
-  #endif
-// End: DSB //
   pathresultsscale = pr;
   Scalesave = FULLCOND(o,datamatrix(1,1),"Scaleparameter",1,1,ps);
   Scalesave.setflags(MCMC::norelchange | MCMC::nooutput);
@@ -584,11 +480,6 @@ DISTRIBUTION::DISTRIBUTION(const datamatrix & offset,MCMCoptions * o,
                            const ST::string & pr,const ST::string & ps)
   {
   nosamples = false;
-// Begin: DSB
-  #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  mscheck=false;
-  #endif
-// End : DSB
   pathresultsscale = pr;
   Scalesave = FULLCOND(o,datamatrix(1,1),"Scaleparameter",1,1,ps);
   Scalesave.setflags(MCMC::norelchange | MCMC::nooutput);
@@ -809,21 +700,6 @@ DISTRIBUTION::DISTRIBUTION(const DISTRIBUTION & d)
   lassosum = d.lassosum;
   nrnigmix = d.nrnigmix;
   nigmixsum = d.nigmixsum;
-
-// Begin: DSB
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  mscheck = d.mscheck;
-  msc_pred = d.msc_pred;
-  msc_like = d.msc_like;
-  msc_obssamples = d.msc_obssamples;
-  predchange = d.predchange;
-  msindex = d.msindex;
-  msnrind = d.msnrind;
-  msposbeg = d.msposbeg;
-  msposend = d.msposend;
-#endif
-// End: DSB
-
   }
 
 
@@ -922,19 +798,6 @@ const DISTRIBUTION & DISTRIBUTION::operator=(const DISTRIBUTION & d)
   nrnigmix = d.nrnigmix;
   nigmixsum = d.nigmixsum;
 
-// Begin: DSB
-  #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  mscheck = d.mscheck;
-  msc_pred = d.msc_pred;
-  msc_like = d.msc_like;
-  msc_obssamples = d.msc_obssamples;
-  predchange = d.predchange;
-  msindex = d.msindex;
-  msnrind = d.msnrind;
-  msposbeg = d.msposbeg;
-  msposend = d.msposend;
-  #endif
-// End: DSB
   return *this;
   }
 
@@ -1158,31 +1021,6 @@ double DISTRIBUTION::loglikelihood2(const unsigned & beg,const unsigned & end,
   return help;
 
   }
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-// FUNCTION: loglikelihood_from_deviance
-// TASK: computes the loglikelihood for a single observation for univariate
-// response, by using the compute_deviance function.
-
-    double
-    DISTRIBUTION::loglikelihood_from_deviance(const double res, // response
-                                              const double mu, // mean sample
-                                              const double weight // weight
-                                              ) const
-    {
-        // compute the deviance
-        double deviance = 0;
-        double unused = 0;
-
-        compute_deviance(&res, &weight, &mu, &deviance, &unused, scale, 0);
-
-        // and return the corresponding loglikelihood
-        return - 0.5 * deviance;
-    }
-
-#endif
-// END: DSB //
 
 void DISTRIBUTION::compute_weight(datamatrix & w,const unsigned & col,
                                   const bool & current) const
@@ -2282,86 +2120,6 @@ void DISTRIBUTION::swap_linearpred(void)
 
         } // end: if (scaleexisting)
 
-        // BEGIN: DSB //
-        #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-        // do we need to do mschecking?
-        if (mscheck)
-        {
-
-            // add the current linear predictor values to the predictor changes values
-            {
-                double * prc = predchange.getV();
-                double * prcu = linpred_current->getV();
-                for (unsigned int i = 0; i < nrobs; i++, prc++, prcu++)
-                {
-                    * prc += * prcu;
-                }
-            }
-            // so now predchange contains the approximate leave-one-out predictor samples!
-
-            // write the approximate LOO predictor values into the output matrix,
-            // and compute the corresponding log-likelihood contributions,
-            // for all (single) observations.
-            datamatrix singleLogLikelihoods = datamatrix(nrobs, 1);
-            {
-                double * msc_predp = msc_pred.getbetapointer();
-                double * msc_obssamplesp = msc_obssamples.getbetapointer();
-                double * resp = response.getV();
-                double * wei = weight.getV();
-                double * prc = predchange.getV();
-                double * singleLogLikelihoodsp = singleLogLikelihoods.getV();
-
-                for (unsigned int i = 0; i < nrobs;
-                     i++, singleLogLikelihoodsp++, msc_predp++, msc_obssamplesp++, resp++, wei++, prc++)
-                {
-                    // first compute the corresponding mu (with transformation onto the original scale,
-                    // as the functions below expect that.)
-                    double mu = 0;
-                    compute_mu(prc, &mu);
-
-                    // compute the loglikelihood of the observation *resp
-                    * singleLogLikelihoodsp = loglikelihood_from_deviance(*resp, mu, *wei);
-
-                    // sample once from the corresponding predictive distribution
-                    * msc_obssamplesp = sample_from_likelihood(*wei, mu);
-
-                    // and finally compute the linear predictor sample
-                    double factor = trmult(0,0);
-                    double shift = addinterceptsample;
-                    * msc_predp = factor * (*prc) + shift;
-                }
-            }
-
-
-            double * msc_likep = msc_like.getbetapointer();
-
-            for(unsigned int i=0; i<msnrind; i++, msc_likep++)
-                {
-
-                // first sum all loglikelihood contributions for individual i
-                int * workindex = msindex.getV() + msposbeg[i];
-                *msc_likep = 0.0;
-
-                for (unsigned  j = msposbeg[i]; j <= msposend[i]; j++, workindex++)
-                   {
-                   *msc_likep += singleLogLikelihoods(*workindex,0);
-                   }
-
-                // and then exponentiate to get the likelihood of individual i
-                *msc_likep = exp(*msc_likep);
-                }
-
-            // write into files
-            msc_like.update();
-            msc_pred.update();
-            msc_obssamples.update();
-
-            // refresh predchange vector with zeros
-            predchange = datamatrix(nrobs, 1, 0);
-        }
-        #endif
-        // END: DSB //
-
     } // end: update
 
 
@@ -2691,158 +2449,6 @@ void DISTRIBUTION::outresults(void)
       }
 
     }
-
-    // BEGIN: DSB //
-    #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-    // if we do mschecking
-  if (mscheck)
-    {
-        msc_like.outresults();
-        // and then the predictor samples
-        msc_pred.outresults();
-        // then the predictive observation samples
-        msc_obssamples.outresults();
-
-    double avescore = 0;
-
-    optionsp->out("  Marshall-Spiegelhalter Cross Validation:\n",true);
-    optionsp->out("\n");
-    optionsp->out("  Estimated individual likelihoods, predictors and\n");
-    optionsp->out("  observation samples are stored in files\n");
-    optionsp->out("\n");
-
-    // Likelihood results
-    ST::string pathhelp =
-        pathresultsscale.substr(0, pathresultsscale.length() - 10)
-                        + "_mscheck_like.res";
-    optionsp->out("  " + pathhelp + "\n");
-    optionsp->out("\n");
-
-    ofstream outres(pathhelp.strtochar());
-
-    outres << "intnr" << "   ";
-    outres << "pmean   ";
-    outres << "pqu"  << l1  << "   ";
-    outres << "pqu"  << l2  << "   ";
-    outres << "pmed   ";
-    outres << "pqu"  << u1  << "   ";
-    outres << "pqu"  << u2  << "   ";
-    outres << endl;
-
-    // here is the pointer to the means of the individuals likelihood samples:
-    double * workmean = msc_like.get_betameanp();
-
-    double * workbetaqu_l1_lower_p = msc_like.get_beta_lower1_p();
-    double * workbetaqu_l2_lower_p = msc_like.get_beta_lower2_p();
-    double * workbetaqu50 = msc_like.get_betaqu50p();
-    double * workbetaqu_l1_upper_p = msc_like.get_beta_upper1_p();
-    double * workbetaqu_l2_upper_p = msc_like.get_beta_upper2_p();
-
-    for(unsigned int i=0; i<msnrind; i++, workmean++, workbetaqu_l1_lower_p++,
-    workbetaqu_l2_lower_p++, workbetaqu50++, workbetaqu_l2_upper_p++, workbetaqu_l1_upper_p++)
-      {
-        // for the average log-score, we first have to logarithmize the individuals mean likelihoods,
-        // and then average this over all individuals
-      avescore += log(*workmean);
-
-      outres << (i+1) << "   ";
-      outres << *workmean << "   ";
-      outres << *workbetaqu_l1_lower_p << "   ";
-      outres << *workbetaqu_l2_lower_p << "   ";
-      outres << *workbetaqu50 << "   ";
-      outres << *workbetaqu_l2_upper_p << "   ";
-      outres << *workbetaqu_l1_upper_p << "   ";
-      outres << endl;
-      }
-
-    // divide by the number of individuals to get the average log-score,
-    // and also add a minus to get the same orientation as for the DIC (lower scores are then better)
-    avescore /= - (double)msnrind;
-
-    // Predictor results
-    pathhelp = pathresultsscale.substr(0, pathresultsscale.length()
-                - 10) + "_mscheck_pred.res";
-    optionsp->out("  " + pathhelp + "\n");
-    optionsp->out("\n");
-
-    ofstream outres2(pathhelp.strtochar());
-
-    outres2 << "intnr" << "   ";
-    outres2 << "pmean   ";
-    outres2 << "pqu"  << l1  << "   ";
-    outres2 << "pqu"  << l2  << "   ";
-    outres2 << "pmed   ";
-    outres2 << "pqu"  << u1  << "   ";
-    outres2 << "pqu"  << u2  << "   ";
-    outres2 << endl;
-
-    workmean = msc_pred.get_betameanp();
-    workbetaqu_l1_lower_p = msc_pred.get_beta_lower1_p();
-    workbetaqu_l2_lower_p = msc_pred.get_beta_lower2_p();
-    workbetaqu50 = msc_pred.get_betaqu50p();
-    workbetaqu_l1_upper_p = msc_pred.get_beta_upper1_p();
-    workbetaqu_l2_upper_p = msc_pred.get_beta_upper2_p();
-
-    for(unsigned int i=0; i<nrobs; i++, workmean++, workbetaqu_l1_lower_p++,
-    workbetaqu_l2_lower_p++, workbetaqu50++, workbetaqu_l2_upper_p++, workbetaqu_l1_upper_p++)
-      {
-      outres2 << (i+1) << "   ";
-      outres2 << *workmean << "   ";
-      outres2 << *workbetaqu_l1_lower_p << "   ";
-      outres2 << *workbetaqu_l2_lower_p << "   ";
-      outres2 << *workbetaqu50 << "   ";
-      outres2 << *workbetaqu_l2_upper_p << "   ";
-      outres2 << *workbetaqu_l1_upper_p << "   ";
-      outres2 << endl;
-      }
-
-    // Observation samples
-
-    pathhelp = pathresultsscale.substr(0, pathresultsscale.length() - 10)
-                       + "_mscheck_obssamples.res";
-    optionsp->out("  " + pathhelp + "\n\n\n");
-
-    ofstream outres3(pathhelp.strtochar());
-
-    outres3 << "intnr" << "   ";
-    outres3 << "pmean   ";
-    outres3 << "pqu"  << l1  << "   ";
-    outres3 << "pqu"  << l2  << "   ";
-    outres3 << "pmed   ";
-    outres3 << "pqu"  << u1  << "   ";
-    outres3 << "pqu"  << u2  << "   ";
-    outres3 << endl;
-
-    workmean = msc_obssamples.get_betameanp();
-    workbetaqu_l1_lower_p = msc_obssamples.get_beta_lower1_p();
-    workbetaqu_l2_lower_p = msc_obssamples.get_beta_lower2_p();
-    workbetaqu50 = msc_obssamples.get_betaqu50p();
-    workbetaqu_l1_upper_p = msc_obssamples.get_beta_upper1_p();
-    workbetaqu_l2_upper_p = msc_obssamples.get_beta_upper2_p();
-
-    for(unsigned int i=0; i<nrobs; i++, workmean++, workbetaqu_l1_lower_p++,
-    workbetaqu_l2_lower_p++, workbetaqu50++, workbetaqu_l2_upper_p++, workbetaqu_l1_upper_p++)
-      {
-      outres3 << (i+1) << "   ";
-      outres3 << *workmean << "   ";
-      outres3 << *workbetaqu_l1_lower_p << "   ";
-      outres3 << *workbetaqu_l2_lower_p << "   ";
-      outres3 << *workbetaqu50 << "   ";
-      outres3 << *workbetaqu_l2_upper_p << "   ";
-      outres3 << *workbetaqu_l1_upper_p << "   ";
-      outres3 << endl;
-      }
-
-    // Results for the log-score
-    optionsp->out("\n");
-    optionsp->out("  Resulting average leave one out log-score: " + ST::doubletostring(avescore, 6) + "\n");
-    optionsp->out("\n");
-    optionsp->out("\n");
-
-    }
-    #endif
-    // END: DSB //
-
 
   if ( (predict) && (optionsp->get_samplesize() > 0) && (!isbootstrap) )
     {
@@ -4432,30 +4038,6 @@ void DISTRIBUTION_gamma::compute_IWLS_weight_tildey(
 
   }
 
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-double
-    DISTRIBUTION_gamma::sample_from_likelihood(const double weight,
-                                               const double mu) const
-    {
-        // get the current "scale" parameter of the Gamma likelihood
-        double nu = (weight != 0.0) ? weight / scale(0, 0) : 1.0 / scale(0, 0);
-        // todo: is this correct?? Even if the observation has weight 0,
-        // we should be able to produce samples from the predictive distribution
-        // which conditions on the observations with positive weights!
-
-        // transform into the Gamma(a, b) parametrization
-        double a = nu;
-        double b = nu / mu;
-
-        // and then use the sample function from Random.cpp
-        return randnumbers::rand_gamma(a, b);
-    }
-#endif
-// END: DSB //
-
-
 void DISTRIBUTION_gamma::compute_deviance(const double * response,
                                           const double * weight,
                                           const double * mu,double * deviance,
@@ -4954,28 +4536,6 @@ double DISTRIBUTION_gamma2::compute_gmu(double * linpred,
   {
   return 1.0/exp(*linpred);
   }
-
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-// this is just a copy of DISTRIBUTION_gamma::sample_from_likelihood
-double
-    DISTRIBUTION_gamma2::sample_from_likelihood(const double weight,
-                                                const double mu) const
-    {
-        // get the current "scale" parameter of the Gamma likelihood
-        double nu = (weight != 0.0) ? weight / scale(0, 0) : 1.0 / scale(0, 0);
-        // todo: is this correct?
-
-        // transform into the Gamma(a, b) parametrization
-        double a = nu;
-        double b = nu / mu;
-
-        // and then use the sample function from Random.cpp
-        return randnumbers::rand_gamma(a, b);
-    }
-#endif
-// END: DSB //
 
 void DISTRIBUTION_gamma2::compute_deviance(const double * response,
                                           const double * weight,
@@ -5849,7 +5409,6 @@ void DISTRIBUTION_AFT::outresults(void)
 //------------------------------------------------------------------------------
 //---------------------- CLASS: DISTRIBUTION_QUANTREG --------------------------
 //------------------------------------------------------------------------------
-#if !defined (__BUILDING_THE_DLL)
 
 DISTRIBUTION_QUANTREG::DISTRIBUTION_QUANTREG(void) : DISTRIBUTION_gaussian()
   {
@@ -6010,7 +5569,6 @@ void DISTRIBUTION_QUANTREG::outresults(void)
   {
   DISTRIBUTION_gaussian::outresults();
   }
-#endif
 
 //------------------------------------------------------------------------------
 //----------------------- END: DISTRIBUTION_QUANTREG ---------------------------
@@ -6235,23 +5793,6 @@ const DISTRIBUTION_gaussian & DISTRIBUTION_gaussian::operator=(
   uniformprior = nd.uniformprior;
   return *this;
   }
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-double
-    DISTRIBUTION_gaussian::sample_from_likelihood(const double weight,
-                                                  const double mu) const
-    {
-        // get the current "scale" parameter of the normal likelihood
-        double s =  scale(0,0) * pow(trmult(0,0), 2);
-        double sigma2 = (weight != 0.0) ? s / weight : s;
-
-        // and then use the sample function from Random.cpp
-        return mu + sqrt(sigma2) * randnumbers::rand_normal();
-    }
-#endif
-// END: DSB //
-
 
 void DISTRIBUTION_gaussian::compute_deviance(const double * response,
                            const double * weight,
@@ -6574,25 +6115,6 @@ const DISTRIBUTION_gaussian_re & DISTRIBUTION_gaussian_re::operator=(
   return *this;
   }
 
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-// this is the same as DISTRIBUTION_gaussian::sample_from_likelihood
-// todo: perhaps the other function is not needed because there cannot be any random effects??
-double
-    DISTRIBUTION_gaussian_re::sample_from_likelihood(const double weight,
-                                                     const double mu) const
-    {
-        // get the current "scale" parameter of the normal likelihood
-        double s =  scale(0,0) * pow(trmult(0,0), 2);
-        double sigma2 = (weight != 0.0) ? s / weight : s;
-
-        // and then use the sample function from Random.cpp
-        return mu + sqrt(sigma2) * randnumbers::rand_normal();
-    }
-#endif
-// END: DSB //
-
 void DISTRIBUTION_gaussian_re::compute_deviance(const double * response,
                            const double * weight,
                            const double * mu, double * deviance,
@@ -6739,30 +6261,6 @@ const DISTRIBUTION_lognormal & DISTRIBUTION_lognormal::operator=(
   DISTRIBUTION_gaussian::operator=(DISTRIBUTION_gaussian(nd));
   return *this;
   }
-
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-double
-    DISTRIBUTION_lognormal::sample_from_likelihood(const double weight,
-                                                   const double mu) const
-    {
-        // get the current scale parameter of the normal likelihood
-        double s = scale(0,0) * pow(trmult(0,0), 2);
-
-        // and the current mean parameter
-        double m = log(mu) - 0.5 * s;
-        // todo: why doesn't this depend on sigma2 but on s? It is also like that in the compute_deviance function below!
-
-        // the variance parameter then depends again on the weight
-        double sigma2 = (weight != 0.0) ? s / weight : s;
-
-        // finally we can draw from the lognormal distribution
-        return exp(m + sqrt(sigma2) * randnumbers::rand_normal());
-    }
-#endif
-// END: DSB //
-
 
 void DISTRIBUTION_lognormal::compute_deviance(const double * response,
                            const double * weight,
@@ -7077,23 +6575,6 @@ bool DISTRIBUTION_binomial::posteriormode_converged(const unsigned & itnr)
 
   }
 
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-double
-    DISTRIBUTION_binomial::sample_from_likelihood(const double weight,
-                                                  const double mu) const
-    {
-        // determine the size parameter
-        double size = (weight != 0.0) ? weight : 1.0;
-
-        // use the sample function from Random.cpp
-        return randnumbers::rand_binom(size, mu);
-    }
-#endif
-// END: DSB //
-
-
 void DISTRIBUTION_binomial::compute_deviance(const double * response,
                const double * weight,const double * mu,double * deviance,
                double * deviancesat,
@@ -7286,22 +6767,6 @@ void DISTRIBUTION_binomial_latent::outoptions(void)
   optionsp->out("\n");
   optionsp->out("\n");
   }
-
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-double
-    DISTRIBUTION_binomial_latent::sample_from_likelihood(const double weight,
-                                                         const double mu) const
-    {
-        // determine the size parameter
-        double size = (weight != 0.0) ? weight : 1.0;
-
-        // use the sample function from Random.cpp
-        return randnumbers::rand_binom(size, mu);
-    }
-#endif
-// END: DSB //
 
 void DISTRIBUTION_binomial_latent::compute_deviance(const double * response,
           const double * weight, const double * mu,double * deviance,
@@ -7641,22 +7106,6 @@ void DISTRIBUTION_binomial_logit_latent::outoptions(void)
   optionsp->out("\n");
   optionsp->out("\n");
   }
-
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-double
-    DISTRIBUTION_binomial_logit_latent::sample_from_likelihood(const double weight,
-                                                               const double mu) const
-    {
-        // determine the size parameter
-        double size = (weight != 0.0) ? weight : 1.0;
-
-        // use the sample function from Random.cpp
-        return randnumbers::rand_binom(size, mu);
-    }
-#endif
-// END: DSB //
 
 void DISTRIBUTION_binomial_logit_latent::compute_deviance(
           const double * response, const double * weight,
@@ -8072,21 +7521,6 @@ void DISTRIBUTION_poisson::compute_IWLS_weight_tildey(double * response,
   *tildey =  (*response - mu)/mu;
 
   }
-
-// BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-double
-    DISTRIBUTION_poisson::sample_from_likelihood(const double weight,
-                                                 const double mu) const
-    {
-        // derive the mean for the Poisson distribution
-        double m = (weight != 0.0) ? weight * mu : mu;
-
-        // then use the sample function from Random.cpp
-        return randnumbers::rand_pois(m);
-    }
-#endif
-// END: DSB //
 
 void DISTRIBUTION_poisson::compute_deviance(const double * response,
                                             const double * weight,

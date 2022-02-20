@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19415,10 +19415,10 @@ double DISTR_bivprobit2_rho::loglikelihood_weightsone(double * response,
 
   vector<double> lower(3);
   vector<double> upper(3);
+  lower[0] = -DBL_MAX;
   lower[1] = -DBL_MAX;
-  lower[2] = -DBL_MAX;
-  upper[1] = (*worklin[1]);
-  upper[2] = (*worklin[0]);
+  upper[0] = (*worklin[1]);
+  upper[1] = (*worklin[0]);
   double r;
   if (*linpred <= -100)
     r  = -0.99995;
@@ -19428,12 +19428,12 @@ double DISTR_bivprobit2_rho::loglikelihood_weightsone(double * response,
     r = (*linpred)/pow((1+pow((*linpred),2)),0.5);
 
   double p = 0;
-  double p1 = randnumbers::Phi2(upper[1]);
-  double p2 = randnumbers::Phi2(upper[2]);
-  double p11 = randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
-  double p10 = p1-p11;//randnumbers::pbivn(lower[1], upper[1], lower[2], -upper[2], -r);
-  double p01 = p2-p11;//randnumbers::pbivn(lower[1], -upper[1], lower[2], upper[2], -r);
-  double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
+  double p1 = randnumbers::Phi2(upper[0]);
+  double p2 = randnumbers::Phi2(upper[1]);
+  double p11 = randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
+  double p10 = p1-p11;//randnumbers::pbivn(lower[0], upper[0], lower[1], -upper1[1], -r);
+  double p01 = p2-p11;//randnumbers::pbivn(lower[0], -upper[0], lower[1], upper[1], -r);
+  double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
   if((*response1p)>0)
     {
     if((*response2p)<=0)
@@ -19485,10 +19485,10 @@ void DISTR_bivprobit2_rho::compute_iwls_wweightschange_weightsone(
 
   vector<double> lower(3);
   vector<double> upper(3);
+  lower[0] = -DBL_MAX;
   lower[1] = -DBL_MAX;
-  lower[2] = -DBL_MAX;
-  upper[1] = (*worklin[1]);
-  upper[2] = (*worklin[0]);
+  upper[0] = (*worklin[1]);
+  upper[1] = (*worklin[0]);
   double r;
   if (*linpred <= -100)
     r  = -0.99995;
@@ -19502,12 +19502,12 @@ void DISTR_bivprobit2_rho::compute_iwls_wweightschange_weightsone(
   double nucont;
   double dens = randnumbers::dbivn((*worklin[1]),(*worklin[0]),r);
   double p = 0;
-  double p1 = randnumbers::Phi2(upper[1]);
-  double p2 = randnumbers::Phi2(upper[2]);
-  double p11 = randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
-  double p10 = p1-p11;//randnumbers::pbivn(lower[1], upper[1], lower[2], -upper[2], -r);
-  double p01 = p2-p11;//randnumbers::pbivn(lower[1], -upper[1], lower[2], upper[2], -r);
-  double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
+  double p1 = randnumbers::Phi2(upper[0]);
+  double p2 = randnumbers::Phi2(upper[1]);
+  double p11 = randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
+  double p10 = p1-p11;//randnumbers::pbivn(lower[0], upper[0], lower[1], -upper[1], -r);
+  double p01 = p2-p11;//randnumbers::pbivn(lower[0], -upper[0], lower[1], upper[1], -r);
+  double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
   if((*response1p)>0)
     {
     if((*response2p)<=0)
@@ -19684,18 +19684,18 @@ void DISTR_bivprobit2_mu::compute_deviance_mult(vector<double *> response,
 
      vector<double> lower(3);
     vector<double> upper(3);
+    lower[0] = -DBL_MAX;
     lower[1] = -DBL_MAX;
-    lower[2] = -DBL_MAX;
-    upper[1] = mu_1;
-    upper[2] = mu_2;
+    upper[0] = mu_1;
+    upper[1] = mu_2;
     double r = (*worktransformlin[0]);
     double p = 0;
-    double p1 = randnumbers::Phi2(upper[1]);
-    double p2 = randnumbers::Phi2(upper[2]);
-    double p11 = randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
-    double p10 = p1-p11;//randnumbers::pbivn(lower[1], upper[1], lower[2], -upper[2], -r);
-    double p01 = p2-p11;//randnumbers::pbivn(lower[1], -upper[1], lower[2], upper[2], -r);
-    double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
+    double p1 = randnumbers::Phi2(upper[0]);
+    double p2 = randnumbers::Phi2(upper[1]);
+    double p11 = randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
+    double p10 = p1-p11;//randnumbers::pbivn(lower[0], upper[0], lower[1], -upper[1], -r);
+    double p01 = p2-p11;//randnumbers::pbivn(lower[0], -upper[0], lower[1], upper[1], -r);
+    double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
     if((*response[2])>0)
       {
       if((*response[1])<=0)
@@ -19807,18 +19807,18 @@ double DISTR_bivprobit2_mu::loglikelihood_weightsone(double * response,
 
   vector<double> lower(3);
   vector<double> upper(3);
+  lower[0] = -DBL_MAX;
   lower[1] = -DBL_MAX;
-  lower[2] = -DBL_MAX;
-  upper[1] = (*linpred);
-  upper[2] = (*worklin[1]);
+  upper[0] = (*linpred);
+  upper[1] = (*worklin[1]);
   double r = (*worktransformlin[0]);
   double p = 0;
-  double p1 = randnumbers::Phi2(upper[1]);
-  double p2 = randnumbers::Phi2(upper[2]);
-  double p11 = randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
-  double p10 = p1-p11;//randnumbers::pbivn(lower[1], upper[1], lower[2], -upper[2], -r);
-  double p01 = p2-p11;//randnumbers::pbivn(lower[1], -upper[1], lower[2], upper[2], -r);
-  double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
+  double p1 = randnumbers::Phi2(upper[0]);
+  double p2 = randnumbers::Phi2(upper[1]);
+  double p11 = randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
+  double p10 = p1-p11;//randnumbers::pbivn(lower[0], upper[0], lower[1], -upper[1], -r);
+  double p01 = p2-p11;//randnumbers::pbivn(lower[0], -upper[0], lower[1], upper[1], -r);
+  double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
   if((*response)>0)
     {
     if((*response2p)<=0)
@@ -19871,22 +19871,22 @@ void DISTR_bivprobit2_mu::compute_iwls_wweightschange_weightsone(
 
   vector<double> lower(3);
   vector<double> upper(3);
+  lower[0] = -DBL_MAX;
   lower[1] = -DBL_MAX;
-  lower[2] = -DBL_MAX;
-  upper[1] = (*linpred);
-  upper[2] = (*worklin[1]);
+  upper[0] = (*linpred);
+  upper[1] = (*worklin[1]);
   double r = (*worktransformlin[0]);
   double p;
   double arg = ((*worklin[1])-r*(*linpred))/pow((1-r*r),0.5);
   double nucont;
   double prop = randnumbers::Phi2(arg);
-  double dens = randnumbers::phi(upper[1]);
-  double p1 = randnumbers::Phi2(upper[1]);
-  double p2 = randnumbers::Phi2(upper[2]);
-  double p11 = randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
-  double p10 = p1-p11;//randnumbers::pbivn(lower[1], upper[1], lower[2], -upper[2], -r);
-  double p01 = p2-p11;//randnumbers::pbivn(lower[1], -upper[1], lower[2], upper[2], -r);
-  double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[1], upper[1], lower[2], upper[2], r);
+  double dens = randnumbers::phi(upper[0]);
+  double p1 = randnumbers::Phi2(upper[0]);
+  double p2 = randnumbers::Phi2(upper[1]);
+  double p11 = randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
+  double p10 = p1-p11;//randnumbers::pbivn(lower[0], upper[0], lower[1], -upper[1], -r);
+  double p01 = p2-p11;//randnumbers::pbivn(lower[0], -upper[0], lower[1], upper[1], -r);
+  double p00 = 1-p11-p10-p01;//randnumbers::pbivn(lower[0], upper[0], lower[1], upper[1], r);
   if((*response)>0)
     {
     if((*response2p)<=0)

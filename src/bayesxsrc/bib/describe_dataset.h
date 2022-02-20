@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -37,22 +37,22 @@ __published:	// Komponenten, die von der IDE verwaltet werden
     TScrollBar *VertScrollBar;
     TScrollBar *HorzScrollBar;
     void __fastcall FormActivate(TObject *Sender);
-    
-    
-    
+
+
+
     void __fastcall VertScrollBarChange(TObject *Sender);
     void __fastcall FormResize(TObject *Sender);
-    
+
     void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
-    
+
         void __fastcall HorzScrollBarChange(TObject *Sender);
-    
+
 private:	// Benutzerdeklarationen
 public:		// Benutzerdeklarationen
 dataset * datap;
 ST::string dataname;
     __fastcall Tdatasetform(TComponent* Owner);
-void fillGrid(void);    
+void fillGrid(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tdatasetform *datasetform;

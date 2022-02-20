@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -28,21 +28,6 @@ namespace MCMC
 //------------------------------------------------------------------------------
 //----------------- class FULLCOND_random --------------------------------------
 //------------------------------------------------------------------------------
-
-  // BEGIN: DSB //
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  void FULLCOND_random::set_mscheck(const bool & val)
-    {
-    mscheck = val;
-    if(mscheck)
-      {
-      ST::string path = samplepath.substr(0,samplepath.length()-4);
-      likep->initialise_mscheck(path, index, nrpar-includefixed, posbeg, posend);
-      }
-    }
-#endif
-  // END: DSB //
-
 
 void FULLCOND_random::init_name(const ST::string & na)
     {
@@ -887,13 +872,6 @@ FULLCOND_random::FULLCOND_random(const FULLCOND_random & fc)
   df_lambdaold2 = fc.df_lambdaold2;
   lambdaconst=fc.lambdaconst;
   data2 = fc.data2;
-
-  // BEGIN: DSB //
-  #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  mscheck = fc.mscheck;
-  #endif
-  // END: DSB //
-
   }
 
 
@@ -928,13 +906,6 @@ const FULLCOND_random & FULLCOND_random::
   df_lambdaold2 = fc.df_lambdaold2;
   lambdaconst=fc.lambdaconst;
   data2 = fc.data2;
-
-  // BEGIN: DSB //
-  #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-  mscheck = fc.mscheck;
-  #endif
-  // END: DSB //
-
   return *this;
   }
 
@@ -947,42 +918,6 @@ void FULLCOND_random::update(void)
   else
     transform = 1;
 
-  // BEGIN: DSB //
-  #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-    if (mscheck)
-        {
-            // allocate storage for the random effects prior samples
-            datamatrix bsamples = datamatrix(beta.rows(), beta.cols());
-
-            // draw from the random effects prior
-            double sigma = sqrt(sigma2);
-
-            // draw a random effect from the prior for each individual
-            // so we must process all rows of bsamples (?)
-
-            // however, if randomslope is true, the last effect is the fixed effect (includefixed == true).
-            if(randomslope && includefixed)
-            {
-                for (unsigned int i = 0; i < bsamples.rows() - 1; i++)
-                {
-                    bsamples(i, 0) = sigma * rand_normal();
-                }
-                bsamples(bsamples.rows() - 1, 0) = beta(bsamples.rows() - 1, 0);
-            }
-            else
-            {
-                for (unsigned int i = 0; i < bsamples.rows(); i++)
-                {
-                    bsamples(i, 0) = sigma * rand_normal();
-                }
-            }
-
-            // update the linear predictors accordingly
-            update_linpred_mscheck(bsamples, beta);
-
-        }
-  #endif
-  // END: DSB //
 
   FULLCOND::update();
 
@@ -1334,55 +1269,7 @@ void FULLCOND_random::update_linpred_diff(datamatrix & b1,datamatrix & b2)
         likep->add_linearpred(*workb1-*workb2,*itbeg,*itend,index,column);
       }
     }
-
   }
-
-    // BEGIN: DSB //
-    #if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-    void
-    FULLCOND_random::update_linpred_mscheck(datamatrix & priorSamples,
-                                            datamatrix & posteriorSamples)
-    {
-        // these pointers are needed both for random slopes and random intercepts:
-
-        double * prior = priorSamples.getV();
-        double * posterior = posteriorSamples.getV();
-
-        vector<unsigned>::iterator itbeg = posbeg.begin();
-        vector<unsigned>::iterator itend = posend.begin();
-
-        // if this random effect is a random slope:
-        if (randomslope)
-        {
-            // get the index and covariate data pointers, similarly as in update_linpred_diff...
-            int * workindex = index.getV();
-            double * workdata = data.getV();
-
-            // note that if a fixed effect is included (then includefixed is true), we only
-            // go up to the last but one parameter, in order not to run into segmentation faults
-            for (unsigned int i = 0; i < nrpar - includefixed; i++, prior++, posterior++, ++itbeg, ++itend)
-            {
-                // compute the difference prior-posterior, multiply with the covariate
-                // value and put thant into the predchange container,
-                // for all [itbeg:itend] indices.
-                for (unsigned int j = * itbeg; j <= * itend; j++, workindex++, workdata++)
-                {
-                    likep->add_linearpred_mscheck((* prior - * posterior) * (* workdata), unsigned(* workindex));
-                }
-            }
-        }
-        else
-        {
-            // process each sample
-            for (unsigned int i = 0; i < nrpar; i++, prior++, posterior++, ++itbeg, ++itend)
-            {
-                likep->add_linearpred_mscheck(*prior - *posterior, * itbeg, * itend, index);
-            }
-        }
-
-    }
-    #endif
-    // END: DSB //
 
 void FULLCOND_random::update_linpred(const bool & add)
   {

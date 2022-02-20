@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,16 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<StatwinFrame.h>
-
-#endif
 
 #include"mcmcsimul.h"
 #include<time.h>
@@ -364,44 +354,8 @@ bool MCMCsimulate::simulate(const vector<ST::string> & header, const int & seed,
         likep_mult[nrmodels-1-i]->update_predict();
       }
 
-#if defined(BORLAND_OUTPUT_WINDOW)
-    Application->ProcessMessages();
-
-    if (Frame->stop)
-      {
-//      genoptions->out("USER BREAK\n");
-      break;
-      }
-
-    if (Frame->pause)
-      {
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("SIMULATION PAUSED\n");
-      genoptions_mult[0]->out("Click CONTINUE to proceed\n");
-      genoptions_mult[0]->out("\n");
-
-      while (Frame->pause)
-        {
-        Application->ProcessMessages();
-        }
-
-      genoptions_mult[0]->out("SIMULATION CONTINUED\n");
-      genoptions_mult[0]->out("\n");
-      }
-#elif defined(JAVA_OUTPUT_WINDOW)
-      bool stop = genoptions_mult[0]->adminb_p->breakcommand();
-      if(stop)
-        break;
-#endif
-
     } // end: for (i=1;i<=genoptions->iterations;i++)
 
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-    if (!Frame->stop)
-#elif defined(JAVA_OUTPUT_WINDOW)
-    if (!genoptions_mult[0]->adminb_p->get_stop())
-#endif
       {
       genoptions_mult[0]->out("\n");
       genoptions_mult[0]->out("SIMULATION TERMINATED\n",true);
@@ -474,52 +428,6 @@ bool MCMCsimulate::simulate(const vector<ST::string> & header, const int & seed,
 
 
       } // end: if Frame->stop
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-    else
-      {
-
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("SIMULATION TERMINATED BY USER BREAK\n");
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("Estimation results: none\n");
-      genoptions_mult[0]->out("\n");
-
-      for(i=0;i<nrmodels;i++)
-        {
-        if (likepexisting)
-          likep_mult[i]->reset();
-        }
-
-      for(j=0;j<fullcondp.size();j++)
-        fullcondp[j]->reset();
-
-
-      return true;
-      }
-#elif defined(JAVA_OUTPUT_WINDOW)
-    else
-      {
-
-      genoptions_mult[0]->out("\n");
-      genoptions_mult[0]->out("Estimation results: none\n");
-      genoptions_mult[0]->out("\n");
-
-
-      for(i=0;i<nrmodels;i++)
-        {
-        if (likepexisting)
-          likep_mult[i]->reset();
-        }
-
-
-      for(j=0;j<fullcondp.size();j++)
-        fullcondp[j]->reset();
-
-      return true;
-      }
-#endif
-
   } // end: no errors
 
   return true;
@@ -623,36 +531,6 @@ bool MCMCsimulate::posteriormode(const vector<ST::string> & header,
         if (allconverged)
           converged = true;
 
-        #if defined(BORLAND_OUTPUT_WINDOW)
-
-        Application->ProcessMessages();
-
-        if (Frame->stop)
-          {
-          break;
-          }
-
-        if (Frame->pause)
-          {
-          genoptions_mult[nrmodels-1-i]->out("\n");
-          genoptions_mult[nrmodels-1-i]->out("SIMULATION PAUSED\n");
-          genoptions_mult[nrmodels-1-i]->out("Click CONTINUE to proceed\n");
-          genoptions_mult[nrmodels-1-i]->out("\n");
-
-          while (Frame->pause)
-            {
-            Application->ProcessMessages();
-            }
-
-          genoptions_mult[nrmodels-1-i]->out("SIMULATION CONTINUED\n");
-          genoptions_mult[nrmodels-1-i]->out("\n");
-          }
-        #elif defined(JAVA_OUTPUT_WINDOW)
-        bool stop = genoptions_mult[0]->adminb_p->breakcommand();
-        if(stop)
-          break;
-        #endif
-
         it++;
 
         } // end:   while ((!converged) && (it <= 100))
@@ -684,11 +562,6 @@ bool MCMCsimulate::posteriormode(const vector<ST::string> & header,
 
     if (!presim)
       {
-      #if defined(BORLAND_OUTPUT_WINDOW)
-      if (!Frame->stop)
-      #elif defined(JAVA_OUTPUT_WINDOW)
-      if (!genoptions_mult[0]->adminb_p->get_stop())
-      #endif
         {
         genoptions_mult[nrmodels-1-i]->out("\n");
         genoptions_mult[nrmodels-1-i]->out("ESTIMATION RESULTS:\n",true);
@@ -712,44 +585,6 @@ bool MCMCsimulate::posteriormode(const vector<ST::string> & header,
 //        return false;
 
         } // end: if Frame->stop
-      #if defined(BORLAND_OUTPUT_WINDOW)
-      else
-        {
-
-        genoptions_mult[nrmodels-1-i]->out("\n");
-        genoptions_mult[nrmodels-1-i]->out(
-        "ESTIMATION TERMINATED BY USER BREAK\n");
-        genoptions_mult[nrmodels-1-i]->out("\n");
-        genoptions_mult[nrmodels-1-i]->out("Estimation results: none\n");
-        genoptions_mult[nrmodels-1-i]->out("\n");
-
-        if (likepexisting)
-          likep_mult[nrmodels-1-i]->reset();
-
-        for(j=begin[nrmodels-1-i];j<=end[nrmodels-1-i];j++)
-          fullcondp[j]->reset();
-
-        errors=true;
-//        return true;
-        }
-      #elif defined(JAVA_OUTPUT_WINDOW)
-      else
-        {
-
-        genoptions_mult[nrmodels-1-i]->out("\n");
-        genoptions_mult[nrmodels-1-i]->out("Estimation results: none\n");
-        genoptions_mult[nrmodels-1-i]->out("\n");
-
-        if (likepexisting)
-          likep_mult[nrmodels-1-i]->reset();
-
-        for(j=begin[nrmodels-1-i];j<=end[nrmodels-1-i];j++)
-          fullcondp[j]->reset();
-
-        errors=true;
-//        return true;
-        }
-      #endif
 
       } // end: if (!presim)
 
@@ -780,12 +615,6 @@ void MCMCsimulate::autocorr(const unsigned & lag,const ST::string & path)
     genoptions_mult[0]->out("Computing autocorrelation functions...\n");
     autocorr(lag,cmat);
 
-
-    #if defined(BORLAND_OUTPUT_WINDOW)
-    if (!Frame->stop)
-    #elif defined(JAVA_OUTPUT_WINDOW)
-    if (!genoptions_mult[0]->adminb_p->get_stop())
-    #endif
       {
       out << "lag ";
 
@@ -944,31 +773,9 @@ void MCMCsimulate::autocorr(const unsigned & lag,const ST::string & path)
         genoptions_mult[0]->out("\n");
         }
 
-    #if !defined(JAVA_OUTPUT_WINDOW)
       genoptions_mult[0]->out("They may be visualized using the R function 'plotautocor'.\n");
       genoptions_mult[0]->out("\n");
-    #endif
       } // end: if (!Frame->stop)
-    #if defined(BORLAND_OUTPUT_WINDOW)
-    else
-      {
-      genoptions_mult[0]->out("USER BREAK\n");
-      genoptions_mult[0]->out("No autocorrelation functions computed\n");
-      genoptions_mult[0]->out("\n");
-      out.close();
-      remove(path.strtochar());
-      }
-    #elif defined(JAVA_OUTPUT_WINDOW)
-    else
-      {
-//      genoptions->out("SIMULATION TERMINATED BY USER BREAK\n");
-      genoptions_mult[0]->out("No autocorrelation functions computed\n");
-      genoptions_mult[0]->out("\n");
-      out.close();
-      remove(path.strtochar());
-      }
-    #endif
-
     }  // end: if (p > 0)
   else
     {
@@ -1026,57 +833,11 @@ void MCMCsimulate::autocorr(const unsigned & lag,datamatrix & cmat)
           cmat.putCol(col,fullcondp[j]->compute_autocorr(lag,i,k));
           col++;
 
-          #if defined(BORLAND_OUTPUT_WINDOW)
-          Application->ProcessMessages();
-
-          if (Frame->stop)
-            {
-            break;
-            }
-
-          if (Frame->pause)
-            {
-            genoptions_mult[0]->out("\n");
-            genoptions_mult[0]->out("SIMULATION PAUSED\n");
-            genoptions_mult[0]->out("Click CONTINUE to proceed\n");
-            genoptions_mult[0]->out("\n");
-
-            while (Frame->pause)
-              {
-              Application->ProcessMessages();
-              }
-
-            genoptions_mult[0]->out("SIMULATION CONTINUED\n");
-            genoptions_mult[0]->out("\n");
-            }
-          #elif defined(JAVA_OUTPUT_WINDOW)
-          bool stop = genoptions_mult[0]->adminb_p->breakcommand();
-          if(stop)
-            break;
-          #endif
-
           }
 
       } // end: if (fullcondp[j]->sample_stored())
 
-    #if defined(BORLAND_OUTPUT_WINDOW)
-    Application->ProcessMessages();
-    if (Frame->stop)
-      {
-      cmat = datamatrix(1,1);
-      break;
-      }
-    #elif defined(JAVA_OUTPUT_WINDOW)
-//    Application->ProcessMessages();
-    if (genoptions_mult[0]->adminb_p->get_stop())
-      {
-      cmat = datamatrix(1,1);
-      break;
-      }
-    #endif
-
     } // end:  for(j=0;j<fullcondp.size();j++)
-
 
   }
 
@@ -1771,9 +1532,6 @@ const vector<ST::string> & path_stata)
 
 
 void MCMCsimulate::get_samples(
-#if defined(JAVA_OUTPUT_WINDOW)
-vector<ST::string> & newc,
-#endif
 const ST::string & path,const unsigned & step)
   {
   unsigned i;
@@ -1791,18 +1549,6 @@ const ST::string & path,const unsigned & step)
       filename = path + fullcondp[i]->get_title() + "_sample.raw";
       fullcondp[i]->get_samples(filename,step);
       genoptions_mult[0]->out(filename + "\n");
-      #if defined(JAVA_OUTPUT_WINDOW)
-
-      psname = path + fullcondp[i]->get_title() + "_sample.ps";
-      newc.push_back("dataset _dat");
-      newc.push_back("_dat.infile , nonote using " + filename);
-      newc.push_back("graph _g");
-      newc.push_back("_g.plotsample , replace outfile=" +
-                  psname  + " using _dat");
-      genoptions_mult[0]->out(psname + " (graphs)\n");
-      newc.push_back("drop _dat _g");
-
-      #endif
       genoptions_mult[0]->out("\n");
       }
     }
@@ -1817,18 +1563,6 @@ const ST::string & path,const unsigned & step)
         filename = likep_mult[i]->get_mean_sample();
         genoptions_mult[0]->out(filename+"\n");
         genoptions_mult[0]->out("\n");
-        #if defined(JAVA_OUTPUT_WINDOW)
-
-        psname = filename.substr(0,filename.length()-4) +   + ".ps";
-        newc.push_back("dataset _dat");
-        newc.push_back("_dat.infile , nonote using " + filename);
-        newc.push_back("graph _g");
-        newc.push_back("_g.plotsample , replace outfile=" +
-                      psname  + " using _dat");
-        genoptions_mult[0]->out(psname + " (graphs)\n");
-        newc.push_back("drop _dat _g");
-
-        #endif
         }
 
       if (likep_mult[i]->get_scaleexisting())
@@ -1836,42 +1570,13 @@ const ST::string & path,const unsigned & step)
         filename = likep_mult[i]->get_scale_sample();
         genoptions_mult[0]->out(filename+"\n");
         genoptions_mult[0]->out("\n");
-        #if defined(JAVA_OUTPUT_WINDOW)
-
-        psname = filename.substr(0,filename.length()-4) +   + ".ps";
-        newc.push_back("dataset _dat");
-        newc.push_back("_dat.infile , nonote using " + filename);
-        newc.push_back("graph _g");
-        newc.push_back("_g.plotsample , replace outfile=" +
-                      psname  + " using _dat");
-        genoptions_mult[0]->out(psname + " (graphs)\n");
-        newc.push_back("drop _dat _g");
-
-        #endif
-
         }
-
-// Begin: DSB
-#if !defined (__BUILDING_THE_DLL) & !defined(__BUILDING_GNU)
-      if (likep_mult[i]->get_mscheck())
-        {
-        likep_mult[i]->get_mssamples();
-        }
-#endif
-// End: DSB
       }
     }
 
   genoptions_mult[0]->out("\n");
   genoptions_mult[0]->out("Storing completed\n");
   genoptions_mult[0]->out("\n");
-  #if defined(BORLAND_OUTPUT_WINDOW)
-  genoptions_mult[0]->out(
-  "Sampled parameters may be visualized using the R\n");
-  genoptions_mult[0]->out("function 'plotsample'.\n");
-  genoptions_mult[0]->out("\n");
-  #endif
-
   }
 
 
@@ -1917,11 +1622,6 @@ void compare(const vector<ST::string> & files,ostream & out)
 
 
 } // end: namespace MCMC
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif
 
 
 

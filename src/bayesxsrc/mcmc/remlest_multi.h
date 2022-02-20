@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -26,10 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include "statmat_penalty.h"
 #include "fullcond.h"
 
-#if defined(JAVA_OUTPUT_WINDOW)
-#include"adminparse_basic.h"
-#endif
-
 using std::ofstream;
 
 //------------------------------------------------------------------------------
@@ -44,10 +40,6 @@ class remlest_multinomial
 //------------------------------------------------------------------------------
 
   private:
-
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adminb_p;
-  #endif
 
   ostream * logout;                         // Pointer to filestream for writing
                                             // output
@@ -113,9 +105,6 @@ class remlest_multinomial
   // Initialize from fullcond-objects
 
   remlest_multinomial(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adb,
-  #endif
   vector<MCMC::FULLCOND*> & fc,datamatrix & re,
           const ST::string & family, const ST::string & ofile,
           const int & maxiter, const double & lowerlimit, const double & epsi,
@@ -241,10 +230,6 @@ class remlest_multistate
 
   private:
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adminb_p;
-  #endif
-
   ostream * logout;                         // Pointer to filestream for writing
                                             // output
 
@@ -291,9 +276,6 @@ class remlest_multistate
   // CONSTRUCTOR 1: Initialize from fullcond-objects
 
   remlest_multistate(
-  #if defined(JAVA_OUTPUT_WINDOW)
-  administrator_basic * adb,
-  #endif
   vector<MCMC::FULLCOND*> & fc,datamatrix & re,
           const ST::string & family, const ST::string & ofile,
           const int & maxiter, const double & lowerlimit, const double & epsi,

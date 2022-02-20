@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,17 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include <vcl.h>
-#pragma hdrstop
-
-#include<describe_dataset.h>
-#endif
 
 #include "dataobj.h"
 
@@ -188,33 +177,17 @@ void dataobject::changedescription(void)
     describetext.push_back("Size of dataset:        " + ST::inttostring(s));
   }
 
-
-#if defined(JAVA_OUTPUT_WINDOW)
-dataobject::dataobject(administrator_basic * adb, administrator_pointer * adp,
-                       const ST::string & n,ofstream * lo,istream * in)
-			 : statobject(adb,n,"dataset",lo,in)
-	 {
-     adminp_p = adp;
-	 d = dataset(n,adb);
-	 create();
-	 }
-#else
 dataobject::dataobject(const ST::string & n,ofstream * lo,istream * in)
 			 : statobject(n,"dataset",lo,in)
 	 {
 	 d = dataset(n);
 	 create();
 	 }
-#endif
-
 
 dataobject::dataobject(const dataobject & o) : statobject(statobject(o))
   {
   create();
   d = o.d;
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = o.adminp_p;
-  #endif
   }
 
 
@@ -225,9 +198,6 @@ const dataobject & dataobject::operator=(const dataobject & o)
   statobject::operator=(statobject(o));
   create();
   d = o.d;
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminp_p = o.adminp_p;
-  #endif
   return *this;
   }
 
@@ -276,11 +246,7 @@ void infilerun(dataobject & o)
   ifstream fin;
   ST::open(fin,path);
 
-  #if defined(JAVA_OUTPUT_WINDOW)
-  o.d.read(o.adminb_p,fin,missingvalue,o.maxobs.getvalue(),names);
-  #else
   o.d.read(fin,missingvalue,o.maxobs.getvalue(),names);
-  #endif
   fin.close();
   o.errormessages = o.d.geterrormessages();
   if ((o.errormessages.empty()) && (o.nonote.getvalue()==false))
@@ -416,19 +382,11 @@ void outfilerun(dataobject & o)
 	 if (expression.length() > 0)
 		{
 		realvar v = o.d.eval_exp(expression);
-        #if defined(JAVA_OUTPUT_WINDOW)
-		nrwritten = o.d.write(o.adminb_p,fout,names,o.header.getvalue(),v);
-        #else
         nrwritten = o.d.write(fout,names,o.header.getvalue(),v);
-        #endif
 		}
 	 else
        {
-        #if defined(JAVA_OUTPUT_WINDOW)
-	   nrwritten = o.d.write(o.adminb_p,fout,names,o.header.getvalue());
-       #else
 	   nrwritten = o.d.write(fout,names,o.header.getvalue());
-       #endif
        }
 
      o.errormessages = o.d.geterrormessages();
@@ -772,28 +730,11 @@ void dataobject::describe(const optionlist & globaloptions)
   {
   if(d.getVarnames().size()>0 && d.obs() > 0)
   {
-#if defined(BORLAND_OUTPUT_WINDOW)
-    datasetform->datap = &d;
-    datasetform->dataname = getname();
-    datasetform->ShowModal();
-#elif defined(JAVA_OUTPUT_WINDOW)
-    adminp_p->set_datap(&d);
-    jmethodID javashowdata = adminb_p->Java->GetMethodID(
-    adminb_p->BayesX_cls, "JavaShowData", "()V");
-    adminb_p->Java->CallVoidMethod(adminb_p->BayesX_obj, javashowdata);
-#else
     out("ERROR: method describe is not available in this version\n");
-#endif
   }
   else
     out("NOTE: dataset does not contain any data\n");
   }
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif
 
 
 

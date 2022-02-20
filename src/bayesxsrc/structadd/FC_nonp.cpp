@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -360,8 +360,8 @@ void FC_nonp::update_IWLS(void)
   unsigned i;
   double * workparam;
 
-  lambda = likep->get_scale()/tau2;
-//  lambda = 1/tau2;
+//  lambda = likep->get_scale()/tau2;
+  lambda = 1/tau2;
 
   if (optionsp->nriter == 1)
     {
@@ -673,17 +673,6 @@ void FC_nonp::update_gaussian_transform(void)
 
 void FC_nonp::update_gaussian(void)
   {
-
-  // TEST
-  // ofstream out0("c:\\bayesx\\testh\\results\\beta_re.res");
-  // beta.prettyPrint(out0);
-
-  // ofstream out00("c:\\bayesx\\testh\\results\\intvar_re.res");
-  // designp->intvar.prettyPrint(out00);
-
-
-  // TEST
-
   if (orthogonal)
     update_gaussian_transform();
   else
@@ -696,13 +685,6 @@ void FC_nonp::update_gaussian(void)
 
     double sigmaresp = sqrt(likep->get_scale());
     lambda = likep->get_scale()/tau2;
-    // cout << lambda << endl;
-//    param.prettyPrint(cout);
-
-    // TEST
-    //  ofstream out("c:\\bayesx\\testh\\results\\responseRE.res");
-    //  likep->response.prettyPrint(out);
-    // TEST
 
     designp->compute_partres(partres,beta);
 
@@ -733,15 +715,7 @@ void FC_nonp::update_gaussian(void)
 
     designp->precision.solve(*(designp->XWres_p),paramhelp,param);
 
-/*    ofstream out1("c:/temp/beta1.raw");
-    param.prettyPrint(out1);
-    out1.close();*/
-
     perform_centering();
-
-/*    ofstream out2("c:/temp/beta2.raw");
-    param.prettyPrint(out2);
-    out2.close();*/
 
     designp->compute_f(param,paramlin,beta,fsample.beta);
 
@@ -775,12 +749,6 @@ void FC_nonp::update_gaussian(void)
       acceptance++;
       }
 
-
-    // TEST
-    // ofstream out("c:\\bayesx\\testh\\results\\beta_re.res");
-    // beta.prettyPrint(out);
-    // TEST
-
     if (designp->position_lin!=-1)
       {
       fsample.update();
@@ -801,19 +769,6 @@ void FC_nonp::update_gaussian(void)
 
 void FC_nonp::update_isotonic(void)
   {
-
-  // TEST
-
-   // ofstream out0("c:\\bayesx\\testh\\results\\beta_f.res");
-   // beta.prettyPrint(out0);
-   // out0.close();
-
-   // ofstream out00("c:\\bayesx\\testh\\results\\intvar_f.res");
-   // designp->intvar.prettyPrint(out00);
-   // out00.close();
-
-  // TEST
-
   unsigned i,j;
 
   bool lambdaconst = false;
@@ -913,17 +868,15 @@ void FC_nonp::update_isotonic(void)
     count++;
     }
 
-  /*
-  TEST
-  ofstream out("c:\\bayesx\\test\\results\\paramhelp.res");
-  paramhelp.prettyPrint(out);
-
-  ofstream out2("c:\\bayesx\\test\\results\\param.res");
-  param.prettyPrint(out2);
-  TEST
-  */
+  ofstream out("c:/temp/param.raw");
+  param.prettyPrint(out);
+  out.close();
 
   perform_centering();
+
+  ofstream out2("c:/temp/param2.raw");
+  param.prettyPrint(out2);
+  out2.close();
 
   designp->compute_f(param,paramlin,beta,fsample.beta);
 
@@ -982,9 +935,9 @@ bool FC_nonp::posteriormode_transform(void)
 
   betaold.assign(beta);
 
-  if(likep->dgexists)
-    designp->compute_partres_multiplicative(partres,beta,true);
-  else
+//  if(likep->dgexists)
+//    designp->compute_partres_multiplicative(partres,beta,true);
+//  else
     designp->compute_partres(partres,beta,true);
 
   if (designp->QtRinv.rows() <= 1)
@@ -1060,9 +1013,9 @@ bool FC_nonp::posteriormode(void)
 
     betaold.assign(beta);
 
-    if(likep->dgexists)
-      designp->compute_partres_multiplicative(partres,beta,true);
-    else
+//    if(likep->dgexists)
+//      designp->compute_partres_multiplicative(partres,beta,true);
+//    else
       designp->compute_partres(partres,beta,true);
 
     designp->compute_XtransposedWX();
@@ -1070,16 +1023,6 @@ bool FC_nonp::posteriormode(void)
     designp->compute_XtransposedWres(partres, lambda, tau2);
 
     designp->compute_precision(lambda);
-
-/*    ofstream out("c:\\temp\\precision.raw");
-    designp->precision.print4(out);
-    out.close();
-    ofstream out2("c:\\temp\\XWX.raw");
-    designp->XWX.print4(out2);
-    out2.close();
-    ofstream out3("c:\\temp\\XWres.raw");
-    designp->XWres.prettyPrint(out3);
-    out3.close();*/
 
     designp->precision.solve(*(designp->XWres_p),param);
 
@@ -1135,21 +1078,12 @@ bool FC_nonp::posteriormode(void)
     designp->compute_meaneffect(masterp->level1_likep[equationnr],meaneffect,
                                 beta,meaneffect_sample.beta,computemeaneffect,
                                 meaneffectconstant);
-
-//    ofstream out("c:\\bayesx\\trunk\\testh\\results\\intvar.raw");
-//    designp->intvar.prettyPrint(out);
-
     }
 
   if(multiplicative)
     {
     designp->compute_effect(multlikep->fx,beta,MCMC::Function);
-
-/*    ofstream out("c:/temp/fx.raw");
-    (multlikep->fx).prettyPrint(out);
-    out.close();*/
     }
-
   return FC::posteriormode();
   }
 
@@ -2098,7 +2032,6 @@ void FC_nonp::centerparam_sample_var(void)
 
 void FC_nonp::centerparam_sample(void)
   {
-
   int nrrest = designp->basisNull.rows();
   int nrpar = param.rows();
 
@@ -2117,60 +2050,6 @@ void FC_nonp::centerparam_sample(void)
 
     designp->precision.solve(designp->basisNullt[i],helpcenter);
 
-/*    datamatrix helpcenter2(nrpar,1,0.0);
-    datamatrix helpcenter3(nrpar,1,0.0);
-    designp->precision.solveL(designp->basisNullt[i],helpcenter2);
-
-    ofstream out0("c:/temp/lhs.res");
-    helpcenter2.prettyPrint(out0);
-    out0.close();
-
-    vector<double> help;
-    for(j=0; j<helpcenter2.rows(); j++)
-      help.push_back(helpcenter2(j,0));
-    designp->precision.solveU(helpcenter2);
-    designp->precision.solveU(help);
-
-    for(j=0; j<helpcenter2.rows(); j++)
-      helpcenter3(j,0) = help[j];
-
-    ofstream out1("c:/temp/res1.res");
-    helpcenter2.prettyPrint(out1);
-    out1.close();
-
-    ofstream out2("c:/temp/res2.res");
-    helpcenter3.prettyPrint(out2);
-    out2.close();
-
-   ofstream out10("c:/temp/precisionL.res");
-   (designp->precision).print4L(out10);
-   out10.close();*/
-
-/*   datamatrix helpcenter2(nrpar,1,0.0);
-   designp->precision.solveL(designp->basisNullt[i],helpcenter2);
-
-   ofstream out8("c:\\temp\\helpcenter.res");
-   helpcenter.prettyPrint(out8);
-   out8.close();
-   ofstream out9("c:\\temp\\basisnull1.res");
-   (designp->basisNullt[i]).prettyPrint(out9);
-   out9.close();
-   ofstream out10("c:\\temp\\precision.res");
-   (designp->precision).print4(out10);
-   out10.close();
-   ofstream out11("c:\\temp\\precisionL.res");
-   (designp->precision).print4L(out11);
-   out11.close();
-   ofstream out12("c:\\temp\\helpcenter2.res");
-   helpcenter2.prettyPrint(out12);
-   out12.close();
-
-   designp->precision.solveU(helpcenter2);
-
-   ofstream out13("c:\\temp\\helpcenter3.res");
-   helpcenter2.prettyPrint(out13);
-   out13.close();*/
-
     helpcenterp = helpcenter.getV();
 
     for (j=0;j<nrpar;j++,helpcenterp++,Vcentertp++,Vcenterp+=nrrest)
@@ -2180,61 +2059,12 @@ void FC_nonp::centerparam_sample(void)
       }
     }
 
-  // TEST
-
-/*   ofstream out0("c:\\temp\\basisnull1.res");
-   (designp->basisNullt[0]).prettyPrint(out0);
-   out0.close();
-   if(designp->basisNullt.size()>1)
-     {
-     ofstream out01("c:\\temp\\basisnull2.res");
-     (designp->basisNullt[1]).prettyPrint(out01);
-     out01.close();
-     ofstream out02("c:\\temp\\basisnull3.res");
-     (designp->basisNullt[2]).prettyPrint(out02);
-     out02.close();
-     }
-
-   ofstream out("c:\\temp\\Vcenter.res");
-   Vcenter.prettyPrint(out);
-   out.close();
-
-   ofstream out2("c:\\temp\\praecision.res");
-   designp->precision.print4(out2);
-   out2.close();*/
-
-  // TEST
-
   Wcenter.mult(designp->basisNull,Vcenter);
   Ucenter = Wcenter.inverse()*Vcentert;
   ccenter.mult(designp->basisNull,param);
   Utc = Ucenter.transposed()*ccenter;
 
-  //  TEST
-
-/*   ofstream out4("c:\\temp\\param.res");
-   param.prettyPrint(out4);
-   out4.close();*/
-
-  //  TEST
-
   param.minus(param,Utc);
-
-  //  TEST
-/*   ofstream out5("c:\\temp\\paramneu.res");
-   param.prettyPrint(out5);
-   out5.close();
-
-   ofstream out6("c:\\temp\\Utc.res");
-   Utc.prettyPrint(out6);
-   out6.close();*/
-  //  TEST
-
-
-  //  TEST
-  //  ofstream out2("c:\\bayesx\\test\\results\\param.res");
-  //  param.prettyPrint(out2);
-  //  TEST
   }
 
 
@@ -2293,7 +2123,6 @@ void FC_nonp::centerparam_weight(void)
 
   for (i=0;i<nrparam;i++,workparam++)
     *workparam-= sum;
-
   }
 
 

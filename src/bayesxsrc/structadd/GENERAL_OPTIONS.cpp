@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,14 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-#include "StatResults.h"
-#include "statwinframe.h"
-
-#endif
-
 
 #include "GENERAL_OPTIONS.h"
 
@@ -56,17 +48,16 @@ GENERAL_OPTIONS::GENERAL_OPTIONS(void)
   sampleselval = 0.0;
   IWLSlineff=false;
   forceIWLS=false;
+  highspeedon=false;
   }
 
 
 GENERAL_OPTIONS::GENERAL_OPTIONS(
-#if defined(JAVA_OUTPUT_WINDOW)
-administrator_basic * abp,
-#endif
 const unsigned & it,const unsigned & bu,
                          const unsigned & st, const bool & sa,
                          const bool & cop, const unsigned & rot,
                          const bool & samsel, const double & samselval, const bool & fiwls,
+                         const bool & hso,
                          ostream * lo,
                          const double & l1,const double & l2)
   {
@@ -89,24 +80,14 @@ const unsigned & it,const unsigned & bu,
   samplesel = samsel;
   sampleselval = samselval;
   forceIWLS = fiwls;
+  highspeedon = hso;
 
   (*logout) << flush;
-#if defined(BORLAND_OUTPUT_WINDOW)
-
-#elif defined(JAVA_OUTPUT_WINDOW)
-adminb_p = abp;
-#else
-//  if (logout->fail())
-//    logout = &cout;
-#endif
   }
 
 
 GENERAL_OPTIONS::GENERAL_OPTIONS(const GENERAL_OPTIONS & o)
   {
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = o.adminb_p;
-  #endif
   iterations = o.iterations;
   burnin = o.burnin;
   step = o.step;
@@ -128,6 +109,7 @@ GENERAL_OPTIONS::GENERAL_OPTIONS(const GENERAL_OPTIONS & o)
   sampleselval = o.sampleselval;
   IWLSlineff = o.IWLSlineff;
   forceIWLS = o.forceIWLS;
+  highspeedon = o.highspeedon;
   }
 
 
@@ -135,9 +117,6 @@ const GENERAL_OPTIONS & GENERAL_OPTIONS::operator=(const GENERAL_OPTIONS & o)
   {
   if (this == &o)
     return *this;
-  #if defined(JAVA_OUTPUT_WINDOW)
-  adminb_p = o.adminb_p;
-  #endif
   iterations = o.iterations;
   burnin = o.burnin;
   step = o.step;
@@ -159,6 +138,7 @@ const GENERAL_OPTIONS & GENERAL_OPTIONS::operator=(const GENERAL_OPTIONS & o)
   sampleselval = o.sampleselval;
   IWLSlineff = o.IWLSlineff;
   forceIWLS = o.forceIWLS;
+  highspeedon = o.highspeedon;
   return *this;
   }
 
@@ -166,31 +146,9 @@ const GENERAL_OPTIONS & GENERAL_OPTIONS::operator=(const GENERAL_OPTIONS & o)
 void GENERAL_OPTIONS::out(const ST::string & s,bool thick,bool italic,
                           unsigned size,int r,int g, int b)
   {
-#if defined(BORLAND_OUTPUT_WINDOW)
-  ST::string sh = s;
-  sh = sh.replaceallsigns('\n',' ');
-  if (!Frame->suppoutput)
-    Results->ResultsRichEdit->Lines->Append(sh.strtochar());
- if (!(logout->fail()))
-    (*logout) << s << flush;
-#elif defined(JAVA_OUTPUT_WINDOW)
-
-  ST::string sh = s;
-  sh = sh.replaceallsigns('\n',' ');
-  sh = sh+"\n";
-
-  if (!adminb_p->get_suppressoutput())
-    adminb_p->Java->CallVoidMethod(adminb_p->BayesX_obj, adminb_p->javaoutput,
-    adminb_p->Java->NewStringUTF(sh.strtochar()),
-    thick, italic, size,r,g,b);
-
-  if (!(logout->fail()))
-    (*logout) << s << flush;
-#else
   cout << s;
   if (!(logout->fail()))
     (*logout) << s << flush;
-#endif
   }
 
 

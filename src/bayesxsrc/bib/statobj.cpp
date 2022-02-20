@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,19 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
-
-
-
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-
-#pragma package(smart_init)
-
-#include "StatResults.h"
-#include "statwinframe.h"
-
-#endif
 
 #include"statobj.h"
 
@@ -84,59 +71,6 @@ int statobject::parsecom(const ST::string & c, vector<command> & methods,
 
   }
 
-#if defined(BORLAND_OUTPUT_WINDOW)
-
-void statobject::out(const ST::string & c,bool thick,bool italic,unsigned size,
-                     int r, int g, int b,
-                     bool descr)
-  {
-  ST::string sh = c;
-  sh = sh.replaceallsigns('\n',' ');
-  if (!Frame->suppoutput)
-    Results->ResultsRichEdit->Lines->Append(sh.strtochar());
-  if (logout->is_open())
-    (*logout) << c << flush;
-
-  if (descr==true)
-	 describetext.push_back(c);
-  }
-
-
-void statobject::out(const vector<ST::string> & m,bool thick,bool italic,
-                     unsigned size,int r, int g, int b,bool descr)
-  {
-  for (unsigned i=0;i<m.size();i++)
-	 out(m[i],descr);
-  }
-
-#elif defined (JAVA_OUTPUT_WINDOW)
-
-void statobject::out(const ST::string & c,bool thick,bool italic,
-                     unsigned size,int r, int g, int b,bool descr)
-  {
-  ST::string sh = c;
-  sh = sh.replaceallsigns('\n',' ');
-  sh = sh+"\n";
-  if (!adminb_p->get_suppressoutput())
-    adminb_p->Java->CallVoidMethod(adminb_p->BayesX_obj, adminb_p->javaoutput,
-    adminb_p->Java->NewStringUTF(sh.strtochar()),thick,italic,size,r,g,b);
-  if (logout->is_open())
-    (*logout) << c << flush;
-
-  if (descr==true)
-	 describetext.push_back(c);
-  }
-
-
-void statobject::out(const vector<ST::string> & m,bool thick,
-                     bool italic, unsigned size,int r, int g, int b,bool descr)
-  {
-  for (unsigned i=0;i<m.size();i++)
-	 out(m[i],thick,italic,size,r,g,b,descr);
-  }
-
-#else
-
 void statobject::out(const ST::string & c,bool thick,bool italic,unsigned size,
                      int r, int g, int b,bool descr)
   {
@@ -156,8 +90,6 @@ void statobject::out(const vector<ST::string> & m,bool thick,bool italic,
 	 out(m[i],descr);
   }
 
-#endif
-
 void statobject::outerror(const ST::string & c)
   {
   out(c,true,true,12,255,0,0);
@@ -168,19 +100,6 @@ void statobject::outerror(const vector<ST::string> & c)
   out(c,true,true,12,255,0,0);
   }
 
-#if defined (JAVA_OUTPUT_WINDOW)
-statobject::statobject(administrator_basic * adb,
-                       const ST::string & n,const ST::string t,ofstream * lo,
-                       istream * in,ST::string p)
-  {
-  adminb_p = adb;
-  name = n;
-  type = t;
-  logout = lo;
-  input = in;
-  defaultpath = p;
-  }
-#else
 statobject::statobject(const ST::string & n,const ST::string t,ofstream * lo,
                        istream * in,ST::string p)
   {
@@ -190,13 +109,9 @@ statobject::statobject(const ST::string & n,const ST::string t,ofstream * lo,
   input = in;
   defaultpath = p;
   }
-#endif
 
 statobject::statobject(const statobject & so)
   {
-  #if defined (JAVA_OUTPUT_WINDOW)
-  adminb_p = so.adminb_p;
-  #endif
   name = so.name;
   type = so.type;
   describetext = so.describetext;
@@ -213,9 +128,6 @@ const statobject & statobject::operator=(const statobject & so)
   {
   if (this == &so)
 	 return *this;
-  #if defined (JAVA_OUTPUT_WINDOW)
-  adminb_p = so.adminb_p;
-  #endif
   name = so.name;
   type = so.type;
   describetext = so.describetext;
@@ -298,10 +210,4 @@ void statobject::describe(const optionlist & globaloptions)
   out ("\n");
 
   }
-
-
-#if defined(BORLAND_OUTPUT_WINDOW)
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
-#endif
 

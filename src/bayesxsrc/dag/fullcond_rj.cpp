@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -1868,18 +1868,7 @@ void FULLCOND_rj::switch_version_2(unsigned v_i, unsigned v_j)
 			total_number_ess = total_number_ess+list_ess[i].freq;
 		}
 
-	  	#if defined(MICROSOFT_VISUAL)
-		{
-			loop_end = __min(size_list, 10);
-		}
-		#else
-		{
-// Vorschlag:
-//			loop_end = min(size_list, unsigned (10)) ;
-			loop_end = std::min(size_list, unsigned (10)) ;
-		}
-		#endif
-
+		loop_end = std::min(size_list, unsigned (10)) ;
 
         loop_end = size_list - loop_end;
 

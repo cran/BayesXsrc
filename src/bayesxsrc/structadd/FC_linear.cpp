@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -719,8 +719,51 @@ void FC_linear::compute_Wpartres(datamatrix & linpred)
     }
   }
 
+/*void FC_linear::compute_Wpartres_multiplicative(datamatrix & linpred)
+  {
+  unsigned i;
+  double * workingweightp = likep->workingweight.getV();
+  double * workingresponsep = likep->workingresponse.getV();
+  double * residualp = residual.getV();
+  double * linpredp = linpred.getV();
 
-double FC_linear::compute_XtWpartres(double & mo)
+  double * predictorp;
+  if (likep->linpred_current==1)
+    predictorp = (likep->linearpred1).getV();
+  else
+    predictorp = (likep->linearpred2).getV();
+
+  double * worklinp_dg;
+  if (likep->dg->linpred_current==1)
+    worklinp_dg = (likep->dg->linearpred1).getV();
+  else
+    worklinp_dg = (likep->dg->linearpred2).getV();
+
+  double * fxp = (likep->fx).getV();
+
+  if (likep->wtype == wweightsnochange_one)
+    {
+    for (i=0;i<likep->nrobs;i++,workingresponsep++,
+                                residualp++,linpredp++,worklinp_dg++,fxp++,predictorp++)
+    cout << "argh (max)!!" << endl;
+    }
+  else
+    {
+    for (i=0;i<likep->nrobs;i++,workingweightp++,workingresponsep++,
+                                residualp++,linpredp++,worklinp_dg++,fxp++,predictorp++)
+      {
+//      cout << *workingweightp << endl;
+      if (*workingweightp==0)
+        *residualp = 0;
+      else
+//        *residualp = *workingweightp * ((*workingresponsep) - *worklinp_dg +
+//                        exp(*linpredp) * (*fxp));
+        *residualp = *workingweightp * ((*workingresponsep) - *predictorp + *linpredp);
+      }
+    }
+  }*/
+
+/*double FC_linear::compute_XtWpartres(double & mo)
   {
 
   unsigned i;
@@ -743,9 +786,7 @@ double FC_linear::compute_XtWpartres(double & mo)
            ((*workingresponsep)  - (*predictorp) + *workdesign*mo);
 
   return res;
-  }
-
-
+  }*/
 
 bool FC_linear::posteriormode(void)
   {
@@ -779,25 +820,18 @@ bool FC_linear::posteriormode(void)
     if (rankXWX_ok == true)
       {
       linold.mult(design,beta);
+//      if(likep->dgexists)
+//        compute_Wpartres_multiplicative(linold);
+//      else
       compute_Wpartres(linold);
 
       Xtresidual.mult(Xt,residual);
 
       beta = XWX.solve(Xtresidual);
 
-/*      ofstream out1("c:/temp/XWX.raw");
-      XWX.prettyPrint(out1);
-      out1.close();
-      ofstream out2("c:/temp/weights.raw");
-      (likep->workingweight).prettyPrint(out2);
-      out2.close();
-      ofstream out3("c:/temp/Xtresidual.raw");
-      Xtresidual.prettyPrint(out3);
-      out3.close();*/
-
       betadiff.minus(beta,betaold);
 
-     likep->addmult(design, betadiff);
+      likep->addmult(design, betadiff);
 
       bool ok;
       if (optionsp->saveestimation)
@@ -1039,6 +1073,8 @@ void FC_linear_pen::compute_XWX(datamatrix & r)
   double * tau2oldinvp = tau2oldinv.getV();
   unsigned nrpar = beta.rows();
 
+  double sigma2resp = likep->get_scale();
+
   if ((likep->wtype==wweightschange_weightsneqone) ||
       (likep->wtype==wweightschange_weightsone) ||
       (optionsp->nriter<=1))
@@ -1047,8 +1083,8 @@ void FC_linear_pen::compute_XWX(datamatrix & r)
     for (i=0;i<nrpar;i++,tau2p++,tau2oldinvp++)
       {
 //      XWX(i,i) += (1/(*tau2p));
-      r(i,i) += (1/(*tau2p));
-      *tau2oldinvp =  1/(*tau2p);
+      r(i,i) += (sigma2resp/(*tau2p));
+      *tau2oldinvp =  sigma2resp/(*tau2p);
       }
 
     }
@@ -1058,8 +1094,8 @@ void FC_linear_pen::compute_XWX(datamatrix & r)
     for (i=0;i<nrpar;i++,tau2p++,tau2oldinvp++)
       {
 //      XWX(i,i) += (1/(*tau2p) - *tau2oldinvp);
-      r(i,i) += (1/(*tau2p) - *tau2oldinvp);
-      *tau2oldinvp =  1/(*tau2p);
+      r(i,i) += sigma2resp/(*tau2p) - *tau2oldinvp;
+      *tau2oldinvp =  sigma2resp/(*tau2p);
       }
 
     }

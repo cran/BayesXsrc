@@ -2,18 +2,6 @@
 #define __BUILDING_GNU
 #endif
 
-#if !defined (TEMPL_INCL_DEF)
-#define TEMPL_INCL_DEF
-#endif
-
-#if !defined (_MSC_VER2)
-#define _MSC_VER2
-#endif
-
-#if !defined (NO_TEMPLATE_FRIENDS)
-#define NO_TEMPLATE_FRIENDS
-#endif
-
 #include "clstring.h"
 #include "adminparse_gnu.h"
 #include <iostream>

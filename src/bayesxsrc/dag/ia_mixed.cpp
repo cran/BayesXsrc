@@ -1,7 +1,7 @@
 /* BayesX - Software for Bayesian Inference in
 Structured Additive Regression Models.
-Copyright (C) 2011  Christiane Belitz, Andreas Brezger,
-Thomas Kneib, Stefan Lang, Nikolaus Umlauf
+Copyright (C) 2019 Christiane Belitz, Andreas Brezger,
+Nadja Klein, Thomas Kneib, Stefan Lang, Nikolaus Umlauf
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -34,20 +34,20 @@ namespace MCMC
 	IA_MIXED::IA_MIXED(void): IA()
 	{
 	}
-	
+
 
 
 	// CONSTRUCTOR_1
 	IA_MIXED::IA_MIXED(const datamatrix & d):IA(d)
 	{
-		
+
 	}
 
 
 
 
 	// CONSTRUCTOR_2
-	// for interactions of order>2 (some day in future....) 
+	// for interactions of order>2 (some day in future....)
 	IA_MIXED::IA_MIXED(unsigned order, const datamatrix & d):IA(order, d)
 	{
 	}
@@ -55,7 +55,7 @@ namespace MCMC
 
 	// COPY CONSTRUCTOR
 	IA_MIXED::IA_MIXED(const IA_MIXED & a) : IA (IA(a))
-	{	
+	{
 	}
 
 
@@ -74,7 +74,7 @@ namespace MCMC
 
 
 
-	
+
 
 
 } //namespace MCMC
