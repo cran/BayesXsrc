@@ -145,7 +145,7 @@ DISTRIBUTION_multistatemodel::DISTRIBUTION_multistatemodel(MCMCoptions * o,
 {
      unsigned i;
 
-     nrcat = 1; // ändern bei competing risk
+     nrcat = 1; // aendern bei competing risk
 
      ti = t;
      relrisk = offset;

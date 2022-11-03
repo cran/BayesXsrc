@@ -30,10 +30,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 // #include "describe_dataset.h"
 
 
-// HINZUFÜGEN EINER METHODE ZUR KLASSE DATAOBJECT:
-// 1. runpointer um eins erhöhen
+// HINZUFUEGEN EINER METHODE ZUR KLASSE DATAOBJECT:
+// 1. runpointer um eins erhoehen
 // 2. run (friend)function zur neuen Methode schreiben
-// 3. Funktion create ändern
+// 3. Funktion create aendern
 
 
 // dataobjects methods:

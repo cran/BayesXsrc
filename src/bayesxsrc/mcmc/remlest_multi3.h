@@ -59,7 +59,7 @@ class remlest_multinomial_catsp
   double refcat;                                   // Referenz-Kategorie
   unsigned nrcat;                                  // Anzahl Kategorien
   unsigned nrcat2;                                 // Anzahl nicht redundanter Kategorien
-  statmatrix<double> cats;                         // Mögliche Kategorien
+  statmatrix<double> cats;                         // Moegliche Kategorien
 
   vector<bool> catspecific;                     // true if corresponding covariate is
                                                 // category-specific
@@ -80,7 +80,7 @@ class remlest_multinomial_catsp
   unsigned partialnrrandom;
   unsigned partialvar;
 
-  unsigned totalnrfixed;                        // Anzahl fixer Effekte für alle Kategorien!
+  unsigned totalnrfixed;                        // Anzahl fixer Effekte fuer alle Kategorien!
   unsigned totalnrpar;                          // Parameter in allen Kategorien
   unsigned totalvars;                           // no. of variance parameters
 

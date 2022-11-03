@@ -48,14 +48,14 @@ class __EXPORT_TYPE IWLS_pspline : public spline_basis
   updatetype utype;                         // iwls || iwlsmode || hyperblock || hyperblockmode
                                             // increasing || decreasing || diagtransform
 
-// für gemeinsames updaten von beta und sigma2 (hyperblock)
+// fuer gemeinsames updaten von beta und sigma2 (hyperblock)
 
-  double a_invgamma;                        // Parameter a der IG(a,b) für sigma2
-  double b_invgamma;                        // Parameter b der IG(a,b) für sigma2
+  double a_invgamma;                        // Parameter a der IG(a,b) fuer sigma2
+  double b_invgamma;                        // Parameter b der IG(a,b) fuer sigma2
   double kappa;                             // 1/sigma2
   double kappaprop;                         // vorgeschlagenes kappa
-  double kappamode;                         // kappa für hyperblock
-  double kappamean;                         // Hilfvariable für Startwert von kappamode
+  double kappamode;                         // kappa fuer hyperblock
+  double kappamean;                         // Hilfvariable fuer Startwert von kappamode
 
   bool diagtransform;                       // Tranformation, so dass 'prec_env' eine Diagonalmatrix ist
 
@@ -97,7 +97,7 @@ class __EXPORT_TYPE IWLS_pspline : public spline_basis
                     const double & uk, const double & lg, const double & ug,
                     const unsigned & c);
 
-  // CONSTRUCTOR 2 (für variierende Koeffizienten)
+  // CONSTRUCTOR 2 (fuer variierende Koeffizienten)
 
   IWLS_pspline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const datamatrix & effmod,const datamatrix & intact,const bool & mode,
@@ -108,7 +108,7 @@ class __EXPORT_TYPE IWLS_pspline : public spline_basis
                     const ST::string & fp, const ST::string & pres, const bool & deriv,
                     const int & gs, const bool & diag, const unsigned & c);
 
-  // CONSTRUCTOR 3 (für Cox)
+  // CONSTRUCTOR 3 (fuer Cox)
 
   IWLS_pspline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const datamatrix & d,const bool & mode,

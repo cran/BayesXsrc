@@ -84,7 +84,7 @@ double DISTRIBUTION::compute_msep(void)
 
       nr += 1;
       }
-    else       // überprüfen!!!!!
+    else       // ueberpruefen!!!!!
       {
       worklin += nlcols - 1;
       workresp += nlcols - 1;
@@ -207,7 +207,7 @@ void DISTRIBUTION::create_bootstrap_weights(void)   // wie bei MSEP und CV???
     {
     srand(seed);
     response_ori = response;  // speichert Response vom Original-Datensatz
-    linearpred_ori = linearpred;     // speichert Prädiktor vom Original-Datensatz
+    linearpred_ori = linearpred;     // speichert Praediktor vom Original-Datensatz
     }
 
   double * workresp = response.getV();
@@ -248,7 +248,7 @@ void DISTRIBUTION::create_weight(datamatrix & w, const double & p1, const bool &
 
   srand(seed);
 
-  if(fertig == true)        // erstellt neue Gewichte für MSEP / AUC
+  if(fertig == true)        // erstellt neue Gewichte fuer MSEP / AUC
     {
     constant_iwlsweights = false;
     iwlsweights_notchanged_df = false;
@@ -286,7 +286,7 @@ void DISTRIBUTION::create_weight(datamatrix & w, const double & p1, const bool &
     iwlsweights_notchanged_df = false;
     weightcv = datamatrix(nrobs,p1,1);
 
-    if(weight.max(0) != 1 || weight.max(0) != 1)  // falls Gewichte im Befehl angegeben wurden, werden diese berücksuchtigt
+    if(weight.max(0) != 1 || weight.max(0) != 1)  // falls Gewichte im Befehl angegeben wurden, werden diese beruecksuchtigt
       {
       double * workw = weight.getV();
       double * workcv = weightcv.getV();
@@ -5097,7 +5097,7 @@ void DISTRIBUTION_gaussian::update(void)
 
   if ( (varianceest==true) || (constscale==true) )
     {
-/* ------------------------- für sigma2_i bei fMRI !!! ------------------------
+/* ------------------------- fuer sigma2_i bei fMRI !!! ------------------------
     unsigned j;
     double sum;
 
@@ -5595,7 +5595,7 @@ void DISTRIBUTION_QUANTREG::outresults(void)
     if (*workweight == 0)
       {
       help = exp(trmult(0,0) * *workresp) - exp(trmult(0,0) * *worklin + sigma2_halbe);
-      //sum += *workweight*help*help;     // u.U. ändern, so dass zwei Variablen, eine mit
+      //sum += *workweight*help*help;     // u.U. aendern, so dass zwei Variablen, eine mit
                                           // Gewichten != 0, die andere 0/1 Variable
       sum += help*help * *work2;
       nr += 1;
@@ -5624,7 +5624,7 @@ double DISTRIBUTION_gaussian::compute_msep(void)
     if (*workweight == 0)
       {
       help = *workresp - *worklin;
-      //sum += *workweight*help*help;     // u.U. ändern, so dass zwei Variablen, eine mit
+      //sum += *workweight*help*help;     // u.U. aendern, so dass zwei Variablen, eine mit
                                           // Gewichten != 0, die andere 0/1 Variable
       sum += help*help * *work2;
       nr += 1;
@@ -5725,7 +5725,7 @@ DISTRIBUTION_gaussian::DISTRIBUTION_gaussian(const double & a,
   constscale=false;
   uniformprior=false;
 
-/* ---------------------- für sigma2_i bei fMRI !!! ---------------------------
+/* ---------------------- fuer sigma2_i bei fMRI !!! ---------------------------
   scale(0,0)=1;
   changingweight=true;
   constscale=true;
@@ -6611,10 +6611,10 @@ void DISTRIBUTION_binomial::compute_deviance(const double * response,
 
 double DISTRIBUTION_binomial::compute_auc(void)
   {
-  datamatrix linpred_null_hilf = datamatrix(nrobs,1,0);       // Erzeugen einer Matrix die Einträge für Beob.
-                                                              // mit weight=0 enthält und darunter Nuller
-  datamatrix response_null_hilf = datamatrix(nrobs,1,0);      // Erzeugen einer Matrix die Einträge für Beob.
-                                                              // mit weight=0 enthält und darunter Nuller
+  datamatrix linpred_null_hilf = datamatrix(nrobs,1,0);       // Erzeugen einer Matrix die Eintraege fuer Beob.
+                                                              // mit weight=0 enthaelt und darunter Nuller
+  datamatrix response_null_hilf = datamatrix(nrobs,1,0);      // Erzeugen einer Matrix die Eintraege fuer Beob.
+                                                              // mit weight=0 enthaelt und darunter Nuller
   double * worklin = linearpred.getV();
   double * lin_null = linpred_null_hilf.getV();
   double * workweight = weight.getV();
@@ -6637,8 +6637,8 @@ double DISTRIBUTION_binomial::compute_auc(void)
       }
     }
 
-  datamatrix linpred_null = datamatrix(nrnull,1,0);  // Kürzen des "Null"-Prädiktors, d.h. Weglassen der Nullen
-  datamatrix response_null = datamatrix(nrnull,1,0); // Kürzen des "Null"-Response, d.h. Weglassen der Nullen
+  datamatrix linpred_null = datamatrix(nrnull,1,0);  // Kuerzen des "Null"-Praediktors, d.h. Weglassen der Nullen
+  datamatrix response_null = datamatrix(nrnull,1,0); // Kuerzen des "Null"-Response, d.h. Weglassen der Nullen
   double * lin_hilf = linpred_null_hilf.getV();
   lin_null = linpred_null.getV();
   double * resp_hilf = response_null_hilf.getV();
@@ -6649,11 +6649,11 @@ double DISTRIBUTION_binomial::compute_auc(void)
      *resp_null = *resp_hilf;
      }
 
-  statmatrix<int> index_gesamt(linpred_null.rows(),1);      // Sortieren des linearen Prädiktors
+  statmatrix<int> index_gesamt(linpred_null.rows(),1);      // Sortieren des linearen Praediktors
   index_gesamt.indexinit();
   linpred_null.indexsort(index_gesamt,0,linpred_null.rows()-1,0,0);
   statmatrix<double> rang_gepoolt(linpred_null.rows(),1);
-  linpred_null.rank(rang_gepoolt,index_gesamt,0,linpred_null.rows()-1,0);  // Ränge berechnen
+  linpred_null.rank(rang_gepoolt,index_gesamt,0,linpred_null.rows()-1,0);  // Raenge berechnen
 
   int* gesamt = index_gesamt.getV();
   double* rang_gep = rang_gepoolt.getV();

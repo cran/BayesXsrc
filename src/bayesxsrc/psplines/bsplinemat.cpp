@@ -317,7 +317,7 @@ datamatrix bsplinemat::bspline_derivative(const double & x)
       }
     }
 
-// Hämmerlin/Hoffmann Seite 263
+// Haemmerlin/Hoffmann Seite 263
 
   bwork = b.getV();
   helpwork = help.getV();

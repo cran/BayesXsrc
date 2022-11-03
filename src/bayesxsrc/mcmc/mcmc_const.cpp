@@ -1888,7 +1888,7 @@ void FULLCOND_const_nbinomial::update(void)
 
 
 /*
-    Mit der Funktion geht es nicht! die Acceptance-Raten für FixedEffect
+    Mit der Funktion geht es nicht! die Acceptance-Raten fuer FixedEffect
     sind viel zu klein!
 
   FULLCOND_const_nongaussian::update();
@@ -2035,7 +2035,7 @@ double FULLCOND_const_nbinomial::update_hierint(void) const
         double intpost;
         double priori_ratio=0.0; // Weil diffuse Prior
         double likelihood_ratio;
-        double proposal_ratio=0.0; // Weil unabhängig von aktuellem Zustand
+        double proposal_ratio=0.0; // Weil unabhaengig von aktuellem Zustand
         double pwork=nblikep->get_pvar();
 
         intpost = (nrobs*0.5-1+

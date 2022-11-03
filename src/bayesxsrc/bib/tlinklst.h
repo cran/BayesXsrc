@@ -366,7 +366,7 @@ public:
 
 //	class List
 
-//	Simuliert eine einfach verzeigerte Liste mit Einfügen am Ende
+//	Simuliert eine einfach verzeigerte Liste mit Einfuegen am Ende
 
 template <class T>
 class List : public LinkedList<T>

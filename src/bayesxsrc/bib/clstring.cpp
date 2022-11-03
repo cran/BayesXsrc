@@ -895,11 +895,12 @@ int string::strtodouble(double & value) const
 
 string inttostring(int value)
   {
-  char h[20];
+/*  char h[20];
 // GNU:
   sprintf(h,"%d",value);
 //  itoa(value,h,10);
-  return string(h);
+  return string(h);*/
+  return std::to_string(value);
   }
 
 string doubletostring(double value,int dec)

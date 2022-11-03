@@ -216,7 +216,7 @@ pspline_multibaseline::pspline_multibaseline(MCMCoptions * o,DISTRIBUTION * dp,F
 
   compute_betaweight();
 
-//------------------Designmatrix int_D für P-Spline an Knoten-------------------
+//------------------Designmatrix int_D fuer P-Spline an Knoten-------------------
 
   double knot_min = 0.0;
   double knot_max = zi.max(0);
@@ -447,7 +447,7 @@ pspline_multibaseline::pspline_multibaseline(MCMCoptions * o,DISTRIBUTION * dp,F
 
   compute_betaweight();
 
-//------------------Designmatrix int_D für P-Spline an Knoten-------------------
+//------------------Designmatrix int_D fuer P-Spline an Knoten-------------------
 
   double knot_min = 0.0;
   double knot_max = zi.max(0);
@@ -679,7 +679,7 @@ void pspline_multibaseline::update(void)
       for(k=an-1;k<en;k++,workbeta++,workbetaold++)
         *workbeta = *workbetaold;
 
-//---------Integral berechnen für vorgeschlagenes beta--------
+//---------Integral berechnen fuer vorgeschlagenes beta--------
       update_multibaseline();
 //------------------------------------/
 
@@ -760,7 +760,7 @@ void pspline_multibaseline::update(void)
 
   } // end function update
 
-//--------Für's DIC-------------------------------------------------------------
+//--------Fuer's DIC-------------------------------------------------------------
 void pspline_multibaseline::compute_int_ti_mean(void)
   {
   if(baselinep.size()>1)
@@ -1293,7 +1293,7 @@ for(i_vc=0;i_vc<2;i_vc++)
   spline_zi_help(i_vc,0)++;
 while(i<zi_ges.rows())
   {
-//-----------falls z_vc==0: zu nächster Beobachtung---------------
+//-----------falls z_vc==0: zu naechster Beobachtung---------------
   if(*(z_vc_help+ges_index(i,0))==0)
     {
     i++;

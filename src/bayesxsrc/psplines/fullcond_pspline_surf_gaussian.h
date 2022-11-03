@@ -46,52 +46,52 @@ class __EXPORT_TYPE FULLCOND_pspline_surf_gaussian : public spline_basis_surf
 
   protected:
 
-  double lambda_prec;           // lambda mit dem die aktuelle Präzisionsmatrix berechnet wurde
+  double lambda_prec;           // lambda mit dem die aktuelle Praezisionsmatrix berechnet wurde
 
-  double f2;                    // Skalierungsfaktor für die Parameter a,b bei Gamma-Proposal für kappa
+  double f2;                    // Skalierungsfaktor fuer die Parameter a,b bei Gamma-Proposal fuer kappa
                                 // bei IWLS update basierend auf dem posteriori Modus
-  datamatrix kappaburnin;       // Samples für kappa aus der ersten Hälfte der burnin Phase
+  datamatrix kappaburnin;       // Samples fuer kappa aus der ersten Haelfte der burnin Phase
 
   updatetype utype;             // iwls || iwlsmode || hyperblock || hyperblockmode
                                 // increasing || decreasing || diagtransform
 
   double kappa;                 // 1/sigma2
   double kappaprop;             // vorgeschlagenes kappa
-  double kappacurrent;          // für zeilen- und spaltenweises updaten
-  double kappamean;             // Hilfvariable für Startwert von kappamode
-  double kappamode;             // kappa für hyperblock
+  double kappacurrent;          // fuer zeilen- und spaltenweises updaten
+  double kappamean;             // Hilfvariable fuer Startwert von kappamode
+  double kappamode;             // kappa fuer hyperblock
   double kappavar;              // Varianz aus kappaburnin
 
   bool samplecentered;          // Samplen unter der Nebenbedingung, dass die Zentrierungskonstante = 0 ist.
 
   unsigned updateW;             // jede wievielte Iteration soll IWLS-Gewicht W neu berechnet werden?
 
-  double a_invgamma;            // Parameter a der IG(a,b) für sigma2
-  double b_invgamma;            // Parameter a der IG(a,b) für sigma2
+  double a_invgamma;            // Parameter a der IG(a,b) fuer sigma2
+  double b_invgamma;            // Parameter a der IG(a,b) fuer sigma2
 
   datamatrix W;                 // IWLS Gewichtsmatrix
   datamatrix proposal;          // Vorgeschlagenes beta
 
-  bandmatdouble XX;             // X'X (für Gauss und zeilenweises updaten)
-  bandmatdouble prec;           // Präzisionsmatrix (X'WX + 1/sigma2*K) als Band-Matrix (für Gauss und zeilenweises updaten)
+  bandmatdouble XX;             // X'X (fuer Gauss und zeilenweises updaten)
+  bandmatdouble prec;           // Praezisionsmatrix (X'WX + 1/sigma2*K) als Band-Matrix (fuer Gauss und zeilenweises updaten)
 
-  envmatdouble XX_env;          // X'X als Envelope-Matrix (für IWLS)
-  envmatdouble prec_env;        // Präzisionsmatrix (X'WX + 1/sigma2*K) als Envelope-Matrix (für IWLS)
+  envmatdouble XX_env;          // X'X als Envelope-Matrix (fuer IWLS)
+  envmatdouble prec_env;        // Praezisionsmatrix (X'WX + 1/sigma2*K) als Envelope-Matrix (fuer IWLS)
 
   datamatrix mu;                // tildey
   datamatrix muy;               // X'W*tildey
   datamatrix standnormal;       // N(0,1)-verteilte ZV
 
-// für zeilen- und spaltenweises updaten
+// fuer zeilen- und spaltenweises updaten
 
   bool singleblock;             // zeilen- und spaltenweises updaten oder komplett?
 
-  vector<datamatrix> Xblock;    // für zeilen- und spaltenweises updaten
-  vector<envmatdouble> Kblock;  // für zeilen- und spaltenweises updaten
+  vector<datamatrix> Xblock;    // fuer zeilen- und spaltenweises updaten
+  vector<envmatdouble> Kblock;  // fuer zeilen- und spaltenweises updaten
 
-  datamatrix beta_ab;           // für zeilen- und spaltenweises updaten
-  datamatrix prop_ab;           // für zeilen- und spaltenweises updaten
-  datamatrix beta_mode_ab;      // für zeilen- und spaltenweises updaten
+  datamatrix beta_ab;           // fuer zeilen- und spaltenweises updaten
+  datamatrix prop_ab;           // fuer zeilen- und spaltenweises updaten
+  datamatrix beta_mode_ab;      // fuer zeilen- und spaltenweises updaten
 
   datamatrix muyhelp;           // Hilfsvariable
   datamatrix betahelp;          // Hilfsvariable
@@ -102,14 +102,14 @@ class __EXPORT_TYPE FULLCOND_pspline_surf_gaussian : public spline_basis_surf
 
   // FUNCTION: add_linearpred_multBS
   // TASK: multipliziert 'X' (Desing-Matrix) mit 'b', speichert das Ergebnis in 'spline'
-  //       und addiert das Ergebnis zum linearen Prädiktor
+  //       und addiert das Ergebnis zum linearen Praediktor
 
   void add_linearpred_multBS(const datamatrix & b);
 
   // FUNCTION: add_linearpred_multBS2
-  // TASK: zieht 'spline' vom linearen Prädiktor ab,
+  // TASK: zieht 'spline' vom linearen Praediktor ab,
   //       multipliziert 'X' (Desing-Matrix) mit 'b', speichert das Ergebnis in 'spline'
-  //       und addiert das Ergebnis zum linearen Prädiktor
+  //       und addiert das Ergebnis zum linearen Praediktor
 
   void add_linearpred_multBS2(const datamatrix & b);
 
@@ -117,7 +117,7 @@ class __EXPORT_TYPE FULLCOND_pspline_surf_gaussian : public spline_basis_surf
   void compute_XWXenv(const datamatrix & W,const unsigned & col=0);
   void compute_XWtildey(const datamatrix & W,const double & scale);
 
-  // für zeilen und spalten weises updaten
+  // fuer zeilen und spalten weises updaten
 
   void compute_XWX_Block(const datamatrix & W,const unsigned a,const unsigned e,
                          const unsigned beg,const unsigned end,const unsigned & col=0);
@@ -126,13 +126,13 @@ class __EXPORT_TYPE FULLCOND_pspline_surf_gaussian : public spline_basis_surf
   void compute_XWtildey_Block(const datamatrix & W,const double & scale,const unsigned & beg,const unsigned & end);
 
   // FUNCTION: compute_q
-  // TASK: berechnet den Erwartungswertvektor für die IWLS proposal bei zeilenweisem updaten
+  // TASK: berechnet den Erwartungswertvektor fuer die IWLS proposal bei zeilenweisem updaten
 
   void compute_q(const datamatrix & beta, const unsigned & an, const unsigned & en,
                  const unsigned & beg, const unsigned & end, const double & sigma2,
                  const bool & current = true);
 
-  // für posteriormode
+  // fuer posteriormode
 
   void compute_XWtildey(const datamatrix & W,const datamatrix & tildey,const double & scale,const unsigned & col=0);
 
@@ -185,8 +185,8 @@ class __EXPORT_TYPE FULLCOND_pspline_surf_gaussian : public spline_basis_surf
 
   // upW  : updateW
   // updatetau : updatetau
-  // fstart: Startwert für Tuningparameter f
-  // a,b  : Hyperparameter für IG-prior
+  // fstart: Startwert fuer Tuningparameter f
+  // a,b  : Hyperparameter fuer IG-prior
 
   FULLCOND_pspline_surf_gaussian(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                          const datamatrix & v1, const datamatrix & v2,

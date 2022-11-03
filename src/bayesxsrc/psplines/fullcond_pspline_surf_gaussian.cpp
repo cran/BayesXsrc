@@ -353,7 +353,7 @@ FULLCOND_pspline_surf_gaussian::FULLCOND_pspline_surf_gaussian(MCMCoptions * o,
   create(v1,v2);
 
 /*
-// Xblock und Kblock initialisieren (für zeilenweise updaten)
+// Xblock und Kblock initialisieren (fuer zeilenweise updaten)
   envmatdouble help;
   vector<double>::iterator di;
 
@@ -1448,7 +1448,7 @@ void FULLCOND_pspline_surf_gaussian::update_IWLS_hyperblock_mode(void)
 //  if(optionsp->get_nriter() == optionsp->get_burnin())
 //    optionsp->out("NOTE: Tuning constant 'f' for term " + title + " set to " + ST::doubletostring(f) + "\n");
 
-// für aprop,bprop (Gamma proposal)
+// fuer aprop,bprop (Gamma proposal)
   if(optionsp->get_nriter() == optionsp->get_burnin()/2)
     {
     kappamean = 2.0*kappaburnin.mean(0);
@@ -1457,12 +1457,12 @@ void FULLCOND_pspline_surf_gaussian::update_IWLS_hyperblock_mode(void)
 //    optionsp->out("  var for the Gamma proposal: " + ST::doubletostring(kappavar)  + "\n");
     }
 
-// für Gamma proposal
+// fuer Gamma proposal
   aprop = kappamean*kappamean/(f2*kappavar);
   bprop = kappamean/(f2*kappavar);
   kappamode = (aprop-1)/bprop;                                        // Mode Gamma proposal
 
-  sigma2 = 1.0/kappamode;                                             // für prec_env!
+  sigma2 = 1.0/kappamode;                                             // fuer prec_env!
 
 //  kappaprop = kappamode*randnumbers::rand_variance(f);              // Rue/Held
   kappaprop = randnumbers::rand_gamma(aprop,bprop);                   // Gamma proposal
@@ -1594,7 +1594,7 @@ void FULLCOND_pspline_surf_gaussian::update(void)
   else if(utype == hyperblockmode)
     {
     if(optionsp->get_nriter()<optionsp->get_burnin()/2)
-      update_IWLS_hyperblock();                          // Startwert für kappa ermitteln: getrennt updaten
+      update_IWLS_hyperblock();                          // Startwert fuer kappa ermitteln: getrennt updaten
     else
       update_IWLS_hyperblock_mode();                     // Simulation: gemeinsam updaten
 
@@ -1623,7 +1623,7 @@ void FULLCOND_pspline_surf_gaussian::update(void)
         *work = rand_normal();
 
       prec.solveL(standnormal,beta);
-      likep->compute_respminuslinpred(mu,column);   // nicht ändern wegen multgaussian
+      likep->compute_respminuslinpred(mu,column);   // nicht aendern wegen multgaussian
       compute_XWtildey(likep->get_weight(),scaleinv);
       prec.solve(muy,betahelp,0,0);
       beta.plus(beta,betahelp);
@@ -1668,7 +1668,7 @@ void FULLCOND_pspline_surf_gaussian::update(void)
           end--;
 
 
-        likep->compute_respminuslinpred(mu,column);   // nicht ändern wegen multgaussian
+        likep->compute_respminuslinpred(mu,column);   // nicht aendern wegen multgaussian
         compute_XWtildey_Block(likep->get_weight(),scaleinv,beg,end);        // --> muy
 
         prec.addtoblock2(XX,K,1.0/likep->get_scale(column),1.0/sigma2,an,en-1);
@@ -2066,7 +2066,7 @@ bool FULLCOND_pspline_surf_gaussian::posteriormode(void)
       {
       multDG(splinehelp,beta);  // NICHT zeilen- und spaltenweise zentriert!!!
                                 // dazu: if(center && !centertotal){multDG(splinehelp,beta);}
-                                // und: 'splinehelp' ändern 'in compute_maineffects'
+                                // und: 'splinehelp' aendern 'in compute_maineffects'
       for(i=0;i<gridsize;i++,fchelpbetap++)
         *fchelpbetap = splinehelp(i,0);
       }
@@ -2707,7 +2707,7 @@ void FULLCOND_pspline_surf_gaussian::sample_centered(datamatrix & beta)
       for(j=0;j<nrpar1dim;j++)
         help(i,1) += beta(j+i*nrpar1dim,0)/nrpar1dim;
 
-// betas ändern
+// betas aendern
     for(i=0;i<nrpar1dim;i++)
       for(j=0;j<nrpar1dim;j++)
         beta(i+j*nrpar1dim,0) -= help(i,0);

@@ -384,7 +384,7 @@ bool STEPMULTIrun::stepwise(const ST::string & procedure, const ST::string & min
       fullcond_alle[y]->set_calculate_xwx();
     }
 
-  // Files werden nicht mehr gebraucht und müssen wieder geschlossen werden!!!
+  // Files werden nicht mehr gebraucht und muessen wieder geschlossen werden!!!
   outcriterium.close();
   outmodels.close();
 
@@ -393,7 +393,7 @@ bool STEPMULTIrun::stepwise(const ST::string & procedure, const ST::string & min
     fullcond_z = fullcondp;
     for(i=0;i<fullcond_z.size();i++)
       fullcond_z[i]->set_fcnumber(i);
-    posteriormode(posttitle,false); // Problem: linearer Prädiktor bei "true" standardisiert! Hier wird zurückgerechnet!
+    posteriormode(posttitle,false); // Problem: linearer Praediktor bei "true" standardisiert! Hier wird zurueckgerechnet!
                                       // danach nicht mehr compute_criterion() aufrufen!!!
     }
   else
@@ -876,7 +876,7 @@ void STEPMULTIrun::schaetzen(int z, double & kriterium, bool neu, ST::string var
       if((possible != "valles" && possible != "vrfix" && possible != "vraus")
           || fullcond_alle[z]->is_identifiable() == true)
         fullcond_alle[ind_fullc]->posteriormode_const();
-      else // if(possible == "valles")  // bei Rauslassen von VC muß zugehöriger fixer Effekt upgedatet werden!
+      else // if(possible == "valles")  // bei Rauslassen von VC muss zugehoeriger fixer Effekt upgedatet werden!
         {
         vector<ST::string> help;
         help.push_back(fullcond_alle[z]->get_datanames()[1]);
@@ -901,7 +901,7 @@ void STEPMULTIrun::schaetzen(int z, double & kriterium, bool neu, ST::string var
         if((possible != "valles" && possible != "vrfix" && possible != "vraus")
             || fullcond_alle[z]->is_identifiable() == true)
           fullcond_alle[ind_fullc]->posteriormode_const();
-        else // if(possible == "valles")  // bei Rauslassen von VC muß zugehöriger fixer Effekt upgedatet werden!
+        else // if(possible == "valles")  // bei Rauslassen von VC muss zugehoeriger fixer Effekt upgedatet werden!
           {
           vector<ST::string> help;
           help.push_back(fullcond_alle[z]->get_datanames()[1]);
@@ -1779,8 +1779,8 @@ void STEPMULTIrun::stepmin_nonp_nonp(unsigned & z, vector<double> & krit_fkt,dou
 
   fullcond_alle[z]->set_inthemodel(1);
   fullcond_alle[z]->update_stepwise(modell_alt[ind_mod]);
-  if(possible != "spline" && fullcond_alle[z]->is_identifiable() == false)   // bei Haupteffekten der ANOVA Zerlegung muß center=false bleiben
-    fullcond_alle[z]->set_center(true);                                      // sonst wird Interaktion nicht geschätzt.
+  if(possible != "spline" && fullcond_alle[z]->is_identifiable() == false)   // bei Haupteffekten der ANOVA Zerlegung muss center=false bleiben
+    fullcond_alle[z]->set_center(true);                                      // sonst wird Interaktion nicht geschaetzt.
   fullcond_alle[z]->posteriormode();
   fullcond_alle[ind_fullc]->update_linold();
 
@@ -1855,7 +1855,7 @@ void STEPMULTIrun::stepmin_nonp_fix(unsigned & z, vector<double> & krit_fkt, dou
 
   unsigned m = 0;
   bool interact = false;
-  fullcond_alle[z]->safe_splines(interact);  // für ANOVA-Zerlegung: speichert Haupteffekte
+  fullcond_alle[z]->safe_splines(interact);  // fuer ANOVA-Zerlegung: speichert Haupteffekte
 
   for(i=0;i<lambdavec[ind_lamb].size();i++)
     {
@@ -1896,7 +1896,7 @@ void STEPMULTIrun::stepmin_nonp_fix(unsigned & z, vector<double> & krit_fkt, dou
   fullcond_alle[ind_fullc]->posteriormode_single(names_nonp[ind_name],
                                 fullcond_alle[z]->get_data_forfixedeffects(),true);
   fullcond_alle[ind_fullc]->update_linold();
-  if(interact && possible=="alles")      // stellt den alten Zustand für ANOVA-Zerlegung wieder her
+  if(interact && possible=="alles")      // stellt den alten Zustand fuer ANOVA-Zerlegung wieder her
     {
     krit_fkt[m] = compute_criterion();
     fullcond_alle[z]->set_splines_old();
@@ -1991,7 +1991,7 @@ void STEPMULTIrun::stepmin_nonp_leer(unsigned & z, vector<double> & krit_fkt, do
 
   unsigned m = 0;
   bool interact = false;
-  fullcond_alle[z]->safe_splines(interact);  // für ANOVA-Zerlegung: speichert Haupteffekte
+  fullcond_alle[z]->safe_splines(interact);  // fuer ANOVA-Zerlegung: speichert Haupteffekte
 
   for(i=0;i<lambdavec[ind_lamb].size();i++)
     {
@@ -2040,7 +2040,7 @@ void STEPMULTIrun::stepmin_nonp_leer(unsigned & z, vector<double> & krit_fkt, do
   fullcond_alle[z]->reset_effect(0);
   fullcondp.erase(fullcondp.end()-1,fullcondp.end());
   fullcond_alle[ind_fullc]->posteriormode_const();
-  if(interact && possible=="alles")      // stellt den alten Zustand für ANOVA-Zerlegung wieder her
+  if(interact && possible=="alles")      // stellt den alten Zustand fuer ANOVA-Zerlegung wieder her
     {
     krit_fkt[m] = compute_criterion();
     fullcond_alle[z]->set_splines_old();
@@ -3463,7 +3463,7 @@ void STEPMULTIrun::initialise_lambdas(vector<vector<ST::string> > & namen_nonp,
            }
         else if(fullcond_alle[i]->get_fctype() == MCMC::factor)
            {
-           fullcondp.erase(fullcondp.begin() + katje*anz_fullcond + 1 - katje * deleted);   //löscht das entspr. Element aus fullcondp-Vektor
+           fullcondp.erase(fullcondp.begin() + katje*anz_fullcond + 1 - katje * deleted);   //loescht das entspr. Element aus fullcondp-Vektor
            if(katje==0)
              deleted += 1;
            fullcond_alle[katje*anz_fullcond]->include_effect(fullcond_alle[i]->get_datanames(),
@@ -4863,7 +4863,7 @@ bool STEPMULTIrun::confidence_MCMCselect(const vector<double> & modell_final,
   katje = 0;
 
   //if(neuschaetzen == true)
-    schaetzen(0,kriterium_alt,true,"backfitting");  // nötig für Startwerte, wenn mind. ein lambda=-2
+    schaetzen(0,kriterium_alt,true,"backfitting");  // noetig fuer Startwerte, wenn mind. ein lambda=-2
 
   unsigned iterations = genoptions_mult[0]->get_iterations();
   unsigned start = 1;
@@ -4930,7 +4930,7 @@ bool STEPMULTIrun::confidence_bootstrap(const vector<double> & modell_final,
 
     if(criterion == "MSEP" || criterion == "AUC")
       {
-      likep_mult[0]->weight_for_all();   // macht hier das Gegenteil und setzt "weight" für MSEP ein!
+      likep_mult[0]->weight_for_all();   // macht hier das Gegenteil und setzt "weight" fuer MSEP ein!
       for(unsigned y=0;y<fullcond_alle.size();y++)
         fullcond_alle[y]->set_calculate_xwx();
       }
@@ -5072,8 +5072,8 @@ bool STEPMULTIrun::confidence_MCMCbootstrap(const vector<double> & modell_final,
       fullcond_alle[i]->set_lambdaconst(modell_alt[ind_mod]);
     }
 
-  fix_ganz_komplett(modell_mcmc);        // stellt "fullcondp" neu auf (für Funktionen mit lambda=-1 -> lambda=10^8)
-  fullcond_komplett(modell_mcmc);        // fullcond-Objekte für leere Funktionen sind auch enthalten.
+  fix_ganz_komplett(modell_mcmc);        // stellt "fullcondp" neu auf (fuer Funktionen mit lambda=-1 -> lambda=10^8)
+  fullcond_komplett(modell_mcmc);        // fullcond-Objekte fuer leere Funktionen sind auch enthalten.
 
   for(katje=0;katje<kategorien;katje++)
     {
@@ -5100,13 +5100,13 @@ bool STEPMULTIrun::confidence_MCMCbootstrap(const vector<double> & modell_final,
   unsigned startit = 1;
   unsigned endit = double(iterations) / double(bootstrap+1);
   unsigned itpmod = endit;
-  schaetzen(0,kriterium_alt,true,"backfitting");  // nötig, da fixe Effekte in "fix_ganz_komplett" gleich Null gesetzt werden.
+  schaetzen(0,kriterium_alt,true,"backfitting");  // noetig, da fixe Effekte in "fix_ganz_komplett" gleich Null gesetzt werden.
   for(katje=0;katje<kategorien;katje++)
     {
     unsigned unten = (katje+1)*anz_fullcond;
     unsigned oben = 1 + katje*anz_fullcond;
     for(i=oben;i<unten;i++)
-      fullcond_alle[i]->update_beta_average(zaehler);     // speichert MA-Schätzer der Funktionen
+      fullcond_alle[i]->update_beta_average(zaehler);     // speichert MA-Schaetzer der Funktionen
     fullcond_alle[oben-1]->update_beta_average(zaehler);
     }
   katje = 0;
@@ -5161,7 +5161,7 @@ bool STEPMULTIrun::confidence_MCMCbootstrap(const vector<double> & modell_final,
 
     if(criterion == "MSEP" || criterion == "AUC")
       {
-      likep_mult[0]->weight_for_all();   // macht hier das Gegenteil und setzt "weight" für MSEP ein!
+      likep_mult[0]->weight_for_all();   // macht hier das Gegenteil und setzt "weight" fuer MSEP ein!
       for(unsigned y=0;y<fullcond_alle.size();y++)
         fullcond_alle[y]->set_calculate_xwx();
       }
@@ -5255,14 +5255,14 @@ genoptions_mult[0]->out("\n");  */
       }
     katje = 0;
 
-    // neu schätzen, da fixe Effekte in "fix_ganz_komplett" gleich Null gesetzt werden.
+    // neu schaetzen, da fixe Effekte in "fix_ganz_komplett" gleich Null gesetzt werden.
     schaetzen(0,kriterium_alt,true,"backfitting");
     for(katje=0;katje<kategorien;katje++)
       {
       unsigned unten = (katje+1)*anz_fullcond;
       unsigned oben = 1 + katje*anz_fullcond;
       for(i=oben;i<unten;i++)
-        fullcond_alle[i]->update_beta_average(zaehler);     // speichert MA-Schätzer der Funktionen
+        fullcond_alle[i]->update_beta_average(zaehler);     // speichert MA-Schaetzer der Funktionen
       fullcond_alle[oben-1]->update_beta_average(zaehler);
       }
     katje = 0;
@@ -5271,7 +5271,7 @@ genoptions_mult[0]->out("\n");  */
     abbruch = simulate(posttitle,seed,startit,endit);
     if(abbruch==true)
       return true;
-    // rechnet die Zentrierungskonstanten zum linearen Prädiktor
+    // rechnet die Zentrierungskonstanten zum linearen Praediktor
     fullcond_alle[0]->update_linold();
     fullcond_alle[0]->update_linold_vc();
 

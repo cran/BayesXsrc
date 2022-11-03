@@ -323,7 +323,7 @@ spline_basis::spline_basis(MCMCoptions * o, DISTRIBUTION * dp,
 
   }
 
-  // CONSTRUCTOR für REML
+  // CONSTRUCTOR fuer REML
 
 spline_basis::spline_basis(MCMCoptions * o,
                       const datamatrix & d, const unsigned & nrk, const unsigned & degr,
@@ -449,7 +449,7 @@ spline_basis::spline_basis(MCMCoptions * o,
     }
   }
 
-  // CONSTRUCTOR für REML VCM
+  // CONSTRUCTOR fuer REML VCM
 
 spline_basis::spline_basis(MCMCoptions * o,const datamatrix & d1,
                       const datamatrix & d2, const unsigned & nrk, const unsigned & degr,
@@ -1015,7 +1015,7 @@ void spline_basis::make_Bspline(const datamatrix & md, const bool & minnull)
 
   unsigned mindomain = 0;
   int maxdomain = md.rows()-1;
-// Prädiktion ja/nein
+// Praediktion ja/nein
   if(likep != NULL)
     {
     while(likep->get_weight(index(mindomain,0),0)==0 && mindomain<likep->get_nrobs())
@@ -1318,7 +1318,7 @@ void spline_basis::init_fchelp(const datamatrix & d)
 
 double spline_basis::bspline_rek(unsigned l, unsigned nu, const datamatrix & X)
   {
-// Rekursionsformel aus Hämmerlin/Hoffmann
+// Rekursionsformel aus Haemmerlin/Hoffmann
   if(l==0)
     {
     if(knot[nu] <= X(0,0) && X(0,0) < knot[nu+1])
@@ -1714,7 +1714,7 @@ void spline_basis::add_linearpred_multBS_Block2(const unsigned a,const unsigned 
 
 datamatrix spline_basis::bspline(const double & x)
   {
-// nach Hämmerlin/Hoffmann
+// nach Haemmerlin/Hoffmann
   datamatrix b(nrpar,1,0.0);
   datamatrix help(nrpar+degree,1,0.0);
   unsigned j;
@@ -1753,7 +1753,7 @@ datamatrix spline_basis::bspline(const double & x)
 
 datamatrix spline_basis::bspline(const double & x, const unsigned & d)
   {
-// nach Hämmerlin/Hoffmann
+// nach Haemmerlin/Hoffmann
   datamatrix b(nrpar+degree-d,1,0.0);
   datamatrix help(nrpar+d,1,0.0);
   unsigned j;
@@ -2908,14 +2908,14 @@ void spline_basis::change(const datamatrix & main,const double & inter)
   vector<int>::iterator freqwork = freq.begin();
   int * workindex = index.getV();
 
-// spline ändern
+// spline aendern
   for(i=0;i<spline.rows();i++,freqwork++,workindex++)
     spline(*workindex,0) += main(*freqwork,0);
 
-// Intercept ändern
+// Intercept aendern
   intercept += inter;
 
-// fchelp ändern
+// fchelp aendern
   if( (optionsp->get_nriter() > optionsp->get_burnin()) &&
       ((optionsp->get_nriter()-optionsp->get_burnin()-1) % (optionsp->get_step()) == 0) )
     {
@@ -2949,7 +2949,7 @@ void spline_basis::change(const datamatrix & main)
   {
 
   unsigned i;
-// beta, spline ändern
+// beta, spline aendern
   beta.plus(beta,main);
   multBS_index(spline,beta);
   compute_intercept();
@@ -2960,7 +2960,7 @@ void spline_basis::change(const datamatrix & main)
   betaold.assign(beta);
   intercept = 0.0;
 
-// fchelp ändern
+// fchelp aendern
   if( (optionsp->get_nriter() > optionsp->get_burnin()) &&
       ((optionsp->get_nriter()-optionsp->get_burnin()-1) % (optionsp->get_step()) == 0) )
     {
@@ -2984,14 +2984,14 @@ bool spline_basis::changeposterior(const datamatrix & main,const double & inter)
   vector<int>::iterator freqwork = freq.begin();
   int * workindex = index.getV();
 
-// spline ändern
+// spline aendern
   for(i=0;i<spline.rows();i++,freqwork++,workindex++)
     spline(*workindex,0) += main(*freqwork,0);
 
-// Intercept ändern
+// Intercept aendern
   intercept += inter;
 
-// fchelp ändern
+// fchelp aendern
   double * fchelpbetap = fchelp.getbetapointer();
 
   freqwork = freq.begin();
@@ -3020,7 +3020,7 @@ bool spline_basis::changeposterior(const datamatrix & main)
   {
 
   unsigned i;
-// beta, spline ändern
+// beta, spline aendern
   beta.plus(beta,main);
   multBS_index(spline,beta);
   compute_intercept();
@@ -3031,7 +3031,7 @@ bool spline_basis::changeposterior(const datamatrix & main)
   betaold.assign(beta);
   intercept = 0.0;
 
-// fchelp ändern
+// fchelp aendern
   write_spline();
   write_derivative();
 

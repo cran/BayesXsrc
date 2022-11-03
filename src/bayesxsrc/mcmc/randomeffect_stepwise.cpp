@@ -379,7 +379,7 @@ void FULLCOND_random_stepwise::compute_lambdavec(vector<double> & lvec, int & nu
   if(forced_into==false)
      lvec.push_back(0);
 
-  // Startwert für lambda aus df:
+  // Startwert fuer lambda aus df:
   if(spfromdf!="direct")
     {
     double lambdavorg = 1000;
@@ -786,7 +786,7 @@ void FULLCOND_random_stepwise::outresults_df(unsigned & size)
   outres << "frequency  ";
   outres << "selected  " << endl;
 
-// Häufigkeitstabelle:
+// Haeufigkeitstabelle:
 
   //samplestream.close();
   datamatrix sample(size,1);
@@ -926,7 +926,7 @@ void FULLCOND_random_stepwise::update_gauss(void)
   update_linpred(false);
 
   datamatrix mu = datamatrix(index.rows(),1,0);
-  // nicht verändern wegen SUR-Modellen
+  // nicht veraendern wegen SUR-Modellen
   likep->compute_respminuslinpred(mu,column);
 
   vector<unsigned>::iterator itbeg = posbeg.begin();

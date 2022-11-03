@@ -527,10 +527,10 @@ else
   if (error == false)
     {
 
-    // Landkarte zeichnen einfügen
+    // Landkarte zeichnen einfuegen
     // Name der plotvariable:   plotvar
     // Name der Regionvariable: regionvar
-    // Daten: erste Spalte von D enthält plotvar, zweite Spalte von D enthält
+    // Daten: erste Spalte von D enthaelt plotvar, zweite Spalte von D enthaelt
     //        regionvar
     // Map: m
     // Farbe ja/nein: o.color.getvalue() == true bedeutet Farbe, ansonsten

@@ -110,7 +110,7 @@ PreMatrix<T> PreMatrix<T>::operator+( const PreMatrix<T> &m ) const
 
 	unsigned size = this->rows( ) * this->cols( );
 
-	// Laufvariablen (Zeiger und Zäaehler)
+	// Laufvariablen (Zeiger und Zaeaehler)
 
 	T *workA = this->getV( );
 	T *workB = m.getV( );
@@ -1441,7 +1441,7 @@ kronecker(const PreMatrix<T> &m) const
 //
 // Ergebnis:
 //
-// Spaltenvektor, der die Elemente der spaltenweise durchlaufenen Matrix enthält.
+// Spaltenvektor, der die Elemente der spaltenweise durchlaufenen Matrix enthaelt.
 
 template <class T>
 PreMatrix<T>
@@ -1462,7 +1462,7 @@ vec() const
 //
 // Ergebnis:
 //
-// Zeilenvektor, der die Elemente der zeilenweise durchlaufenen Matrix enthält.
+// Zeilenvektor, der die Elemente der zeilenweise durchlaufenen Matrix enthaelt.
 
 template <class T>
 PreMatrix<T>

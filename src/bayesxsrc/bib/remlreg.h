@@ -95,8 +95,8 @@ class __EXPORT_TYPE remlreg : public statobject
   // general variables for plotting results
 
   unsigned nrterms;                         // Anzahl Modellterme
-  vector<unsigned> fullcondnr;              // Welches fullcond-Objekt gehört zu dem Term
-  datamatrix catnr;                         // Zu welcher Kategorie gehört der Term
+  vector<unsigned> fullcondnr;              // Welches fullcond-Objekt gehoert zu dem Term
+  datamatrix catnr;                         // Zu welcher Kategorie gehoert der Term
   vector<bool> needscat;                    // ist der Effekt kategorienspezifisch
 
 //------------------------------------------------------------------------------

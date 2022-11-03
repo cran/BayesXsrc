@@ -146,7 +146,7 @@ IWLS_baseline::IWLS_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * 
     gaussy[i](zi.rows(),0)=maxzi;
     gaussmat[i] = MCMC::bsplinemat(gaussy[i],nrk,degr,kp,true,knot);
     }
-//------------------Designmatrix int_D für P-Spline an Knoten-------------------
+//------------------Designmatrix int_D fuer P-Spline an Knoten-------------------
 
   double knot_min = 0.0;
   double knot_max = zi.max(0);
@@ -420,7 +420,7 @@ void IWLS_baseline::update(void)
   if(lambdaconst == true)
     sigma2 = likep->get_scale(column)/lambda;
 
-  if(optionsp->get_nriter()==1)       // posterior mode Schätzung übernehmen
+  if(optionsp->get_nriter()==1)       // posterior mode Schaetzung uebernehmen
     betaold.assign(beta);
 
 
@@ -867,9 +867,9 @@ double IWLS_baseline::compute_quadform(void)
   }
 
 
-//--------- für baseline -------------------------------------------------------
+//--------- fuer baseline -------------------------------------------------------
 
-//--------Für's DIC-------------------------------------------------------------
+//--------Fuer's DIC-------------------------------------------------------------
 void IWLS_baseline::compute_int_ti_mean(void)
   {
   unsigned i;
@@ -906,7 +906,7 @@ void IWLS_baseline::compute_int_ti_mean(void)
       {
       multBS(spline,betamean);
       compute_int_ti(betamean);
-//    compute_int_ti_linear(betamean(0,0));  //für linearen baseline
+//    compute_int_ti_linear(betamean(0,0));  //fuer linearen baseline
       }
     }
   }
@@ -1225,7 +1225,7 @@ else
 //---------------------erg=Integral bei "beg-1"------------------
   int_ti_help_p=int_ti_help.getV()+index(beg-1,0);
   erg=*int_ti_help_p*2.0;
-//ersten Knoten finden, der größer ist als "beg-1"
+//ersten Knoten finden, der groesser ist als "beg-1"
   while(k<int_knots.rows() && int_knots(k,0)<=zi(index(beg-1,0),0) )
     {
     for(j=0;j<nrpar;j++)
@@ -1514,7 +1514,7 @@ for(i_vc=0;i_vc<2;i_vc++)
   spline_zi_help(i_vc,0)++;
 while(i<zi.rows())
   {
-//-----------falls z_vc==0: zu nächster Beobachtung---------------
+//-----------falls z_vc==0: zu naechster Beobachtung---------------
   if(*(z_vc_help+index(i,0))==0)
     {
     i++;
@@ -1707,7 +1707,7 @@ void IWLS_baseline::update_baseline()
 unsigned i;
 if(baselinep.size()>=1)
   {
-  if(vc_dummy1==true)   //keine Linkstrunkierung, zeitl. var. Effekt für dummykod. Variable
+  if(vc_dummy1==true)   //keine Linkstrunkierung, zeitl. var. Effekt fuer dummykod. Variable
     {
     vector <double *> splinevec;
     vector <double *> betavec;
@@ -1721,7 +1721,7 @@ if(baselinep.size()>=1)
       compute_int_ti_vc_di(i,splinevec,betavec);
       }
     }
-  else    //zeitl. var. Effekt für beliebige Kovariablen, Linkstrunkierung
+  else    //zeitl. var. Effekt fuer beliebige Kovariablen, Linkstrunkierung
     {
     compute_int_gauss();
     }
@@ -2217,7 +2217,7 @@ void IWLS_baseline::compute_score(void)
 
   }
 
-//------------ ENDE: für baseline ----------------------------------------------
+//------------ ENDE: fuer baseline ----------------------------------------------
 
 } // end: namespace MCMC
 

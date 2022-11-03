@@ -966,7 +966,7 @@ void remlest_multinomial::make_plots(ofstream & outtex,ST::string path_batch,
   ST::string pathresult;
   bool stil = false;
 
-// Schleife überprüft, ob es ein fullcond-Object
+// Schleife ueberprueft, ob es ein fullcond-Object
 // gibt, bei dem Effekt gezeichnet werden kann
   MCMC::plotstyles plst;
   for(j=0;j<fullcond.size();j++)
@@ -979,10 +979,10 @@ void remlest_multinomial::make_plots(ofstream & outtex,ST::string path_batch,
 
   if(stil == true)
     {
-//erzeugt File, das Plot-Befehle für Java-Version enthält
+//erzeugt File, das Plot-Befehle fuer Java-Version enthaelt
     ofstream outbatch(path_batch.strtochar());
 
-//erzeugt File, das SPlus-Befehle zum Plotten enthält
+//erzeugt File, das SPlus-Befehle zum Plotten enthaelt
     ofstream outsplus(path_splus.strtochar());
 
     outtex << "\n\\newpage" << "\n\\noindent {\\bf \\large Plots:}" << endl;
@@ -995,7 +995,7 @@ void remlest_multinomial::make_plots(ofstream & outtex,ST::string path_batch,
              << "# In S-PLUS the file extension in the source command has to be changed"
              << " to '.s' \n"
              << endl
-    // einlesen der Source-Files für S-Plus
+    // einlesen der Source-Files fuer S-Plus
              << "source(\"'directory'\\\\sfunctions\\\\plotsample.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotnonp.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotsurf.r\")" << endl
@@ -1003,7 +1003,7 @@ void remlest_multinomial::make_plots(ofstream & outtex,ST::string path_batch,
              << "source(\"'directory'\\\\sfunctions\\\\readbndfile.r\")\n" << endl;*/
 
     bool stil2 = true;
-    for(j=0;j<fullcond.size();j++)  //Schleife überprüft, ob es map-Objekt gibt
+    for(j=0;j<fullcond.size();j++)  //Schleife ueberprueft, ob es map-Objekt gibt
       {
       plst = fullcond[j]->get_plotstyle();
       if(plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
@@ -1037,7 +1037,7 @@ void remlest_multinomial::make_plots(ofstream & outtex,ST::string path_batch,
 
     outbatch << "% usefile " << path_batch << endl;
 
-    // falls andere Quantile gewünscht werden
+    // falls andere Quantile gewuenscht werden
     double u = fullcond[0]->get_level1();
     double o = fullcond[0]->get_level2();
     ST::string u_str = ST::doubletostring(u,0);
@@ -1059,7 +1059,7 @@ void remlest_multinomial::make_plots(ofstream & outtex,ST::string path_batch,
       if (plst != MCMC::noplot)
         {
 
-        // Pfade für ps-, tex-, SPlus-files
+        // Pfade fuer ps-, tex-, SPlus-files
         ST::string pathps = pathresult.substr(0, pathresult.length()-4);
         ST::string pathgr = pathps.replaceallsigns('\\', '/');
 
@@ -1105,7 +1105,7 @@ void remlest_multinomial::make_plots(ofstream & outtex,ST::string path_batch,
                  << "\\% pointwise credible intervals.}" << endl
                  << "\\end{figure}" << endl;
           }
-        // für map-Funktionen
+        // fuer map-Funktionen
         else if (plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
           {
           outbatch << "\n";                 // Befehle f. d. batch-file
@@ -1228,7 +1228,7 @@ void remlest_multinomial::make_model(ofstream & outtex, const ST::string & rname
     familyname="multinomial logit";
     }
 
-  //Anz. Beob. wird übergeben
+  //Anz. Beob. wird uebergeben
   unsigned obs = X.rows();
 
   char charh = '_';
@@ -1253,12 +1253,12 @@ void remlest_multinomial::make_predictor(ofstream & outtex)
   unsigned j;
 
   ST::string term2 = fullcond[0]->get_term_symbolic();
-  ST::string term = "$\\eta$ & $=$ & $" + term2;    //linearer Prädiktor wird erweitert
+  ST::string term = "$\\eta$ & $=$ & $" + term2;    //linearer Praediktor wird erweitert
   for(j=1;j<fullcond.size();j++)
     {
     out(fullcond[j]->get_results_type());
     term2 = fullcond[j]->get_term_symbolic();
-    term = term + " + " + term2;    //linearer Prädiktor wird erweitert
+    term = term + " + " + term2;    //linearer Praediktor wird erweitert
     }
 
   outtex << endl << "\n\\begin{tabular}{ccp{12cm}}\n";
@@ -1318,7 +1318,7 @@ void remlest_multinomial::make_options(ofstream & outtex)
 void remlest_multinomial::make_fixed_table(ofstream & outtex)
   {
 
-  // falls andere Quantile gewünscht werden
+  // falls andere Quantile gewuenscht werden
   double u = fullcond[0]->get_level1();
   ST::string u_str = ST::doubletostring(u,0);
 
@@ -1624,7 +1624,7 @@ bool remlest_multistate::estimate(const datamatrix resp,
   // Matrix containing the inverse covariance matrix of the random effects
   statmatrix<double>Qinv(zcols,1,0);
 
-  // Inzidenzvektor, die für jeden Wert in fullcond bzw. beta angibt, ob er zur Baseline-HR beiträgt
+  // Inzidenzvektor, die fuer jeden Wert in fullcond bzw. beta angibt, ob er zur Baseline-HR beitraegt
   vector<int>isbaseline(fullcond.size(),0);
   vector<bool> timevarying(nrtransitions,false);
   unsigned nrbaseline=0;
@@ -1922,7 +1922,7 @@ out1.close();*/
     theta(i,0)=1/theta(i,0);
     }
 
-  // Startwerte für beta0
+  // Startwerte fuer beta0
   j=k=0;
   for(i=0; i<fullcond.size(); i++)
     {
@@ -3224,7 +3224,7 @@ out1.close();*/
       }
     H.addtodiag(Qinv,xcols,beta.rows());
 
-    // Fisher-scoring für beta
+    // Fisher-scoring fuer beta
     beta = betaold + H.solve(H1);
 
 
@@ -3243,7 +3243,7 @@ out1.close();*/
         theta(i,0)=log(sqrt(theta(i,0)));
         }
 
-      // Score-Funktion für theta
+      // Score-Funktion fuer theta
 
      for(j=0; j<theta.rows(); j++)
         {
@@ -3255,7 +3255,7 @@ out1.close();*/
                          (beta.getRowBlock(xcols+zcut[j],xcols+zcut[j+1]).transposed()*beta.getRowBlock(xcols+zcut[j],xcols+zcut[j+1]))(0,0)/(exp(theta(j,0))*exp(theta(j,0))));
         }
 
-      // Fisher-Info für theta
+      // Fisher-Info fuer theta
 
       for(j=0; j<theta.rows(); j++)
         {
@@ -3267,7 +3267,7 @@ out1.close();*/
           }
         }
 
-      //Fisher-scoring für theta
+      //Fisher-scoring fuer theta
 
       theta = thetaold + Fisher.solve(score);
 
@@ -3454,7 +3454,7 @@ void remlest_multistate::make_plots(ofstream & outtex,ST::string path_batch,
   ST::string pathresult;
   bool stil = false;
 
-// Schleife überprüft, ob es ein fullcond-Object
+// Schleife ueberprueft, ob es ein fullcond-Object
 // gibt, bei dem Effekt gezeichnet werden kann
   MCMC::plotstyles plst;
   for(j=0;j<fullcond.size();j++)
@@ -3467,10 +3467,10 @@ void remlest_multistate::make_plots(ofstream & outtex,ST::string path_batch,
 
   if(stil == true)
     {
-//erzeugt File, das Plot-Befehle für Java-Version enthält
+//erzeugt File, das Plot-Befehle fuer Java-Version enthaelt
     ofstream outbatch(path_batch.strtochar());
 
-//erzeugt File, das SPlus-Befehle zum Plotten enthält
+//erzeugt File, das SPlus-Befehle zum Plotten enthaelt
     ofstream outsplus(path_splus.strtochar());
 
     outsplus << "library(\"BayesX\")\n\n";
@@ -3480,7 +3480,7 @@ void remlest_multistate::make_plots(ofstream & outtex,ST::string path_batch,
              << "# In S-PLUS the file extension in the source command has to be changed"
              << " to '.s' \n"
              << endl
-    // einlesen der Source-Files für S-Plus
+    // einlesen der Source-Files fuer S-Plus
              << "source(\"'directory'\\\\sfunctions\\\\plotsample.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotnonp.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotsurf.r\")" << endl
@@ -3488,7 +3488,7 @@ void remlest_multistate::make_plots(ofstream & outtex,ST::string path_batch,
              << "source(\"'directory'\\\\sfunctions\\\\readbndfile.r\")\n" << endl;*/
 
     bool stil2 = true;
-    for(j=0;j<fullcond.size();j++)  //Schleife überprüft, ob es map-Objekt gibt
+    for(j=0;j<fullcond.size();j++)  //Schleife ueberprueft, ob es map-Objekt gibt
       {
       plst = fullcond[j]->get_plotstyle();
       if(plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
@@ -3522,7 +3522,7 @@ void remlest_multistate::make_plots(ofstream & outtex,ST::string path_batch,
 
     outbatch << "% usefile " << path_batch << endl;
 
-    // falls andere Quantile gewünscht werden
+    // falls andere Quantile gewuenscht werden
     double u = fullcond[0]->get_level1();
     double o = fullcond[0]->get_level2();
     ST::string u_str = ST::doubletostring(u,0);
@@ -3545,7 +3545,7 @@ void remlest_multistate::make_plots(ofstream & outtex,ST::string path_batch,
         if (plst != MCMC::noplot)
           {
 
-          // Pfade für ps-, tex-, SPlus-files
+          // Pfade fuer ps-, tex-, SPlus-files
           ST::string pathps = pathresult.substr(0, pathresult.length()-4);
           ST::string pathgr = pathps.replaceallsigns('\\', '/');
 
@@ -3591,7 +3591,7 @@ void remlest_multistate::make_plots(ofstream & outtex,ST::string path_batch,
                    << "\\% pointwise credible intervals.}" << endl
                    << "\\end{figure}" << endl;
             }
-          // für map-Funktionen
+          // fuer map-Funktionen
           else if (plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
             {
             outbatch << "\n";                 // Befehle f. d. batch-file
@@ -3711,7 +3711,7 @@ void remlest_multistate::make_model(ofstream & outtex,
   unsigned i;
   ST::string familyname ="multistate";
 
-  //Anz. Beob. wird übergeben
+  //Anz. Beob. wird uebergeben
   unsigned obs = X.rows();
 
   char charh = '_';
@@ -3749,12 +3749,12 @@ void remlest_multistate::make_predictor(ofstream & outtex)
   for(i=0; i<nrtransitions; i++)
     {
     term2 = fullcond[j]->get_term_symbolic();
-    term = "$\\eta_" + ST::inttostring(i+1) + "$ & $=$ & $" + term2;    //linearer Prädiktor wird erweitert
+    term = "$\\eta_" + ST::inttostring(i+1) + "$ & $=$ & $" + term2;    //linearer Praediktor wird erweitert
     j++;
     for(k=1; k<nrfullconds[i]; k++, j++)
       {
       term2 = fullcond[j]->get_term_symbolic();
-      term = term + " + " + term2;    //linearer Prädiktor wird erweitert
+      term = term + " + " + term2;    //linearer Praediktor wird erweitert
       }
     term = term.insert_after_all_string("^{("+ST::inttostring(i+1)+")}","\\gamma");
     term = term.insert_after_all_string("^{("+ST::inttostring(i+1)+")}","+ f");
@@ -3809,7 +3809,7 @@ void remlest_multistate::make_options(ofstream & outtex)
 
 void remlest_multistate::make_fixed_table(ofstream & outtex)
   {
-  // falls andere Quantile gewünscht werden
+  // falls andere Quantile gewuenscht werden
   double u = fullcond[0]->get_level1();
   ST::string u_str = ST::doubletostring(u,0);
 

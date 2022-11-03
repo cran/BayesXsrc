@@ -1870,7 +1870,7 @@ bool remlest::estimate_survival(const datamatrix resp,
   // Matrix containing the inverse covariance matrix of the random effects
   statmatrix<double>Qinv(zcols,1,0);
 
-  // Inzidenzmatrix, die für jeden Wert in fullcond bzw. beta angibt, ob er zur Baseline-HR beiträgt
+  // Inzidenzmatrix, die fuer jeden Wert in fullcond bzw. beta angibt, ob er zur Baseline-HR beitraegt
   vector<int>isbaseline(fullcond.size(),0);
   int nrbaseline=0;
   for(i=0; i<fullcond.size(); i++)
@@ -1966,7 +1966,7 @@ bool remlest::estimate_survival(const datamatrix resp,
     theta(i,0)=1/theta(i,0);
     }
 
-  // Startwert für beta0 ist der ML-Schätzer bei konstanter Rate + Poisson-Verteilung
+  // Startwert fuer beta0 ist der ML-Schaetzer bei konstanter Rate + Poisson-Verteilung
   beta(0,0) = log(resp.sum(0)/t_X(t_X.rows()-1,1));
 
   while(test==true)
@@ -2071,7 +2071,7 @@ bool remlest::estimate_survival(const datamatrix resp,
       cumhazard(i,0)=cumbaseline(i,0)*mult_hazard(i,0);
       }
 
-    // Score-Funktion für beta
+    // Score-Funktion fuer beta
 
     for(j=0; j<X.cols(); j++)
       {
@@ -2157,7 +2157,7 @@ bool remlest::estimate_survival(const datamatrix resp,
         }
       }
 
-  // Fisher-Info für beta
+  // Fisher-Info fuer beta
 
   // X & X
     for(j=0; j<X.cols(); j++)
@@ -2527,7 +2527,7 @@ bool remlest::estimate_survival(const datamatrix resp,
 
     H.addtodiag(Qinv,xcols,beta.rows());
 
-    // Fisher-scoring für beta
+    // Fisher-scoring fuer beta
     beta = betaold + H.solve(H1);
 
     stop = check_pause();
@@ -2547,7 +2547,7 @@ bool remlest::estimate_survival(const datamatrix resp,
       theta(i,0)=signs[i]*sqrt(theta(i,0));
       }
 
-    // Score-Funktion für theta
+    // Score-Funktion fuer theta
 
    for(j=0; j<theta.rows(); j++)
       {
@@ -2556,7 +2556,7 @@ bool remlest::estimate_survival(const datamatrix resp,
                        (beta.getRowBlock(X.cols()+zcut[j],X.cols()+zcut[j+1]).transposed()*beta.getRowBlock(X.cols()+zcut[j],X.cols()+zcut[j+1]))(0,0)/(theta(j,0)*theta(j,0)*theta(j,0)));
       }
 
-    // Fisher-Info für theta
+    // Fisher-Info fuer theta
 
     for(j=0; j<theta.rows(); j++)
       {
@@ -2567,7 +2567,7 @@ bool remlest::estimate_survival(const datamatrix resp,
         }
       }
 
-    //Fisher-scoring für theta
+    //Fisher-scoring fuer theta
 
     theta = thetaold + Fisher.solve(score);
 
@@ -2737,7 +2737,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
   // Matrix containing the inverse covariance matrix of the random effects
   statmatrix<double>Qinv(zcols,1,0);
 
-  // Inzidenzmatrix, die für jeden Eintrag in fullcond bzw. beta angibt, ob er zur Baseline-HR beiträgt
+  // Inzidenzmatrix, die fuer jeden Eintrag in fullcond bzw. beta angibt, ob er zur Baseline-HR beitraegt
   vector<int>isbaseline(fullcond.size(),0);
   int nrbaseline=0;
   for(i=0; i<fullcond.size(); i++)
@@ -2843,7 +2843,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
     theta(i,0)=1/theta(i,0);
     }
 
-// Startwert für beta0
+// Startwert fuer beta0
   beta(0,0) = log(5/t_X(t_X.rows()-1,1));
 
   while(test==true)
@@ -2970,7 +2970,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
         }
       }
 
-    // Score-Funktion für beta
+    // Score-Funktion fuer beta
 
     // X
 
@@ -2978,7 +2978,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
       {
       H1(j,0)=(resp.transposed()*X.getCol(j))(0,0);
 
-      // x_j gehört zu Baseline
+      // x_j gehoert zu Baseline
       if(isbaselinebeta[j]==1)
         {
         for(i=0; i<nrobs; i++)
@@ -2996,7 +2996,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
           }
         }
 
-      // x_j gehört nicht zur Baseline
+      // x_j gehoert nicht zur Baseline
       else
         {
         for(i=0; i<nrobs; i++)
@@ -3037,7 +3037,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
           }
         }
 
-      // z_j gehört nicht zur Baseline
+      // z_j gehoert nicht zur Baseline
       else
         {
         for(i=0; i<nrobs; i++)
@@ -3627,7 +3627,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
 
     H.addtodiag(Qinv,xcols,beta.rows());
 
-    // Fisher-scoring für beta
+    // Fisher-scoring fuer beta
     beta = betaold + H.solve(H1);
 
     stop = check_pause();
@@ -3647,7 +3647,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
       theta(i,0)=signs[i]*sqrt(theta(i,0));
       }
 
-    // Score-Funktion für theta
+    // Score-Funktion fuer theta
 
    for(j=0; j<theta.rows(); j++)
       {
@@ -3656,7 +3656,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
                        (beta.getRowBlock(X.cols()+zcut[j],X.cols()+zcut[j+1]).transposed()*beta.getRowBlock(X.cols()+zcut[j],X.cols()+zcut[j+1]))(0,0)/(theta(j,0)*theta(j,0)*theta(j,0)));
       }
 
-    // Fisher-Info für theta
+    // Fisher-Info fuer theta
 
     for(j=0; j<theta.rows(); j++)
       {
@@ -3667,7 +3667,7 @@ bool remlest::estimate_survival_interval(datamatrix resp,
         }
       }
 
-    //Fisher-scoring für theta
+    //Fisher-scoring fuer theta
 
     theta = thetaold + Fisher.solve(score);
 
@@ -3841,7 +3841,7 @@ bool remlest::estimate_survival_interval2(datamatrix resp,
   // Matrix containing the inverse covariance matrix of the random effects
   statmatrix<double>Qinv(zcols,1,0);
 
-  // Inzidenzmatrix, die für jeden Eintrag in fullcond bzw. beta angibt, ob er zur Baseline-HR beiträgt
+  // Inzidenzmatrix, die fuer jeden Eintrag in fullcond bzw. beta angibt, ob er zur Baseline-HR beitraegt
   vector<int>isbaseline(fullcond.size(),0);
   int nrbaseline=0;
   for(i=0; i<fullcond.size(); i++)
@@ -4153,7 +4153,7 @@ for(i=0; i<nrobs; i++)
         }
       }
 
-    // Score-Funktion für beta
+    // Score-Funktion fuer beta
 
     if(!timevarying)
 
@@ -4174,7 +4174,7 @@ for(i=0; i<nrobs; i++)
             }
           }
 
-        // x_j gehört zu Baseline
+        // x_j gehoert zu Baseline
         if(isbaselinebeta[j]==1)
           {
           for(i=0; i<nrobs; i++)
@@ -4198,7 +4198,7 @@ for(i=0; i<nrobs; i++)
               }
             }
           }
-        // x_j gehört nicht zur Baseline
+        // x_j gehoert nicht zur Baseline
         else
           {
           for(i=0; i<nrobs; i++)
@@ -4239,7 +4239,7 @@ for(i=0; i<nrobs; i++)
             }
           }
 
-        // z_j gehört zu Baseline
+        // z_j gehoert zu Baseline
         if(isbaselinebeta[xcols+j]==1)
           {
           for(i=0; i<nrobs; i++)
@@ -4263,7 +4263,7 @@ for(i=0; i<nrobs; i++)
               }
             }
           }
-        // z_j gehört nicht zur Baseline
+        // z_j gehoert nicht zur Baseline
         else
           {
           for(i=0; i<nrobs; i++)
@@ -4307,7 +4307,7 @@ for(i=0; i<nrobs; i++)
             }
           }
 
-        // x_j gehört zu Baseline
+        // x_j gehoert zu Baseline
         if(isbaselinebeta[j]==1)
           {
           for(i=0; i<nrobs; i++)
@@ -4346,7 +4346,7 @@ for(i=0; i<nrobs; i++)
               }
             }
           }
-        // x_j gehört nicht zu Baseline
+        // x_j gehoert nicht zu Baseline
         else
           {
 
@@ -4399,7 +4399,7 @@ for(i=0; i<nrobs; i++)
             H1(xcols+j,0) += resp(i,0)*Z(i,j);
             }
           }
-        // z_j gehört zu Baseline
+        // z_j gehoert zu Baseline
         if(isbaselinebeta[xcols+j]==1)
           {
           for(i=0; i<nrobs; i++)
@@ -4438,7 +4438,7 @@ for(i=0; i<nrobs; i++)
               }
             }
           }
-        // z_j gehört nicht zu Baseline
+        // z_j gehoert nicht zu Baseline
         else
           {
           for(i=0; i<nrobs; i++)
@@ -5538,7 +5538,7 @@ for(i=0; i<nrobs; i++)
 
     H.addtodiag(Qinv,xcols,beta.rows());
 
-    // Fisher-scoring für beta
+    // Fisher-scoring fuer beta
     beta = betaold + H.solve(H1);
 
     stop = check_pause();
@@ -5560,7 +5560,7 @@ for(i=0; i<nrobs; i++)
         theta(i,0)=signs[i]*sqrt(theta(i,0));
         }
 
-      // Score-Funktion für theta
+      // Score-Funktion fuer theta
 
      for(j=0; j<theta.rows(); j++)
         {
@@ -5569,7 +5569,7 @@ for(i=0; i<nrobs; i++)
                          (beta.getRowBlock(X.cols()+zcut[j],X.cols()+zcut[j+1]).transposed()*beta.getRowBlock(X.cols()+zcut[j],X.cols()+zcut[j+1]))(0,0)/(theta(j,0)*theta(j,0)*theta(j,0)));
         }
 
-      // Fisher-Info für theta
+      // Fisher-Info fuer theta
 
       for(j=0; j<theta.rows(); j++)
         {
@@ -5580,7 +5580,7 @@ for(i=0; i<nrobs; i++)
           }
         }
 
-      //Fisher-scoring für theta
+      //Fisher-scoring fuer theta
 
       theta = thetaold + Fisher.solve(score);
 
@@ -5603,7 +5603,7 @@ for(i=0; i<nrobs; i++)
         theta(i,0)=log(sqrt(theta(i,0)));
         }
 
-      // Score-Funktion für theta
+      // Score-Funktion fuer theta
 
      for(j=0; j<theta.rows(); j++)
         {
@@ -5615,7 +5615,7 @@ for(i=0; i<nrobs; i++)
                          (beta.getRowBlock(X.cols()+zcut[j],X.cols()+zcut[j+1]).transposed()*beta.getRowBlock(X.cols()+zcut[j],X.cols()+zcut[j+1]))(0,0)/(exp(theta(j,0))*exp(theta(j,0))));
         }
 
-      // Fisher-Info für theta
+      // Fisher-Info fuer theta
 
       for(j=0; j<theta.rows(); j++)
         {
@@ -5627,7 +5627,7 @@ for(i=0; i<nrobs; i++)
           }
         }
 
-      //Fisher-scoring für theta
+      //Fisher-scoring fuer theta
 
       theta = thetaold + Fisher.solve(score);
 
@@ -6027,7 +6027,7 @@ void remlest::make_plots(ofstream & outtex,ST::string path_batch,
   ST::string pathresult;
   bool stil = false;
 
-// Schleife überprüft, ob es ein fullcond-Object
+// Schleife ueberprueft, ob es ein fullcond-Object
 // gibt, bei dem Effekt gezeichnet werden kann
   MCMC::plotstyles plst;
   for(j=0;j<fullcond.size();j++)
@@ -6040,10 +6040,10 @@ void remlest::make_plots(ofstream & outtex,ST::string path_batch,
 
   if(stil == true)
     {
-//erzeugt File, das Plot-Befehle für Java-Version enthält
+//erzeugt File, das Plot-Befehle fuer Java-Version enthaelt
     ofstream outbatch(path_batch.strtochar());
 
-//erzeugt File, das SPlus-Befehle zum Plotten enthält
+//erzeugt File, das SPlus-Befehle zum Plotten enthaelt
     ofstream outsplus(path_splus.strtochar());
 
     outtex << "\n\\newpage" << "\n\\noindent {\\bf \\large Plots:}" << endl;
@@ -6055,7 +6055,7 @@ void remlest::make_plots(ofstream & outtex,ST::string path_batch,
              << "# In S-PLUS the file extension in the source command has to be changed"
              << " to '.s' \n"
              << endl
-    // einlesen der Source-Files für S-Plus
+    // einlesen der Source-Files fuer S-Plus
              << "source(\"'directory'\\\\sfunctions\\\\plotsample.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotnonp.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotsurf.r\")" << endl
@@ -6063,7 +6063,7 @@ void remlest::make_plots(ofstream & outtex,ST::string path_batch,
              << "source(\"'directory'\\\\sfunctions\\\\readbndfile.r\")\n" << endl;*/
 
     bool stil2 = true;
-    for(j=0;j<fullcond.size();j++)  //Schleife überprüft, ob es map-Objekt gibt
+    for(j=0;j<fullcond.size();j++)  //Schleife ueberprueft, ob es map-Objekt gibt
       {
       plst = fullcond[j]->get_plotstyle();
       if(plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
@@ -6097,7 +6097,7 @@ void remlest::make_plots(ofstream & outtex,ST::string path_batch,
 
     outbatch << "% usefile " << path_batch << endl;
 
-    // falls andere Quantile gewünscht werden
+    // falls andere Quantile gewuenscht werden
     double u = fullcond[0]->get_level1();
     double o = fullcond[0]->get_level2();
     ST::string u_str = ST::doubletostring(u,0);
@@ -6116,7 +6116,7 @@ void remlest::make_plots(ofstream & outtex,ST::string path_batch,
       if (plst != MCMC::noplot)
         {
 
-        // Pfade für ps-, tex-, SPlus-files
+        // Pfade fuer ps-, tex-, SPlus-files
         ST::string pathps = pathresult.substr(0, pathresult.length()-4);
         ST::string pathgr = pathps.replaceallsigns('\\', '/');
 
@@ -6162,7 +6162,7 @@ void remlest::make_plots(ofstream & outtex,ST::string path_batch,
                  << "\\% pointwise credible intervals.}" << endl
                  << "\\end{figure}" << endl;
           }
-        // für map-Funktionen
+        // fuer map-Funktionen
         else if (plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
           {
           outbatch << "\n";                 // Befehle f. d. batch-file
@@ -6329,7 +6329,7 @@ void remlest::make_model(ofstream & outtex, const ST::string & rname)
       familyname="cox";
       }
 
-  //Anz. Beob. wird übergeben
+  //Anz. Beob. wird uebergeben
   unsigned obs = X.rows();
 
   char charh = '_';
@@ -6372,11 +6372,11 @@ void remlest::make_predictor(ofstream & outtex)
   unsigned j;
 
   ST::string term2 = fullcond[0]->get_term_symbolic();
-  ST::string term = "$\\eta$ & $=$ & $" + term2;    //linearer Prädiktor wird erweitert
+  ST::string term = "$\\eta$ & $=$ & $" + term2;    //linearer Praediktor wird erweitert
   for(j=1;j<fullcond.size();j++)
     {
     term2 = fullcond[j]->get_term_symbolic();
-    term = term + " + " + term2;    //linearer Prädiktor wird erweitert
+    term = term + " + " + term2;    //linearer Praediktor wird erweitert
     }
 
   outtex << endl << "\n\\begin{tabular}{ccp{12cm}}\n" << term
@@ -6424,7 +6424,7 @@ void remlest::make_options(ofstream & outtex)
 void remlest::make_fixed_table(ofstream & outtex)
   {
 
-  // falls andere Quantile gewünscht werden
+  // falls andere Quantile gewuenscht werden
   double u = fullcond[0]->get_level1();
   ST::string u_str = ST::doubletostring(u,0);
 

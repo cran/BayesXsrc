@@ -215,7 +215,7 @@ class __EXPORT_TYPE string
 	 return len;
 	 }
 
-  // Liefert die Länge des Teilsstrings der ausschließlich aus Zeichen besteht,
+  // Liefert die Laenge des Teilsstrings der ausschliesslich aus Zeichen besteht,
   // die in s enthalten sind
 
   int spn(const string & s) const

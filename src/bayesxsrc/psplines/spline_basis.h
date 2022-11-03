@@ -41,7 +41,7 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
 
   protected:
 
-  FULLCOND_const * fcconst;             // Zeiger auf Fullcond-Objekt für fixe Effekte + Intercept
+  FULLCOND_const * fcconst;             // Zeiger auf Fullcond-Objekt fuer fixe Effekte + Intercept
 
   bool pseudocontourprob;               // Sollen Pseudo-Contour-Wahrscheinlichkeiten nach Besag
                                         // berechnet werden?
@@ -49,12 +49,12 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
                                         // Wahrscheinlichkeiten mit dem Verfahren von
                                         // Tierney approximiert werden?
   int lengthstart;                      // Anzahl der Iteration die verwendet werden sollen
-                                        // um Startwerte für die Approximation nach Tierney
+                                        // um Startwerte fuer die Approximation nach Tierney
                                         // zu berechnen.
 
-  bool lambdaconst;                     // Soll der Glättungsparameter geschätzt werden oder nicht?
+  bool lambdaconst;                     // Soll der Glaettungsparameter geschaetzt werden oder nicht?
   bool outbsplines;                     // Sollen die B-Spline Basisfunktionen ausgegeben werden?
-  double lambda_prec;                   // lambda mit dem die aktuelle Präzisionsmatrix berechnet wurde
+  double lambda_prec;                   // lambda mit dem die aktuelle Praezisionsmatrix berechnet wurde
 
   bool predictright;                    // Sollen auf der rechten Seite Parameter prognostiziert werden?
   unsigned nrparpredictright;           // Anzahl der Parameter die rechts prognostiziert werden sollen
@@ -65,8 +65,8 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
   vector<int> index2;                   // Indexvariable zum schnelleren durchlaufen
                                         // von spline, linpred, etc.
 
-  bool increasing;                      // für monotone Regression: monoton steigender Effekt
-  bool decreasing;                      // für monotone Regression: monoton fallender Effekt
+  bool increasing;                      // fuer monotone Regression: monoton steigender Effekt
+  bool decreasing;                      // fuer monotone Regression: monoton fallender Effekt
 
   datamatrix interactvar;               // speichert bei variierden Koeffizienten
                                         // die Werte der Interaktionsvariable
@@ -76,9 +76,9 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
   datamatrix betaprop;                  // Vorgeschlagenes beta
 
   bandmatdouble XX;                     // X'X
-  bandmatdouble prec;                   // Präzisionsmatrix (X'WX + 1/sigma2*K)
+  bandmatdouble prec;                   // Praezisionsmatrix (X'WX + 1/sigma2*K)
 
-  envmatdouble prec_env;                // Präzisionsmatrix als Envelope-Matrix (X'WX + 1/sigma2*K)
+  envmatdouble prec_env;                // Praezisionsmatrix als Envelope-Matrix (X'WX + 1/sigma2*K)
   envmatdouble XX_env;                  // X'X als Envelope-Matrix
 
   datamatrix mu;                        // tildey
@@ -90,9 +90,9 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
   FULLCOND fchelp;                      // Fullcond-Objekt zum Abspeichern der Samples
                                         // des Splines in jeder Iteration
   FULLCOND fcderivative;                // Fullcond-Objekt zum Abspeichern der Samples
-                                        // für die erste Ableitung in jeder Iteration
+                                        // fuer die erste Ableitung in jeder Iteration
 
-  bsplinemat Bderivative;               // Designmatrix für die erste Ableitung
+  bsplinemat Bderivative;               // Designmatrix fuer die erste Ableitung
                                         // (f'(x) = Bderivative*beta)
   datamatrix splinederivative;          // Erste Ableitung des Splines
 
@@ -102,20 +102,20 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
   unsigned degree;                      // Grad des Splines
   unsigned nrdiffobs;                   // Anzahl verschiedener Kovariablen-Werte
 
-  int gridsize;                         // -1 falls Schätzungen für alle verschiedenen
+  int gridsize;                         // -1 falls Schaetzungen fuer alle verschiedenen
                                         // Kovariablen-Werte ausgegeben werden sollen
-                                        // sonst: Anzahl von äquidistanten Punkten, an
-                                        // denen Schätzungen ausgegeben werden sollen
+                                        // sonst: Anzahl von aequidistanten Punkten, an
+                                        // denen Schaetzungen ausgegeben werden sollen
   double intercept;                     // Zentrierungskonstante
   knotpos knpos;                        // 'equidistant' oder 'quantiles'
 
-  vector<int> freq;                     // Wert wird um 1 erhöht, wenn ein Kovariablen-Wert
+  vector<int> freq;                     // Wert wird um 1 erhoeht, wenn ein Kovariablen-Wert
                                         // der sortierten Beobachtungen verschieden vom
-                                        // vorherigen ist. Wichtig für die Berechnung von X*beta,
-                                        // X'WX etc., da in X nur Einträge für VERSCHIEDENE
+                                        // vorherigen ist. Wichtig fuer die Berechnung von X*beta,
+                                        // X'WX etc., da in X nur Eintraege fuer VERSCHIEDENE
                                         // Kovariablen-Werte gespeichert werden.
                                         // Beobachtungen ausgegeben werden
-  vector<int> freqoutput;               // Für die Ausgabe. Wichtig damit nur verschiedene
+  vector<int> freqoutput;               // Fuer die Ausgabe. Wichtig damit nur verschiedene
                                         // Beobachtungen ausgegeben werden. Identisch mit
                                         // freq, falls varcoeff==false
 
@@ -126,21 +126,21 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
   deque<double> knot;                   // Vektor der Knoten (sichtbare und unsichtbare)
 
   datamatrix xvalues;                   // geordente, verschiedene Kovariablen-
-                                        // Werte (für die Ausgabe)
+                                        // Werte (fuer die Ausgabe)
   datamatrix spline;                    // aktueller Spline
   datamatrix splinehelp;                // Hilfmatrix
-  datamatrix betaweight;                // Gewichte für compute_intercept
+  datamatrix betaweight;                // Gewichte fuer compute_intercept
 
-  datamatrix B;                         // 0 für nonp, X für varcoeff==true
-                                        // (enthält nur Einträge ungleich 0 und nur
-                                        // für verschiedene Kovariablen-Werte.)
-  datamatrix BS;                        // X für nonp, XZ für varcoeff==true
-                                        // (enthält nur Einträge ungleich 0 und nur
-                                        // für verschiedene Kovariablen-Werte.)
-  datamatrix G;                         // Transformationsmatrix für diagtransform
+  datamatrix B;                         // 0 fuer nonp, X fuer varcoeff==true
+                                        // (enthaelt nur Eintraege ungleich 0 und nur
+                                        // fuer verschiedene Kovariablen-Werte.)
+  datamatrix BS;                        // X fuer nonp, XZ fuer varcoeff==true
+                                        // (enthaelt nur Eintraege ungleich 0 und nur
+                                        // fuer verschiedene Kovariablen-Werte.)
+  datamatrix G;                         // Transformationsmatrix fuer diagtransform
 
-  datamatrix X_VCM;                     // für REML VCM
-  datamatrix Z_VCM;                     // für REML VCM
+  datamatrix X_VCM;                     // fuer REML VCM
+  datamatrix Z_VCM;                     // fuer REML VCM
 
   datamatrix X_grid;                    // Evaulation on a predefined grid
   datamatrix Z_grid;                    //
@@ -184,13 +184,13 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
   // TASK: berechnet B, BS, knot, nrparpredictleft, nrparpredictright, Bcolmean
   // md:        Datenmatrix
   // minnull:   false - erster sichtbarer Knoten ist bei x_min
-  //            true  - erster sichtbarer Knoten ist bei 0 (für baseline bei Cox)
+  //            true  - erster sichtbarer Knoten ist bei 0 (fuer baseline bei Cox)
 
   void make_Bspline(const datamatrix & md,const bool & minnull = false);
 
   // FUNCTION: make_BS
-  // TASK: berechnet die B-Spline-Designmatrix für VCM-Modelle (B=BS, BS = diag(ia)*BS)
-  // NOTE: make_Bspline muss bereits ausgeführt sein
+  // TASK: berechnet die B-Spline-Designmatrix fuer VCM-Modelle (B=BS, BS = diag(ia)*BS)
+  // NOTE: make_Bspline muss bereits ausgefuehrt sein
   // ia:   Interaktionsvariable
 
   void make_BS(const datamatrix & ia);
@@ -211,7 +211,7 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
   void init_fchelp(const datamatrix & d);
 
   // FUNCTION: compute_betaweight
-  // TASK: berechnet die nötigen Gewichte zur Berechnung der Zentrierungskonstanten
+  // TASK: berechnet die noetigen Gewichte zur Berechnung der Zentrierungskonstanten
 
   void compute_betaweight(void);
 
@@ -221,7 +221,7 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
   void compute_intercept(void);
 
   // FUNCTION: compute_intercept
-  // TASK: berechnet die Zentrierungskonstante mit der übergebenen Matrix
+  // TASK: berechnet die Zentrierungskonstante mit der uebergebenen Matrix
 
   void compute_intercept(const datamatrix & beta);
 
@@ -256,14 +256,14 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
 
   void add_linearpred_multBS_Block(const unsigned a, const unsigned e, const datamatrix & b);
 
-  // für Cox-Modell, wenn baseline direkt modelliert wird anstatt log(baseline)  (condprior)
+  // fuer Cox-Modell, wenn baseline direkt modelliert wird anstatt log(baseline)  (condprior)
 
 //  void add_linearpred_multBS_Block2(const unsigned a, const unsigned e, const datamatrix & b);
 
   // FUNCTION compute_XWX
   // TASK: computes X'diag(weight)X and assigns the result to XX
 
-  void compute_XWX(const datamatrix & weight);     // nur für diagtransform
+  void compute_XWX(const datamatrix & weight);     // nur fuer diagtransform
 
   // FUNCTION compute_XWXenv
   // TASK: computes X'diag(weight)X and assigns the result to XX_env
@@ -283,7 +283,7 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
 
   // FUNCTION compute_XWtildey
   // TASK: computes scale * X'diag(weight)tildey and assigns the result to muy
-  // NOTE: für posteriormode
+  // NOTE: fuer posteriormode
 
   void compute_XWtildey(const datamatrix & weight, const datamatrix & tildey, const double & scale, const unsigned & c=0);
 
@@ -366,7 +366,7 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
                 const double & uk, const double & lg, const double & ug,
                 const unsigned & c);
 
-  // CONSTRUCTOR für REML
+  // CONSTRUCTOR fuer REML
 
   spline_basis(MCMCoptions * o, const datamatrix & d, const unsigned & nrk, const unsigned & degr,
                const knotpos & kp, const fieldtype & ft, const ST::string & ti,
@@ -375,7 +375,7 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
                const double & ug, const double & lk, const double & uk,
                const int & gs, const double & rv);
 
-  // CONSTRUCTOR für REML VCM
+  // CONSTRUCTOR fuer REML VCM
 
   spline_basis(MCMCoptions * o, const datamatrix & d1, const datamatrix & d2,
                const unsigned & nrk, const unsigned & degr,
@@ -391,19 +391,19 @@ class __EXPORT_TYPE spline_basis : public FULLCOND_nonp_basis
 
   const spline_basis & operator=(const spline_basis & sp);
 
-  // Funktionen zum ändern der Haupteffekte bei Interaktionen
+  // Funktionen zum aendern der Haupteffekte bei Interaktionen
 
   // main: Matrix mit den Haupteffekten
   //       Im Gauss-Fall:       'rausgerechneter' Haupteffekt
   //       Im Nicht-Gauss-Fall: 'rausgerechnetes' beta
   // inter: Zentrierungskonstante
 
-  // für die MCMC-Simulation
+  // fuer die MCMC-Simulation
 
   void change(const datamatrix & main, const double & inter);            // Gauss-Fall
   void change(const datamatrix & main);                                  // Nicht-Gauss-Fall
 
-  // für die Posteriori-Modus-Schätzung
+  // fuer die Posteriori-Modus-Schaetzung
 
   bool changeposterior(const datamatrix & main, const double & inter);   // Gauss-Fall
   bool changeposterior(const datamatrix & main);                         // Nicht-Gauss-Fall

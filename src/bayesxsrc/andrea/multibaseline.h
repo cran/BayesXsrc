@@ -93,7 +93,7 @@ class __EXPORT_TYPE pspline_multibaseline : public FULLCOND_pspline
                     const datamatrix & anfang,const bool & wb);
 
 
-// CONSTRUCTOR 2 (für zeitabhängige Effekte)
+// CONSTRUCTOR 2 (fuer zeitabhaengige Effekte)
 
 pspline_multibaseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const datamatrix & time, const datamatrix & z,

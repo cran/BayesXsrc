@@ -184,17 +184,17 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
     }
 
 // ----------------------------------------------------------------------------
-// --- Conny: Konstruiere großes X und Z
+// --- Conny: Konstruiere grosses X und Z
 // ----------------------------------------------------------------------------
 
- // xcutbetalength gibt die Länge der Abschnitte von xcutbeta an
+ // xcutbetalength gibt die Laenge der Abschnitte von xcutbeta an
    vector <unsigned> xcutbetalength (xcutbeta.size()-1);
    for (i=0; i<xcutbetalength.size(); i++)
    {
    xcutbetalength[i]=xcutbeta[i+1]-xcutbeta[i];
    }
 
- // xcutlength gibt die Länge der Abschnitte von xcut an
+ // xcutlength gibt die Laenge der Abschnitte von xcut an
    vector <unsigned> xcutlength (xcut.size()-1);
    for (i=0; i<xcutlength.size(); i++)
    {
@@ -211,18 +211,18 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
     unsigned XaltSpalte_fixed=0;                                                  // gibt die aktuelle Spalte in Xalt an
     unsigned XneuSpalte_fixed=0;                                                  // gibt die aktuelle Spalte in Xneu an
 
- // j durchläuft den Bereich 0..catspecific_fixed.size()           // catspecific_fixed.size() = xcut[1]
+ // j durchlaeuft den Bereich 0..catspecific_fixed.size()           // catspecific_fixed.size() = xcut[1]
 
     for (j=0; j<catspecific_fixed.size(); j++)                                    // Durchlauf solange Bedingung vorhanden
-    {                                                                             // Anfang zur for-Schleife für X
+    {                                                                             // Anfang zur for-Schleife fuer X
        // 1. Skalar und catspecific
        // -> nrcat2 x 1 - Matrizen
 
        if (catspecific_fixed[j])
        {
-          for(i=0; i<nrobs; i++)                                                  // i durchläuft die Zeilen von Xalt
+          for(i=0; i<nrobs; i++)                                                  // i durchlaeuft die Zeilen von Xalt
           {
-              for(k=0; k<nrcat2; k++)                                             // k durchläuft nrcat2
+              for(k=0; k<nrcat2; k++)                                             // k durchlaeuft nrcat2
               {
               Xneu(i*nrcat2+k, XneuSpalte_fixed)= X (i, XaltSpalte_fixed + k );
               }
@@ -237,9 +237,9 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
 
        else
        {
-          for(i=0; i<nrobs; i++)                                                  // i durchläuft die Zeilen von Xalt
+          for(i=0; i<nrobs; i++)                                                  // i durchlaeuft die Zeilen von Xalt
           {
-              for(k=0; k<nrcat2; k++)                                             // k durchläuft nrcat2
+              for(k=0; k<nrcat2; k++)                                             // k durchlaeuft nrcat2
               {
               Xneu(i*nrcat2+k, XneuSpalte_fixed+k)= X (i, XaltSpalte_fixed );
               }
@@ -258,21 +258,21 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
     unsigned XaltSpalte=xcut[1];                                                  // gibt die aktuelle Spalte in Xalt an
     unsigned XneuSpalte=xcutbeta[1];                                              // gibt die aktuelle Spalte in Xneu an
 
- // j durchläuft den Bereich 1..catspecific.size()
+ // j durchlaeuft den Bereich 1..catspecific.size()
 
     for (j=1; j<catspecific.size(); j++)                                          // Durchlauf solange Bedingung vorhanden
-    {                                                                             // Anfang zur for-Schleife für X
+    {                                                                             // Anfang zur for-Schleife fuer X
 
        // 1. Vektor und catspecific
        // -> nrcat2 x 1*xcutlength[j] - Matrizen
 
        if ( catspecific[j])
        {
-             for(i=0; i<nrobs; i++)                                               // i durchläuft die Zeilen von Xalt
+             for(i=0; i<nrobs; i++)                                               // i durchlaeuft die Zeilen von Xalt
              {
-                for(k=0; k<nrcat2; k++)                                           // k durchläuft nrcat2
+                for(k=0; k<nrcat2; k++)                                           // k durchlaeuft nrcat2
                 {
-                   for(l=0; l<(xcutlength[j]/nrcat2); l++)                                 // l durchläuft xcutbetalength[j]
+                   for(l=0; l<(xcutlength[j]/nrcat2); l++)                                 // l durchlaeuft xcutbetalength[j]
                     {
                    Xneu(i*nrcat2+k, XneuSpalte+l)= X (i, XaltSpalte+l+(k*xcutlength[j]/nrcat2) );               //+(k*xcutlength[j])
                    }
@@ -289,11 +289,11 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
 
        else
        {
-             for(i=0; i<nrobs; i++)                                               // i durchläuft die Zeilen von Xalt
+             for(i=0; i<nrobs; i++)                                               // i durchlaeuft die Zeilen von Xalt
              {
-                for(k=0; k<nrcat2; k++)                                           // k durchläuft nrcat2
+                for(k=0; k<nrcat2; k++)                                           // k durchlaeuft nrcat2
                 {
-                   for(l=0; l<xcutlength[j]; l++)                                 // l durchläuft xcutbetalength[j]
+                   for(l=0; l<xcutlength[j]; l++)                                 // l durchlaeuft xcutbetalength[j]
                    {
                    Xneu(i*nrcat2+k, XneuSpalte+(k*xcutlength[j]) +l)= X (i, XaltSpalte+l );
                    }
@@ -304,20 +304,20 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
        XneuSpalte=XneuSpalte+(xcutlength[j]*nrcat2);                              // aktualisiert XneuSpalte
        }
 
-    }                                                                             // Ende zur for-Schleife für X
+    }                                                                             // Ende zur for-Schleife fuer X
 
  //  Basteln an Z
 
- // Zu Z: Hilfsvektor bzw. Hilfsmatrix für die if - Schleifen
+ // Zu Z: Hilfsvektor bzw. Hilfsmatrix fuer die if - Schleifen
 
- // zcutbetalength gibt die Länge der Abschnitte von zcutbeta an
+ // zcutbetalength gibt die Laenge der Abschnitte von zcutbeta an
    vector <unsigned> zcutbetalength (zcutbeta.size()-1);
    for (i=0; i<zcutbetalength.size(); i++)
    {
    zcutbetalength[i]=zcutbeta[i+1]-zcutbeta[i];
    }
 
- // zcutlength gibt die Länge der Abschnitte von zcut an
+ // zcutlength gibt die Laenge der Abschnitte von zcut an
    vector <unsigned> zcutlength (zcut.size()-1);
    for (i=0; i<zcutlength.size(); i++)
    {
@@ -331,20 +331,20 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
     unsigned ZaltSpalte=0;                                                        // gibt die aktuelle Spalte in Zalt an
     unsigned ZneuSpalte=0;                                                        // gibt die aktuelle Spalte in Zneu an
 
- // j durchläuft den Bereich 1..catspecific.size()
+ // j durchlaeuft den Bereich 1..catspecific.size()
 
     for (j=1; j<catspecific.size(); j++)                                          // Durchlauf solange Bedingung vorhanden
-    {                                                                             // Anfang zur for-Schleife für Z
+    {                                                                             // Anfang zur for-Schleife fuer Z
        // 1. Vektor und catspecific
        // -> nrcat2 x 1*xcutbetalength[j-1] - Matrizen
 
       if (catspecific[j])
         {
-             for(i=0; i<nrobs; i++)                                               // i durchläuft die Zeilen von Zalt
+             for(i=0; i<nrobs; i++)                                               // i durchlaeuft die Zeilen von Zalt
              {
-                for(k=0; k<nrcat2; k++)                                           // k durchläuft nrcat2
+                for(k=0; k<nrcat2; k++)                                           // k durchlaeuft nrcat2
                 {
-                   for(l=0; l< (zcutlength[j-1]/nrcat2); l++)                               // l durchläuft zcutbetalength[j-1]
+                   for(l=0; l< (zcutlength[j-1]/nrcat2); l++)                               // l durchlaeuft zcutbetalength[j-1]
                    {
                    Zneu(i*nrcat2+k, ZneuSpalte+l)= Z (i, ZaltSpalte+l+(k*zcutlength[j-1]/nrcat2) );
                    }
@@ -360,11 +360,11 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
 
        else
        {
-             for(i=0; i<nrobs; i++)                                               // i durchläuft die Zeilen von Zalt
+             for(i=0; i<nrobs; i++)                                               // i durchlaeuft die Zeilen von Zalt
              {
-                for(k=0; k<nrcat2; k++)                                           // k durchläuft nrcat2
+                for(k=0; k<nrcat2; k++)                                           // k durchlaeuft nrcat2
                 {
-                   for(l=0; l<zcutlength[j-1]; l++)                               // l durchläuft zcutbetalength[j-1]
+                   for(l=0; l<zcutlength[j-1]; l++)                               // l durchlaeuft zcutbetalength[j-1]
                    {
                    Zneu(i*nrcat2+k, ZneuSpalte+(k*zcutlength[j-1]) +l)= Z (i, ZaltSpalte+l );
                    }
@@ -374,7 +374,7 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
        ZaltSpalte=ZaltSpalte+zcutlength[j-1];                                     // aktualisiert ZaltSpalte
        ZneuSpalte=ZneuSpalte+(zcutlength[j-1]*nrcat2);                            // aktualisiert ZneuSpalte
        }
-    }                                                                             // Ende zur for-Schleife für Z
+    }                                                                             // Ende zur for-Schleife fuer Z
 
 /*
 // Berechnen von Xneu' unter XneuTr
@@ -407,7 +407,7 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
    datamatrix H_11hilf (1, nrobs*nrcat2,  0);*/
 
 // ----------------------------------------------------------------------------
-// --- Ende: Konstruiere großes X und Z
+// --- Ende: Konstruiere grosses X und Z
 // ----------------------------------------------------------------------------
 
   out("\n");
@@ -516,11 +516,11 @@ bool remlest_multinomial_catsp::estimate(const datamatrix resp, const datamatrix
 
 // Berechnen von H_00, H_01, H1_0
 
-for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                   // l durchläuft die Zeilen von Xneu' und die Zeilen von H_00
+for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                   // l durchlaeuft die Zeilen von Xneu' und die Zeilen von H_00
 {
-     for  (j=0;  j<nrobs*nrcat2;  j=j+nrcat2)                                                                                                                      // j durchläuft die Spalten von Xneu'
+     for  (j=0;  j<nrobs*nrcat2;  j=j+nrcat2)                                                                                                                      // j durchlaeuft die Spalten von Xneu'
      {
-          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchläuft nrcat2
+          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchlaeuft nrcat2
           {
           H_00hilf (0, j+i) = ((XneuTr.getBlock( l, j, l+1, j+nrcat2)) * (workweight.getBlock(j, i,  j+nrcat2, i+1)))(0,0);
           }
@@ -528,14 +528,14 @@ for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                  
 
 // Berechnen von H_00 = Xneu' workweight Xneu
 
-     for (k=l; k<xcutbeta[xcutbeta.size()-1]; k++ )                              // k durchläuft die Spalten von Xneu
+     for (k=l; k<xcutbeta[xcutbeta.size()-1]; k++ )                              // k durchlaeuft die Spalten von Xneu
      {
      H_00(l, k) = ((H_00hilf) * (Xneu.getCol(k)))(0,0);
      H_00(k,l)=H_00(l,k);
      }
 
 // Berechnen von H_01 = Xneu' workweight Zneu
-     for (k=0; k<zcutbeta[zcutbeta.size()-1]; k++ )                              // k durchläuft die Spalten von Zneu
+     for (k=0; k<zcutbeta[zcutbeta.size()-1]; k++ )                              // k durchlaeuft die Spalten von Zneu
      {
      H_01(l, k) = ((H_00hilf) * (Zneu.getCol(k))) (0,0);
      }
@@ -550,19 +550,19 @@ for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                  
 
 // Berechnen von H_11, H1_1
 
-for (l=0; l<zcutbeta[zcutbeta.size()-1]; l++ )                                   // l durchläuft die Zeilen von Zneu' und die Zeilen von H_11
+for (l=0; l<zcutbeta[zcutbeta.size()-1]; l++ )                                   // l durchlaeuft die Zeilen von Zneu' und die Zeilen von H_11
 {
 
-     for  (j=0;  j<nrobs*nrcat2; j=j+nrcat2)                                                                                                                      // j durchläuft die Spalten von Zneu'
+     for  (j=0;  j<nrobs*nrcat2; j=j+nrcat2)                                                                                                                      // j durchlaeuft die Spalten von Zneu'
      {
-          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchläuft nrcat2
+          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchlaeuft nrcat2
           {
           H_11hilf (0, j+i) = ((ZneuTr.getBlock( l, j, l+1, j+nrcat2)) * (workweight.getBlock(j, i,  j+nrcat2, i+1))) (0,0);
           }
      }
 
 // Berechnen von H_11 = Zneu' workweight Zneu
-     for (k=l; k<zcutbeta[zcutbeta.size()-1]; k++ )                              // k durchläuft die Spalten von Zneu
+     for (k=l; k<zcutbeta[zcutbeta.size()-1]; k++ )                              // k durchlaeuft die Spalten von Zneu
      {
      H_11(l, k) = ((H_11hilf) * (Zneu.getCol(k))) (0,0);
      H_11(k,l)=H_11(l,k);
@@ -954,7 +954,7 @@ bool remlest_multinomial_catsp::estimate_glm(const datamatrix resp,
     fullcond[i]->outoptionsreml();
 
 // ----------------------------------------------------------------------------
-// --- Conny: Konstruiere großes X
+// --- Conny: Konstruiere grosses X
 // ----------------------------------------------------------------------------
 
 // Ausgabedateien gegeben
@@ -1007,10 +1007,10 @@ bool remlest_multinomial_catsp::estimate_glm(const datamatrix resp,
    unsigned XaltSpalte_fixed=0;                                                  // gibt die aktuelle Spalte in Xalt an
    unsigned XneuSpalte_fixed=0;                                                  // gibt die aktuelle Spalte in Xneu an
 
-// j durchläuft den Bereich 0..catspecific_fixed.size()           // catspecific_fixed.size() = xcut[1]
+// j durchlaeuft den Bereich 0..catspecific_fixed.size()           // catspecific_fixed.size() = xcut[1]
 
    for (j=0; j<catspecific_fixed.size(); j++)                                    // Durchlauf solange Bedingung vorhanden
-   {                                                                             // Anfang zur for-Schleife für X
+   {                                                                             // Anfang zur for-Schleife fuer X
 
       //----------------------------------
       // 1. Skalar und catspecific
@@ -1018,9 +1018,9 @@ bool remlest_multinomial_catsp::estimate_glm(const datamatrix resp,
 
       if (catspecific_fixed[j])
       {
-         for(i=0; i<nrobs; i++)                                                  // i durchläuft die Zeilen von Xalt
+         for(i=0; i<nrobs; i++)                                                  // i durchlaeuft die Zeilen von Xalt
          {
-             for(k=0; k<nrcat2; k++)                                             // k durchläuft nrcat2
+             for(k=0; k<nrcat2; k++)                                             // k durchlaeuft nrcat2
              {
              Xneu(i*nrcat2+k, XneuSpalte_fixed)= X (i, XaltSpalte_fixed + k );
              }
@@ -1036,9 +1036,9 @@ bool remlest_multinomial_catsp::estimate_glm(const datamatrix resp,
 
       else
       {
-         for(i=0; i<nrobs; i++)                                                  // i durchläuft die Zeilen von Xalt
+         for(i=0; i<nrobs; i++)                                                  // i durchlaeuft die Zeilen von Xalt
          {
-             for(k=0; k<nrcat2; k++)                                             // k durchläuft nrcat2
+             for(k=0; k<nrcat2; k++)                                             // k durchlaeuft nrcat2
              {
              Xneu(i*nrcat2+k, XneuSpalte_fixed+k)= X (i, XaltSpalte_fixed );
              }
@@ -1056,7 +1056,7 @@ bool remlest_multinomial_catsp::estimate_glm(const datamatrix resp,
 // Interessante Matrixoperationen, Matrizen A, B
      // datamatrix A (zeilen, spalten, wert);  z.B. datamatrix A(2, 2, 0);       Anlegen einer Matrix
      // A.diag(dimension, wert);                                                 Diagonalmatrix mit "wert" auf der Diagonalen
-     // A.diag(werte);                                                           "werte" als Spaltenvektor mit dem gew³nschten Werten der Diagonalen
+     // A.diag(werte);                                                           "werte" als Spaltenvektor mit dem gewuenschten Werten der Diagonalen
 
 // Zugriff auf einzelne Teile
     // A.rows();  Anzahl der Zeilen
@@ -1099,7 +1099,7 @@ bool remlest_multinomial_catsp::estimate_glm(const datamatrix resp,
         outXneu.close();*/
 
 // ----------------------------------------------------------------------------
-// --- Conny: Konstruiere großes X    Ende
+// --- Conny: Konstruiere grosses X    Ende
 // ----------------------------------------------------------------------------
 
   out("\n");
@@ -1172,11 +1172,11 @@ bool remlest_multinomial_catsp::estimate_glm(const datamatrix resp,
 // Hilfsmatrix zum Berechnen der Zeilen von Xneu' workweight
    datamatrix H_00hilf (1, nrobs*nrcat2,  0);
 
-for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                   // l durchläuft die Zeilen von Xneu' und die Zeilen von H_00
+for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                   // l durchlaeuft die Zeilen von Xneu' und die Zeilen von H_00
 {
-     for  (j=0;  j<nrobs*nrcat2;  j=j+nrcat2)                                                                                                                      // j durchläuft die Spalten von Xneu'
+     for  (j=0;  j<nrobs*nrcat2;  j=j+nrcat2)                                                                                                                      // j durchlaeuft die Spalten von Xneu'
      {
-          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchläuft nrcat2
+          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchlaeuft nrcat2
           {
           H_00hilf (0, j+i) = ((XneuTr.getBlock( l, j, l+1, j+nrcat2)) * (workweight.getBlock(j, i,  j+nrcat2, i+1)))(0,0);
           }
@@ -1191,7 +1191,7 @@ for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                  
 //----------------------------------------------------------------------------
 // Berechnen von H = Xneu' workweight Xneu
 
-     for (k=l; k<xcutbeta[xcutbeta.size()-1]; k++ )                              // k durchläuft die Spalten von Xneu
+     for (k=l; k<xcutbeta[xcutbeta.size()-1]; k++ )                              // k durchlaeuft die Spalten von Xneu
      {
      H(l, k) = ((H_00hilf) * (Xneu.getCol(k)))(0,0);
      H(k,l)=H(l,k);
@@ -1675,7 +1675,7 @@ void remlest_multinomial_catsp::make_plots(ofstream & outtex,ST::string path_bat
   ST::string pathresult;
   bool stil = false;
 
-// Schleife überprüft, ob es ein fullcond-Object
+// Schleife ueberprueft, ob es ein fullcond-Object
 // gibt, bei dem Effekt gezeichnet werden kann
   MCMC::plotstyles plst;
   for(j=0;j<fullcond.size();j++)
@@ -1688,10 +1688,10 @@ void remlest_multinomial_catsp::make_plots(ofstream & outtex,ST::string path_bat
 
   if(stil == true)
     {
-//erzeugt File, das Plot-Befehle für Java-Version enthält
+//erzeugt File, das Plot-Befehle fuer Java-Version enthaelt
     ofstream outbatch(path_batch.strtochar());
 
-//erzeugt File, das SPlus-Befehle zum Plotten enthält
+//erzeugt File, das SPlus-Befehle zum Plotten enthaelt
     ofstream outsplus(path_splus.strtochar());
 
     outtex << "\n\\newpage" << "\n\\noindent {\\bf \\large Plots:}" << endl;
@@ -1703,7 +1703,7 @@ void remlest_multinomial_catsp::make_plots(ofstream & outtex,ST::string path_bat
              << "# In S-PLUS the file extension in the source command has to be changed"
              << " to '.s' \n"
              << endl
-    // einlesen der Source-Files für S-Plus
+    // einlesen der Source-Files fuer S-Plus
              << "source(\"'directory'\\\\sfunctions\\\\plotsample.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotnonp.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotsurf.r\")" << endl
@@ -1711,7 +1711,7 @@ void remlest_multinomial_catsp::make_plots(ofstream & outtex,ST::string path_bat
              << "source(\"'directory'\\\\sfunctions\\\\readbndfile.r\")\n" << endl;*/
 
     bool stil2 = true;
-    for(j=0;j<fullcond.size();j++)  //Schleife überprüft, ob es map-Objekt gibt
+    for(j=0;j<fullcond.size();j++)  //Schleife ueberprueft, ob es map-Objekt gibt
       {
       plst = fullcond[j]->get_plotstyle();
       if(plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
@@ -1745,7 +1745,7 @@ void remlest_multinomial_catsp::make_plots(ofstream & outtex,ST::string path_bat
 
     outbatch << "% usefile " << path_batch << endl;
 
-    // falls andere Quantile gewünscht werden
+    // falls andere Quantile gewuenscht werden
     double u = fullcond[0]->get_level1();
     double o = fullcond[0]->get_level2();
     ST::string u_str = ST::doubletostring(u,0);
@@ -1782,7 +1782,7 @@ void remlest_multinomial_catsp::make_plots(ofstream & outtex,ST::string path_bat
             pathresult = pathresult.insert_after_string(ST::doubletostring(cats(i,0),6)+"_","_f_");
             }
 
-          // Pfade für ps-, tex-, SPlus-files
+          // Pfade fuer ps-, tex-, SPlus-files
           ST::string pathps = pathresult.substr(0, pathresult.length()-4);
           ST::string pathgr = pathps.replaceallsigns('\\', '/');
 
@@ -1832,7 +1832,7 @@ void remlest_multinomial_catsp::make_plots(ofstream & outtex,ST::string path_bat
                    << "\\% pointwise credible intervals.}" << endl
                    << "\\end{figure}" << endl;
             }
-          // für map-Funktionen
+          // fuer map-Funktionen
           else if (plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
             {
             outbatch << "\n";                 // Befehle f. d. batch-file
@@ -1979,7 +1979,7 @@ void remlest_multinomial_catsp::make_model(ofstream & outtex, const ST::string &
     familyname="multinomial logit";
     }
 
-  //Anz. Beob. wird übergeben
+  //Anz. Beob. wird uebergeben
   unsigned obs = X.rows();
 
   char charh = '_';
@@ -2004,7 +2004,7 @@ void remlest_multinomial_catsp::make_predictor(ofstream & outtex)
   unsigned j;
 
   ST::string term2 = fullcond[0]->get_term_symbolic();
-  ST::string term = "$\\eta^{(j)} = " + term2;    //linearer Prädiktor wird erweitert
+  ST::string term = "$\\eta^{(j)} = " + term2;    //linearer Praediktor wird erweitert
   for(j=1;j<fullcond.size();j++)
     {
     term2 = fullcond[j]->get_term_symbolic();
@@ -2012,7 +2012,7 @@ void remlest_multinomial_catsp::make_predictor(ofstream & outtex)
       {
       term2 = term2.insert_after_all_string("^{(j)}","f");;
       }
-    term = term + " + " + term2;    //linearer Prädiktor wird erweitert
+    term = term + " + " + term2;    //linearer Praediktor wird erweitert
     }
   outtex << term << "$\\\\\n";
   }
@@ -2061,7 +2061,7 @@ void remlest_multinomial_catsp::make_options(ofstream & outtex)
 
 void remlest_multinomial_catsp::make_fixed_table(ofstream & outtex)
   {
-  // falls andere Quantile gewünscht werden
+  // falls andere Quantile gewuenscht werden
   double u = fullcond[0]->get_level1();
   ST::string u_str = ST::doubletostring(u,0);
 

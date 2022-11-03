@@ -89,14 +89,14 @@ void DISTRIBUTION_zip::create(MCMCoptions * o, const double & a,
     else
         scaleexisting = false;
 
-// Für die Acceptance-Quote der S-P
+// Fuer die Acceptance-Quote der S-P
     accept=datamatrix(nrobs+3 ,1, 0);
 
     nu = datamatrix(nrobs, 1, 1);
     unsigned l = ps.length();
     ST::string pathnu = ps.substr(0, l-9) + "nu_sample.raw";
 
-    if(oversize)     // Für die KFZ-Daten!!!!
+    if(oversize)     // Fuer die KFZ-Daten!!!!
     {
         nusave = FULLCOND(o, datamatrix(nrobs, 1), "Multiplicative Random Effects",
                 nrobs, 1, pathnu);
@@ -397,14 +397,14 @@ double DISTRIBUTION_zip::compute_weight(double * linpred,double *weight,
     double help;
 
 
-    if(optionsp->get_nriter()<1) // Für Posteriormode!!!!!  ohne Zero Inflated!!!!!!
+    if(optionsp->get_nriter()<1) // Fuer Posteriormode!!!!!  ohne Zero Inflated!!!!!!
     {
         if(ver!=zip)
             return *weight * explin* *scalework/(explin + *scalework);
         else
             return *weight * explin;
     }
-    else  // Für MCMC!!!!!!
+    else  // Fuer MCMC!!!!!!
     {
         if(ver==zinb)
         {
@@ -633,13 +633,13 @@ void DISTRIBUTION_zip::outresults(void)
 
     if(ver != zinb)
     {
-        if(!oversize) // Für die Normale Version!!!!
+        if(!oversize) // Fuer die Normale Version!!!!
         {
             nusave.outresults();
             ST::string pathnu = pathresultsscale.substr(0, l-10) + "_nu_sample.raw";
             nusave.get_samples(pathnu);
         }
-        else    // Für die KFZ-Daten!!!!!
+        else    // Fuer die KFZ-Daten!!!!!
         {
             nusavekfz.outresults();
             ST::string pathnukfz = pathresultsscale.substr(0, l-10) + "_nu_sample.raw";
@@ -649,7 +649,7 @@ void DISTRIBUTION_zip::outresults(void)
         ST::string pathnures = pathresultsscale.substr(0, l-10) + "_nu.res";
 
 
-        if(!oversize) // für die normale Version!!!!!
+        if(!oversize) // fuer die normale Version!!!!!
         {
             double * workmean = nusave.get_betameanp();
             double * workstddev = nusave.get_betavarp();
@@ -686,7 +686,7 @@ void DISTRIBUTION_zip::outresults(void)
 
             }
         }
-        else   // Für KFZ-Daten!!!
+        else   // Fuer KFZ-Daten!!!
         {
             double * workmean = nusave.get_betameanp();
             double * workstddev = nusave.get_betavarp();

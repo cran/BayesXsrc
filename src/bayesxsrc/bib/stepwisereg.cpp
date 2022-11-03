@@ -2806,7 +2806,7 @@ bool stepwisereg::create_spatial(const unsigned & collinpred)
         fcnonpgaussian[fcnonpgaussian.size()-1].set_otherfullcond(other);
         other = &fcnonpgaussian[fcnonpgaussian.size()-1];
         fcnonpgaussian[fcnonpgaussian.size()-2].set_otherfullcond(other);
-        // hier gegenseitige ZEIGER für twomrfI setzen!!!!!!!!!!!!!!!!
+        // hier gegenseitige ZEIGER fuer twomrfI setzen!!!!!!!!!!!!!!!!
         }
       else if(type == MCMC::twomrfI)
         {

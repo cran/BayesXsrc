@@ -298,7 +298,7 @@ else
         }
       }
 
-    update_linpred(true);  // addiert Fkt. zum Gesamtprädiktor
+    update_linpred(true);  // addiert Fkt. zum Gesamtpraediktor
 
     if(center)
       {
@@ -579,7 +579,7 @@ else
             vector<double>::iterator d = XXenv.getDiagIterator();
             vector<double>::iterator d2 = XXenv.getDiagIterator();
             vector<double>::iterator p = Kenv.getDiagIterator();
-            double sumn = 0; // enthält Summe der Elemente von XXenv
+            double sumn = 0; // enthaelt Summe der Elemente von XXenv
 
             unsigned i,j;
             for(i=0;i<nrpar;i++,d++)
@@ -621,7 +621,7 @@ else
                 }
               }
 
-            for(i=0;i<nrpar;i++)    // schreibt untere Hälfte von Z voll
+            for(i=0;i<nrpar;i++)    // schreibt untere Haelfte von Z voll
               {
               for(j=i+1;j<nrpar;j++)
                 {
@@ -864,7 +864,7 @@ vector<double> & lvec, int & number)
     for(i=0;i<otherfullcond.size();i++)
       otherfullcond[i]->update_stepwise(0.0000001);
     kchanged = true;
-    kombimatrix = false;    // damit das Auswählen der Lambdas schneller geht
+    kombimatrix = false;    // damit das Auswaehlen der Lambdas schneller geht
     }
 
   if(spfromdf=="automatic")
@@ -1015,7 +1015,7 @@ vector<double> & lvec, int & number)
   if(forced_into==false)
      lvec.push_back(0);
 
-  // Startwert für lambda aus df:
+  // Startwert fuer lambda aus df:
   if(spfromdf!="direct")
     {
     double lambdavorg = 1000;
@@ -1251,7 +1251,7 @@ if(kombimatrix == false || matrixnumber==1)
     fc_df.update_bootstrap_df();
     }
 
-  betaold = datamatrix(1,1,0); // löscht "beta" vom letzten Bootstrap-Sample
+  betaold = datamatrix(1,1,0); // loescht "beta" vom letzten Bootstrap-Sample
   }
   }
 
@@ -1354,7 +1354,7 @@ if(kombimatrix == false || matrixnumber==1)
   outres << "frequency  ";
   outres << "selected  " << endl;
 
-// Häufigkeitstabelle:
+// Haeufigkeitstabelle:
 
   //samplestream.close();
   datamatrix sample(size,1);
@@ -2005,7 +2005,7 @@ else
       else
         compute_XWX_env(likep->get_weightiwls(),column);
       }
-    precenv.addto(XXenv,Kenv,1.0,lambda);       // hier gehört lambda zu "MRF" und kappa zu "I"
+    precenv.addto(XXenv,Kenv,1.0,lambda);       // hier gehoert lambda zu "MRF" und kappa zu "I"
     precenv.addto(precenv,Kenv2,1.0,kappa[0]);
     if(type == twomrfI)
       precenv.addto(precenv,Kenv3,1.0,kappa[1]);
@@ -2098,7 +2098,7 @@ if(matrixnumber==1)
       vector<double>::iterator p3;
       if(type == twomrfI)
         p3 = Kenv3.getDiagIterator();
-      double sumn = 0; // enthält Summe der Elemente von XXenv
+      double sumn = 0; // enthaelt Summe der Elemente von XXenv
       unsigned i,j;
 
       for(i=0;i<nrpar;i++,d++)
@@ -2180,7 +2180,7 @@ if(matrixnumber==1)
           }
         }
 
-      for(i=0;i<nrpar;i++)    // schreibt untere Hälfte von Z voll
+      for(i=0;i<nrpar;i++)    // schreibt untere Haelfte von Z voll
         {
         for(j=i+1;j<nrpar;j++)
           {

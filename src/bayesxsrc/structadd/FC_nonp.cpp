@@ -457,6 +457,14 @@ void FC_nonp::update_IWLS(void)
 
     if (ok && (u <= (lognew - logold  + qnew - qold)) )
       {
+/*      if(likep->family == "Shared predictor")
+        {
+        cout << "lognew: " << lognew << endl;
+        cout << "logold: " << logold << endl;
+        cout << "qnew: " << qnew << endl;
+        cout << "qold: " << qold << endl;
+        }*/
+
       acceptance++;
 
       paramKparam=designp->penalty_compute_quadform(param);
@@ -868,15 +876,15 @@ void FC_nonp::update_isotonic(void)
     count++;
     }
 
-  ofstream out("c:/temp/param.raw");
+/*  ofstream out("c:/temp/param.raw");
   param.prettyPrint(out);
-  out.close();
+  out.close();*/
 
   perform_centering();
 
-  ofstream out2("c:/temp/param2.raw");
+/*  ofstream out2("c:/temp/param2.raw");
   param.prettyPrint(out2);
-  out2.close();
+  out2.close();*/
 
   designp->compute_f(param,paramlin,beta,fsample.beta);
 

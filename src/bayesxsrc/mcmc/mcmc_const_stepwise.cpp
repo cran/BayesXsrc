@@ -127,7 +127,7 @@ const FULLCOND_const_stepwise & FULLCOND_const_stepwise::
 
 void FULLCOND_const_stepwise::compute_matrices(void)
   {
-  // nur für MCMC
+  // nur fuer MCMC
 
   if(utype == "gauss")
     {
@@ -409,7 +409,7 @@ void FULLCOND_const_stepwise::update_fix_effect(const unsigned & pos, double & v
 
   double * lin = linold.getV();
   double * dat = fix.getV();
-  //linold.mult(data,beta);     // nur wenn "spline" den zentrierten Effekt enthält!
+  //linold.mult(data,beta);     // nur wenn "spline" den zentrierten Effekt enthaelt!
   for(unsigned i=0;i<linold.rows();i++,lin++,dat++)
     {
     *lin += value * *dat;
@@ -928,7 +928,7 @@ void FULLCOND_const_stepwise::update_bootstrap_df(void)
     conditional = false;  // wird bei MCMCbootstrap aufgerufen, nicht bei MCMCselect
     //effectsadd = datamatrix(nrpar,1,0);
 
-    if(X1root.rows()>1)     // nötig oder nicht?
+    if(X1root.rows()>1)     // noetig oder nicht?
       {
       X1root = datamatrix(1,1,0);
       X1X = datamatrix(1,1,0);
@@ -1361,7 +1361,7 @@ void FULLCOND_const_stepwise::compute_XWtildey(datamatrix * linb,double & invsca
 // For Varying Coefficient Model -----------------------------------------------
 
 void FULLCOND_const_stepwise::posteriormode_const_varcoeff(datamatrix newx)
-  {  // Funktion schätzt b0 und b1, damit b0 annähernd zum VC passt! (D.h., es wird nur b0 verwendet)
+  {  // Funktion schaetzt b0 und b1, damit b0 annaehernd zum VC passt! (D.h., es wird nur b0 verwendet)
   unsigned i;
   if(interceptadd != 0)
     {
@@ -1527,7 +1527,7 @@ void FULLCOND_const_stepwise::compute_lambdavec(vector<double> & lvec, int & num
   if(forced_into==false)
      lvec.push_back(0);
 
-  // Startwert für lambda aus df:
+  // Startwert fuer lambda aus df:
   if(spfromdf=="direct" && fctype == MCMC::factor)
     {
     if(dfstart!=0)
@@ -1538,7 +1538,7 @@ void FULLCOND_const_stepwise::compute_lambdavec(vector<double> & lvec, int & num
   }
 
 
-// Für VCM-Modell
+// Fuer VCM-Modell
 void FULLCOND_const_stepwise::set_pointer_to_interaction(FULLCOND * inter)
   {
   interactions_pointer.push_back(inter);

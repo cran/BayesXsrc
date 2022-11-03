@@ -775,7 +775,7 @@ double FC::simconfBand(bool l1)
         if (shelp > maxscaling(i,0))
           maxscaling(i,0) = shelp;
         }
-      else if ( sampled_beta(i,j) > *upp ) // funktion drüber
+      else if ( sampled_beta(i,j) > *upp ) // funktion drueber
         {
         shelp = (sampled_beta(i,j) -  *meanp) / (*upp - *meanp);
         if (shelp > maxscaling(i,0))
@@ -855,7 +855,7 @@ void FC::outresults_help(ofstream & out_stata, ofstream & out_R,
     vnames = datanames;
   else
     {
-    nr = datanames.size();                            //Kommentar Susanne: das hab ich hier eigefügt
+    nr = datanames.size();                            //Kommentar Susanne: das hab ich hier eigefuegt
     unsigned i;
     for (i=0;i<nr;i++)
 //      vnames.push_back("_x_" + ST::inttostring(i)); //Kommentar Susanne: das hab ich auskommentiert

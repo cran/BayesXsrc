@@ -164,9 +164,9 @@ class __EXPORT_TYPE FULLCOND_pspline_surf_stepwise : public FULLCOND_pspline_sur
   bool posteriormode(void);
 
 
-// ----------------------- für stepwise ----------------------------------------
+// ----------------------- fuer stepwise ----------------------------------------
 
- /*void hilfeee(void)        // nur für Kontrolle!!!
+ /*void hilfeee(void)        // nur fuer Kontrolle!!!
     {
     ST::string test = datanames[0];
     test = test.replaceallsigns('*', '_');

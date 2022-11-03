@@ -49,13 +49,13 @@ using randnumbers::rand_inv_gaussian;
 using randnumbers::invPhi2;
 
 /*
-1. workingweights ändern sich, weights ungleich 1
+1. workingweights aendern sich, weights ungleich 1
 
-2. workingweights ändern sich, weights gleich eins
+2. workingweights aendern sich, weights gleich eins
 
-3. workingweights ändern sich nicht und sind konstant
+3. workingweights aendern sich nicht und sind konstant
 
-4. workingweights ändern sich nicht und sind eins
+4. workingweights aendern sich nicht und sind eins
 */
 
 enum weighttype{wweightschange_weightsneqone,wweightschange_weightsone,
@@ -805,6 +805,8 @@ class __EXPORT_TYPE DISTR_quantreg : public DISTR_gaussian
   double xi,xi2;
   double num;
   double sigma02;
+
+  datamatrix weightoriginal;
 
   public:
 

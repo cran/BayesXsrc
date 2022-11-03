@@ -168,7 +168,7 @@ bool remlest_multistate::estimate(const datamatrix resp,
   // Matrix containing the inverse covariance matrix of the random effects
   statmatrix<double>Qinv(zcols,1,0);
 
-  // Inzidenzmatrix, die für jeden Wert in fullcond bzw. beta angibt, ob er zur Baseline-HR beiträgt
+  // Inzidenzmatrix, die fuer jeden Wert in fullcond bzw. beta angibt, ob er zur Baseline-HR beitraegt
   vector<int>isbaseline(fullcond.size(),0);
   int nrbaseline=0;
   for(i=0; i<fullcond.size(); i++)

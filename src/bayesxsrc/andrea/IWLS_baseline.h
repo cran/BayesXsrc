@@ -107,7 +107,7 @@ class __EXPORT_TYPE IWLS_baseline : public IWLS_pspline
                     const ST::string & fp, const ST::string & pres, const bool & deriv,
                     const int & gs, const bool & diag, const unsigned & c, const datamatrix & anfang);
 
-  // CONSTRUCTOR 2 (für variierende Koeffizienten)
+  // CONSTRUCTOR 2 (fuer variierende Koeffizienten)
 
   IWLS_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const datamatrix & effmod,const datamatrix & intact,const bool & mode,
@@ -158,7 +158,7 @@ class __EXPORT_TYPE IWLS_baseline : public IWLS_pspline
     fcconst = fcc;
     }
 
-//-------- für baseline --------------------------------------------------------
+//-------- fuer baseline --------------------------------------------------------
 
   void compute_int_ti(const datamatrix & b);
   void compute_int_ti_linear(const double & b);
@@ -242,7 +242,7 @@ class __EXPORT_TYPE IWLS_baseline : public IWLS_pspline
   void compute_Wbase(void);
   void compute_score(void);
 
-//---------- ENDE: für baseline ------------------------------------------------
+//---------- ENDE: fuer baseline ------------------------------------------------
 
   // DESTRUCTOR
 

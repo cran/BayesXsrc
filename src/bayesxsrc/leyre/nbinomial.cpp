@@ -86,14 +86,14 @@ void DISTRIBUTION_nbinomial::create(MCMCoptions * o, const double & a,
     hierarchical = hie;
     family = "negative binomial";
     scaleexisting = true;
-// Für die Acceptance-Quote der S-P
+// Fuer die Acceptance-Quote der S-P
     accept=datamatrix(nrobs+2 ,1, 0);
 
     nu = datamatrix(nrobs, 1, 1);
     unsigned l = ps.length();
     ST::string pathnu = ps.substr(0, l-9) + "nu_sample.raw";
 
-    if(oversize)     // Für die KFZ-Daten!!!!
+    if(oversize)     // Fuer die KFZ-Daten!!!!
     {
         nusave = FULLCOND(o, datamatrix(nrobs, 1), "Multiplicative Random Effects",
                 nrobs, 1, pathnu);
@@ -271,14 +271,14 @@ double DISTRIBUTION_nbinomial::compute_weight(double * linpred,double *weight,
                         const int & i,const unsigned & col) const
 {
 
-// Für Posteriormode!!!!!
+// Fuer Posteriormode!!!!!
     if(optionsp->get_nriter()<1)
     {
         return *weight * exp(*linpred)*scale(0,0)/(exp(*linpred) +
                         scale(0,0));
     }
 
-// Für MCMC iterations!!!!!!
+// Fuer MCMC iterations!!!!!!
     else
     {
         // Negative binomial
@@ -456,13 +456,13 @@ void DISTRIBUTION_nbinomial::outresults(void)
 
     if(ver != nb)
     {
-        if(!oversize) // Für die Normale Version!!!!
+        if(!oversize) // Fuer die Normale Version!!!!
         {
             nusave.outresults();
             ST::string pathnu = pathresultsscale.substr(0, l-10) + "_nu_sample.raw";
             nusave.get_samples(pathnu);
         }
-        else    // Für die KFZ-Daten!!!!!
+        else    // Fuer die KFZ-Daten!!!!!
         {
             nusavekfz.outresults();
             ST::string pathnukfz = pathresultsscale.substr(0, l-10) + "_nu_sample.raw";
@@ -472,7 +472,7 @@ void DISTRIBUTION_nbinomial::outresults(void)
         ST::string pathnures = pathresultsscale.substr(0, l-10) + "_nu.res";
 
 
-        if(!oversize) // für die normale Version!!!!!
+        if(!oversize) // fuer die normale Version!!!!!
         {
             double * workmean = nusave.get_betameanp();
             double * workstddev = nusave.get_betavarp();
@@ -509,7 +509,7 @@ void DISTRIBUTION_nbinomial::outresults(void)
 
             }
         }
-        else   // Für KFZ-Daten!!!
+        else   // Fuer KFZ-Daten!!!
         {
             double * workmean = nusave.get_betameanp();
             double * workstddev = nusave.get_betavarp();

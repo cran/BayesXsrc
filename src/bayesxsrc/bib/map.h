@@ -54,7 +54,7 @@ enum metric {adjacent, centroid, combnd};
 //------------------------------------------------------------------------------
 
 
-// struct 'line' repräsentiert eine Gerade in der 2-Punkt Darstellung
+// struct 'line' repraesentiert eine Gerade in der 2-Punkt Darstellung
 
 struct line
   {
@@ -145,7 +145,7 @@ struct line
 //---------------------------- class: polygone --------------------------------
 //------------------------------------------------------------------------------
 
-// class polygone repräsentiert einen Polygonzug
+// class polygone repraesentiert einen Polygonzug
 
 class polygone
   {
@@ -736,7 +736,7 @@ class __EXPORT_TYPE map
   void outneighbors2(const ST::string & path) const;
 
   // FUNCTION: getneighbors
-  // TASK: für Guenter
+  // TASK: fuer Guenter
 
   matrix getneighbors(void) const;
 

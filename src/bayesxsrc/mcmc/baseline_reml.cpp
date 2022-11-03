@@ -250,7 +250,7 @@ void baseline_reml::createreml(datamatrix & X,datamatrix & Z,
       X_ref = datamatrix(1,2);
     }
 
-  // X für Daten berechen
+  // X fuer Daten berechen
 
   datamatrix knoten = datamatrix(nrpar,1,0.0);
   for(i=0;i<nrpar;i++)
@@ -295,7 +295,7 @@ void baseline_reml::createreml(datamatrix & X,datamatrix & Z,
       }
     }
 
-// Z für Daten berechnen
+// Z fuer Daten berechnen
 
   compute_Kweights();
   datamatrix diffmatrix = weighteddiffmat(2,weight);
@@ -338,7 +338,7 @@ void baseline_reml::createreml(datamatrix & X,datamatrix & Z,
 
   if(!varcoeff)
     {
-// X für tvalues berechen
+// X fuer tvalues berechen
 
     t_X = datamatrix(tvalues.rows(),2,1);
 
@@ -351,7 +351,7 @@ void baseline_reml::createreml(datamatrix & X,datamatrix & Z,
       t_X(i,1) = *workdata;
       }
 
-// Z für tvalues berechnen
+// Z fuer tvalues berechnen
 
     t_Z = datamatrix(tvalues.rows(),dimZ,0);
     for(j=0;j<dimZ;j++)

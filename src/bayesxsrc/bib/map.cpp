@@ -1870,7 +1870,7 @@ void map::compute_reg(const datamatrix & d,vector<int> & posbeg,
 
   if (error == false)
     {
-    // index, posbeg, posend ändern
+    // index, posbeg, posend aendern
 
     statmatrix<int> inveffindex(effindex.rows(),1);
     for(j=0;j<posbeg.size();j++)

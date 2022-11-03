@@ -45,11 +45,11 @@ class __EXPORT_TYPE FULLCOND_pspline_gaussian : public spline_basis
   bool diagtransform;            // Tranformation, so dass 'prec_env' eine Diagonalmatrix ist
   bool hierarchical;             // hierarchical centering
 
-  // für hierachical centering
+  // fuer hierachical centering
 
   double lineff;                 // linearer Anteil
-  double lineffsum;              // Summe der samples für den linearen Anteil
-  vector<double> lineffsamples;  // Samples für linearen Anteil
+  double lineffsum;              // Summe der samples fuer den linearen Anteil
+  vector<double> lineffsamples;  // Samples fuer linearen Anteil
   datamatrix gamma;              // Hilfsmatrix: lineff*X*gamma ergibt Gerade mit Steigung lineff
 
 

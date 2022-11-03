@@ -47,12 +47,12 @@ class __EXPORT_TYPE FULLCOND_kriging : public FULLCOND_nonp_basis
   bool onedim;
   vector<unsigned> incidence;         // contains for each observation the position in the knots-vector
 
-  MAP::map m;                         // Variablen für geokriging
+  MAP::map m;                         // Variablen fuer geokriging
   bool mapexisting;
   ST::string mapname;
   vector<ST::string> regionnames;
 
-  double p;                           // p und q für Space-Filling-Algorithmus
+  double p;                           // p und q fuer Space-Filling-Algorithmus
   double q;
   unsigned maxsteps;
 
@@ -73,8 +73,8 @@ class __EXPORT_TYPE FULLCOND_kriging : public FULLCOND_nonp_basis
   datamatrix Z_grid;
 
   vector<double> effectvaluesxgrid;      // bildet zusammen mit effectvaluesy die Daten-Paare
-  vector<double> effectvaluesygrid;      // für die Ausgabe auf einem Gitter
-  datamatrix xvaluesgrid;                // geordnete, äquidistante Werte zwischen Min(x/y) und Max(x/y)
+  vector<double> effectvaluesygrid;      // fuer die Ausgabe auf einem Gitter
+  datamatrix xvaluesgrid;                // geordnete, aequidistante Werte zwischen Min(x/y) und Max(x/y)
   datamatrix yvaluesgrid;                // falls gridsize > 0
 
   vector<int> index2;
@@ -83,8 +83,8 @@ class __EXPORT_TYPE FULLCOND_kriging : public FULLCOND_nonp_basis
   vector<int>freqoutput;
   unsigned nrdiffobs;
 
-  datamatrix X_VCM;                  // für REML VCM
-  datamatrix Z_VCM;                  // für REML VCM
+  datamatrix X_VCM;                  // fuer REML VCM
+  datamatrix Z_VCM;                  // fuer REML VCM
 
   void make_index(const datamatrix & var1,const datamatrix & var2);
   void make_xy_values(const datamatrix & var1,const datamatrix & var2);

@@ -223,10 +223,10 @@ class __EXPORT_TYPE modelStandard : public model
   // FUNCTION: parse
   // TASK: parses model 'm'
   //       m wird zerlegt in einzelne token und speichert diese in
-  //       modelVarnames. Es findet keine Überprüfung statt, ob die einzelnen
-  //       token gültige Variablennamen sind. Handelt es sich bei 'm' um einen
+  //       modelVarnames. Es findet keine Ueberpruefung statt, ob die einzelnen
+  //       token gueltige Variablennamen sind. Handelt es sich bei 'm' um einen
   //       leeren string, so bleibt auch modelVarnames leer. Auch in diesem
-  //       Fall wird keine Fehlermeldung zurückgegeben.
+  //       Fall wird keine Fehlermeldung zurueckgegeben.
   //       modeltexisting wird auf 'true' gesetzt.
 
   void parse(const ST::string & m);
@@ -369,7 +369,7 @@ class __EXPORT_TYPE term
 
   // FUNKTION: parse
   // AUFGABE: parsen des strings 't'
-  //          2 Möglichkeiten:
+  //          2 Moeglichkeiten:
   //            1. t = Variablenname, dann wird 'varname' = t gesetzt.
   //            2. t = Funktion, d.h. funktionsname(option1,option2,...)
   //               dann wird 'varname' = funktionsname gesetzt und
@@ -468,27 +468,27 @@ class __EXPORT_TYPE term_shrinkage : public basic_termtype
   stroption startdata;
 //  simpleoption startdata;
 
-  // Startwerte für die shhrinkgeeffekte
+  // Startwerte fuer die shhrinkgeeffekte
   doubleoption effectstart;
 
-  // Startwert für tau^2=Varianzparameter
+  // Startwert fuer tau^2=Varianzparameter
   doubleoption tau2;
 
   // Startwert fuer den Shrinkageparameter
   doubleoption shrinkagestart;
 
 
-  // Gewichte für die Shrinkageeffekte
+  // Gewichte fuer die Shrinkageeffekte
   doubleoption weight;
 
   // Hyperparameter der Priori fuer Shrinkageparameter
   doubleoption a_shrinkage;
   doubleoption b_shrinkage;
 
-  // Feste Werte für den Shrinkageparameter
+  // Feste Werte fuer den Shrinkageparameter
   simpleoption shrinkagefix;
 
-  // Varianzspezifische Werte für den Shrinkageparameter
+  // Varianzspezifische Werte fuer den Shrinkageparameter
   simpleoption shrinkageadaptive;
 
   // FUNCTION: setdefault
@@ -524,13 +524,13 @@ class __EXPORT_TYPE term_nigmix : public basic_termtype
   // Einlesen der Starwerte aus externer Datei
   stroption startdata;
 
-  // Startwerte für die shhrinkgeeffekte
+  // Startwerte fuer die shhrinkgeeffekte
   doubleoption effectstart;
 
-  // Startwert für Indicator (1. Komponente des Varianzparameters)
+  // Startwert fuer Indicator (1. Komponente des Varianzparameters)
   intoption indicatorstart;
 
-  // Startwert für t^2 (2. Komponente des Varianzparameters)
+  // Startwert fuer t^2 (2. Komponente des Varianzparameters)
   doubleoption t2start;
 
   // Startwert fuer die Mischungskomponente
@@ -548,10 +548,10 @@ class __EXPORT_TYPE term_nigmix : public basic_termtype
   doubleoption a_omega;
   doubleoption b_omega;
 
-  // Feste Werte für die Komponenten
+  // Feste Werte fuer die Komponenten
   simpleoption omegafix;
 
-  // Varinazspezifische Werte für die Komponenten
+  // Varinazspezifische Werte fuer die Komponenten
   simpleoption omegaadaptive;
 
   // FUNCTION: setdefault
@@ -1758,7 +1758,7 @@ class __EXPORT_TYPE modelterm : public model
   //           Syntax von m: responsevariable = term1 + term2 + ... + termn
   //           Syntax eines Terms: unterterm1 * unterterm2 * unterterm3
   //           Syntax eines Unterterms funktions/variablenname(option1,option2,...)
-  //           alle möglichen Unterterme sind in 'termtypes' gespeichert
+  //           alle moeglichen Unterterme sind in 'termtypes' gespeichert
   //           Responsevariable wird in 'responsevar' gespeichert
   //           Terme mit ihren Untertermen werden in 'terms' gespeichert
 
@@ -1836,7 +1836,7 @@ class __EXPORT_TYPE modeltermmult : public model
   //                                 .
   //           Syntax eines Terms: unterterm1 * unterterm2 * unterterm3
   //           Syntax eines Unterterms funktions/variablenname(option1,option2,...)
-  //           alle möglichen Unterterme sind in 'termtypes' gespeichert
+  //           alle moeglichen Unterterme sind in 'termtypes' gespeichert
   //           Responsevariable wird in 'responsevar' gespeichert
   //           Terme mit ihren Untertermen werden in 'terms' gespeichert
 

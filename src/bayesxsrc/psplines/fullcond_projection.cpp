@@ -104,7 +104,7 @@ FULLCOND_projection::FULLCOND_projection(MCMCoptions * o,
   likep->compute_iwls();
   compute_linear_combination(true);
   spline = datamatrix(spline.rows(),1,0);
-  if(pp_pointer.size() == nrterms-1)     // beim letzten Term wird der lineare Prädiktor wieder auf Null gesetzt.
+  if(pp_pointer.size() == nrterms-1)     // beim letzten Term wird der lineare Praediktor wieder auf Null gesetzt.
     likep->substr_linearpred_m(likep->get_linearpred(true),column,true);
   }
 
@@ -153,7 +153,7 @@ const FULLCOND_projection & FULLCOND_projection::operator=(
 void FULLCOND_projection::compute_linear_combination(bool eins)
   {
   unsigned i;
-  //compute_Kweights();                           // wäre nötig für nicht-äquidistante Knoten
+  //compute_Kweights();                           // waere noetig fuer nicht-aequidistante Knoten
   bool abbruch = false;
   datamatrix pp_weights_alt = pp_weights;
 datamatrix pp_weights_alt2 = datamatrix(pp_weights.rows(),1,0);
@@ -167,7 +167,7 @@ double krit2 = 0;
   datamatrix X = datamatrix(nrvar,nrvar,0);
 
 ST::string wfile = "h:\\simulationen\\sim_ppr\\adaptiv\\" + likep->get_responsename() + "_weights.txt";
-outw.open(wfile.strtochar(),ios::app); // append = anfügen
+outw.open(wfile.strtochar(),ios::app); // append = anfuegen
 outw << "lambda   w1   w2" << endl;
 
   unsigned z = 0;
@@ -185,7 +185,7 @@ outw << "lambda   w1   w2" << endl;
       index = statmatrix<int>(1,1,0);
       begcol.erase(begcol.begin(),begcol.end());
       make_index(data_forfixed);
-      make_Bspline(data_forfixed,true);     // eigene Funktion, die Matrix für Spline und Ableitung erstellt
+      make_Bspline(data_forfixed,true);     // eigene Funktion, die Matrix fuer Spline und Ableitung erstellt
       // index2 initialisieren
       index2.erase(index2.begin(),index2.end());
       index2.push_back(index(0,0));
@@ -203,14 +203,14 @@ outw << "lambda   w1   w2" << endl;
 
     add_linearpred_multBS(true);
 
-    // 2) Gewichte berechnen aus KQ-Schätzung
-    double * zielwork = ziel.getV();                                     // enthält Zielvariable für KQ-Schätzung
-    double * squarework = splinederiv_square.getV();                     // enthält Gewichte für KQ-Schätzung
+    // 2) Gewichte berechnen aus KQ-Schaetzung
+    double * zielwork = ziel.getV();                                     // enthaelt Zielvariable fuer KQ-Schaetzung
+    double * squarework = splinederiv_square.getV();                     // enthaelt Gewichte fuer KQ-Schaetzung
     double * rd = data_forfixed.getV();
     double * fdwork = splinederivative.getV();
     likep->compute_workingresiduals(column);                             // berechnet (y-spline)
     double * works = likep->get_workingresiduals().getV();
-    double * workweight = likep->get_weightiwls().getV();                // für gewichtete KQ-Schätzung
+    double * workweight = likep->get_weightiwls().getV();                // fuer gewichtete KQ-Schaetzung
     for(i=0;i<data_forfixed.rows();i++,zielwork++,squarework++,rd++,fdwork++,works++,workweight++)
       {
       *squarework = *fdwork * *fdwork * *workweight;
@@ -646,7 +646,7 @@ datamatrix FULLCOND_projection::bspline_derivative(const double & x)
       }
     }
 
-// Hämmerlin/Hoffmann Seite 263
+// Haemmerlin/Hoffmann Seite 263
 
   bwork = b.getV();
   helpwork = help.getV();
@@ -908,7 +908,7 @@ vector<double> & lvec, int & number)
   if(forced_into==false)
      lvec.push_back(0);
 
-  // Startwert für lambda aus df:
+  // Startwert fuer lambda aus df:
   if(spfromdf==true)
     {
     double lambdavorg = 1000;

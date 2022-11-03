@@ -76,7 +76,7 @@ namespace MCMC
 //        Cambridge University Press, New York.
 //
 //      * Osuna, Leyre (2004), "Semiparametric Bayesian count data models"
-//        Dissertation an der LMU, München.
+//        Dissertation an der LMU, Muenchen.
 //
 ////////////////////////////////////////////////////////////////////////////////
 

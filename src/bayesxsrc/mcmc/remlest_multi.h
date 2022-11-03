@@ -60,7 +60,7 @@ class remlest_multinomial
 //  double refcat;                                   // Referenz-Kategorie
   unsigned nrcat;                                    // Anzahl Kategorien
   unsigned nrcat2;                                   // Anzahl nicht redundanter Kategorien
-  statmatrix<double> cats;                         // Mögliche Kategorien
+  statmatrix<double> cats;                         // Moegliche Kategorien
 
   unsigned nrobs;
   unsigned nrobspos;
@@ -74,7 +74,7 @@ class remlest_multinomial
   unsigned partialnrpar;                        // Parameter pro Kategorie
   unsigned partialnrfixed;                      // fixe Effekte pro Kategorien
   unsigned partialnrrandom;
-  unsigned totalnrfixed;                        // Anzahl fixer Effekte für alle Kategorien!
+  unsigned totalnrfixed;                        // Anzahl fixer Effekte fuer alle Kategorien!
   unsigned totalnrpar;                          // Parameter in allen Kategorien
 
   unsigned partialvar;                          // Varianzparameter pro Kategorie

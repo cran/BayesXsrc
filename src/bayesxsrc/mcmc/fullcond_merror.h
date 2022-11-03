@@ -38,8 +38,8 @@ class __EXPORT_TYPE fullcond_merror : public FULLCOND
 
   protected:
 
-  FULLCOND_nonp_basis * designp;  // Pointer wird für IWLS-proposal benötigt
-//  FULLCOND_nonp * designp;          // Pointer wird für Conditional prior proposal benötigt
+  FULLCOND_nonp_basis * designp;  // Pointer wird fuer IWLS-proposal benoetigt
+//  FULLCOND_nonp * designp;          // Pointer wird fuer Conditional prior proposal benoetigt
   DISTRIBUTION * likep;
 
 // BEGIN: merror
@@ -93,12 +93,12 @@ class __EXPORT_TYPE fullcond_merror : public FULLCOND
 
   datamatrix effmod;
 
-  datamatrix P;                     // Präzisionsmatrix der wahren Werte
-  //envmatdouble precenv;           // envmatrix zum Speichern der Präzisionsmatrixx der wahren Werte
-                                    // wird nur für IWLS-proposal benötigt
+  datamatrix P;                     // Praezisionsmatrix der wahren Werte
+  //envmatdouble precenv;           // envmatrix zum Speichern der Praezisionsmatrixx der wahren Werte
+                                    // wird nur fuer IWLS-proposal benoetigt
 
   datamatrix rhs;                   // datamatrix zum Speichern von Z'Sigma^{-1}X + Omega^{-1}mu_xi
- //datamatrix betahelp1;            // wird nur für IWLS-proposal benötigt
+ //datamatrix betahelp1;            // wird nur fuer IWLS-proposal benoetigt
 
   datamatrix mmu;                   // P^{-1}*rhs = Erwartungswert der wahren Werte;
 

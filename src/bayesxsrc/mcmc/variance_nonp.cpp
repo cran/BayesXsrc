@@ -431,13 +431,13 @@ void FULLCOND_variance_nonp::update(void)
         double kappa = 1.0/beta(0,0);
 
         double lold = (a_invgamma-1)*log(kappa) - b_invgamma*kappa;           // gamma prior
-        lold += -0.5*Kp->compute_quadform()*kappa;                            // priori für betas
+        lold += -0.5*Kp->compute_quadform()*kappa;                            // priori fuer betas
         lold += 0.5*rankK*log(kappa);                                         // Normalisierungs Konstante
 
         double kappaprop = kappa*randnumbers::rand_variance(2.0);             // kappa ~ (1+1/z)
 
         double lnew = (a_invgamma-1)*log(kappaprop) - b_invgamma*kappaprop;   // gamma prior
-        lnew += -0.5*Kp->compute_quadform()*kappaprop;                        // priori für betas
+        lnew += -0.5*Kp->compute_quadform()*kappaprop;                        // priori fuer betas
         lnew += 0.5*rankK*log(kappaprop);                                     // Normalisierungs Konstante
 
         double u = log(uniform());
@@ -539,7 +539,7 @@ void FULLCOND_variance_nonp::update_stationary(void)
       alpha1help = sqrt(2.0*help*(alphawork+1.0)) - 1.0;
     else
       alpha1help = 1.0 - sqrt(2.0*(help-1.0)*(alphawork-1.0));
-//    double alpha2help = uniform()*2.0-1.0;       // falls alpha1 und alpha2 unabhängig
+//    double alpha2help = uniform()*2.0-1.0;       // falls alpha1 und alpha2 unabhaengig
     double alpha2help = alpha1help;
 
     double alpha1prop = -(alpha1help+alpha2help);

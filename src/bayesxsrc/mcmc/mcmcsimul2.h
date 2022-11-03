@@ -41,7 +41,7 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
 
   datamatrix D;
   vector<ST::string> modelv;
-  vector<FULLCOND*> fullcond_alle;     // Fullcond-Vektor, wie er zu Beginn übergeben wird
+  vector<FULLCOND*> fullcond_alle;     // Fullcond-Vektor, wie er zu Beginn uebergeben wird
   ST::string algorithm;                // Minimierungsalgorithmus (stepwise, Koordinatenabstieg)
   ST::string minim;                    // Art der univariaten Minimierung bei Koordinatenabstieg (z.B. adaptiv, exact)
   ST::string minim2;
@@ -49,7 +49,7 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
   int increment;                       // Anzahl der zu testenden Nachbar-Alternativen bei stepwise
   int steps;
   ST::string startmodel;
-  ST::string trace;                    // Ausführlichkeit der Ausgabe am Bildschirm
+  ST::string trace;                    // Ausfuehrlichkeit der Ausgabe am Bildschirm
   double kriterium_tex;
   ofstream outmodels;
   ofstream outcriterium;
@@ -59,23 +59,23 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
   bool isboot;                         // ist der Algorithmus gerade beim Bootstrap-Teil?
   bool unconditional;
 
-  vector<vector<double> > lambdavec;  // enthält für jedes fullcond-Objekt (außer fixen Effekten) alle Modellierungs-Alternativen
-  vector<ST::string> names_fixed;     // Namen der fixen Effekte (einschließlich "const")
-  vector<vector<ST::string> > names_nonp; // enthält für jedes fullcond-Objekt (außer fixen Effekten) alle Modellierungs-Alternativen
-  vector<double> modell_neu;        // enthält für jede Variable/Funktion die Modellierungsalternative
+  vector<vector<double> > lambdavec;  // enthaelt fuer jedes fullcond-Objekt (ausser fixen Effekten) alle Modellierungs-Alternativen
+  vector<ST::string> names_fixed;     // Namen der fixen Effekte (einschliesslich "const")
+  vector<vector<ST::string> > names_nonp; // enthaelt fuer jedes fullcond-Objekt (ausser fixen Effekten) alle Modellierungs-Alternativen
+  vector<double> modell_neu;        // enthaelt fuer jede Variable/Funktion die Modellierungsalternative
   vector<double> modell_alt;
   double kriterium_alt;
   double kriterium_neu;
-  ST::string text_alt;             // für Bildschirm-Ausgabe
+  ST::string text_alt;             // fuer Bildschirm-Ausgabe
   vector<vector<vector<double> > > modellematrix;  // speichert bereits ausprobierte Modelle ab
   bool fertig;
-  int steps_aktuell;               // Laufindex für Iteration
+  int steps_aktuell;               // Laufindex fuer Iteration
   vector<ST::string> posttitle;
 
   void schaetzen(int z, double & kriterium, bool neu, ST::string variante);
 
 // -----------------------------------------------------------------------------
-// -------------- Funktionen, für Stepwise / Stepmin ---------------------------
+// -------------- Funktionen, fuer Stepwise / Stepmin ---------------------------
 // -----------------------------------------------------------------------------
 
   bool stepfunctions(void);
@@ -96,7 +96,7 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
       unsigned & z);
 
 // -----------------------------------------------------------------------------
-// ------------------ Funktionen für Stepmin -----------------------------------
+// ------------------ Funktionen fuer Stepmin -----------------------------------
 // -----------------------------------------------------------------------------
 
   void step_minfix(vector<double> & kriteriumiteration2,
@@ -136,12 +136,12 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
   double criterion_min(const double & df, const ST::string & auswahl);
 
 // -----------------------------------------------------------------------------
-// ------------------ Funktionen für Koordinatenmethode ------------------------
+// ------------------ Funktionen fuer Koordinatenmethode ------------------------
 // -----------------------------------------------------------------------------
 
   bool koordabstieg(void);
 
-  // Funktion für Modellierungsänderung bei fixen Effekten
+  // Funktion fuer Modellierungsaenderung bei fixen Effekten
   void koord_minfix(vector<double> & kriteriumiteration2,
       vector<vector<double> > & modeliteration, vector<ST::string> & textiteration,
       double & kriterium_aktuell);
@@ -156,7 +156,7 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
       vector<vector<double> > & modeliteration, vector<ST::string> & textiteration,
       double & kriterium_aktuell, unsigned & i);
 
-  // Funktion für Modellierungsänderung bei Faktor-Variablen
+  // Funktion fuer Modellierungsaenderung bei Faktor-Variablen
   unsigned koord_minfactor(vector<double> & kriteriumiteration2,
       vector<vector<double> > & modeliteration, vector<ST::string> & textiteration,
       double & kriterium_aktuell);
@@ -184,7 +184,7 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
       unsigned & z, double & kriterium_aktuell);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Erstellung des Startmodels -----------------------
+// ------- Funktionen fuer die Erstellung des Startmodels -----------------------
 // -----------------------------------------------------------------------------
 
   // Fehler-Abfrage vor Start des Algorithmus
@@ -202,16 +202,16 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
   unsigned search_lambdaindex(const double & m, const vector<double> lam,
                                             bool & b) const;
 
-  // sucht ein dem vorgegebenen Startwert ähnliches Lambda raus
+  // sucht ein dem vorgegebenen Startwert aehnliches Lambda raus
   unsigned search_lambdastartindex(const double & start,
                            const vector<double> & lambdas) const;
 
-  // bestimmt Lambdas für's Startmodell
+  // bestimmt Lambdas fuer's Startmodell
   void startwerte(const ST::string & startmodel,
        vector<vector<unsigned> > & startindex, vector<vector<double> > & startfix);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Berechnung neuer Modelle bei Stepwise ------------
+// ------- Funktionen fuer die Berechnung neuer Modelle bei Stepwise ------------
 // -----------------------------------------------------------------------------
 
   void newmodel(vector<double> & krit, vector<vector<double> > & mi,
@@ -232,18 +232,18 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
        const vector<vector<vector<double> > > & mmatrix);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Erstellung des fullcondp-Vektors -----------------
+// ------- Funktionen fuer die Erstellung des fullcondp-Vektors -----------------
 // -----------------------------------------------------------------------------
 
-  // ändert Fullcond-Vektor für einen nichtlinearen Effekt "i" von modell2 --> modell1
+  // aendert Fullcond-Vektor fuer einen nichtlinearen Effekt "i" von modell2 --> modell1
   void fullcond_einzeln(const vector<double> & modell1,
          const vector<double> & modell2, const unsigned & index);
 
-  // stellt den Fullcond-Vektor neu auf, passend zu Modell-Vektor "m" (außer für fixe Effekte)
+  // stellt den Fullcond-Vektor neu auf, passend zu Modell-Vektor "m" (ausser fuer fixe Effekte)
   void fullcond_komplett(const vector<double> & m);
 
   // stellt die fixen Effekte richtig zusammen, passend zu Modell-Vektor "m";
-  // die Reihenfolge der fixen Effekte wird hier verändert
+  // die Reihenfolge der fixen Effekte wird hier veraendert
   void fix_komplett(const vector<double> & modell);
 
   // stellt die fixen Effekte richtig zusammen, passend zu Modell-Vektor "m";
@@ -253,18 +253,18 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
   // entfernt einen bestimmten fixen Effekt aus fullcond-Objekt der fixen Effekte
   void reset_fix(const ST::string & name);
 
-  // fügt einen bestimmten fixen Effekt dem fullcond-Objekt der fixen Effekte hinzu
+  // fuegt einen bestimmten fixen Effekt dem fullcond-Objekt der fixen Effekte hinzu
   void include_fix(const ST::string & name);
 
-  // sucht die Spalte der Datenmatrix für einen bestimmten fixen Effekt heraus
+  // sucht die Spalte der Datenmatrix fuer einen bestimmten fixen Effekt heraus
   int column_for_fix(const ST::string & name);
 
-  // passt den Intercept nach Entfernen / hinzufügen von fixen Effekten an
-  // so an, dass Mittelwert(Prädiktor) = Mittelwert((Arbeits-)Beobachtungen)
+  // passt den Intercept nach Entfernen / hinzufuegen von fixen Effekten an
+  // so an, dass Mittelwert(Praediktor) = Mittelwert((Arbeits-)Beobachtungen)
   void korrektur(void);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Ausgabe im Output-Fenster ------------------------
+// ------- Funktionen fuer die Ausgabe im Output-Fenster ------------------------
 // -----------------------------------------------------------------------------
 
   bool make_pause(void);
@@ -277,7 +277,7 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
       const vector<vector<unsigned> > & startindex, const ST::string & name);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Ausgabe im Tex-File ------------------------------
+// ------- Funktionen fuer die Ausgabe im Tex-File ------------------------------
 // -----------------------------------------------------------------------------
 
   void make_graphics(const ST::string & name, vector<vector<unsigned> > & startindex);
@@ -317,7 +317,7 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
   bool confidence_MCMCselect(const vector<double> & modell_final,const double & kriterium_final,
                                           vector<FULLCOND*> & fullcond_z);
 
-  // für Ziehen von Zufallszahlen (ähnlich wie Funktion in "mcmcsimul", aber es muß unterschieden werden,
+  // fuer Ziehen von Zufallszahlen (aehnlich wie Funktion in "mcmcsimul", aber es muss unterschieden werden,
   // ob Bootstrap-Algorithmus oder nicht)
   bool simulate(const vector<ST::string> & header, const int & seed,
                            const unsigned & startit, const unsigned & endit);
@@ -347,7 +347,7 @@ class __EXPORT_TYPE STEPWISErun : public MCMCsimulate
 
   const STEPWISErun & operator=(const STEPWISErun & s);
 
-  // ähnlich wie in "mcmcsimul.cpp", aber mit Anpassung an Bootstrap-Algorithmus
+  // aehnlich wie in "mcmcsimul.cpp", aber mit Anpassung an Bootstrap-Algorithmus
   bool posteriormode(const vector<ST::string> & header, const bool & presim);
 
   bool single_stepwise(const vector<unsigned> & start,

@@ -1010,8 +1010,8 @@ DISTR_multinomlogit::DISTR_multinomlogit(GENERAL_OPTIONS * o,unsigned & cnr,
 	{
 
   family = "Multinomial logit";
-  H = 6; // vorläufig fix vorgegeben
-// Tabellenwerte aus Frühwirth-Schnatter
+  H = 6; // vorlaeufig fix vorgegeben
+// Tabellenwerte aus Fruehwirth-Schnatter
   SQ = datamatrix(6,5,0); // entspricht 1/s_r^2
 
 // H = 2:

@@ -1359,18 +1359,18 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
   list<realvar>::iterator varitm;
   list<realvar>::iterator regit;
 
-//  ofstream out("c:\\cprog\\test\\osaft\\marke.raw");  //File nur zum Überprüfen
+//  ofstream out("c:\\cprog\\test\\osaft\\marke.raw");  //File nur zum ueberpruefen
 
   int nrout=0;
   int nrwoche=0;
   int found=0;
 
   unsigned i;
-  for(i=0;i<names.size()-2;i++)    //durchläuft die Variablen outlet, wochenin
+  for(i=0;i<names.size()-2;i++)    //durchlaeuft die Variablen outlet, wochenin
     {
     list<ST::string>namen;
     namen.push_back(names[i]);
-    found = datarep.findvar(names[i],stit,varitwo);  //damit man varit bekommt und später Werte auslesen kann
+    found = datarep.findvar(names[i],stit,varitwo);  //damit man varit bekommt und spaeter Werte auslesen kann
 
     sort(namen,0,nrobs-1);   //sortiert nach Variable "i"
     unsigned k = 0;      //Anzahl der Beobachtungen der einzelnen Variablen feststellen
@@ -1399,8 +1399,8 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
   namen.push_back(names[0]);
   namen.push_back(names[1]);
   namen.push_back(names[3]);
-  sort(namen,0,nrobs-1);   // endgültiges Sortieren; Reihenfolge: markenin, outlet, wochenin, preis
-  realvar wert(nrobs,NA);      //erzeugt neue Variable, die später den minimalen Preis pro Marke enthält
+  sort(namen,0,nrobs-1);   // endgueltiges Sortieren; Reihenfolge: markenin, outlet, wochenin, preis
+  realvar wert(nrobs,NA);      //erzeugt neue Variable, die spaeter den minimalen Preis pro Marke enthaelt
 
   found = datarep.findvar(names[3],stit,varitp);    //Zeiger auf "preis"
   found = datarep.findvar(names[1],stit,varitwo);       //Zeiger auf "wochenin"
@@ -1410,9 +1410,9 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
   realobs wo = getvalue(0,varitwo);  //liefert die einzelnen Werte als "realobs"
   realobs min = getvalue(0,varitp);
   realobs ma = getvalue(0,varitm);
-  vector<int> anzpreis;  //um zu bekommen, wie oft jede Marke pro Woche u. Geschäft vorkommt
+  vector<int> anzpreis;  //um zu bekommen, wie oft jede Marke pro Woche u. Geschaeft vorkommt
 
-  for(i=0;i<nrobs;i++)    //Schleife, die Werte zum "Weiterhüpfen" liefert
+  for(i=0;i<nrobs;i++)    //Schleife, die Werte zum "Weiterhuepfen" liefert
     {
     if(getvalue(i,varitm) != ma)
        {
@@ -1434,11 +1434,11 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
     wert[datarep.index[i]] = min;
     }
   ST::string minpreis = "minpreis";
-  addvariable(minpreis, wert); //fügt neue Variable hinzu
+  addvariable(minpreis, wert); //fuegt neue Variable hinzu
   found = datarep.findvar(minpreis,stit,varitmp);  //Zeiger auf "minpreis"
 
   double sum = 0;
-  for(i=0;i<anzpreis.size();i++)    //berechnet Anzahl der letzten Marke pro Geschäft und Woche
+  for(i=0;i<anzpreis.size();i++)    //berechnet Anzahl der letzten Marke pro Geschaeft und Woche
     {
     sum = sum + nrwoche*nrout*anzpreis[i];
     }
@@ -1450,18 +1450,18 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
   double oben = nrwoche*anzpreis[zma];
   double unten = 0;
   vector<realobs> armit;
-  if(defs=="priceindex")             //Durchschnittspreis einer Marke pro Geschäft
+  if(defs=="priceindex")             //Durchschnittspreis einer Marke pro Geschaeft
     {                                //Werte sind in Vektor "armit"
     while(oben<=nrobs && zma<anzpreis.size())
        {
        realobs sum = 0;
        double nenner = oben - unten;
-       for(unsigned y=unten;y<oben;y++)  //Schleife durchläuft die Werte einer Marke
+       for(unsigned y=unten;y<oben;y++)  //Schleife durchlaeuft die Werte einer Marke
          {
          if(getvalue(y,varitmp)==NA)
            nenner = nenner - 1;
          }
-       for(unsigned y=unten;y<oben;y++)  //Schleife durchläuft die Werte einer Marke
+       for(unsigned y=unten;y<oben;y++)  //Schleife durchlaeuft die Werte einer Marke
          {
          if(getvalue(y,varitmp)!=NA)
            sum = sum + getvalue(y,varitmp) / nenner;
@@ -1480,7 +1480,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
 
   if(defs=="regular")
     {
-    realvar wert(nrobs,NA);      //erzeugt neue Variable, die später den regulären Preis einer Marke enthält
+    realvar wert(nrobs,NA);      //erzeugt neue Variable, die spaeter den regulaeren Preis einer Marke enthaelt
     zma = 0;
     realobs reg = getvalue(0,varitmp);
     realobs akt1 = getvalue(0,varitmp);
@@ -1575,7 +1575,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
         {
         akt2 = getvalue(j,varitmp);
         realobs reg2;
-        if(akt1==reg && akt1!=NA)      //NA hat immer den größten Wert, deshalb Sonderfall!!
+        if(akt1==reg && akt1!=NA)      //NA hat immer den groessten Wert, deshalb Sonderfall!!
           {
           if(akt2!=NA)
             {
@@ -1653,7 +1653,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
         {
         akt2 = getvalue(y,varitmp);
         realobs reg2;
-        if(akt1==reg && akt1!=NA)      //NA hat immer den größten Wert, deshalb Sonderfall!!
+        if(akt1==reg && akt1!=NA)      //NA hat immer den groessten Wert, deshalb Sonderfall!!
           {
           if(akt2!=NA)
             {
@@ -1732,9 +1732,9 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
         }
       }
     ST::string regpreis = "regpreis";
-    addvariable(regpreis, wert); //fügt neue Variable hinzu
+    addvariable(regpreis, wert); //fuegt neue Variable hinzu
     found = datarep.findvar(regpreis,stit,regit);  //Zeiger auf "regpreis"
-    for(i=0;i<nrobs;i++)         //berechnet den Quotienten "aktueller Preis / regulärer Preis"
+    for(i=0;i<nrobs;i++)         //berechnet den Quotienten "aktueller Preis / regulaerer Preis"
       {
       if(getvalue(i,regit)!=NA)
         eintrag[datarep.index[i]] = getvalue(i,varitmp) / getvalue(i,regit);
@@ -1742,7 +1742,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
        eintrag[datarep.index[i]] = NA;
       }
     ST::string regquot = "regquot";
-    addvariable(regquot, eintrag); //fügt neue Variable hinzu
+    addvariable(regquot, eintrag); //fuegt neue Variable hinzu
     found = datarep.findvar(regquot,stit,regit);  //Zeiger auf "regquot"
     }
 
@@ -1757,7 +1757,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
      {
      realobs ma = getvalue(i,varitm);
      double marke = ma.getvalue(); //wandelt die "realobs"-Werte in "double" um
-     realvar vorwo(nrobs,NA);   //für die lag-Variable
+     realvar vorwo(nrobs,NA);   //fuer die lag-Variable
      unsigned j = 0;
      unsigned z2 = 0;
      int mitind = 0;
@@ -1765,16 +1765,16 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
         {
         realobs ko = getvalue(j,varitm);   //liefert die einzelnen Werte als "realobs"
         double konk = ko.getvalue();  //wandelt die "realobs"-Werte in "double" um
-        realvar neuvar(nrobs,NA);     //für die Preisindizes
+        realvar neuvar(nrobs,NA);     //fuer die Preisindizes
         j = j + nrwoche*nrout*anzpreis[z2];
         z2 = z2 + 1;
         int xy = 1;
         int k = 0;
         int mit = 0;
         int zaehlermarke = 0;
-        for(unsigned y=unten;y<oben;y++)  //Schleife durchläuft die Werte der Marke und weist die Beobachtungen zu
+        for(unsigned y=unten;y<oben;y++)  //Schleife durchlaeuft die Werte der Marke und weist die Beobachtungen zu
            {
-           if(anzpreis[zko]==anzpreis[zma])      //Anzahl pro Woche und Geschäft bei Marke und Konkurrenz gleich
+           if(anzpreis[zko]==anzpreis[zma])      //Anzahl pro Woche und Geschaeft bei Marke und Konkurrenz gleich
              {
              if(defs=="notransform")
                neuvar[datarep.index[y]] = getvalue(y+l,varitmp);
@@ -1794,7 +1794,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
              else
                neuvar[datarep.index[y]] = getvalue(y+l,regit);
              }
-           else if(anzpreis[zma]<anzpreis[zko])  //Anzahl pro Woche und Geschäft bei Marke kleiner als bei Konkurrenz
+           else if(anzpreis[zma]<anzpreis[zko])  //Anzahl pro Woche und Geschaeft bei Marke kleiner als bei Konkurrenz
              {
              zaehlermarke = zaehlermarke + 1;
              if(defs=="notransform")
@@ -1817,10 +1817,10 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
              if(zaehlermarke>=anzpreis[zma])
              {
              zaehlermarke = 0;
-             k = k + anzpreis[zko] - anzpreis[zma];  //k sorgt dafür, daß die überflüssigen Beobachtungen übersprungen werden
+             k = k + anzpreis[zko] - anzpreis[zma];  //k sorgt dafuer, dass die ueberfluessigen Beobachtungen uebersprungen werden
              }
              }
-           else                  //Anzahl pro Woche und Geschäft bei Marke größer als bei Konkurrenz
+           else                  //Anzahl pro Woche und Geschaeft bei Marke groesser als bei Konkurrenz
              {
              if(defs=="notransform")
                neuvar[datarep.index[y]] = getvalue(y+l+k,varitmp);
@@ -1841,8 +1841,8 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
                neuvar[datarep.index[y]] = getvalue(y+l+k,regit);
              if(xy<anzpreis[zma])
                {
-               k = k - 1;    //k sorgt dafür, daß die Beobachtungen immer mehrmals übernommen werden
-               xy = xy + 1;  //xy zählt mit, wie oft ein Wert genommen wird
+               k = k - 1;    //k sorgt dafuer, dass die Beobachtungen immer mehrmals uebernommen werden
+               xy = xy + 1;  //xy zaehlt mit, wie oft ein Wert genommen wird
                }
              else
                {
@@ -1850,7 +1850,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
                k = k + anzpreis[zko] - 1;
                }
              }
-           if(getvalue(y,varitwo)-getvalue(0,varitwo) >= lak && zma==zko)  //für Spalte mit Werten einer Vorwoche
+           if(getvalue(y,varitwo)-getvalue(0,varitwo) >= lak && zma==zko)  //fuer Spalte mit Werten einer Vorwoche
              {
              int stelle = y-(anzpreis[zma]*lak);
                 vorwo[datarep.index[y]] = neuvar[datarep.index[stelle]];
@@ -1861,7 +1861,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
           l = l + nrwoche*nrout*anzpreis[zko];  //berechnet das neue "l" zum Weiterspringen
           zko = zko + 1;
           }
-        else               //die Werte für die nächste Marke werden angegeben
+        else               //die Werte fuer die naechste Marke werden angegeben
           {
           unten = oben;
           zma = zma + 1;
@@ -1891,7 +1891,7 @@ void dataset::marketing(vector<ST::string> & names, ST::string & defs, int & lak
      else
        vor = "price_regquot" + ST::doubletostring(marke,0) + "_weekbef" + ST::inttostring(lak);
      addvariable(vor,vorwo);
-     }                                        //Ende äußere while-Schleife
+     }                                        //Ende aeussere while-Schleife
   }
 
 

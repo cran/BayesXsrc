@@ -171,7 +171,7 @@ class __EXPORT_TYPE FC_hrandom_distributional  : public FC_hrandom
   datamatrix offset_RE;
   datamatrix offsetold_RE;
 
-  // FCs für Hyperparameter
+  // FCs fuer Hyperparameter
 
   public:
 

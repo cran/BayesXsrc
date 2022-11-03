@@ -36,15 +36,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 //------------------------------------------------------------------------------
 
 
-// HINZUFÜGEN EINER NEUEN METHODE
+// HINZUFUEGEN EINER NEUEN METHODE
 
-// 1. private - Teil ergänzen
-//   - optionlist für die neue Methode definieren
+// 1. private - Teil ergaenzen
+//   - optionlist fuer die neue Methode definieren
 //   - optionen definieren
 //   - Modell Klasse definieren
 //   - use Klasse definieren
 //   - run Funktion definieren
-// 2. create - Teil ergänzen (in mapobject.cpp)
+// 2. create - Teil ergaenzen (in mapobject.cpp)
 // 3. run funktion schreiben
 
 

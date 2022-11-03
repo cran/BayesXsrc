@@ -874,29 +874,29 @@ void MCMCsimulate::make_predictor(ofstream & outtex,const unsigned & nr)
   //Anz. d. Kategorien
   unsigned lp = (likep_mult[nr]->get_linearpred()).cols();
 
-  for(i=0; i<lp; i++)                //durchläuft alle Kategorien
+  for(i=0; i<lp; i++)                //durchlaeuft alle Kategorien
     {
-    ST::string term = "";         //einführen der Formel für den lin. Prädiktor
+    ST::string term = "";         //einfuehren der Formel fuer den lin. Praediktor
     if(lp==1)
       term = "$\\eta$ & $=$ & $";
     else
       term = "$\\eta_" + ST::inttostring(i+1) + "$ & $=$ & $";
 
-    //Schleife, die fullcond-Obj. durchläuft
+    //Schleife, die fullcond-Obj. durchlaeuft
     bool first = true;
     for(j=begin[nr];j<=end[nr];j++)
       {
       ST::string term2 = fullcondp[j]->get_term_symbolic();
-      //nur für richtige fullcond-Obj. der Kateg. "i" (d.h. String nicht leer)
+      //nur fuer richtige fullcond-Obj. der Kateg. "i" (d.h. String nicht leer)
       if(term2 != "" && fullcondp[j]->get_col()==i)
         {
         if (first)
           {
-          term = term + term2;            //linearer Prädiktor wird erweitert
+          term = term + term2;            //linearer Praediktor wird erweitert
           first=false;
           }
         else
-          term = term + " + " + term2;    //linearer Prädiktor wird erweitert
+          term = term + " + " + term2;    //linearer Praediktor wird erweitert
         }
       }
 
@@ -911,15 +911,15 @@ void MCMCsimulate::make_predictor(ofstream & outtex,const unsigned & nr)
 void MCMCsimulate::make_model(ofstream & outtex,const unsigned & nr)
   {
 
-  //Vert-Fam wird übergeben
+  //Vert-Fam wird uebergeben
   ST::string fam = likep_mult[nr]->get_family();
 
   fam = fam.replaceallsigns('_', ' ');
 
-  //Anz. Beob. wird übergeben
+  //Anz. Beob. wird uebergeben
   unsigned obs = likep_mult[nr]->get_nrobs();
 
-  //Name der Resp.-Var. übergeben
+  //Name der Resp.-Var. uebergeben
   ST::string resp = likep_mult[nr]->get_responsename();
   char charh = '_';
   ST::string stringh = "\\_";
@@ -962,7 +962,7 @@ void MCMCsimulate::make_prior(ofstream & outtex,const unsigned & nr)
 void MCMCsimulate::make_fixed_table(ofstream & outtex,const unsigned & nr)
   {
 
-  // falls andere Quantile gewünscht werden
+  // falls andere Quantile gewuenscht werden
   double u = fullcondp[begin[nr]]->get_level1();
   double o = fullcondp[begin[nr]]->get_level2();
   double u1 = fullcondp[begin[nr]]->get_lower1();
@@ -1070,7 +1070,7 @@ void MCMCsimulate::make_plots(ofstream & outtex,const unsigned nr,
   bool stil = false;
   bool stata = false;
 
-  // Schleife überprüft, ob es ein fullcond-Object
+  // Schleife ueberprueft, ob es ein fullcond-Object
   // gibt, bei dem Effekt gezeichnet werden kann
   MCMC::plotstyles plst;
   for(j=begin[nr];j<=end[nr];j++)
@@ -1086,13 +1086,13 @@ void MCMCsimulate::make_plots(ofstream & outtex,const unsigned nr,
   if(stil == true)
     {
 
-    //erzeugt File, das Plot-Befehle für Java-Version enthält
+    //erzeugt File, das Plot-Befehle fuer Java-Version enthaelt
     ofstream outbatch(path_batch.strtochar());
 
-    //erzeugt File, das SPlus-Befehle zum Plotten enthält
+    //erzeugt File, das SPlus-Befehle zum Plotten enthaelt
     ofstream outsplus(path_splus.strtochar());
 
-    //erzeugt File, das Stata-Befehle zum Plotten enthält
+    //erzeugt File, das Stata-Befehle zum Plotten enthaelt
     ofstream outstata;
     if(stata == true)
        outstata.open(path_stata.strtochar());
@@ -1106,7 +1106,7 @@ void MCMCsimulate::make_plots(ofstream & outtex,const unsigned nr,
              << "# In S-PLUS the file extension in the source command has to be changed"
              << " to '.s' \n"
              << endl
-    // einlesen der Source-Files für S-Plus
+    // einlesen der Source-Files fuer S-Plus
              << "source(\"'directory'\\\\sfunctions\\\\plotsample.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotnonp.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotsurf.r\")" << endl
@@ -1120,7 +1120,7 @@ void MCMCsimulate::make_plots(ofstream & outtex,const unsigned nr,
     genoptions_mult[0]->out("\n");
 
     bool stil2 = true;
-    for(j=begin[nr];j<=end[nr];j++)  //Schleife überprüft, ob es map-Objekt gibt
+    for(j=begin[nr];j<=end[nr];j++)  //Schleife ueberprueft, ob es map-Objekt gibt
       {
       plst = fullcondp[j]->get_plotstyle();
       if(plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
@@ -1172,7 +1172,7 @@ void MCMCsimulate::make_plots(ofstream & outtex,const unsigned nr,
 
     unsigned lp = (likep_mult[nr]->get_linearpred()).cols();
 
-    // falls andere Quantile gewünscht werden
+    // falls andere Quantile gewuenscht werden
     double u = fullcondp[begin[nr]]->get_level1();
     double o = fullcondp[begin[nr]]->get_level2();
     double u1 = fullcondp[begin[nr]]->get_lower1();
@@ -1199,7 +1199,7 @@ void MCMCsimulate::make_plots(ofstream & outtex,const unsigned nr,
       if (plst != MCMC::noplot)
         {
 
-        // Pfade für ps-, tex-, SPlus-files
+        // Pfade fuer ps-, tex-, SPlus-files
         ST::string pathps = pathresult.substr(0, pathresult.length()-4);
         ST::string pathgr = pathps.replaceallsigns('\\', '/');
 
@@ -1210,7 +1210,7 @@ void MCMCsimulate::make_plots(ofstream & outtex,const unsigned nr,
         ST::string pathres_spl = pathresult.insert_string_char(hchar,hstring);
 
         for(i=0;i<lp;i++)
-          {             // für nonparametrische Funktionen
+          {             // fuer nonparametrische Funktionen
           if (plst == MCMC::plotnonp && fullcondp[j]->get_col()==i)
             {
             outbatch << "\n";                // Befehle f. d. batch-file
@@ -1273,7 +1273,7 @@ void MCMCsimulate::make_plots(ofstream & outtex,const unsigned nr,
                    << "\\% pointwise credible intervals.}" << endl
                    << "\\end{figure}" << endl;
             }
-          // für map-Funktionen
+          // fuer map-Funktionen
           else if ((plst == MCMC::drawmap || plst == MCMC::drawmapgraph) && fullcondp[j]->get_col()==i)
             {
             outbatch << "\n";                 // Befehle f. d. batch-file

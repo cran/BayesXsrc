@@ -59,7 +59,7 @@ class remlest_ordinal
 //  double refcat;                                   // Referenz-Kategorie
   unsigned nrcat;                                    // Anzahl Kategorien
   unsigned nrcat2;                                   // Anzahl nicht redundanter Kategorien
-  statmatrix<double> cats;                         // Mögliche Kategorien
+  statmatrix<double> cats;                         // Moegliche Kategorien
   bool catspec;                                 // are there category-specific effects
                                                 // (apart from thresholds)
 

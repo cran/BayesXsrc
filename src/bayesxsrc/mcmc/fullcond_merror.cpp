@@ -38,8 +38,8 @@ namespace MCMC
   // fp   : file path for storing sampled parameters
 
   fullcond_merror::fullcond_merror(MCMCoptions * o,
-//               FULLCOND_nonp_basis * p, const datamatrix & d,        //wird bei IWLS-propsal benötigt
-               /*FULLCOND_nonp * p,*/ FULLCOND_nonp_basis * p, DISTRIBUTION * dp, const datamatrix & d,               //wird bei Conditional prior propsal benötigt
+//               FULLCOND_nonp_basis * p, const datamatrix & d,        //wird bei IWLS-propsal benoetigt
+               /*FULLCOND_nonp * p,*/ FULLCOND_nonp_basis * p, DISTRIBUTION * dp, const datamatrix & d,               //wird bei Conditional prior propsal benoetigt
                const datamatrix & em, const ST::string & t, const ST::string & fp,
                const double & mvar1, const double & mvar2, const double & arvar,
                const double & arpar1, const double & arpar2, const double & bmean,
@@ -97,7 +97,7 @@ namespace MCMC
     setbeta(meandata);
     nrpar=drows;
 
-    // Die Matrix P, also die Präzisionsmatrix für die
+    // Die Matrix P, also die Praezisionsmatrix fuer die
     // wahren Werte xi muss initialisiert werden.
     // Die Matrix setzt sich aus zwei Teilen zusammen:
     // der Kovarianzmatrix des Messfehlermodells (beobachtete
@@ -128,7 +128,7 @@ namespace MCMC
     datamatrix Omegainv (drows,drows,0);
     Omegainv = AR1inv /= sige;
 
-    // Als nächstes brauchen wir die Matrix
+    // Als naechstes brauchen wir die Matrix
     // der Messfehlervarianzen -> dabei handelt es sich
     // um eine Diagonalmatrix
 
@@ -144,7 +144,7 @@ namespace MCMC
         Sigeps1(v,v) = sigma22;
         }
 
-    // Um die richtige Dimension für Sigma^{-1} zu bekommen,
+    // Um die richtige Dimension fuer Sigma^{-1} zu bekommen,
     // brauchen wir die Hilfsmatrix Z = [I_I]'
 
     datamatrix Z = datamatrix(2*drows,drows,0);
@@ -173,25 +173,25 @@ namespace MCMC
     P = datamatrix(drows,drows,0);
     P.plus(ZSZ,Omegainv);
 
-    // Und nun noch die Matrix als envelope-Matrix   // wird nur für IWLS-proposal benötigt
+    // Und nun noch die Matrix als envelope-Matrix   // wird nur fuer IWLS-proposal benoetigt
 
-    //precenv = envmatdouble(P);   // wird nur für IWLS-proposal benötigt
+    //precenv = envmatdouble(P);   // wird nur fuer IWLS-proposal benoetigt
 
     datamatrix Pinv;
     Pinv = P.inverse();
 
-    PABn = datamatrix(drows,1,0);         // wird für Conditional prior proposal benötigt
+    PABn = datamatrix(drows,1,0);         // wird fuer Conditional prior proposal benoetigt
     for(i=0; i<drows; i++)
        {
         PABn(i,0) = sqrt(Pinv(i,i));
         }
 
-    PABl = datamatrix(drows-1,1,0);       // wird für Conditional prior proposal benötigt
+    PABl = datamatrix(drows-1,1,0);       // wird fuer Conditional prior proposal benoetigt
     for(i=0; i<drows-1; i++)
        {
         PABl(i,0) = P(i+1,i);
        }
-    PABr = datamatrix(drows-1,1,0);       // wird für Conditional prior proposal benötigt
+    PABr = datamatrix(drows-1,1,0);       // wird fuer Conditional prior proposal benoetigt
     for(i=0; i<drows-1; i++)
        {
         PABr(i,0) = P(i,i+1);

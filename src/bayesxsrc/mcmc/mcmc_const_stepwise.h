@@ -58,16 +58,16 @@ class __EXPORT_TYPE FULLCOND_const_stepwise : public FULLCOND_const
   datamatrix X1;
   datamatrix X2;
 
-  datamatrix X1root;     // für MCMC: (X'WX)^-0.5
-  datamatrix X1X;        // für MCMC: Gauss: (X'WX)^-1X'W; Nicht-Gauss: (X'WX)
+  datamatrix X1root;     // fuer MCMC: (X'WX)^-0.5
+  datamatrix X1X;        // fuer MCMC: Gauss: (X'WX)^-1X'W; Nicht-Gauss: (X'WX)
 
   datamatrix help;
 
-  datamatrix mu1;       // für MCMC: Gauss: y-eta; Nicht-Gauss: X'Wytilde
+  datamatrix mu1;       // fuer MCMC: Gauss: y-eta; Nicht-Gauss: X'Wytilde
 
   ST::string utype;    // gauss oder nongauss
 
-  datamatrix proposal;       // für MCMC - nongauss
+  datamatrix proposal;       // fuer MCMC - nongauss
   datamatrix weightiwls;
   datamatrix diff;
   datamatrix tildey;
@@ -161,7 +161,7 @@ class __EXPORT_TYPE FULLCOND_const_stepwise : public FULLCOND_const
 
   void include_effect(const vector<ST::string> & names, const datamatrix & newx);
 
-  // Funktion für die Anpassung eines einzelnen, bestimmten fixen Effekts
+  // Funktion fuer die Anpassung eines einzelnen, bestimmten fixen Effekts
   void posteriormode_single(const vector<ST::string> & names, datamatrix newx, const bool include);
 
   // speichert Intercept
@@ -170,15 +170,15 @@ class __EXPORT_TYPE FULLCOND_const_stepwise : public FULLCOND_const
   // setzt alten Intercept-Wert wieder ein
   void set_const_old(void);
 
-  // Funktion für die Anpassung des Intercepts
+  // Funktion fuer die Anpassung des Intercepts
   void posteriormode_const(void);
 
-  // führt Zentrierung bei VCs durch
+  // fuehrt Zentrierung bei VCs durch
   void update_fix_effect(const unsigned & pos, double & value, datamatrix fix);
 
   void posteriormode_const_varcoeff(datamatrix newx);
 
-  // löscht einen bestimmten fixen Effekt
+  // loescht einen bestimmten fixen Effekt
   void reset_effect(const unsigned & pos);
 
   void reset(void);

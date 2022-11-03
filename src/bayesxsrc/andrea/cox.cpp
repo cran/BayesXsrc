@@ -41,7 +41,7 @@ DISTRIBUTION_coxmodel::DISTRIBUTION_coxmodel(MCMCoptions * o,
 
      unsigned i;
 
-     nrcat = 1; // ändern bei competing risk
+     nrcat = 1; // aendern bei competing risk
 
      ti = t;
 
@@ -67,7 +67,7 @@ DISTRIBUTION_coxmodel::DISTRIBUTION_coxmodel(const datamatrix & offset,
 {
      unsigned i;
 
-     nrcat = 1; // ändern bei competing risk
+     nrcat = 1; // aendern bei competing risk
 
      ti = t;
      relrisk = offset;

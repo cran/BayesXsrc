@@ -50,12 +50,12 @@ class __EXPORT_TYPE FULLCOND_kriging2 : public spline_basis
   bool full;
   bool spacefill;
 
-  MAP::map m;                         // Variablen für geokriging
+  MAP::map m;                         // Variablen fuer geokriging
   bool mapexisting;
   ST::string mapname;
   vector<ST::string> regionnames;
 
-  double p;                           // p und q für Space-Filling-Algorithmus
+  double p;                           // p und q fuer Space-Filling-Algorithmus
   double q;
   unsigned maxsteps;
 

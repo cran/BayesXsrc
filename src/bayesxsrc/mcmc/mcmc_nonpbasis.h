@@ -120,7 +120,7 @@ class __EXPORT_TYPE FULLCOND_nonp_basis : public FULLCOND
   FULLCOND fc_contour;         // speichert in jeder Iteration das mu der full
                             // conditional, sowie 1/scale und 1/sigma2
   int contourprob;          // contourprob == -1: keine contour probabilities
-                            // contourprob == n : contour probabilities für
+                            // contourprob == n : contour probabilities fuer
                             // n-te Differenzen (und kleiner)
 
   public:
@@ -145,7 +145,7 @@ class __EXPORT_TYPE FULLCOND_nonp_basis : public FULLCOND
                       const ST::string & pres, const unsigned & c,
                       const unsigned & per=12);
 
-  // CONSTRUCTOR für REML
+  // CONSTRUCTOR fuer REML
 
   FULLCOND_nonp_basis(MCMCoptions * o, const ST::string & ti);
 

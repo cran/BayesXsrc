@@ -774,7 +774,7 @@ void FULLCOND_rj::switch_step(unsigned int i, unsigned int j)
 
 
 
-/**** gibt´s nicht mehr****
+/**** gibt's nicht mehr****
 
 // FUNCTION: ratio_b()
 // TARGET: calculates the ratio of a birth-step
@@ -811,7 +811,7 @@ double FULLCOND_rj::ratio_d(unsigned int j, double u,
 }
 
 
-**** gibt´s nicht mehr**** */
+**** gibt's nicht mehr**** */
 
 
 

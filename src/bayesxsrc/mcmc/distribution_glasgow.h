@@ -554,7 +554,7 @@ class DISTRIBUTION
   void tilde_y(datamatrix & tildey,const bool & current = true);
 
   // FUNCTION: tilde_y
-  // TASK: computes tildey = m + (y-mu)g'(mu)      ( für IWLS )
+  // TASK: computes tildey = m + (y-mu)g'(mu)      ( fuer IWLS )
 
   virtual void tilde_y(datamatrix & tildey,datamatrix & m,
               const unsigned & col,const bool & current,const datamatrix & w);
@@ -1298,23 +1298,23 @@ class newdistribution : public DISTRIBUTION
 //------------------------------------------------------------------------------
 // MODELLIERUNG DES SKALENPARAMETERS SCALE=PHI
 //
-// Implementiert sind drei Möglichkeiten:
+// Implementiert sind drei Moeglichkeiten:
 //
 //
 // 1. FIXER SKALENPARAMETER (Konstruktor 0)
 //
-// Phi wird im Konstruktor 0 einem bekannten, über alle Iterationen konstant
+// Phi wird im Konstruktor 0 einem bekannten, ueber alle Iterationen konstant
 // bleibenden Wert gleichgesetzt.
 //
 //
-// 2. KONSISTENTE SCHÄTZUNG DES SKALENPARAMETERS (Konstruktor 1)
+// 2. KONSISTENTE SCHAETZUNG DES SKALENPARAMETERS (Konstruktor 1)
 //
 // Phi wird in jeder Iteration der Simulation mit phi_hut
-// (vgl. Fahrmeir/Tutz S.44) konsistent geschätzt.
+// (vgl. Fahrmeir/Tutz S.44) konsistent geschaetzt.
 //
 // Zur Verbesserung und Beschleunigung von Konvergenz und Mixing des
-// Gesamtmodells kann phi zu Beginn für eine bestimmte Anzahl von Iterationen
-// (günstig ca. 500) konstant gehalten werden, siehe Konstruktor 1.
+// Gesamtmodells kann phi zu Beginn fuer eine bestimmte Anzahl von Iterationen
+// (guenstig ca. 500) konstant gehalten werden, siehe Konstruktor 1.
 //
 //
 // 3. UPDATE DES SKALENPARAMETERS MIT MH-ALGORITHMUS (Konstruktor 2)
@@ -1325,8 +1325,8 @@ class newdistribution : public DISTRIBUTION
 //
 // PRIORI: Gamma(a,b)
 // PROPOSAL: Gamma(a_nu,b_nu) mit fester Varianz var = (a_nu/b_nu*b_nu)
-// Die feste Varianz muß als Tuning Parameter im Konstruktor 2 geeignet
-// gewählt werden. Dabei gilt: Für große Varianzen ist die Akzeptanz des
+// Die feste Varianz muss als Tuning Parameter im Konstruktor 2 geeignet
+// gewaehlt werden. Dabei gilt: Fuer grosse Varianzen ist die Akzeptanz des
 // Formparameters gering u.u.
 // FULL CONDITIONAL UND AKZEPTANZWAHRSCHEINLICHKEIT:
 // siehe Diplomarbeit Petra Kragler S.93 und S.101ff
@@ -1334,8 +1334,8 @@ class newdistribution : public DISTRIBUTION
 // Zur Verbesserung und Beschleunigung von Konvergenz und Mixing des
 // Gesamtmodells beginnt das Update des Formparameters erst beim Burnin
 // der Gesamtsimulation. Bis dahin wird der Skalenparameter wie in 2. in jeder
-// Iteration konsistent geschätzt. (Dazu ist ebenfalls wieder ein Konstanthalten
-// in den allerersten Iterationen möglich.)
+// Iteration konsistent geschaetzt. (Dazu ist ebenfalls wieder ein Konstanthalten
+// in den allerersten Iterationen moeglich.)
 //------------------------------------------------------------------------------
 
 
@@ -1462,7 +1462,7 @@ class DISTRIBUTION_gamma : public DISTRIBUTION
 
   // FUNCTION: compute_devresidual
   // TASK: computes the deviance residual
-  // weight NICHT berücksichtigt
+  // weight NICHT beruecksichtigt
 
   void compute_deviance(const double * response,const double * weight,
                         const double * mu,double * deviance,

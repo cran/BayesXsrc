@@ -423,7 +423,7 @@ void DESIGN_pspline::make_Bspline(void)
 
 datamatrix DESIGN_pspline::bspline(const double & x)
   {
-// nach Hämmerlin/Hoffmann
+// nach Haemmerlin/Hoffmann
   datamatrix b(nrpar,1,0.0);
   datamatrix help(nrpar+degree,1,0.0);
   unsigned j;
@@ -529,7 +529,7 @@ datamatrix DESIGN_pspline::bspline_derivative(const double & x)
   {
 
 
-// nach Hämmerlin/Hoffmann
+// nach Haemmerlin/Hoffmann
   datamatrix b(nrpar,1,0.0);
   datamatrix help(nrpar+degree,1,0.0);
   unsigned j;
@@ -561,7 +561,7 @@ datamatrix DESIGN_pspline::bspline_derivative(const double & x)
       }
     }
 
-// Hämmerlin/Hoffmann Seite 263
+// Haemmerlin/Hoffmann Seite 263
 
   bwork = b.getV();
   helpwork = help.getV();

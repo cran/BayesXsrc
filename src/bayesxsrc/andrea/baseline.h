@@ -102,7 +102,7 @@ class __EXPORT_TYPE pspline_baseline : public FULLCOND_pspline
                     const bool & partlik);          // NEW FOR PARTIALLIKELIHOOD);
 
 
-// CONSTRUCTOR 2 (für zeitabhängige Effekte)
+// CONSTRUCTOR 2 (fuer zeitabhaengige Effekte)
 
   pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const datamatrix & time, const datamatrix & z,

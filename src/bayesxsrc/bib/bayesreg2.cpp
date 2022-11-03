@@ -59,7 +59,7 @@ bool bayesreg::create_geokriging(const unsigned & collinpred)
         return true;
         }
       f = (terms[i].options[3]).strtodouble(maxdist);
-      if(maxdist<=0) // wähle maxdist so, dass Korrelation für Punkte mitmaximalem Abstand = 0.0001
+      if(maxdist<=0) // waehle maxdist so, dass Korrelation fuer Punkte mitmaximalem Abstand = 0.0001
         {
         if(nu==0.5)
           {
@@ -3014,7 +3014,7 @@ bool bayesreg::create_random_rw1rw2(const unsigned & collinpred)
        &fcnonpgaussian[fcnonpgaussian.size()-1],false,"","","",collinpred));
 
 
-        // Reinhängen in fullcond
+        // Reinhaengen in fullcond
 
         fcnonpgaussian[fcnonpgaussian.size()-1].set_fcnumber(fullcond.size());
         fullcond.push_back(&fcnonpgaussian[fcnonpgaussian.size()-1]);
@@ -3282,7 +3282,7 @@ bool bayesreg::create_spatial_rw1rw2(const unsigned & collinpred)
        &fcnonpgaussian[fcnonpgaussian.size()-2],false,"","","",collinpred));
 
 
-        // Reinhängen in fullcond
+        // Reinhaengen in fullcond
 
         fcnonpgaussian[fcnonpgaussian.size()-2].set_fcnumber(fullcond.size());
         fullcond.push_back(&fcnonpgaussian[fcnonpgaussian.size()-2]);
@@ -3658,7 +3658,7 @@ bool bayesreg::create_random_pspline(const unsigned & collinpred)
        &fcpsplinegaussian[fcpsplinegaussian.size()-1],false,"","","",collinpred));
 
 
-        // Reinhängen in fullcond
+        // Reinhaengen in fullcond
 
         fcpsplinegaussian[fcpsplinegaussian.size()-1].set_fcnumber(fullcond.size());
         fullcond.push_back(&fcpsplinegaussian[fcpsplinegaussian.size()-1]);

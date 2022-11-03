@@ -53,15 +53,15 @@ using MCMC::FULLCOND_rj_mix;
 using MCMC::IA;
 using MCMC::MCMCsimulate;
 
-// HINZUFÜGEN EINER NEUEN METHODE
+// HINZUFUEGEN EINER NEUEN METHODE
 
-// 1. private - Teil ergänzen
-//   - optionlist für die neue Methode definieren
+// 1. private - Teil ergaenzen
+//   - optionlist fuer die neue Methode definieren
 //   - optionen definieren
 //   - Modell Klasse definieren
 //   - use Klasse definieren
 //   - run Funktion definieren
-// 2. create - Teil ergänzen (in bayesreg.cpp)
+// 2. create - Teil ergaenzen (in bayesreg.cpp)
 // 3. run funktion schreiben
 
 

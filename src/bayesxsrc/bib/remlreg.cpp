@@ -645,7 +645,7 @@ bool remlreg::create_data(datamatrix & weight)
       }
     ifexpression = methods[4].getexpression();
 
-    // variable 'state' anfügen
+    // variable 'state' anfuegen
     statepos=-1;
     if(state.getvalue() != "")
       {
@@ -657,14 +657,14 @@ bool remlreg::create_data(datamatrix & weight)
       outerror("ERROR: Variable state has to be specified as a global option!\n");
       return(true);
       }
-    // 'lefttrunc' anfügen
+    // 'lefttrunc' anfuegen
     lefttruncpos=-1;
     if(lefttrunc.getvalue() != "")
       {
       modelvarnamesv.push_back(lefttrunc.getvalue());
       lefttruncpos = modelvarnamesv.size()-1;
       }
-    // variable 'globalfrailty' anfügen
+    // variable 'globalfrailty' anfuegen
     gfrailtypos=-1;
     if(globalfrailty.getvalue() != "")
       {
@@ -679,7 +679,7 @@ bool remlreg::create_data(datamatrix & weight)
 
     ifexpression = methods[0].getexpression();
 
-    // Für Cox model: variable 'leftint' an 2. Stelle setzen
+    // Fuer Cox model: variable 'leftint' an 2. Stelle setzen
     leftintpos=-1;
     if(leftint.getvalue() != "")
       {
@@ -687,7 +687,7 @@ bool remlreg::create_data(datamatrix & weight)
       leftintpos = modelvarnamesv.size()-1;
       }
 
-    // Für Cox model: variable 'lefttrunc' an 3. Stelle setzen
+    // Fuer Cox model: variable 'lefttrunc' an 3. Stelle setzen
     lefttruncpos=-1;
     if(lefttrunc.getvalue() != "")
       {
@@ -695,7 +695,7 @@ bool remlreg::create_data(datamatrix & weight)
       lefttruncpos = modelvarnamesv.size()-1;
       }
 
-    // Für Binomial-Verteilung: variable 'binomweightpos' anfügen
+    // Fuer Binomial-Verteilung: variable 'binomweightpos' anfuegen
     binomweightpos=-1;
     if(binomweight.getvalue() != "")
       {
@@ -703,7 +703,7 @@ bool remlreg::create_data(datamatrix & weight)
       binomweightpos = modelvarnamesv.size()-1;
       }
 
-    // Für multinomiale Modelle: NA-Indikator anfügen
+    // Fuer multinomiale Modelle: NA-Indikator anfuegen
     if(naindicator.getvalue() != "")
       {
       ST::string test;
@@ -727,7 +727,7 @@ bool remlreg::create_data(datamatrix & weight)
         }
       }
 
-    // Für multinomiale Modelle: Kategorienspezifische Kovariablen extrahieren
+    // Fuer multinomiale Modelle: Kategorienspezifische Kovariablen extrahieren
 
     if(family.getvalue()=="multinomialcatsp")
       {
@@ -2599,7 +2599,7 @@ bool remlreg::create_kriging(const unsigned & collinpred)
         return true;
         }
       f = (terms[i].options[3]).strtodouble(maxdist);
-      if(maxdist<=0) // wähle maxdist so, dass Korrelation für Punkte mit maximalem Abstand = 0.0001
+      if(maxdist<=0) // waehle maxdist so, dass Korrelation fuer Punkte mit maximalem Abstand = 0.0001
         {
         if(nu==0.5)
           {
@@ -2747,7 +2747,7 @@ bool remlreg::create_kriging_1dim(const unsigned & collinpred)
         return true;
         }
       f = (terms[i].options[2]).strtodouble(maxdist);
-      if(maxdist<=0) // wähle maxdist so, dass Korrelation für Punkte mitmaximalem Abstand = 0.0001
+      if(maxdist<=0) // waehle maxdist so, dass Korrelation fuer Punkte mitmaximalem Abstand = 0.0001
         {
         if(nu==0.5)
           {
@@ -2845,7 +2845,7 @@ bool remlreg::create_kriging_varcoeff(const unsigned & collinpred)
         return true;
         }
       f = (terms[i].options[3]).strtodouble(maxdist);
-      if(maxdist<=0) // wähle maxdist so, dass Korrelation für Punkte mitmaximalem Abstand = 0.0001
+      if(maxdist<=0) // waehle maxdist so, dass Korrelation fuer Punkte mitmaximalem Abstand = 0.0001
         {
         if(nu==0.5)
           {
@@ -2995,7 +2995,7 @@ bool remlreg::create_geokriging(const unsigned & collinpred)
         return true;
         }
       f = (terms[i].options[3]).strtodouble(maxdist);
-      if(maxdist<=0) // wähle maxdist so, dass Korrelation für Punkte mitmaximalem Abstand = 0.0001
+      if(maxdist<=0) // waehle maxdist so, dass Korrelation fuer Punkte mitmaximalem Abstand = 0.0001
         {
         if(nu==0.5)
           {
@@ -3165,7 +3165,7 @@ bool remlreg::create_geokriging_varcoeff(const unsigned & collinpred)
         return true;
         }
       f = (terms[i].options[3]).strtodouble(maxdist);
-      if(maxdist<=0) // wähle maxdist so, dass Korrelation für Punkte mitmaximalem Abstand = 0.0001
+      if(maxdist<=0) // waehle maxdist so, dass Korrelation fuer Punkte mitmaximalem Abstand = 0.0001
         {
         if(nu==0.5)
           {

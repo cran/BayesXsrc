@@ -643,14 +643,14 @@ void FULLCOND_kriging2::compute_knots(const vector<double> & xvals,
                             // zum Kandidaten wird (ohne Beitrag des neuen Knotens)
 
     int swapindex;                        // Index des zu tauschenden Kandidaten
-                                          // (Kandidat mit dem minimalen Kriterium beim Loop über den aktuellen Knoten)
+                                          // (Kandidat mit dem minimalen Kriterium beim Loop ueber den aktuellen Knoten)
 
-    double covcritold=0; // Coverage-Kriterium (ändert sich nur nach Durchlauf über Knoten)
-    double covcritnew=-1;   // Neues Coverage-Kriterium (ändert sich nur nach Durchlauf über Knoten)
-    double covcritoldi;  // Coverage-Kriterium vorm Swappen von Knoten i (ändert sich nach jedem Swap)
-    double covcritnewi;  // Neues Coverage-Kriterium beim Swappen von Knoten i (ändert sich nach jedem Swap)
+    double covcritold=0; // Coverage-Kriterium (aendert sich nur nach Durchlauf ueber Knoten)
+    double covcritnew=-1;   // Neues Coverage-Kriterium (aendert sich nur nach Durchlauf ueber Knoten)
+    double covcritoldi;  // Coverage-Kriterium vorm Swappen von Knoten i (aendert sich nach jedem Swap)
+    double covcritnewi;  // Neues Coverage-Kriterium beim Swappen von Knoten i (aendert sich nach jedem Swap)
 
-    // Startdesign und Kandidaten zufällig bestimmen
+    // Startdesign und Kandidaten zufaellig bestimmen
 
     datamatrix u(nrdiffobs,1,0);
     statmatrix<int> ind(nrdiffobs,1,0);
@@ -735,10 +735,10 @@ void FULLCOND_kriging2::compute_knots(const vector<double> & xvals,
 
         for(j=0; j<nrcand; j++)
           {
-          // Loop über die Kandidaten. Jeweil das Coverage-Kriterium bei Swap i vs. j ausrechnen
+          // Loop ueber die Kandidaten. Jeweil das Coverage-Kriterium bei Swap i vs. j ausrechnen
           // und gegebenenfalls swapindex umsetzen.
           covcritnewi = 0;
-          // Loopen über Zeilensummen ohne j
+          // Loopen ueber Zeilensummen ohne j
           for(k=0; k<j; k++)
             {
             covcritnewi += pow(rowsumswithouti(k,0) +
@@ -819,7 +819,7 @@ void FULLCOND_kriging2::update()
   if(lambdaconst == true)
     sigma2 = likep->get_scale(column)/lambda;
 
-  if(optionsp->get_nriter()==1)       // posterior mode Schätzung übernehmen
+  if(optionsp->get_nriter()==1)       // posterior mode Schaetzung uebernehmen
     betaold.assign(beta);
 
   if(utype == gaussian)
@@ -869,7 +869,7 @@ void FULLCOND_kriging2::update_gaussian()
 
   likep->substr_linearpred(spline);
 
-  if(changingweight)  // für t-link
+  if(changingweight)  // fuer t-link
     {
     datamatrix help = X.transposed();
     help.multdiagback(likep->get_weight());
@@ -885,7 +885,7 @@ void FULLCOND_kriging2::update_gaussian()
   for(i=0;i<nrpar;i++,work++)
     *work = rand_normal();
 
-  likep->compute_respminuslinpred(mu,column);   // nicht ändern wegen multgaussian
+  likep->compute_respminuslinpred(mu,column);   // nicht aendern wegen multgaussian
 
 //  compute_XWtildey(likep->get_weight(),scaleinv);
   double * weightp = likep->get_weightp();

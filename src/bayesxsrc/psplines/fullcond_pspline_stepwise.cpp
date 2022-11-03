@@ -429,7 +429,7 @@ else
       j = 0;
       for(i=0;i<unsigned(gridsize);i++,fchelpbetap++)
         {
-        *fchelpbetap = betas(0,0) + xvalues(i,0)*betas(1,0);   // keine Fallunterscheidung VC / nicht VC nötig!
+        *fchelpbetap = betas(0,0) + xvalues(i,0)*betas(1,0);   // keine Fallunterscheidung VC / nicht VC noetig!
         while(j<beta.rows())
           {
           if(*fchelpbetap != 0)
@@ -607,7 +607,7 @@ else
       return converged;
       }  // end: if(interaction == false)
     else if(!center && interaction && interaction2)  // Zum Bestimmen der Lambdas (es gilt: "!center")
-      {                                              // sonst überflüssig!
+      {                                              // sonst ueberfluessig!
       if(interactions_pointer[interactions_pointer.size()-1]->is_identifiable() == false)
         interactions_pointer[interactions_pointer.size()-1]->set_center(true);
       return interactions_pointer[interactions_pointer.size()-1]->posteriormode();
@@ -686,7 +686,7 @@ void FULLCOND_pspline_stepwise::const_varcoeff(void)
 
 // END: For Varying Coefficients -----------------------------------------------
 
-// BEGIN: FÜR INTERAKTIONEN-----------------------------------------------------
+// BEGIN: FUER INTERAKTIONEN-----------------------------------------------------
 
 bool FULLCOND_pspline_stepwise::changeposterior3(const datamatrix & betamain,const datamatrix & main,const double & inter)
    {
@@ -694,11 +694,11 @@ bool FULLCOND_pspline_stepwise::changeposterior3(const datamatrix & betamain,con
   vector<int>::iterator freqwork = freq.begin();
   int * workindex = index.getV();
 
-// spline ändern
+// spline aendern
   for(i=0;i<spline.rows();i++,freqwork++,workindex++)
     spline(*workindex,0) += main(*freqwork,0) - inter;
 
-// fchelp ändern
+// fchelp aendern
   double * fchelpbetap = fchelp.getbetapointer();
   freqwork = freq.begin();
   workindex = index.getV();
@@ -715,7 +715,7 @@ bool FULLCOND_pspline_stepwise::changeposterior3(const datamatrix & betamain,con
 
   unsigned i;
 
-// beta, spline ändern
+// beta, spline aendern
   beta.assign(betamain);
   for(i=0;i<nrpar;i++)
     beta(i,0) -= inter;
@@ -730,7 +730,7 @@ bool FULLCOND_pspline_stepwise::changeposterior3(const datamatrix & betamain,con
   bool converged = FULLCOND_nonp_basis::posteriormode();
   if(converged)
     {
-    // fchelp ändern
+    // fchelp aendern
     write_spline();
     fchelp.posteriormode();
     }
@@ -744,7 +744,7 @@ bool FULLCOND_pspline_stepwise::changeposterior_varcoeff(const datamatrix & beta
   {
   unsigned i;
 
-// beta ändern
+// beta aendern
   beta.assign(betamain);
   for(i=0;i<nrpar;i++)
     beta(i,0) -= inter;
@@ -752,7 +752,7 @@ bool FULLCOND_pspline_stepwise::changeposterior_varcoeff(const datamatrix & beta
   vector<int>::iterator freqwork = freqoutput.begin();
   int * workindex = index.getV();
 
-// splinehelp ändern
+// splinehelp aendern
   for(i=0;i<splinehelp.rows();i++,freqwork++,workindex++)
     {
     splinehelp(*workindex,0) = main(*freqwork,0) - inter;
@@ -768,7 +768,7 @@ bool FULLCOND_pspline_stepwise::changeposterior_varcoeff(const datamatrix & beta
   bool converged = FULLCOND_nonp_basis::posteriormode();
   if(converged)
     {
-    // fchelp ändern
+    // fchelp aendern
     double * fchelpbetap = fchelp.getbetapointer();
     freqwork = freqoutput.begin();
     workindex = index.getV();
@@ -804,7 +804,7 @@ bool FULLCOND_pspline_stepwise::search_for_interaction(void)
   bool thereis = false;
 //  for(i=0;i<interactions_pointer.size();i++)
 //    {
-    bool drin, fix;         // 2d Interaktion muß an der letzten Stelle sein!!!
+    bool drin, fix;         // 2d Interaktion muss an der letzten Stelle sein!!!
     interactions_pointer[interactions_pointer.size()-1]->get_inthemodel(drin,fix);
     if(drin == true)
       thereis = true;
@@ -831,8 +831,8 @@ void FULLCOND_pspline_stepwise::hierarchical(ST::string & possible)
       else
         possible = "alles";
       }
-    else if(number == -1)  // für Interaktionsvariable "z" bei VC (g(x)*z + h(y)*z + b*z)
-      {                    // number = -1 als Kennzeichen für "z" (theoretisch nicht eindeutig)
+    else if(number == -1)  // fuer Interaktionsvariable "z" bei VC (g(x)*z + h(y)*z + b*z)
+      {                    // number = -1 als Kennzeichen fuer "z" (theoretisch nicht eindeutig)
       for(i=0;i<interactions_pointer.size();i++)
         {
         interactions_pointer[i]->get_inthemodel(spline1,fix1);
@@ -848,7 +848,7 @@ void FULLCOND_pspline_stepwise::hierarchical(ST::string & possible)
         possible = "alles";
       }
     }
-  else    // nur für Unterscheidung VC / !VC
+  else    // nur fuer Unterscheidung VC / !VC
     {
     if(interaction)
       {       // Zeiger auf 2d-Interaktion ist an der letzten Stelle!!!
@@ -933,7 +933,7 @@ else
   //  df = 1;
   if(inthemodel == true)
     {
-    // falls Übergang: leer --> VC kann fixer Effekt noch nicht enthalten sein, d.h. es muß ein df addiert werden!
+    // falls Uebergang: leer --> VC kann fixer Effekt noch nicht enthalten sein, d.h. es muss ein df addiert werden!
     /*if(varcoeff && !identifiable && !center)
       {
       bool raus = false;
@@ -1191,7 +1191,7 @@ vector<double> & lvec, int & number)
   if(forced_into==false)
      lvec.push_back(0);
 
-  // Startwert für lambda aus df:
+  // Startwert fuer lambda aus df:
   if(spfromdf!="direct")
     {
     double lambdavorg = 1000;
@@ -1620,7 +1620,7 @@ if(kombimatrix == false || matrixnumber==1)
     outres << "frequency  ";
   outres << "selected  " << endl;
 
-// Häufigkeitstabelle:
+// Haeufigkeitstabelle:
 
   // samplestream.close();
   datamatrix sample(size,1);
@@ -1703,7 +1703,7 @@ if(kombimatrix == false || matrixnumber==1)
     outres << endl;
     }
 
-  if(*workmean > 0)    // für ANOVA, damit wieder richtiges lambda eingesetzt ist.
+  if(*workmean > 0)    // fuer ANOVA, damit wieder richtiges lambda eingesetzt ist.
     update_stepwise(*workmean);
   else
     update_stepwise(sample.get(index(cumnumber[merken]-1,0),0));
@@ -1856,11 +1856,11 @@ void FULLCOND_pspline_stepwise::change_varcoeff(const datamatrix & betamain,
   vector<int>::iterator freqwork = freqoutput.begin();
   int * workindex = index.getV();
 
-// splinehelp ändern
+// splinehelp aendern
   for(i=0;i<splinehelp.rows();i++,freqwork++,workindex++)
     splinehelp(*workindex,0) = main(*freqwork,0) - inter;
 
-// Intercept ändern
+// Intercept aendern
 //  intercept += inter;
 
   double * worksp = spline.getV();
@@ -1871,7 +1871,7 @@ void FULLCOND_pspline_stepwise::change_varcoeff(const datamatrix & betamain,
     *worksp = *worksph * *workint;
     }
 
-// fchelp ändern
+// fchelp aendern
   if( (optionsp->get_nriter() > optionsp->get_burnin()) &&
       ((optionsp->get_nriter()-optionsp->get_burnin()-1) % (optionsp->get_step()) == 0) )
     {
@@ -1915,7 +1915,7 @@ void FULLCOND_pspline_stepwise::update_gauss(void)
   else
     subtr_spline();                                 // eta = eta - spline + intercept
 
-  if(changingweight)                                // für t-link
+  if(changingweight)                                // fuer t-link
     compute_XWXenv(likep->get_weight());
 
   double scaleinv = 1.0/likep->get_scale(column);   // scaleinv = 1/scale
@@ -1934,7 +1934,7 @@ void FULLCOND_pspline_stepwise::update_gauss(void)
   for(i=0;i<nrpar;i++,work++)
     *work = rand_normal();
 
-  likep->compute_respminuslinpred(mu,column);       // nicht ändern wegen multgaussian
+  likep->compute_respminuslinpred(mu,column);       // nicht aendern wegen multgaussian
   compute_XWtildey(likep->get_weight(),scaleinv);   // muy = scaleinv * X'W*mu
 
   beta.assign(standnormal);
@@ -2033,7 +2033,7 @@ void FULLCOND_pspline_stepwise::update_IWLS(void)
   if(lambdaconst == true)
     sigma2 = likep->get_scale(column)/lambda;
 
-  if(optionsp->get_nriter()==1)                             // posterior mode Schätzung übernehmen
+  if(optionsp->get_nriter()==1)                             // posterior mode Schaetzung uebernehmen
     {
     betaold = datamatrix(nrpar,1,0);
     W = datamatrix(likep->get_nrobs(),1,0);

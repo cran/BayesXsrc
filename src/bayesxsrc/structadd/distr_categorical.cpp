@@ -2122,8 +2122,10 @@ double DISTR_JM::compute_iwls(double * response, double * linpred,
 
   if (*weightd2p != 0)
     {
-    *workingweight = (*weightpoisp)*alpha*alpha*ww1 + (*weightd2p) / dist2->sigma2 * ww2;
-    *workingresponse = *linpred + ((*weightpoisp) * alpha * ww1 * (wr1-*predpoisp) + (*weightd2p) / dist2->sigma2 * ww2 * (wr2-*predd2p)) / *workingweight;
+    *workingweight = (*weightpoisp)*alpha*alpha*ww1 + 1.0 / dist2->sigma2 * ww2;
+    *workingresponse = *linpred + ((*weightpoisp) * alpha * ww1 * (wr1-*predpoisp) + 1.0 / dist2->sigma2 * ww2 * (wr2-*predd2p)) / *workingweight;
+//    *workingweight = (*weightpoisp)*alpha*alpha*ww1 + (*weightd2p) / dist2->sigma2 * ww2;
+//    *workingresponse = *linpred + ((*weightpoisp) * alpha * ww1 * (wr1-*predpoisp) + (*weightd2p) / dist2->sigma2 * ww2 * (wr2-*predd2p)) / *workingweight;
     }
   else
     {

@@ -38,7 +38,7 @@ void IWLS_pspline::create_iwls(void)
   compute_Kweights();
 
   if(predictright || predictleft)                          // betaweight erweitern, damit in die Zentrierungskonstante
-    {                                                      // nur die zu schätzenden Parameter einfliessen, nicht die
+    {                                                      // nur die zu schaetzenden Parameter einfliessen, nicht die
     datamatrix help = betaweight;                          // zu prognostizierenden
     betaweight = datamatrix(nrpar,1,0);
     for(i=0;i<nrparpredictleft;i++)
@@ -72,7 +72,7 @@ void IWLS_pspline::create_iwls(void)
     rankK = nrpar-nrparpredictleft-nrparpredictright-2;
     }
 
-  if(predictleft || predictright)                          // K-matrix anpassen für Prädiktion
+  if(predictleft || predictright)                          // K-matrix anpassen fuer Praediktion
     change_K();
 
   betaold = datamatrix(nrpar,1,0);
@@ -146,7 +146,7 @@ IWLS_pspline::IWLS_pspline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fc
 
   }
 
-  // CONSTRUCTOR 2 (für variierende Koeffizienten)
+  // CONSTRUCTOR 2 (fuer variierende Koeffizienten)
 
 IWLS_pspline::IWLS_pspline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const datamatrix & effmod,const datamatrix & intact,const bool & mode,
@@ -210,7 +210,7 @@ IWLS_pspline::IWLS_pspline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fc
 
   }
 
-  // CONSTRUCTOR 3 (für Cox)
+  // CONSTRUCTOR 3 (fuer Cox)
 
 IWLS_pspline::IWLS_pspline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const datamatrix & d,const bool & mode,
@@ -485,7 +485,7 @@ void IWLS_pspline::update(void)
   if(lambdaconst == true)
     sigma2 = likep->get_scale(column)/lambda;
 
-  if(optionsp->get_nriter()==1)                             // posterior mode Schätzung übernehmen
+  if(optionsp->get_nriter()==1)                             // posterior mode Schaetzung uebernehmen
     betaold.assign(beta);
 
   if(increasing || decreasing)                              // update bei Monotonie-Restriktion
@@ -514,7 +514,7 @@ void IWLS_pspline::update(void)
     }
 
 
-  if(predictright || predictleft)                           // Prädiktion
+  if(predictright || predictleft)                           // Praediktion
     update_prediction();
 
   if(interaction == false)                                  // wird bei interaction==true in der full conditional des Interaktionseffekts gemacht
@@ -555,7 +555,7 @@ void IWLS_pspline::update_IWLS_hyperblock_mode(void)
   if(optionsp->get_nriter() == optionsp->get_burnin())
     optionsp->out("NOTE: Tuning constant 'f' for term " + title + " set to " + ST::doubletostring(f) + "\n");
 
-// startwert für kappamode berechnen
+// startwert fuer kappamode berechnen
 
   aprop = a_invgamma + 0.5*rankK;
   bprop = b_invgamma + 0.5*Kenv.compute_quadformblock(beta,0,nrparpredictleft,nrpar-nrparpredictright-1);
@@ -608,7 +608,7 @@ void IWLS_pspline::update_IWLS_hyperblock_mode(void)
     compute_XWtildey(W,1.0);
     }
 
-  prec_env.addto(XX_env,Kenv,1.0,1.0/sigma2);                //  fixes sigma2 für beta_mode (m)
+  prec_env.addto(XX_env,Kenv,1.0,1.0/sigma2);                //  fixes sigma2 fuer beta_mode (m)
 
   prec_env.solve(muy,betahelp);
 
@@ -657,7 +657,7 @@ void IWLS_pspline::update_IWLS_hyperblock_mode(void)
     {
     acceptance++;
     kappa = kappaprop;
-    sigma2 = 1.0/kappa;                                      // für variance_nonp
+    sigma2 = 1.0/kappa;                                      // fuer variance_nonp
     if(center)
       {
       compute_intercept();
@@ -773,7 +773,7 @@ void IWLS_pspline::update_IWLS_hyperblock(void)
   if(u<=alpha)
     {
     kappa = kappaprop;
-    sigma2 = 1.0/kappa;                                             // für variance_nonp
+    sigma2 = 1.0/kappa;                                             // fuer variance_nonp
     acceptance++;
     if(center)
       {

@@ -78,8 +78,8 @@ FULLCOND_ridge::FULLCOND_ridge(MCMCoptions * o, DISTRIBUTION * dp,
   X1 = datamatrix(d.cols(),d.cols(),0);
   X2 = datamatrix(d.cols(),likep->get_nrobs(),0);
 
-//-Temorär ---------------------------------------------------------------------
-  // Outputmatrix für Varianzschätzer und Lassoschätzer und Hyperparameter
+//-Temoraer ---------------------------------------------------------------------
+  // Outputmatrix fuer Varianzschaetzer und Lassoschaetzer und Hyperparameter
   hypr = 0.01;                                                           //SET!
   hyps = 0.01;                                                           //SET!
   estimVariances = datamatrix(1,d.cols(),0);
@@ -96,7 +96,7 @@ FULLCOND_ridge::FULLCOND_ridge(MCMCoptions * o, DISTRIBUTION * dp,
     outpInitialVal << variances[i] << ' ';
     }
   outpInitialVal << endl;
-//-Temorär Ende-----------------------------------------------------------------
+//-Temoraer Ende-----------------------------------------------------------------
   }
 
 
@@ -116,12 +116,12 @@ FULLCOND_ridge::FULLCOND_ridge(const FULLCOND_ridge & m)
   XX = m.XX;
   X1 = m.X1;
   X2 = m.X2;
-//-Temorär ---------------------------------------------------------------------
+//-Temoraer ---------------------------------------------------------------------
   hypr = m.hypr;
   hyps = m.hyps;
   estimVariances = m.estimVariances;
   estimLasso = m.estimLasso;
-//-Temorär Ende-----------------------------------------------------------------
+//-Temoraer Ende-----------------------------------------------------------------
   }
 
 
@@ -144,12 +144,12 @@ const FULLCOND_ridge & FULLCOND_ridge::operator=(const FULLCOND_ridge & m)
   XX = m.XX;
   X1 = m.X1;
   X2 = m.X2;
-//-Temorär ---------------------------------------------------------------------
+//-Temoraer ---------------------------------------------------------------------
   hypr = m.hypr;
   hyps = m.hyps;
   estimVariances = m.estimVariances;
   estimLasso = m.estimLasso;
-//-Temorär Ende-----------------------------------------------------------------
+//-Temoraer Ende-----------------------------------------------------------------
 
   return *this;
   }
@@ -225,10 +225,10 @@ void FULLCOND_ridge::update(void)
     sumvariances = sumvariances + variances[i];
     }
   lasso = sqrt(rand_gamma(nrpar + hypr, hyps + 0.5*sumvariances));
-//-Temorär----------------------------------------------------------------------
-// Update der Outputmatrix für Lassoschätzer
+//-Temoraer----------------------------------------------------------------------
+// Update der Outputmatrix fuer Lassoschaetzer
   estimLasso = estimLasso.vcat(datamatrix(1,1,lasso));
-//-Temorär Ende-----------------------------------------------------------------
+//-Temoraer Ende-----------------------------------------------------------------
 
 
   // Gibbs-Update of parameters 1/tau^2: with Inverse Normaldistribution
@@ -248,10 +248,10 @@ void FULLCOND_ridge::update(void)
       }
    matrixvariances(0,i) = variances[i];
     }
-//-Temorär----------------------------------------------------------------------
-// Update der Outputmatrix für Varianzschätzer und Lassoschätzer
+//-Temoraer----------------------------------------------------------------------
+// Update der Outputmatrix fuer Varianzschaetzer und Lassoschaetzer
   estimVariances = estimVariances.vcat(matrixvariances);
-//-Temorär Ende-----------------------------------------------------------------
+//-Temoraer Ende-----------------------------------------------------------------
 
 
   // Bedingugng zur Erzeugung des Ouutputs
@@ -276,13 +276,13 @@ void FULLCOND_ridge::outresults(void)
   {
   FULLCOND::outresults();
 
-//-Temorär----------------------------------------------------------------------
-  // Output der Matrizen für Varianzschätzer und Lassoschätzer
+//-Temoraer----------------------------------------------------------------------
+  // Output der Matrizen fuer Varianzschaetzer und Lassoschaetzer
   ofstream outpLasso("c:/bayesx/test/results/Lasso.txt", ios::out);
   ofstream outpVariances("c:/bayesx/test/results/Variances.txt", ios::out);
   estimLasso.prettyPrint(outpLasso);
   estimVariances.prettyPrint(outpVariances);
-//-Temorär Ende-----------------------------------------------------------------
+//-Temoraer Ende-----------------------------------------------------------------
 
 
   ofstream outp(pathcurrent.strtochar());

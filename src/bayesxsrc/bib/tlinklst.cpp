@@ -514,7 +514,7 @@ unsigned LinkedList<T>::newNode()
 	 unsigned i;
 	 ListNode<T> *work;
 
-	//	Jetzt muß wirklich Speicher bereitgestellt sein, damit in
+	//	Jetzt muss wirklich Speicher bereitgestellt sein, damit in
 	//	diesem Speicher nach einem freien Knoten gesucht werden
 	//	kann.
 
@@ -590,7 +590,7 @@ void LinkedList<T>::deleteNode(unsigned at)
 //
 //	Ergebnis :
 //
-//	Knotenindex (Zeigeräquivalent) des Knoten oder 0, wenn
+//	Knotenindex (Zeigeraequivalent) des Knoten oder 0, wenn
 //	kein passender Knoten gefunden wurde.
 
 template <class T>
@@ -637,11 +637,11 @@ unsigned LinkedList<T>::findNode(const T *node) const
 //	void resize()
 //
 //	Nach einem Zugriffsversuch jenseits der Grenzen des bisherigen
-//	Speichers den verfügbaren Speicher anpassen.
+//	Speichers den verfuegbaren Speicher anpassen.
 //
 //	Bemerkung:
 //
-//	Durch diese Operation kann die Liste ungültig werden.
+//	Durch diese Operation kann die Liste ungueltig werden.
 
 template <class T>
 void LinkedList<T>::

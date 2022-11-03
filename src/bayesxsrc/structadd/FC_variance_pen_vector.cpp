@@ -134,11 +134,11 @@ void FC_variance_pen_vector::add_variable(datamatrix & x,vector<ST::string> & op
 // KOMMENTAR Susanne:
 //-------------------
 // Derzeit ist die scale-dependent Variante implementiert, d.h. die
-// Shrinkageprioris hängen in Gaussfall vom Skalenparameter sigma2 ab.
+// Shrinkageprioris haengen in Gaussfall vom Skalenparameter sigma2 ab.
 // Dies hat zur Folge, das zum update von sigma2 der Wert sum(beta^2/tau^2),
-// der in lassosum und ridgesum berechnet wird, benötigt wird.
-// Für den Fall das kein adaptives shrinkage gewählt wird, werden die
-// ersten Einträge aus den Vektoroptionen für das Verfahren verwendet.
+// der in lassosum und ridgesum berechnet wird, benoetigt wird.
+// Fuer den Fall das kein adaptives shrinkage gewaehlt wird, werden die
+// ersten Eintraege aus den Vektoroptionen fuer das Verfahren verwendet.
 // Einentsprechender Hinweis sollte in das Handbuch.
 //==============================================================================
 
@@ -171,7 +171,7 @@ FC_variance_pen_vector::FC_variance_pen_vector(MASTER_OBJ * mp,
   priorassumptions.push_back("\\\\");
 
   // vector<ST::string> vnames = FC_shrinkage.get_datanames();
-  //Initialisieren der Betamatrizen für die Varianzan + Übergabe der Startwerte
+  //Initialisieren der Betamatrizen fuer die Varianzan + Uebergabe der Startwerte
   //is_fix = shrinkagefix[0];
   //is_adaptive = adaptiveshrinkage[0];
 

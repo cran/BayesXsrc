@@ -34,14 +34,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include<map.h>
 
 
-// HINZUFÜGEN EINES NEUEN OBJEKTTYPS
-// 1. Neue header Datei mit include hinzufügen
+// HINZUFUEGEN EINES NEUEN OBJEKTTYPS
+// 1. Neue header Datei mit include hinzufuegen
 // 2. Im default constructor den neuen Objekttyp initialisieren
 // 3. Vektor definieren, der die neuen Objekttypen speichern kann (im private
 //    Teil von administrator)
 // 4. In der Funktion 'create' den neuen Objekttyp initialisieren
-// 5. function 'dropobjects' abändern
-// 6. function 'adjustobjects' abändern
+// 5. function 'dropobjects' abaendern
+// 6. function 'adjustobjects' abaendern
 
 
 class administrator

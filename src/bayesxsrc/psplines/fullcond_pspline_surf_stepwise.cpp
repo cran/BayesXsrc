@@ -56,7 +56,7 @@ void FULLCOND_pspline_surf_stepwise::init_maineffects(
   he1 = datamatrix(xv.size(),1,0);
   he2 = datamatrix(yv.size(),1,0);
 
-  // 2) Berechnen der Strafmatrix für 1. Haupteffekt
+  // 2) Berechnen der Strafmatrix fuer 1. Haupteffekt
   if(type == mrfkr1)
     {
     datamatrix K1 = datamatrix(nrpar1dim,nrpar1dim,0.0);
@@ -97,7 +97,7 @@ void FULLCOND_pspline_surf_stepwise::init_maineffects(
     Ky = bandmatdouble(de,ud);
     Kyenv = envmatdouble(Ky);
 
-  // 3) Berechnen der Strafmatrix für 2. Haupteffekt
+  // 3) Berechnen der Strafmatrix fuer 2. Haupteffekt
 
     for(i=0;i<nrpar1dim;i++)
       {
@@ -466,7 +466,7 @@ bool FULLCOND_pspline_surf_stepwise::posteriormode(void)
     likep->compute_weightiwls_workingresiduals(column);
     betas = XVX*data_varcoeff_fix.transposed()*likep->get_workingresiduals();
     spline.mult(data_varcoeff_fix,betas);
-    likep->add_linearpred_m(spline,column);     // addiert durchschnittl. Fkt. zum Gesamtprädiktor
+    likep->add_linearpred_m(spline,column);     // addiert durchschnittl. Fkt. zum Gesamtpraediktor
 
     if(center)
       {
@@ -505,7 +505,7 @@ bool FULLCOND_pspline_surf_stepwise::posteriormode(void)
       vector<double>::iterator effity = effectvaluesy.begin();
       for(i=0;i<unsigned(gridsize);i++,fchelpbetap++,effitx++,effity++)
         {
-        *fchelpbetap = betas(0,0) + *effitx * *effity * betas(1,0);   // keine Fallunterscheidung VC / nicht VC nötig!
+        *fchelpbetap = betas(0,0) + *effitx * *effity * betas(1,0);   // keine Fallunterscheidung VC / nicht VC noetig!
         while(j<beta.rows())
           {
           help(j,0) = *fchelpbetap;
@@ -519,8 +519,8 @@ bool FULLCOND_pspline_surf_stepwise::posteriormode(void)
 
   else  // if(lambda!=-2)
     {
-    if(type == mrfkr1 && rankK==(nrpar1dim-1)*(nrpar1dim-1))   // hier passen "type" und "rankK" zusammen, d.h. kein Spezialfall für Bootstrap
-      {                                                        // außerdem nicht für "rw2" oder "rw1"
+    if(type == mrfkr1 && rankK==(nrpar1dim-1)*(nrpar1dim-1))   // hier passen "type" und "rankK" zusammen, d.h. kein Spezialfall fuer Bootstrap
+      {                                                        // ausserdem nicht fuer "rw2" oder "rw1"
       mainpoi1->reset_effect(0);
       mainpoi2->reset_effect(0);
 
@@ -747,7 +747,7 @@ bool FULLCOND_pspline_surf_stepwise::posteriormode(void)
           {
           multDG(splinehelp,beta);  // NICHT zeilen- und spaltenweise zentriert!!!
                                 // dazu: if(center && !centertotal){multDG(splinehelp,beta);}
-                                // und: 'splinehelp' ändern 'in compute_maineffects'
+                                // und: 'splinehelp' aendern 'in compute_maineffects'
           for(i=0;i<unsigned(gridsize);i++,fchelpbetap++)
             *fchelpbetap = splinehelp(i,0) - intercept_save;
           }
@@ -816,7 +816,7 @@ void FULLCOND_pspline_surf_stepwise::hierarchical(ST::string & possible)
     else
       possible = "rfix";
     }
-  else if(varcoeff)    // nur für Unterscheidung VC / !VC
+  else if(varcoeff)    // nur fuer Unterscheidung VC / !VC
     {
     if(maineffectsexisting == 11)
       {
@@ -1004,7 +1004,7 @@ vector<double> & lvec, int & number)
   if(forced_into==false)
      lvec.push_back(0);
 
-  // Startwert für lambda aus df:
+  // Startwert fuer lambda aus df:
   if(spfromdf!="direct")
     {
     double lambdavorg = 1000;
@@ -1075,11 +1075,11 @@ double FULLCOND_pspline_surf_stepwise::compute_df(void)
       else
         df = df + 1;
       }
-    else if(type == mrfkr1 && rankK==(nrpar1dim-1)*(nrpar1dim-1))   // d.h. Typ und Rang passen zusammen --> kein Spezialfall für Bootstrap
+    else if(type == mrfkr1 && rankK==(nrpar1dim-1)*(nrpar1dim-1))   // d.h. Typ und Rang passen zusammen --> kein Spezialfall fuer Bootstrap
       {
       double lambdax = 0;
       double lambday = 0;
-      bool fix,drin;    // für das Initialisieren der Startwerte!
+      bool fix,drin;    // fuer das Initialisieren der Startwerte!
       mainpoi1->get_inthemodel(drin,fix);
       if(drin==true)
         {
@@ -1480,7 +1480,7 @@ void FULLCOND_pspline_surf_stepwise::outresults_df(unsigned & size)
   outres << "frequency  ";
   outres << "selected  " << endl;
 
-// Häufigkeitstabelle:
+// Haeufigkeitstabelle:
 
   //samplestream.close();
   datamatrix sample(size,1);
@@ -1637,7 +1637,7 @@ void FULLCOND_pspline_surf_stepwise::update(void)
       {
       if(utype == gaussian)
         {
-        // Bandmatrizen nötig für Update-Funktion!
+        // Bandmatrizen noetig fuer Update-Funktion!
         // "K" ist gesamte Matrix, deshalb KH = rw1#rw1
         if(optionsp->get_nriter() == 1 || KH.bandsize()!=(nrpar1dim+1))
           {
@@ -1674,7 +1674,7 @@ void FULLCOND_pspline_surf_stepwise::update(void)
         }
 
       set_lambdaconst(1);
-      mainpoi1->reset_effect(0);  // Haupteffekte werden hier mitgeschätzt
+      mainpoi1->reset_effect(0);  // Haupteffekte werden hier mitgeschaetzt
       mainpoi2->reset_effect(0);
       }
     /*else
@@ -1894,7 +1894,7 @@ void FULLCOND_pspline_surf_stepwise::update_vc_anova(void)
       *work = rand_normal();
 
     prec.solveL(standnormal,beta);
-    likep->compute_respminuslinpred(mu,column);   // nicht ändern wegen multgaussian
+    likep->compute_respminuslinpred(mu,column);   // nicht aendern wegen multgaussian
     compute_XWtildey(likep->get_weight(),scaleinv);
     prec.solve(muy,betahelp,0,0);
     beta.plus(beta,betahelp);
@@ -2120,7 +2120,7 @@ void FULLCOND_pspline_surf_stepwise::update_linear_function(void)
     prec_env.solve(muy,betahelp);
     prec_env.solveU(proposal,betahelp);
 
-    // hier bezüglich Haupteffekten zentrieren und diese "wegschmeißen"! (damit nur Anteil "x1*x2" bleibt)
+    // hier bezueglich Haupteffekten zentrieren und diese "wegschmeissen"! (damit nur Anteil "x1*x2" bleibt)
     datamatrix betasave = beta;
     beta.assign(proposal);
     compute_intercept();
@@ -2167,7 +2167,7 @@ void FULLCOND_pspline_surf_stepwise::update_linear_function(void)
 
     prec_env.solve(muy,betahelp);
 
-    // hier bezüglich Haupteffekten zentrieren und diese "wegschmeißen"!
+    // hier bezueglich Haupteffekten zentrieren und diese "wegschmeissen"!
     betasave.assign(beta);
     beta.assign(betahelp);
     compute_intercept();
@@ -2231,12 +2231,12 @@ void FULLCOND_pspline_surf_stepwise::update_linear_function(void)
       }
 
     prec.solveL(standnormal,beta);
-    likep->compute_respminuslinpred(mu,column);   // nicht ändern wegen multgaussian
+    likep->compute_respminuslinpred(mu,column);   // nicht aendern wegen multgaussian
     compute_XWtildey(likep->get_weight(),scaleinv);
     prec.solve(muy,betahelp,0,0);
     beta.plus(beta,betahelp);
 
-    // hier bezüglich Haupteffekten zentrieren und diese "wegschmeißen"!
+    // hier bezueglich Haupteffekten zentrieren und diese "wegschmeissen"!
     compute_intercept();
     compute_beta();
     fcconst->update_intercept(intercept);
@@ -2509,7 +2509,7 @@ void FULLCOND_pspline_surf_stepwise::compute_main(void)
   he1.mult(betaweightx,beta);
   he2.mult(betaweighty,beta);
 
-// 'spline' ändern
+// 'spline' aendern
   freqwork = mainpoi1->get_freqit();
   workindex = mainpoi1->get_indexp();
   for(i=0;i<spline.rows();i++,freqwork++,workindex++)
@@ -2564,7 +2564,7 @@ void FULLCOND_pspline_surf_stepwise::compute_main_varcoeff(void)
   he1.mult(betaweightx,beta);
   he2.mult(betaweighty,beta);
 
-// 'splinehelp' ändern
+// 'splinehelp' aendern
   freqwork = mainpoi1->get_freqoutputit();
   workindex = mainpoi1->get_indexp();
   for(i=0;i<splinehelp.rows();i++,freqwork++,workindex++)

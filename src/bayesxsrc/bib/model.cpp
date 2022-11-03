@@ -261,26 +261,26 @@ term_shrinkage::term_shrinkage(void)
   // Einlesen der Starwerte aus externer Datei
   startdata = stroption("startdata");
 
-  // Startwerte für die shhrinkgeeffekte
+  // Startwerte fuer die shhrinkgeeffekte
   effectstart = doubleoption("effect",1E8,-1E7,1E7) ;
 
   // Startwert fuer inverse varianzparameter tau^2
   tau2 = doubleoption("tau2",0.1,0,10000000);
 
-  // Startwert für den Shrinkageparameter
+  // Startwert fuer den Shrinkageparameter
   shrinkagestart = doubleoption("shrinkage",1,0,10000000);
 
   // Hyperparameter der Priori fuer Shrinkageparameter
   a_shrinkage = doubleoption("a",0.001,0,500);
   b_shrinkage = doubleoption("b",0.001,0,500);
 
-  // Gewichte für die Shrinkageeffekte
+  // Gewichte fuer die Shrinkageeffekte
   weight = doubleoption("weight",1,0,10000000);
 
-  // Feste Werte für den Shrinkageparameter
+  // Feste Werte fuer den Shrinkageparameter
   shrinkagefix = simpleoption("shrinkagefix",false);
 
-  // Varianzspezifische Werte für den Shrinkageparameter
+  // Varianzspezifische Werte fuer den Shrinkageparameter
   shrinkageadaptive = simpleoption("adaptive",false);
 
   }
@@ -413,13 +413,13 @@ term_nigmix::term_nigmix(void)
   // Einlesen der Starwerte aus externer Datei
   startdata = stroption("startdata");
 
-  // Startwerte für die shhrinkgeeffekte
+  // Startwerte fuer die shhrinkgeeffekte
   effectstart = doubleoption("effect",1E8,-1E7,1E7) ;
 
-  // Startwert für Indicator (1. Komponente des Varianzparameters)
+  // Startwert fuer Indicator (1. Komponente des Varianzparameters)
   indicatorstart = intoption("I",1,0,1);
 
-  // Startwert für t^2 (2. Komponente des Varianzparameters)
+  // Startwert fuer t^2 (2. Komponente des Varianzparameters)
   t2start = doubleoption("t2",11,0,10000000);
 
   // Startwert fuer die Mischungskomponente
@@ -437,10 +437,10 @@ term_nigmix::term_nigmix(void)
   a_omega = doubleoption("aw",1,0,500);
   b_omega = doubleoption("bw",1,0,500);
 
-  // Feste Werte für die Komponenten
+  // Feste Werte fuer die Komponenten
   omegafix = simpleoption("wfix",false);
 
-  // Varinazspezifische Werte für die Komponenten
+  // Varinazspezifische Werte fuer die Komponenten
   omegaadaptive = simpleoption("adaptive",false);
 
   }

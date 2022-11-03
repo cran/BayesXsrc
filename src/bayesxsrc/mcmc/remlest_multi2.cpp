@@ -182,8 +182,8 @@ vector<MCMC::FULLCOND*> & fc,datamatrix & re,
       }
     }
 
-// Startwerte für die Schwellenwerte bestimmen
-// Berechne Häufigkeiten
+// Startwerte fuer die Schwellenwerte bestimmen
+// Berechne Haeufigkeiten
   if(respfamily=="cumlogit" || respfamily=="cumprobit")
     {
     datamatrix freq(nrcat2,1,0);
@@ -205,7 +205,7 @@ vector<MCMC::FULLCOND*> & fc,datamatrix & re,
       {
       freq(j,0) += freq(j-1,0);
       }
-// Kumulierte relative Häufigkeiten bestimmen und Schwellenwerte berechnen
+// Kumulierte relative Haeufigkeiten bestimmen und Schwellenwerte berechnen
     for(j=0; j<nrcat2; j++)
       {
       freq(j,0) /= nrobspos;
@@ -237,7 +237,7 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
     fullcond[i]->outoptionsreml();
 
   //----------------------------------------------------------------------------
-  //--- Konstruiere großes X und großes Z
+  //--- Konstruiere grosses X und grosses Z
   //----------------------------------------------------------------------------
 
 
@@ -344,9 +344,9 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
 // Basteln an X
 
 //---------------------------------------------
-// Zu X: Hilfsvektor bzw. Hilfsmatrix für die if - Schleifen
+// Zu X: Hilfsvektor bzw. Hilfsmatrix fuer die if - Schleifen
 
-// xcutbetalength gibt die Länge der Abschnitte von xcutbeta an
+// xcutbetalength gibt die Laenge der Abschnitte von xcutbeta an
   vector <unsigned> xcutbetalength (xcutbeta.size()-1);
   for (i=0; i<xcutbetalength.size(); i++)
   {
@@ -366,7 +366,7 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
         outXlength.close();   */
 
 //----------------------------------------------------------------------------------------------------------------------------------
-// xcutlength gibt die Länge der Abschnitte von xcut an
+// xcutlength gibt die Laenge der Abschnitte von xcut an
   vector <unsigned> xcutlength (xcut.size()-1);
   for (i=0; i<xcutlength.size(); i++)
   {
@@ -399,10 +399,10 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
    unsigned XaltSpalte_fixed=0;                                                  // gibt die aktuelle Spalte in Xalt an
    unsigned XneuSpalte_fixed=0;                                                  // gibt die aktuelle Spalte in Xneu an
 
-// j durchläuft den Bereich 0..catspecific_fixed.size()           // catspecific_fixed.size() = xcut[1]
+// j durchlaeuft den Bereich 0..catspecific_fixed.size()           // catspecific_fixed.size() = xcut[1]
 
    for (j=0; j<catspecific_fixed.size(); j++)                                    // Durchlauf solange Bedingung vorhanden
-   {                                                                             // Anfang zur for-Schleife für X
+   {                                                                             // Anfang zur for-Schleife fuer X
 
       //----------------------------------
       // 1. Skalar und nicht catspecific
@@ -411,9 +411,9 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
 
       if ( !catspecific_fixed[j])
       {
-         for(i=0; i<nrobs; i++)                                                  // i durchläuft die Zeilen von Xalt
+         for(i=0; i<nrobs; i++)                                                  // i durchlaeuft die Zeilen von Xalt
          {
-             for(k=0; k<nrcat2; k++)                                             // k durchläuft nrcat2
+             for(k=0; k<nrcat2; k++)                                             // k durchlaeuft nrcat2
              {
              Xneu(i*nrcat2+k, XneuSpalte_fixed)= X (i, XaltSpalte_fixed );
              }
@@ -430,9 +430,9 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
 
       else
       {
-         for(i=0; i<nrobs; i++)                                                  // i durchläuft die Zeilen von Xalt
+         for(i=0; i<nrobs; i++)                                                  // i durchlaeuft die Zeilen von Xalt
          {
-             for(k=0; k<nrcat2; k++)                                             // k durchläuft nrcat2
+             for(k=0; k<nrcat2; k++)                                             // k durchlaeuft nrcat2
              {
              Xneu(i*nrcat2+k, XneuSpalte_fixed+k)= X (i, XaltSpalte_fixed );
              }
@@ -453,10 +453,10 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
    unsigned XaltSpalte=xcut[1];                                                  // gibt die aktuelle Spalte in Xalt an
    unsigned XneuSpalte=xcutbeta[1];                                              // gibt die aktuelle Spalte in Xneu an
 
-// j durchläuft den Bereich 1..catspecific.size()
+// j durchlaeuft den Bereich 1..catspecific.size()
 
    for (j=1; j<catspecific.size(); j++)                                          // Durchlauf solange Bedingung vorhanden
-   {                                                                             // Anfang zur for-Schleife für X
+   {                                                                             // Anfang zur for-Schleife fuer X
 
       //----------------------------------
       // 1. Vektor und nicht catspecific
@@ -465,11 +465,11 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
 
       if ( !catspecific[j])
       {
-            for(i=0; i<nrobs; i++)                                               // i durchläuft die Zeilen von Xalt
+            for(i=0; i<nrobs; i++)                                               // i durchlaeuft die Zeilen von Xalt
             {
-               for(k=0; k<nrcat2; k++)                                           // k durchläuft nrcat2
+               for(k=0; k<nrcat2; k++)                                           // k durchlaeuft nrcat2
                {
-                  for(l=0; l<xcutlength[j]; l++)                                 // l durchläuft xcutbetalength[j]
+                  for(l=0; l<xcutlength[j]; l++)                                 // l durchlaeuft xcutbetalength[j]
                   {
                   Xneu(i*nrcat2+k, XneuSpalte+l)= X (i, XaltSpalte+l );
                   }
@@ -487,11 +487,11 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
 
       else
       {
-            for(i=0; i<nrobs; i++)                                               // i durchläuft die Zeilen von Xalt
+            for(i=0; i<nrobs; i++)                                               // i durchlaeuft die Zeilen von Xalt
             {
-               for(k=0; k<nrcat2; k++)                                           // k durchläuft nrcat2
+               for(k=0; k<nrcat2; k++)                                           // k durchlaeuft nrcat2
                {
-                  for(l=0; l<xcutlength[j]; l++)                                 // l durchläuft xcutbetalength[j]
+                  for(l=0; l<xcutlength[j]; l++)                                 // l durchlaeuft xcutbetalength[j]
                   {
                   Xneu(i*nrcat2+k, XneuSpalte+(k*xcutlength[j]) +l)= X (i, XaltSpalte+l );
                   }
@@ -502,7 +502,7 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
       XneuSpalte=XneuSpalte+(xcutlength[j]*nrcat2);                              // aktualisiert XneuSpalte
       }
 
-   }                                                                             // Ende zur for-Schleife für X
+   }                                                                             // Ende zur for-Schleife fuer X
 
    // Ausgabe von Xneu unter Xneu
    /*  ofstream outXneu("c:\\bayesx\\mcmc\\Xneu");
@@ -515,9 +515,9 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
 //  Basteln an Z
 
 //---------------------------------------------
-// Zu Z: Hilfsvektor bzw. Hilfsmatrix für die if - Schleifen
+// Zu Z: Hilfsvektor bzw. Hilfsmatrix fuer die if - Schleifen
 
-// zcutbetalength gibt die Länge der Abschnitte von zcutbeta an
+// zcutbetalength gibt die Laenge der Abschnitte von zcutbeta an
   vector <unsigned> zcutbetalength (zcutbeta.size()-1);
   for (i=0; i<zcutbetalength.size(); i++)
   {
@@ -537,7 +537,7 @@ bool remlest_ordinal::estimate2(const datamatrix resp, const datamatrix & offset
         outZlength.close();  */
 
 //------------------------------------------------------------------
-// zcutlength gibt die Länge der Abschnitte von zcut an
+// zcutlength gibt die Laenge der Abschnitte von zcut an
   vector <unsigned> zcutlength (zcut.size()-1);
   for (i=0; i<zcutlength.size(); i++)
   {
@@ -565,10 +565,10 @@ datamatrix Zneu (nrobs*nrcat2,zcutbeta[zcutbeta.size()-1],0);
    unsigned ZaltSpalte=0;                                                        // gibt die aktuelle Spalte in Zalt an
    unsigned ZneuSpalte=0;                                                        // gibt die aktuelle Spalte in Zneu an
 
-// j durchläuft den Bereich 1..catspecific.size()
+// j durchlaeuft den Bereich 1..catspecific.size()
 
    for (j=1; j<catspecific.size(); j++)                                          // Durchlauf solange Bedingung vorhanden
-   {                                                                             // Anfang zur for-Schleife für Z
+   {                                                                             // Anfang zur for-Schleife fuer Z
 
       //----------------------------------
       // 1. Vektor und nicht catspecific
@@ -577,11 +577,11 @@ datamatrix Zneu (nrobs*nrcat2,zcutbeta[zcutbeta.size()-1],0);
 
      if (!catspecific[j])
        {
-            for(i=0; i<nrobs; i++)                                               // i durchläuft die Zeilen von Zalt
+            for(i=0; i<nrobs; i++)                                               // i durchlaeuft die Zeilen von Zalt
             {
-               for(k=0; k<nrcat2; k++)                                           // k durchläuft nrcat2
+               for(k=0; k<nrcat2; k++)                                           // k durchlaeuft nrcat2
                {
-                  for(l=0; l<zcutlength[j-1]; l++)                               // l durchläuft zcutbetalength[j-1]
+                  for(l=0; l<zcutlength[j-1]; l++)                               // l durchlaeuft zcutbetalength[j-1]
                   {
                   Zneu(i*nrcat2+k, ZneuSpalte+l)= Z (i, ZaltSpalte+l );
                   }
@@ -599,11 +599,11 @@ datamatrix Zneu (nrobs*nrcat2,zcutbeta[zcutbeta.size()-1],0);
 
       else
       {
-            for(i=0; i<nrobs; i++)                                               // i durchläuft die Zeilen von Zalt
+            for(i=0; i<nrobs; i++)                                               // i durchlaeuft die Zeilen von Zalt
             {
-               for(k=0; k<nrcat2; k++)                                           // k durchläuft nrcat2
+               for(k=0; k<nrcat2; k++)                                           // k durchlaeuft nrcat2
                {
-                  for(l=0; l<zcutlength[j-1]; l++)                               // l durchläuft zcutbetalength[j-1]
+                  for(l=0; l<zcutlength[j-1]; l++)                               // l durchlaeuft zcutbetalength[j-1]
                   {
                   Zneu(i*nrcat2+k, ZneuSpalte+(k*zcutlength[j-1]) +l)= Z (i, ZaltSpalte+l );
                   }
@@ -614,7 +614,7 @@ datamatrix Zneu (nrobs*nrcat2,zcutbeta[zcutbeta.size()-1],0);
       ZneuSpalte=ZneuSpalte+(zcutlength[j-1]*nrcat2);                            // aktualisiert ZneuSpalte
       }
 
-   }                                                                             // Ende zur for-Schleife für Z
+   }                                                                             // Ende zur for-Schleife fuer Z
 
 // Ausgabe von Zneu unter Zneu
 /*  ofstream outZneu("c:\\bayesx\\mcmc\\Zneu");
@@ -798,11 +798,11 @@ datamatrix Zneu (nrobs*nrcat2,zcutbeta[zcutbeta.size()-1],0);
 // Hilfsmatrix zum Berechnen der Zeilen von Xneu' workweight
    datamatrix H_00hilf (1, nrobs*nrcat2,  0);
 
-for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                   // l durchläuft die Zeilen von Xneu' und die Zeilen von H_00
+for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                   // l durchlaeuft die Zeilen von Xneu' und die Zeilen von H_00
 {
-     for  (j=0;  j<nrobs*nrcat2;  j=j+nrcat2)                                                                                                                      // j durchläuft die Spalten von Xneu'
+     for  (j=0;  j<nrobs*nrcat2;  j=j+nrcat2)                                                                                                                      // j durchlaeuft die Spalten von Xneu'
      {
-          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchläuft nrcat2
+          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchlaeuft nrcat2
           {
           H_00hilf (0, j+i) = ((XneuTr.getBlock( l, j, l+1, j+nrcat2)) * (workweight.getBlock(j, i,  j+nrcat2, i+1)))(0,0);
           }
@@ -817,7 +817,7 @@ for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                  
 //----------------------------------------------------------------------------
 // Berechnen von H_00 = Xneu' workweight Xneu
 
-     for (k=l; k<xcutbeta[xcutbeta.size()-1]; k++ )                              // k durchläuft die Spalten von Xneu
+     for (k=l; k<xcutbeta[xcutbeta.size()-1]; k++ )                              // k durchlaeuft die Spalten von Xneu
      {
      H_00(l, k) = ((H_00hilf) * (Xneu.getCol(k)))(0,0);
      H_00(k,l)=H_00(l,k);
@@ -829,7 +829,7 @@ for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                  
                      outH_00.close();*/
 //-----------------------------------------------------------------------
 // Berechnen von H_01 = Xneu' workweight Zneu
-     for (k=0; k<zcutbeta[zcutbeta.size()-1]; k++ )                              // k durchläuft die Spalten von Zneu
+     for (k=0; k<zcutbeta[zcutbeta.size()-1]; k++ )                              // k durchlaeuft die Spalten von Zneu
      {
      H_01(l, k) = ((H_00hilf) * (Zneu.getCol(k))) (0,0);
      }
@@ -863,12 +863,12 @@ for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                  
 // Hilfsmatrix zum Berechnen der Zeilen von Zneu' workweight
    datamatrix H_11hilf (1, nrobs*nrcat2,  0);
 
-for (l=0; l<zcutbeta[zcutbeta.size()-1]; l++ )                                   // l durchläuft die Zeilen von Zneu' und die Zeilen von H_11
+for (l=0; l<zcutbeta[zcutbeta.size()-1]; l++ )                                   // l durchlaeuft die Zeilen von Zneu' und die Zeilen von H_11
 {
 
-     for  (j=0;  j<nrobs*nrcat2; j=j+nrcat2)                                                                                                                      // j durchläuft die Spalten von Zneu'
+     for  (j=0;  j<nrobs*nrcat2; j=j+nrcat2)                                                                                                                      // j durchlaeuft die Spalten von Zneu'
      {
-          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchläuft nrcat2
+          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchlaeuft nrcat2
           {
           H_11hilf (0, j+i) = ((ZneuTr.getBlock( l, j, l+1, j+nrcat2)) * (workweight.getBlock(j, i,  j+nrcat2, i+1))) (0,0);
           }
@@ -881,7 +881,7 @@ for (l=0; l<zcutbeta[zcutbeta.size()-1]; l++ )                                  
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 // Berechnen von H_11 = Zneu' workweight Zneu
-     for (k=l; k<zcutbeta[zcutbeta.size()-1]; k++ )                              // k durchläuft die Spalten von Zneu
+     for (k=l; k<zcutbeta[zcutbeta.size()-1]; k++ )                              // k durchlaeuft die Spalten von Zneu
      {
      H_11(l, k) = ((H_11hilf) * (Zneu.getCol(k))) (0,0);
      H_11(k,l)=H_11(l,k);
@@ -1968,7 +1968,7 @@ bool remlest_ordinal::estimate_glm(const datamatrix resp,
 bool remlest_ordinal::estimate_glm2(const datamatrix resp,
                   const datamatrix & offset, const datamatrix & weight)
   {
-  unsigned i, j, k, l;                                                           // k und l dazugefügt
+  unsigned i, j, k, l;                                                           // k und l dazugefuegt
 
   outoptions();
   out("\n");
@@ -1985,10 +1985,10 @@ bool remlest_ordinal::estimate_glm2(const datamatrix resp,
    unsigned XaltSpalte_fixed=0;                                                  // gibt die aktuelle Spalte in Xalt an
    unsigned XneuSpalte_fixed=0;                                                  // gibt die aktuelle Spalte in Xneu an
 
-// j durchläuft den Bereich 0..catspecific_fixed.size()           // catspecific_fixed.size() = xcut[1]
+// j durchlaeuft den Bereich 0..catspecific_fixed.size()           // catspecific_fixed.size() = xcut[1]
 
    for (j=0; j<catspecific_fixed.size(); j++)                                    // Durchlauf solange Bedingung vorhanden
-   {                                                                             // Anfang zur for-Schleife für X
+   {                                                                             // Anfang zur for-Schleife fuer X
 
       //----------------------------------
       // 1. Skalar und nicht catspecific
@@ -1998,9 +1998,9 @@ bool remlest_ordinal::estimate_glm2(const datamatrix resp,
 
       if ( !catspecific_fixed[j])
       {
-         for(i=0; i<nrobs; i++)                                                  // i durchläuft die Zeilen von Xalt
+         for(i=0; i<nrobs; i++)                                                  // i durchlaeuft die Zeilen von Xalt
          {
-             for(k=0; k<nrcat2; k++)                                             // m durchläuft nrcat2
+             for(k=0; k<nrcat2; k++)                                             // m durchlaeuft nrcat2
              {
              Xneu(i*nrcat2+k, XneuSpalte_fixed)= X (i, XaltSpalte_fixed );
              }
@@ -2017,9 +2017,9 @@ bool remlest_ordinal::estimate_glm2(const datamatrix resp,
 
       else
       {
-         for(i=0; i<nrobs; i++)                                                  // i durchläuft die Zeilen von Xalt
+         for(i=0; i<nrobs; i++)                                                  // i durchlaeuft die Zeilen von Xalt
          {
-             for(k=0; k<nrcat2; k++)                                             // k durchläuft nrcat2
+             for(k=0; k<nrcat2; k++)                                             // k durchlaeuft nrcat2
              {
              Xneu(i*nrcat2+k, XneuSpalte_fixed+k)= X (i, XaltSpalte_fixed );
              }
@@ -2115,11 +2115,11 @@ bool remlest_ordinal::estimate_glm2(const datamatrix resp,
 // Hilfsmatrix zum Berechnen der Zeilen von Xneu' workweight
    datamatrix H_00hilf (1, nrobs*nrcat2,  0);
 
-for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                   // l durchläuft die Zeilen von Xneu' und die Zeilen von H_00
+for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                   // l durchlaeuft die Zeilen von Xneu' und die Zeilen von H_00
 {
-     for  (j=0;  j<nrobs*nrcat2;  j=j+nrcat2)                                                                                                                      // j durchläuft die Spalten von Xneu'
+     for  (j=0;  j<nrobs*nrcat2;  j=j+nrcat2)                                                                                                                      // j durchlaeuft die Spalten von Xneu'
      {
-          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchläuft nrcat2
+          for (i=0; i<nrcat2; i++)                                                                                                                                       // i durchlaeuft nrcat2
           {
           H_00hilf (0, j+i) = ((XneuTr.getBlock( l, j, l+1, j+nrcat2)) * (workweight.getBlock(j, i,  j+nrcat2, i+1)))(0,0);
           }
@@ -2134,7 +2134,7 @@ for (l=0; l<xcutbeta[xcutbeta.size()-1]; l++ )                                  
 //----------------------------------------------------------------------------
 // Berechnen von H_00 = Xneu' workweight Xneu
 
-     for (k=l; k<xcutbeta[xcutbeta.size()-1]; k++ )                              // k durchläuft die Spalten von Xneu
+     for (k=l; k<xcutbeta[xcutbeta.size()-1]; k++ )                              // k durchlaeuft die Spalten von Xneu
      {
      H(l, k) = ((H_00hilf) * (Xneu.getCol(k)))(0,0);
      H(k,l)=H(l,k);
@@ -2713,7 +2713,7 @@ void remlest_ordinal::make_plots(ofstream & outtex,ST::string path_batch,
   ST::string pathresult;
   bool stil = false;
 
-// Schleife überprüft, ob es ein fullcond-Object
+// Schleife ueberprueft, ob es ein fullcond-Object
 // gibt, bei dem Effekt gezeichnet werden kann
   MCMC::plotstyles plst;
   for(j=0;j<fullcond.size();j++)
@@ -2726,10 +2726,10 @@ void remlest_ordinal::make_plots(ofstream & outtex,ST::string path_batch,
 
   if(stil == true)
     {
-//erzeugt File, das Plot-Befehle für Java-Version enthält
+//erzeugt File, das Plot-Befehle fuer Java-Version enthaelt
     ofstream outbatch(path_batch.strtochar());
 
-//erzeugt File, das SPlus-Befehle zum Plotten enthält
+//erzeugt File, das SPlus-Befehle zum Plotten enthaelt
     ofstream outsplus(path_splus.strtochar());
 
     outtex << "\n\\newpage" << "\n\\noindent {\\bf \\large Plots:}" << endl;
@@ -2741,7 +2741,7 @@ void remlest_ordinal::make_plots(ofstream & outtex,ST::string path_batch,
              << "# In S-PLUS the file extension in the source command has to be changed"
              << " to '.s' \n"
              << endl
-    // einlesen der Source-Files für S-Plus
+    // einlesen der Source-Files fuer S-Plus
              << "source(\"'directory'\\\\sfunctions\\\\plotsample.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotnonp.r\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotsurf.r\")" << endl
@@ -2749,7 +2749,7 @@ void remlest_ordinal::make_plots(ofstream & outtex,ST::string path_batch,
              << "source(\"'directory'\\\\sfunctions\\\\readbndfile.r\")\n" << endl;*/
 
     bool stil2 = true;
-    for(j=0;j<fullcond.size();j++)  //Schleife überprüft, ob es map-Objekt gibt
+    for(j=0;j<fullcond.size();j++)  //Schleife ueberprueft, ob es map-Objekt gibt
       {
       plst = fullcond[j]->get_plotstyle();
       if(plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
@@ -2783,7 +2783,7 @@ void remlest_ordinal::make_plots(ofstream & outtex,ST::string path_batch,
 
     outbatch << "% usefile " << path_batch << endl;
 
-    // falls andere Quantile gewünscht werden
+    // falls andere Quantile gewuenscht werden
     double u = fullcond[0]->get_level1();
     double o = fullcond[0]->get_level2();
     ST::string u_str = ST::doubletostring(u,0);
@@ -2820,7 +2820,7 @@ void remlest_ordinal::make_plots(ofstream & outtex,ST::string path_batch,
             pathresult = pathresult.insert_after_string(ST::doubletostring(cats(i,0),6)+"_","_f_");
             }
 
-          // Pfade für ps-, tex-, SPlus-files
+          // Pfade fuer ps-, tex-, SPlus-files
           ST::string pathps = pathresult.substr(0, pathresult.length()-4);
           ST::string pathgr = pathps.replaceallsigns('\\', '/');
 
@@ -2870,7 +2870,7 @@ void remlest_ordinal::make_plots(ofstream & outtex,ST::string path_batch,
                    << "\\% pointwise credible intervals.}" << endl
                    << "\\end{figure}" << endl;
             }
-          // für map-Funktionen
+          // fuer map-Funktionen
           else if (plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
             {
             outbatch << "\n";                 // Befehle f. d. batch-file
@@ -3029,7 +3029,7 @@ void remlest_ordinal::make_model(ofstream & outtex, const ST::string & rname)
       familyname="sequential probit";
       }
 
-  //Anz. Beob. wird übergeben
+  //Anz. Beob. wird uebergeben
   unsigned obs = X.rows();
 
   char charh = '_';
@@ -3054,7 +3054,7 @@ void remlest_ordinal::make_predictor(ofstream & outtex)
   unsigned j;
 
   ST::string term2 = fullcond[0]->get_term_symbolic();
-  ST::string term = "$\\eta_j = " + term2;    //linearer Prädiktor wird erweitert
+  ST::string term = "$\\eta_j = " + term2;    //linearer Praediktor wird erweitert
   for(j=1;j<fullcond.size();j++)
     {
     term2 = fullcond[j]->get_term_symbolic();
@@ -3062,7 +3062,7 @@ void remlest_ordinal::make_predictor(ofstream & outtex)
       {
       term2 = term2.insert_after_all_string("^{(j)}","f");;
       }
-    term = term + " - " + term2;    //linearer Prädiktor wird erweitert
+    term = term + " - " + term2;    //linearer Praediktor wird erweitert
     }
   outtex << term << "$\\\\\n";
   }
@@ -3112,7 +3112,7 @@ void remlest_ordinal::make_options(ofstream & outtex)
 void remlest_ordinal::make_fixed_table(ofstream & outtex)
   {
 
-  // falls andere Quantile gewünscht werden
+  // falls andere Quantile gewuenscht werden
   double u = fullcond[0]->get_level1();
   ST::string u_str = ST::doubletostring(u,0);
 

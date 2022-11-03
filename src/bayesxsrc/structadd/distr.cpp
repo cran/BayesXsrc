@@ -319,7 +319,15 @@ void DISTR::set_multiplicative(DISTR * d)
   if (check_weightsone())
     wtype = wweightschange_weightsone;
   else
+    {
     wtype = wweightschange_weightsneqone;
+    weightsone = false;
+    }
+  if(dg->family == "Quantile regression based on asymmetric Laplace distribution")
+    {
+    wtype = wweightschange_weightsneqone;
+    weightsone = false;
+    }
   }
 
 
@@ -2106,6 +2114,8 @@ DISTR_quantreg::DISTR_quantreg(const double & a,const double & b,
   sigma02 = 2 / (quantile*(1-quantile));
   num = sqrt(xi2 + 2*sigma02);
   wtype = wweightschange_weightsneqone;
+
+  weightoriginal = w;
   }
 
 
@@ -2117,6 +2127,7 @@ DISTR_quantreg::DISTR_quantreg(const DISTR_quantreg & nd)
   xi2 = nd.xi2;
   num = nd.num;
   sigma02 = nd.sigma02;
+  weightoriginal = nd.weightoriginal;
   }
 
 
@@ -2131,6 +2142,8 @@ const DISTR_quantreg & DISTR_quantreg::operator=(
   xi2 = nd.xi2;
   num = nd.num;
   sigma02 = nd.sigma02;
+  weightoriginal = nd.weightoriginal;
+
   return *this;
   }
 
@@ -2153,6 +2166,30 @@ void DISTR_quantreg::compute_deviance(const double * response,
 {
 }
 */
+
+
+/*double DISTR_quantreg::loglikelihood(double * res, double * lin,
+                                     double * w)
+  {
+  if (*w==0)
+    return 0;
+  else
+    {
+    double help = *res-*lin;
+    return  - *w * (pow(help,2))/(2* sigma2);
+    }
+  }
+
+double DISTR_quantreg::compute_iwls(double * response, double * linpred,
+                              double * weight, double * workingweight,
+                              double * workingresponse, const bool & like)
+  {
+  *workingresponse = *response;
+  if (like && (*weight != 0))
+    return  - *workingweight * (pow(*response-(*linpred),2))/(2* sigma2);
+  else
+    return 0;
+  }*/
 
 /*
 double DISTR_quantreg::loglikelihood(double * res, double * lin,
@@ -2251,6 +2288,7 @@ void DISTR_quantreg::update(void)
   double * workorigresp;
   double * workweight;
   double * workw;
+  double * workworig;
 
   if (linpred_current==1)
     worklin = linearpred1.getV();
@@ -2261,6 +2299,7 @@ void DISTR_quantreg::update(void)
   workorigresp = response.getV();
   workweight = workingweight.getV();
   workw = weight.getV();
+  workworig = weightoriginal.getV();
 
   double lambda = (xi2 + 2*sigma02) / sigma2;
 
@@ -2273,7 +2312,7 @@ void DISTR_quantreg::update(void)
   //  sigma02 = delta2
 
   for(i=0; i<nrobs; i++, workw++, workweight++, workresp++, workorigresp++,
-      worklin++)
+      worklin++, workworig++)
     {
 
     mu = num/(fabs(*workorigresp-*worklin));
@@ -2286,10 +2325,11 @@ void DISTR_quantreg::update(void)
     else
       {
       *workweight = rand_inv_gaussian(mu, lambda);         // 1/z_i
-
       *workresp = *workorigresp  - xi/ (*workweight);      // y_i - offset = y_i - xi * z_i
       sumw += 1 / (*workweight);                           // sum z_i
       sumres += *workweight * pow(*workresp-*worklin,2);   // 1/z_i * (y_i-eta_i - xi * z_i)
+
+      *workw = *workweight;
       }
     }
 
@@ -3077,6 +3117,10 @@ double DISTR_gaussian_multeffect::compute_iwls(const bool & current, const bool 
   {
   unsigned  i;
 
+//  cout << "test1" << endl;
+//  cout << wtype << endl;
+
+  // suspicious: get weight from level 1 equation!!
   double * workweight = weight.getV();
   double * workresponse = response.getV();
 
@@ -3117,6 +3161,7 @@ double DISTR_gaussian_multeffect::compute_iwls(const bool & current, const bool 
 
   if (wtype==wweightschange_weightsneqone)
     {
+//    cout << "weightsneqone" << endl;
     for (i=0;i<nrobs;i++,workweight++,work_workingweight++,workresponse++,
           work_workingresponse++,worklin++,worklintilde++,fxp++)
       {
@@ -3128,6 +3173,7 @@ double DISTR_gaussian_multeffect::compute_iwls(const bool & current, const bool 
     }
   else if (wtype==wweightschange_weightsone)
     {
+//    cout << "weightsone" << endl;
     for (i=0;i<nrobs;i++,work_workingweight++,workresponse++,
           work_workingresponse++,worklin++,worklintilde++,fxp++)
       {
@@ -3170,6 +3216,9 @@ void DISTR_gaussian_multeffect::compute_iwls(const bool & current,datamatrix & l
   double * worklin;
   double * worklintilde;
   double * fxp = fx.getV();
+
+//  cout << "test2" << endl;
+//  cout << wtype << endl;
 
   if (current)
     {

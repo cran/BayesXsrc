@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 
 /******************************************************************************/
-/* Hier werden die Bedingungen für die GNU Version definiert. (Bei der        */
+/* Hier werden die Bedingungen fuer die GNU Version definiert. (Bei der        */
 /* C++-Version ist BORLAND_OUTPUT_WINDOW definiert, bei der JAVA-Version ist  */
 /* __BUILDING_THE_DLL definiert (in Borland), andernfalls werden die          */
 /* Bedingungen _BUILDING_GNU, JAVA_OUTPUT_WINDOW, TEMPL_INCL_DEF, _MSC_VER2   */

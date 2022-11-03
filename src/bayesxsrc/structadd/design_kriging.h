@@ -76,14 +76,14 @@ class __EXPORT_TYPE DESIGN_kriging : public DESIGN
 
   long nrknots;
 
-  // ---------------------- Variablen für geokriging ---------------------------
+  // ---------------------- Variablen fuer geokriging ---------------------------
 
   MAP::map ma;
   bool mapexisting;
   datamatrix regions;
 
 
-  // ---------------------- Variablen für geokriging ---------------------------
+  // ---------------------- Variablen fuer geokriging ---------------------------
 
   datamatrix tildeZ_t;
 

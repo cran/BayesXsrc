@@ -50,13 +50,13 @@ class __EXPORT_TYPE FULLCOND_ridge : public FULLCOND
   datamatrix X1;               // X1=(X'WX)^-0.5
   datamatrix X2;               // X2=(X'WX)^-1X'W
 
-//-Temorär ---------------------------------------------------------------------
-  //  Hyperparameter für Lasso & Outputmatrix für Varianzschätzer, Lassoschätzer
+//-Temoraer ---------------------------------------------------------------------
+  //  Hyperparameter fuer Lasso & Outputmatrix fuer Varianzschaetzer, Lassoschaetzer
   double hypr;
   double hyps;
   datamatrix estimVariances;
   datamatrix estimLasso;
-//-Temorär Ende-----------------------------------------------------------------
+//-Temoraer Ende-----------------------------------------------------------------
 
 
   public:

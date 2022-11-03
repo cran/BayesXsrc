@@ -73,10 +73,10 @@ class __EXPORT_TYPE spline_basis_surf : public FULLCOND_nonp_basis
 
   vector<double> xv;                 // geordnete, beobachtete x-Werte
   vector<double> yv;                 // geordnete, beobachtete y-Werte
-  datamatrix xvalues;                // geordnete, äquidistante Werte zwischen Min(x/y) und Max(x/y)
+  datamatrix xvalues;                // geordnete, aequidistante Werte zwischen Min(x/y) und Max(x/y)
   datamatrix yvalues;                // falls gridsize > 0
   vector<double> effectvaluesx;      // bildet zusammen mit effectvaluesy die Daten-Paare
-  vector<double> effectvaluesy;      // für die Ausgabe
+  vector<double> effectvaluesy;      // fuer die Ausgabe
 
   datamatrix interactvar;
 
@@ -95,49 +95,49 @@ class __EXPORT_TYPE spline_basis_surf : public FULLCOND_nonp_basis
   datamatrix betaweighty;
 
   double intercept;                  // aktueller Intercept
-  datamatrix spline;                 // geordnet wie im linearen Prädiktor
+  datamatrix spline;                 // geordnet wie im linearen Praediktor
   datamatrix splinehelp;
 
   unsigned nrknots;                  // number of 'visible' knots
   unsigned degree;                   // degree of B-splines
   knotpos knpos;                     // knot choice (equidistant or quantiles)
 
-  vector<int>     freq;              // Vektor der Länge N (=Anzahl Beobachtungen), dessen Werte sich
+  vector<int>     freq;              // Vektor der Laenge N (=Anzahl Beobachtungen), dessen Werte sich
                                      // - beginnend bei 0 - immer, wenn die aktuelle Beobachtung der GEORDNETEN Daten
-                                     // von der vorangehenden verschieden ist um 1 erhöhen und ansonsten gleich bleiben
-                                     // (d.h. das letzte Element enthält die Anzahl VERSCHIEDENER Beobachtungen -1)
+                                     // von der vorangehenden verschieden ist um 1 erhoehen und ansonsten gleich bleiben
+                                     // (d.h. das letzte Element enthaelt die Anzahl VERSCHIEDENER Beobachtungen -1)
   vector<int>     freqoutput;
   deque<double>   knot1;             // Position of knots in x1 direction
   deque<double>   knot2;             // Position of knots in x2 direction
 
-  datamatrix B;                      // Design-Matrix (enthält nur Werte ungleich 0)
-  datamatrix Bout;                   // für Output bei VCM
-  vector<int> first;                 // bezeichnet für jede Zeile der 'vollständigen' Design-Matrix
+  datamatrix B;                      // Design-Matrix (enthaelt nur Werte ungleich 0)
+  datamatrix Bout;                   // fuer Output bei VCM
+  vector<int> first;                 // bezeichnet fuer jede Zeile der 'vollstaendigen' Design-Matrix
                                      // die Position der ersten Elements, das ungleich 0 ist
 
-  datamatrix X_VCM;                  // für REML VCM
-  datamatrix Z_VCM;                  // für REML VCM
-  datamatrix X_grid;                  // für Ausgabe auf einem Gitter
-  datamatrix Z_grid;                  // für Ausgabe auf einem Gitter
+  datamatrix X_VCM;                  // fuer REML VCM
+  datamatrix Z_VCM;                  // fuer REML VCM
+  datamatrix X_grid;                  // fuer Ausgabe auf einem Gitter
+  datamatrix Z_grid;                  // fuer Ausgabe auf einem Gitter
   vector<double> effectvaluesxgrid;      // bildet zusammen mit effectvaluesy die Daten-Paare
-  vector<double> effectvaluesygrid;      // für die Ausgabe auf einem Gitter
-  datamatrix xvaluesgrid;                // geordnete, äquidistante Werte zwischen Min(x/y) und Max(x/y)
+  vector<double> effectvaluesygrid;      // fuer die Ausgabe auf einem Gitter
+  datamatrix xvaluesgrid;                // geordnete, aequidistante Werte zwischen Min(x/y) und Max(x/y)
   datamatrix yvaluesgrid;                // falls gridsize > 0
 
-  datamatrix DG;                     // B-Spline-Matrix für regelmäßiges 50*50-Gitter
+  datamatrix DG;                     // B-Spline-Matrix fuer regelmaessiges 50*50-Gitter
   vector<int> DGfirst;
 
 
   // FUNCTION: add_linearpred_multBS
   // TASK: multipliziert die Spalten 'a' bis 'e' von 'X' (Desing-Matrix) mit 'b'
-  //       und addiert das Ergebnis zum linearen Prädiktor ('spline' wird nicht berechnet!!!)
+  //       und addiert das Ergebnis zum linearen Praediktor ('spline' wird nicht berechnet!!!)
 
   void add_linearpred_multBS_Block(const datamatrix & b,const unsigned a,const unsigned e,
                                    const unsigned beg,const unsigned end);
 
   // FUNCTION: multBS
   // TASK: multipliziert 'X' (Desing-Matrix) mit 'b' und weist das Ergebnis 'res'
-  // NOTE: b und res müssen die richtigen Dimensionen haben (N x 1 bzw. nrpar x 1)
+  // NOTE: b und res muessen die richtigen Dimensionen haben (N x 1 bzw. nrpar x 1)
 
   void multBS(datamatrix & res, const datamatrix & b);
   void multBout(datamatrix & res, const datamatrix & b);
@@ -149,7 +149,7 @@ class __EXPORT_TYPE spline_basis_surf : public FULLCOND_nonp_basis
 
   // FUNCTION: multDG
   // TASK: multipliziert 'DG' (Desing-Matrix) mit 'b' und weist das Ergebnis 'res'
-  // NOTE: b und res müssen die richtigen Dimensionen haben (N x 1 bzw. nrpar x 1)
+  // NOTE: b und res muessen die richtigen Dimensionen haben (N x 1 bzw. nrpar x 1)
 
   void multDG(datamatrix & res, const datamatrix & b);
 

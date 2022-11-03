@@ -1201,10 +1201,10 @@ T statmatrix<T>::autocorr (const unsigned & lag,const unsigned & col) const
 
   T sum = 0;                               // Summe der Werte
   T sum2 = 0;                              // Quadratsumme der Werte
-  T sum_lag = 0;                           // Summe der verzögerten Werte
-  T sum_lag2 = 0;                          // Quadratsumme der verzögerten Werte
-  T sum_wertlag = 0;                       // Summe Wert * verzögerter Wert
-  T mean,mean_lag;                         // Mittelwert, verzögerter Mittelwert
+  T sum_lag = 0;                           // Summe der verzoegerten Werte
+  T sum_lag2 = 0;                          // Quadratsumme der verzoegerten Werte
+  T sum_wertlag = 0;                       // Summe Wert * verzoegerter Wert
+  T mean,mean_lag;                         // Mittelwert, verzoegerter Mittelwert
   T anz = this->rows()-lag;                      // Anzahl Beobachtungen
 
   for (unsigned k=lag;k<this->rows();k++)
@@ -1257,10 +1257,10 @@ statmatrix<T> statmatrix<T>::autocorr(const unsigned & beginlag,
 
   T sum = 0;                               // Summe der Werte
   T sum2 = 0;                              // Quadratsumme der Werte
-  T sum_lag = 0;                           // Summe der verzögerten Werte
-  T sum_lag2 = 0;                          // Quadratsumme der verzögerten Werte
-  T sum_wertlag = 0;                       // Summe Wert * verzögerter Wert
-  T mean,mean_lag;                         // Mittelwert, verzögerter Mittelwert
+  T sum_lag = 0;                           // Summe der verzoegerten Werte
+  T sum_lag2 = 0;                          // Quadratsumme der verzoegerten Werte
+  T sum_wertlag = 0;                       // Summe Wert * verzoegerter Wert
+  T mean,mean_lag;                         // Mittelwert, verzoegerter Mittelwert
   T anz = this->rows() - beginlag;                   // Anzahl Beobachtungen
 
   for (unsigned k=beginlag;k<this->rows();k++)

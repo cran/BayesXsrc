@@ -36,7 +36,7 @@ namespace MCMC
 
 
 //------------------------------------------------------------------------------
-//----------------Constructor für zeitlich variierende Effekte------------------
+//----------------Constructor fuer zeitlich variierende Effekte------------------
 //------------------------------------------------------------------------------
 pspline_baseline::pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const datamatrix & time, const datamatrix & z,
@@ -75,7 +75,7 @@ pspline_baseline::pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_co
     beg_i = anfang;
     }
 
-//--bei linkstrunkierten Daten oder zeitlich var. Kovariablen Beginn der Beob.zeit berücksichtigen,
+//--bei linkstrunkierten Daten oder zeitlich var. Kovariablen Beginn der Beob.zeit beruecksichtigen,
 //--d.h. statt zi -> zi_ges=(z_i,beg_i)
 //--statt index -> ges_index
 //--und statt "multBS" -> testmat verwenden------------------------------------------------------------
@@ -255,7 +255,7 @@ pspline_baseline::pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_co
   compute_betaweight();
 
 
-//------------------Designmatrix int_D für P-Spline an Knoten-------------------
+//------------------Designmatrix int_D fuer P-Spline an Knoten-------------------
   double knot_min = 0.0;
   double knot_max = zi.max(0);
   int_knots=datamatrix (50,1,0);
@@ -496,7 +496,7 @@ pspline_baseline::pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_co
 
   compute_betaweight();
 
-//------------------Designmatrix int_D für P-Spline an Knoten-------------------
+//------------------Designmatrix int_D fuer P-Spline an Knoten-------------------
 
   double knot_min = 0.0;
   double knot_max = zi.max(0);
@@ -799,10 +799,10 @@ void pspline_baseline::update(void)
 
 if(Weibull)
 {
-// "...f_time_logbaseline_sample.raw" enthält in der 1. Spalte das Sample der
+// "...f_time_logbaseline_sample.raw" enthaelt in der 1. Spalte das Sample der
 // alpha-Werte aus der baseline=alpha*t^(alpha-1)
-// als priori für alpha wird eine Gamma(a,a)-Verteilung gewählt
-// als proposal für alpha wird eine Gamma(alpha_current*b,b)-Verteilung gewählt
+// als priori fuer alpha wird eine Gamma(a,a)-Verteilung gewaehlt
+// als proposal fuer alpha wird eine Gamma(alpha_current*b,b)-Verteilung gewaehlt
   unsigned i;
   if(optionsp->get_nriter()==1)
     {
@@ -936,7 +936,7 @@ if(Weibull)
     optionsp->out("\n");
     }
 
-// Übergabe der Baselinehazardfunktion alpha*t^(alpha-1) an das fullcondobjekt fchelp.
+// Uebergabe der Baselinehazardfunktion alpha*t^(alpha-1) an das fullcondobjekt fchelp.
 // Die Ausgabe erfolgt in die Datei "...f_time_logbaseline.res" zu den
 // entsprechenden Zeitpunkten
   if( (optionsp->get_nriter() > optionsp->get_burnin()) &&
@@ -1118,7 +1118,7 @@ if(PartialLikelihood)
 
   acceptance++;
 
-// übergabe der baselinehazardfunktion an das fullcondobjekt fchelp
+// uebergabe der baselinehazardfunktion an das fullcondobjekt fchelp
 // die Ausgabe erfolgt in die Datei "...f_time_logbaseline.res" zu den
 // entsprechenden zeitpunkten
   if( (optionsp->get_nriter() > optionsp->get_burnin()) &&
@@ -1428,7 +1428,7 @@ if(!Weibull && !PartialLikelihood)
       for(k=an-1;k<en;k++,workbeta++,workbetaold++)
         *workbeta = *workbetaold;
 
-//---------Integral berechnen für vorgeschlagenes beta--------
+//---------Integral berechnen fuer vorgeschlagenes beta--------
       update_baseline();
 //------------------------------------/
 
@@ -1549,7 +1549,7 @@ if(!Weibull && !PartialLikelihood)
 
   } // end function update
 
-//--------Für's DIC-------------------------------------------------------------
+//--------Fuer's DIC-------------------------------------------------------------
 void pspline_baseline::compute_int_ti_mean(void)
   {
   unsigned i;
@@ -1585,10 +1585,10 @@ void pspline_baseline::compute_int_ti_mean(void)
     else
       {
       if(Weibull)
-        compute_int_ti_weibull(betamean(0,0));  //für Weibull baseline
+        compute_int_ti_weibull(betamean(0,0));  //fuer Weibull baseline
       // NEW FOR PARTIALLIKELIHOOD
       if(PartialLikelihood)
-        compute_int_ti_weibull(betamean(0,0));  //für Breslowbaseline
+        compute_int_ti_weibull(betamean(0,0));  //fuer Breslowbaseline
       //else
       if(!Weibull && !PartialLikelihood)
         {
@@ -1950,7 +1950,7 @@ else
 //---------------------erg=Integral bei "beg-1"------------------
   int_ti_help_p=int_ti_help.getV()+index(beg-1,0);
   erg=*int_ti_help_p*2.0;
-//ersten Knoten finden, der größer ist als "beg-1"
+//ersten Knoten finden, der groesser ist als "beg-1"
   while(k<int_knots.rows() && int_knots(k,0)<=zi(index(beg-1,0),0) )
     {
     for(j=0;j<nrpar;j++)
@@ -2241,7 +2241,7 @@ for(i_vc=0;i_vc<2;i_vc++)
   spline_zi_help(i_vc,0)++;
 while(i<zi.rows())
   {
-//-----------falls z_vc==0: zu nächster Beobachtung---------------
+//-----------falls z_vc==0: zu naechster Beobachtung---------------
   if(*(z_vc_help+index(i,0))==0)
     {
     i++;
@@ -2434,7 +2434,7 @@ void pspline_baseline::update_baseline()
 unsigned i;
 if(baselinep.size()>=1)
   {
-  if(vc_dummy1==true)   //keine Linkstrunkierung, zeitl. var. Effekt für dummykod. Variable
+  if(vc_dummy1==true)   //keine Linkstrunkierung, zeitl. var. Effekt fuer dummykod. Variable
     {
     vector <double *> splinevec;
     vector <double *> betavec;
@@ -2448,7 +2448,7 @@ if(baselinep.size()>=1)
       compute_int_ti_vc_di(i,splinevec,betavec);
       }
     }
-  else    //zeitl. var. Effekt für beliebige Kovariablen, Linkstrunkierung
+  else    //zeitl. var. Effekt fuer beliebige Kovariablen, Linkstrunkierung
     {
     compute_int_gauss();
     }

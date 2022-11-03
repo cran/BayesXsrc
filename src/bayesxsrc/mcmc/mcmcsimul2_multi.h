@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 namespace MCMC
 {
 
-// Datei "mcmcsimul2_multi" ist für Modelle mit >2 Prädiktoren (sonst analog zu "mcmcsimul2")
+// Datei "mcmcsimul2_multi" ist fuer Modelle mit >2 Praediktoren (sonst analog zu "mcmcsimul2")
 
 class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
   {
@@ -61,10 +61,10 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
   bool isboot;
   bool unconditional;
 
-  unsigned kategorien;     // Anzahl Prädiktoren
-  unsigned katje;          // welcher Prädiktor ist gerade an der Reihe
-  unsigned anz_fullcond;   // Anzahl Fullcond-Objekte pro Prädiktor
-                           // (Variablen müssen in den Prädiktoren beim Aufruf übereinstimmen)
+  unsigned kategorien;     // Anzahl Praediktoren
+  unsigned katje;          // welcher Praediktor ist gerade an der Reihe
+  unsigned anz_fullcond;   // Anzahl Fullcond-Objekte pro Praediktor
+                           // (Variablen muessen in den Praediktoren beim Aufruf uebereinstimmen)
 
   vector<vector<double> > lambdavec;
   vector<ST::string> names_fixed;
@@ -82,7 +82,7 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
   void schaetzen(int z, double & kriterium, bool neu, ST::string variante);
 
 // -----------------------------------------------------------------------------
-// -------------- Funktionen, für Stepwise / Stepmin ---------------------------
+// -------------- Funktionen, fuer Stepwise / Stepmin ---------------------------
 // -----------------------------------------------------------------------------
 
   bool stepfunctions(void);
@@ -103,7 +103,7 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
       unsigned & z);
 
 // -----------------------------------------------------------------------------
-// ------------------ Funktionen für Stepmin -----------------------------------
+// ------------------ Funktionen fuer Stepmin -----------------------------------
 // -----------------------------------------------------------------------------
 
   void step_minfix(vector<double> & kriteriumiteration2,
@@ -143,7 +143,7 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
   double criterion_min(const double & df, const ST::string & auswahl);
 
 // -----------------------------------------------------------------------------
-// ------------------ Funktionen für Koordinatenmethode ------------------------
+// ------------------ Funktionen fuer Koordinatenmethode ------------------------
 // -----------------------------------------------------------------------------
 
   bool koordabstieg(void);
@@ -185,7 +185,7 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
       unsigned & z, double & kriterium_aktuell);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Erstellung des Startmodels -----------------------
+// ------- Funktionen fuer die Erstellung des Startmodels -----------------------
 // -----------------------------------------------------------------------------
 
   bool vcm_doppelt(void);
@@ -206,7 +206,7 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
        vector<vector<unsigned> > & startindex, vector<vector<double> > & startfix);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Berechnung neuer Modelle bei Stepwise ------------
+// ------- Funktionen fuer die Berechnung neuer Modelle bei Stepwise ------------
 // -----------------------------------------------------------------------------
 
   void newmodel(vector<double> & krit, vector<vector<double> > & mi,
@@ -227,7 +227,7 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
        const vector<vector<vector<double> > > & mmatrix);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Erstellung des fullcondp-Vektors -----------------
+// ------- Funktionen fuer die Erstellung des fullcondp-Vektors -----------------
 // -----------------------------------------------------------------------------
 
   void fullcond_einzeln(const vector<double> & modell1,
@@ -246,7 +246,7 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
   int column_for_fix(const ST::string & name);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Ausgabe im Output-Fenster ------------------------
+// ------- Funktionen fuer die Ausgabe im Output-Fenster ------------------------
 // -----------------------------------------------------------------------------
 
   bool make_pause(void);
@@ -259,7 +259,7 @@ class __EXPORT_TYPE STEPMULTIrun : public MCMCsimulate
       const vector<vector<unsigned> > & startindex, const ST::string & name);
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Ausgabe im Tex-File ------------------------------
+// ------- Funktionen fuer die Ausgabe im Tex-File ------------------------------
 // -----------------------------------------------------------------------------
 
   void make_graphics(const ST::string & name, vector<vector<unsigned> > & startindex);

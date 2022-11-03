@@ -147,8 +147,8 @@ bool STEPWISErun::posteriormode(const vector<ST::string> & header,
           } // end: for(j=begin[nrmodels-1-i];j<=end[nrmodels-1-i];j++)
         }
 
-      if (allconverged && it>1)         // stellt sicher, dass nicht zufällig das "betaold" vom
-        converged = true;               // Auswählen der Lambdas zu einer fälschlichen Konvergenz führt
+      if (allconverged && it>1)         // stellt sicher, dass nicht zufaellig das "betaold" vom
+        converged = true;               // Auswaehlen der Lambdas zu einer faelschlichen Konvergenz fuehrt
 
       it++;
 
@@ -269,7 +269,7 @@ bool STEPWISErun::stepwise(const ST::string & procedure, const ST::string & mini
 
   fullcond_alle = fullcondp;
 
-  set_center(likep_mult[0],fullcond_alle,begin[0],end[0]);  // sorgt dafür, daß Funktionen zentriert werden!
+  set_center(likep_mult[0],fullcond_alle,begin[0],end[0]);  // sorgt dafuer, dass Funktionen zentriert werden!
 
   bool gewichte = false;
   if(likep_mult[0]->get_family() != "Gaussian")
@@ -296,8 +296,8 @@ bool STEPWISErun::stepwise(const ST::string & procedure, const ST::string & mini
       return true;
       }
     }
-  // überprüfen, dass Randomslopes nicht auch als fixe Effekte angegeben werden!
-  if( vcm_doppelt() == true)      // Für VCM-Modelle!!! --> muß die Funktion raus?
+  // ueberpruefen, dass Randomslopes nicht auch als fixe Effekte angegeben werden!
+  if( vcm_doppelt() == true)      // Fuer VCM-Modelle!!! --> muss die Funktion raus?
      return true;
 
   vector<vector<unsigned> > startindex;
@@ -376,7 +376,7 @@ bool STEPWISErun::stepwise(const ST::string & procedure, const ST::string & mini
       fullcond_alle[y]->set_calculate_xwx();
     }
 
-  // Files werden nicht mehr gebraucht und müssen wieder geschlossen werden!!!
+  // Files werden nicht mehr gebraucht und muessen wieder geschlossen werden!!!
   outcriterium.close();
   outmodels.close();
 
@@ -385,7 +385,7 @@ bool STEPWISErun::stepwise(const ST::string & procedure, const ST::string & mini
     fullcond_z = fullcondp;
     for(i=0;i<fullcond_z.size();i++)
       fullcond_z[i]->set_fcnumber(i);
-    posteriormode(posttitle,false); // Problem: linearer Prädiktor bei "true" standardisiert! Hier wird zurückgerechnet!
+    posteriormode(posttitle,false); // Problem: linearer Praediktor bei "true" standardisiert! Hier wird zurueckgerechnet!
                                       // danach nicht mehr compute_criterion() aufrufen!!!
     }
   else
@@ -400,9 +400,9 @@ bool STEPWISErun::stepwise(const ST::string & procedure, const ST::string & mini
   make_tex_end(path,modell_final,CI);
   outtex.close();
 
-// FÜR SIMULATIONEN:
+// FUER SIMULATIONEN:
 /*
-  // gibt Lambdas aus, damit man die richtig bestimmten Variablen zählen kann!
+  // gibt Lambdas aus, damit man die richtig bestimmten Variablen zaehlen kann!
   ST::string zaehlername = path + "_lambdas_" + likep_mult[0]->get_responsename() + ".ascii";
   ofstream out(zaehlername.strtochar());
   ST::string beschriftung = "  krit   ";
@@ -417,7 +417,7 @@ bool STEPWISErun::stepwise(const ST::string & procedure, const ST::string & mini
   out << eintrag << endl;
   out.close();
 
-  // gibt df für nichtlineare Funktionen aus!
+  // gibt df fuer nichtlineare Funktionen aus!
   zaehlername = path + "_df_" + likep_mult[0]->get_responsename() + ".ascii";
   ofstream out2(zaehlername.strtochar());
   beschriftung = " ";
@@ -429,7 +429,7 @@ bool STEPWISErun::stepwise(const ST::string & procedure, const ST::string & mini
   out2 << beschriftung << endl;
   out2 << eintrag << endl;
   out2.close();
-// ENDE: FÜR SIMULATIONEN
+// ENDE: FUER SIMULATIONEN
 */
 
   return false;
@@ -508,7 +508,7 @@ bool STEPWISErun::single_stepwise(const vector<unsigned> & start,
   outmodels << steps_aktuell << "   " << ST::doubletostring(kriterium_neu,8) << "   ";
 //  outtrace << steps_aktuell << "   " << ST::doubletostring(kriterium_neu,8) << endl;
   ST::string header;
-  fertig = false;    // überprüft, ob es noch nicht gerechnete Modelle gibt
+  fertig = false;    // ueberprueft, ob es noch nicht gerechnete Modelle gibt
   ST::string text_neu;
 
   bool abbruch = false;
@@ -764,7 +764,7 @@ void STEPWISErun::schaetzen(int z, double & kriterium, bool neu, ST::string vari
       if((possible != "valles" && possible != "vrfix" && possible != "vraus")
           || fullcond_alle[z]->is_identifiable() == true)
         fullcond_alle[0]->posteriormode_const();
-      else // if(possible == "valles")  // bei Rauslassen von VC muß zugehöriger fixer Effekt upgedatet werden!
+      else // if(possible == "valles")  // bei Rauslassen von VC muss zugehoeriger fixer Effekt upgedatet werden!
         {
         vector<ST::string> help;
         help.push_back(fullcond_alle[z]->get_datanames()[1]);
@@ -789,7 +789,7 @@ void STEPWISErun::schaetzen(int z, double & kriterium, bool neu, ST::string vari
         if((possible != "valles" && possible != "vrfix" && possible != "vraus")
             || fullcond_alle[z]->is_identifiable() == true)
           fullcond_alle[0]->posteriormode_const();
-        else // if(possible == "valles")  // bei Rauslassen von VC muß zugehöriger fixer Effekt upgedatet werden!
+        else // if(possible == "valles")  // bei Rauslassen von VC muss zugehoeriger fixer Effekt upgedatet werden!
           {
           vector<ST::string> help;
           help.push_back(fullcond_alle[z]->get_datanames()[1]);
@@ -807,7 +807,7 @@ void STEPWISErun::schaetzen(int z, double & kriterium, bool neu, ST::string vari
 
 
 // -----------------------------------------------------------------------------
-// ------------------- Funktionen, für Stepwise / Stepmin ----------------------
+// ------------------- Funktionen, fuer Stepwise / Stepmin ----------------------
 // -----------------------------------------------------------------------------
 
 bool STEPWISErun::stepfunctions(void)
@@ -815,7 +815,7 @@ bool STEPWISErun::stepfunctions(void)
   ST::string tr_akt = "trace_on";
   ST::string text_neu;
   bool eins = true;
-       // Schleife für Minimierung
+       // Schleife fuer Minimierung
   while(kriterium_neu<=kriterium_alt && fertig==false && steps_aktuell<steps)
        {
        steps_aktuell = steps_aktuell + 1;
@@ -1017,7 +1017,7 @@ void STEPWISErun::stepwise_nonp(vector<double> & kriteriumiteration2,
     for(sch=1;sch<=unsigned(increment);sch++)
        {
        modell_neu = modell_alt;
-       bool lambda_exist;    // zum Überprüfen, ob neues Lambda im Vektor enthalten ist
+       bool lambda_exist;    // zum ueberpruefen, ob neues Lambda im Vektor enthalten ist
        unsigned index = search_lambdaindex(modell_alt[names_fixed.size()-2+i],
                                 lambdavec[i-1],lambda_exist);
        lambda_exist = false;
@@ -1025,7 +1025,7 @@ void STEPWISErun::stepwise_nonp(vector<double> & kriteriumiteration2,
           lambda_exist = true;
        if(lambda_exist==true && hierarchical == true)
          {
-         // für 2d-Spline
+         // fuer 2d-Spline
          if(lambdavec[i-1][index+sch] == 0 && (possible == "spline" || possible == "vspline"
                                                || possible == "spfix" || possible == "vspfix"))
            lambda_exist = false;
@@ -1037,11 +1037,11 @@ void STEPWISErun::stepwise_nonp(vector<double> & kriteriumiteration2,
                                               || possible == "vrfix" || possible == "vraus"))
            lambda_exist = false;
 
-         // für VCM
+         // fuer VCM
          if(lambdavec[i-1][index+sch] == 0 && possible == "vfix")
            lambda_exist = false;
          if(lambdavec[i-1][index+sch] == -1 && possible == "vfix")
-           {   // bedeutet, daß fixer Effekt vorher nicht im Modell war, aber durch VC aufgenommen wurde.
+           {   // bedeutet, dass fixer Effekt vorher nicht im Modell war, aber durch VC aufgenommen wurde.
            for(unsigned j=0;j<names_nonp[z-1].size();j++)
             reset_fix(names_nonp[z-1][j]);
            }
@@ -1059,7 +1059,7 @@ void STEPWISErun::stepwise_nonp(vector<double> & kriteriumiteration2,
           lambda_exist = true;
        if(lambda_exist==true && hierarchical == true)
          {
-         // für 2d-Spline
+         // fuer 2d-Spline
          if(lambdavec[i-1][index-sch] == 0 && (possible == "spline" || possible == "vspline"
                                                || possible == "spfix" || possible == "vspfix"))
            lambda_exist = false;
@@ -1071,11 +1071,11 @@ void STEPWISErun::stepwise_nonp(vector<double> & kriteriumiteration2,
                                               || possible == "vrfix" || possible == "vraus"))
            lambda_exist = false;
 
-         // für VCM
+         // fuer VCM
          if(lambdavec[i-1][index-sch] == 0 && possible == "vfix")
            lambda_exist = false;
          if(lambdavec[i-1][index-sch] == -1 && possible == "vfix")
-           {   // bedeutet, daß fixer Effekt vorher nicht im Modell war, aber durch VC aufgenommen wurde.
+           {   // bedeutet, dass fixer Effekt vorher nicht im Modell war, aber durch VC aufgenommen wurde.
            for(unsigned j=0;j<names_nonp[z-1].size();j++)
              reset_fix(names_nonp[z-1][j]);
            }
@@ -1103,7 +1103,7 @@ void STEPWISErun::stepmin_nonp(vector<double> & kriteriumiteration2,
 
     unsigned y;
     for(y=1;y<fullcond_alle.size();y++)
-      fullcond_alle[y]->set_center(false);    // sorgt dafür, daß Funktionen nicht zentriert werden!
+      fullcond_alle[y]->set_center(false);    // sorgt dafuer, dass Funktionen nicht zentriert werden!
 
     vector<double> krit_fkt;
     if(modell_alt[i+names_fixed.size()-2]==0)
@@ -1128,7 +1128,7 @@ void STEPWISErun::stepmin_nonp(vector<double> & kriteriumiteration2,
     for(y=1;y<fullcond_alle.size();y++)
      {
      if(fullcond_alle[y]->is_identifiable() == false)
-       fullcond_alle[y]->set_center(true);    // sorgt dafür, daß Funktionen zentriert werden!
+       fullcond_alle[y]->set_center(true);    // sorgt dafuer, dass Funktionen zentriert werden!
      }
 
     modell_neu[names_fixed.size()-2+i] = lambdavec[i-1][lambda_ind];
@@ -1137,7 +1137,7 @@ void STEPWISErun::stepmin_nonp(vector<double> & kriteriumiteration2,
       if(modelcomparison(modell_neu,modellematrix)==false)
         {
         newmodel_nonp(i,kriteriumiteration2,modeliteration,textiteration);
-        // Stellt linearen Prädiktor wieder her. Besser wäre, den lin. Prädiktor zu speichern!!!
+        // Stellt linearen Praediktor wieder her. Besser waere, den lin. Praediktor zu speichern!!!
         korrektur(); //fullcondp[0]->posteriormode_const();
         posteriormode(posttitle,true);
         }
@@ -1183,7 +1183,7 @@ void STEPWISErun::minexact_nonp(vector<double> & kriteriumiteration2,
       if(modelcomparison(modell_neu,modellematrix)==false)
         {
         newmodel_nonp(i,kriteriumiteration2,modeliteration,textiteration);
-        // Stellt linearen Prädiktor wieder her.
+        // Stellt linearen Praediktor wieder her.
         korrektur();  // fullcondp[0]->posteriormode_const();
         posteriormode(posttitle,true);
         }
@@ -1193,7 +1193,7 @@ void STEPWISErun::minexact_nonp(vector<double> & kriteriumiteration2,
 
 
 // -----------------------------------------------------------------------------
-// ------------------ Funktionen für Stepmin -----------------------------------
+// ------------------ Funktionen fuer Stepmin -----------------------------------
 // -----------------------------------------------------------------------------
 
 void STEPWISErun::step_minfix(vector<double> & kriteriumiteration2,
@@ -1552,8 +1552,8 @@ void STEPWISErun::stepmin_nonp_nonp(unsigned & z, vector<double> & krit_fkt,doub
 
   fullcond_alle[z]->set_inthemodel(1);
   fullcond_alle[z]->update_stepwise(modell_alt[z+names_fixed.size()-2]);
-  if(possible != "spline" && fullcond_alle[z]->is_identifiable() == false)   // bei Haupteffekten der ANOVA Zerlegung muß center=false bleiben
-    fullcond_alle[z]->set_center(true);                                    // sonst wird Interaktion nicht geschätzt.
+  if(possible != "spline" && fullcond_alle[z]->is_identifiable() == false)   // bei Haupteffekten der ANOVA Zerlegung muss center=false bleiben
+    fullcond_alle[z]->set_center(true);                                    // sonst wird Interaktion nicht geschaetzt.
   fullcond_alle[z]->posteriormode();
   fullcond_alle[0]->update_linold();
 
@@ -1613,7 +1613,7 @@ void STEPWISErun::stepmin_nonp_fix(unsigned & z, vector<double> & krit_fkt, doub
 
   unsigned m = 0;
   bool interact = false;
-  fullcond_alle[z]->safe_splines(interact);  // für ANOVA-Zerlegung: speichert Haupteffekte
+  fullcond_alle[z]->safe_splines(interact);  // fuer ANOVA-Zerlegung: speichert Haupteffekte
 
   for(i=0;i<lambdavec[z-1].size();i++)
     {
@@ -1654,7 +1654,7 @@ void STEPWISErun::stepmin_nonp_fix(unsigned & z, vector<double> & krit_fkt, doub
   fullcondp[0]->posteriormode_single(names_nonp[z-1],
                                 fullcond_alle[z]->get_data_forfixedeffects(),true);
   fullcond_alle[0]->update_linold();
-  if(interact && possible=="alles")      // stellt den alten Zustand für ANOVA-Zerlegung wieder her
+  if(interact && possible=="alles")      // stellt den alten Zustand fuer ANOVA-Zerlegung wieder her
     {
     krit_fkt[m] = compute_criterion();
     fullcond_alle[z]->set_splines_old();
@@ -1719,7 +1719,7 @@ void STEPWISErun::stepmin_nonp_leer(unsigned & z, vector<double> & krit_fkt, dou
    fullcondp = fullcond_ori;
 
   // if(minim == "adaptiv" || minim == "adap_exact")
-           // ---> hier nicht nötig (siehe koordmin_leer_fix)
+           // ---> hier nicht noetig (siehe koordmin_leer_fix)
   if( ((criterion == "CV5" || criterion == "CV10") && possible != "vfix")
      || ((minim == "adaptiv" || minim == "adap_exact") && likep_mult[0]->get_family()=="Gamma") )
     {
@@ -1727,14 +1727,14 @@ void STEPWISErun::stepmin_nonp_leer(unsigned & z, vector<double> & krit_fkt, dou
     }
 
   fullcondp = fullcond_ori;
-  fullcond_alle[z]->const_varcoeff();   // Konstante anpassen für varrierenden Koeffizienten
+  fullcond_alle[z]->const_varcoeff();   // Konstante anpassen fuer varrierenden Koeffizienten
   fullcond_alle[0]->safe_const();
   fullcondp.push_back(fullcond_alle[z]);
   fullcond_alle[z]->set_inthemodel(1);
 
   unsigned m = 0;
   bool interact = false;
-  fullcond_alle[z]->safe_splines(interact);  // für ANOVA-Zerlegung: speichert Haupteffekte
+  fullcond_alle[z]->safe_splines(interact);  // fuer ANOVA-Zerlegung: speichert Haupteffekte
 
   for(i=0;i<lambdavec[z-1].size();i++)
     {
@@ -1770,7 +1770,7 @@ void STEPWISErun::stepmin_nonp_leer(unsigned & z, vector<double> & krit_fkt, dou
           fullcond_alle[0]->set_const_old();
           }
         }
-      krit_fkt.push_back(kriterium_versuch); // Länge des Vektors muß zu Anzahl Möglichkeiten passen!
+      krit_fkt.push_back(kriterium_versuch); // Laenge des Vektors muss zu Anzahl Moeglichkeiten passen!
       }
     else
       {
@@ -1783,7 +1783,7 @@ void STEPWISErun::stepmin_nonp_leer(unsigned & z, vector<double> & krit_fkt, dou
   fullcond_alle[z]->reset_effect(0);
   fullcondp.erase(fullcondp.end()-1,fullcondp.end());
   fullcond_alle[0]->posteriormode_const();
-  if(interact && possible=="alles")      // stellt den alten Zustand für ANOVA-Zerlegung wieder her
+  if(interact && possible=="alles")      // stellt den alten Zustand fuer ANOVA-Zerlegung wieder her
     {
     krit_fkt[m] = compute_criterion();
     fullcond_alle[z]->set_splines_old();
@@ -1865,7 +1865,7 @@ void STEPWISErun::minexact_nonp_nonp(unsigned & z, vector<double> & krit_fkt,
           vector<FULLCOND*> fullcond_start = fullcondp;
           vector<double> modell1 = modell_alt;
           modell1[z+names_fixed.size()-2] = -1;
-          fullcond_einzeln(modell1,modell_alt,z);  // hier muß der Fullcond-Vekor angepaßt werden!!!
+          fullcond_einzeln(modell1,modell_alt,z);  // hier muss der Fullcond-Vekor angepasst werden!!!
           korrektur();  // fullcondp[0]->posteriormode_const();
           schaetzen(z,kriterium_versuch,false,"backfitting");
           fullcondp = fullcond_start;
@@ -1881,7 +1881,7 @@ void STEPWISErun::minexact_nonp_nonp(unsigned & z, vector<double> & krit_fkt,
           vector<FULLCOND*> fullcond_start = fullcondp;
           vector<double> modell1 = modell_alt;
           modell1[z+names_fixed.size()-2] = 0;
-          fullcond_einzeln(modell1,modell_alt,z);  // hier muß der Fullcond-Vekor angepaßt werden!!!
+          fullcond_einzeln(modell1,modell_alt,z);  // hier muss der Fullcond-Vekor angepasst werden!!!
           korrektur();  // fullcondp[0]->posteriormode_const();
           schaetzen(z,kriterium_versuch,false,"backfitting");
           fullcondp = fullcond_start;
@@ -1924,7 +1924,7 @@ void STEPWISErun::minexact_nonp_fix(unsigned & z, vector<double> & krit_fkt,
   vector<FULLCOND*> fullcond_begin = fullcondp;
   vector<double> modell1 = modell_alt;
   modell1[z+names_fixed.size()-2] = 1;
-  fullcond_einzeln(modell1,modell_alt,z);  // hier muß der Fullcond-Vekor angepaßt werden!!!
+  fullcond_einzeln(modell1,modell_alt,z);  // hier muss der Fullcond-Vekor angepasst werden!!!
   fullcond_alle[z]->set_inthemodel(1);
   for(i=0;i<lambdavec[z-1].size();i++)
     {
@@ -2000,7 +2000,7 @@ void STEPWISErun::minexact_nonp_leer(unsigned & z, vector<double> & krit_fkt,
   vector<FULLCOND*> fullcond_begin = fullcondp;
   vector<double> modell1 = modell_alt;
   modell1[z+names_fixed.size()-2] = 1;
-  fullcond_einzeln(modell1,modell_alt,z);  // hier muß der Fullcond-Vekor angepaßt werden!!!
+  fullcond_einzeln(modell1,modell_alt,z);  // hier muss der Fullcond-Vekor angepasst werden!!!
   fullcond_alle[z]->set_inthemodel(1);
 
   for(i=0;i<lambdavec[z-1].size();i++)
@@ -2119,12 +2119,12 @@ double STEPWISErun::criterion_min(const double & df, const ST::string & auswahl)
   }
 
 // -----------------------------------------------------------------------------
-// ------------------ Funktionen für Koordinatenmethode ------------------------
+// ------------------ Funktionen fuer Koordinatenmethode ------------------------
 // -----------------------------------------------------------------------------
 
 bool STEPWISErun::koordabstieg(void)
   {
-      // Schleife für Minimierung
+      // Schleife fuer Minimierung
   ST::string tr_akt = "trace_on";
   ST::string text_neu;
   bool eins = true;
@@ -2351,7 +2351,7 @@ void STEPWISErun::koord_fix_leer(vector<double> & kriteriumiteration2,
        name_help.push_back(names_fixed[i]);
        fullcond_alle[0]->posteriormode_single(name_help,datamatrix(D.getCol(c)),true);
        modell_neu[i-1] = -1;
-       if(kriterium_aktuell < kriterium_neu) // verhindert, daß "approx" schlechter wird!
+       if(kriterium_aktuell < kriterium_neu) // verhindert, dass "approx" schlechter wird!
          {
          posteriormode(posttitle,true);
          if( (trace == "trace_minim" || trace == "trace_on") && neu == false)
@@ -2406,8 +2406,8 @@ void STEPWISErun::koord_leer_fix(vector<double> & kriteriumiteration2,
   {
   double kriterium_adaptiv = kriterium_aktuell;
   // if(minim == "adaptiv" || minim == "adap_exact")
-     // --> hier nicht nötig, weil Intercept immer erneuert wird!
-     // --> bei 1. Koeffizienten und "Gamma" doch nötig, weil Phi neu geschätzt wurde!
+     // --> hier nicht noetig, weil Intercept immer erneuert wird!
+     // --> bei 1. Koeffizienten und "Gamma" doch noetig, weil Phi neu geschaetzt wurde!
   if( (criterion == "CV5")
        || (criterion == "CV10")
        || ((minim == "adaptiv" || minim == "adap_exact") && likep_mult[0]->get_family()=="Gamma"))
@@ -2524,7 +2524,7 @@ unsigned STEPWISErun::koord_minfactor(vector<double> & kriteriumiteration2,
                                                || possible == "vfix"))
        {
        if(minim == "adaptiv" || minim == "adap_exact")
-                 // || criterion == "CV5" || criterion == "CV10")  --> hier nicht nötig!
+                 // || criterion == "CV5" || criterion == "CV10")  --> hier nicht noetig!
          {
          kriterium_aktuell = MAXDOUBLE;
          koord_factor_leer(kriteriumiteration2,modeliteration,textiteration,kriterium_aktuell,z);
@@ -2689,7 +2689,7 @@ void STEPWISErun::koord_leer_factor(vector<double> & kriteriumiteration2,
 
   double kriterium_adaptiv = kriterium_aktuell;
   // if(minim == "adaptiv" || minim == "adap_exact")
-      // ---> hier überflüssig (siehe oben)!
+      // ---> hier ueberfluessig (siehe oben)!
   if( (criterion == "CV5")
        || (criterion == "CV10")
        || ((minim == "adaptiv" || minim == "adap_exact") && likep_mult[0]->get_family()=="Gamma"))
@@ -2807,7 +2807,7 @@ void STEPWISErun::koord_minnonp(vector<double> & kriteriumiteration2,
 
     unsigned y;
     for(y=1;y<fullcond_alle.size();y++)
-      fullcond_alle[y]->set_center(false);    // sorgt dafür, daß Funktionen nicht zentriert werden!
+      fullcond_alle[y]->set_center(false);    // sorgt dafuer, dass Funktionen nicht zentriert werden!
 
     vector<double> krit_fkt;
     if(modell_alt[i+names_fixed.size()-2]==0)
@@ -2832,7 +2832,7 @@ void STEPWISErun::koord_minnonp(vector<double> & kriteriumiteration2,
     for(y=1;y<fullcond_alle.size();y++)
      {
      if(fullcond_alle[y]->is_identifiable() == false)
-       fullcond_alle[y]->set_center(true);    // sorgt dafür, daß Funktionen zentriert werden!
+       fullcond_alle[y]->set_center(true);    // sorgt dafuer, dass Funktionen zentriert werden!
      }
 
     modell_neu[names_fixed.size()-2+i] = lambdavec[i-1][lambda_ind];
@@ -2877,12 +2877,12 @@ void STEPWISErun::koord_minnonp(vector<double> & kriteriumiteration2,
         vector<FULLCOND*> fullcond_ori = fullcondp;
         fullcondp = fullcond_ori;
 
-        if(modell_neu[names_fixed.size()-2+i] == 0)      // noch mal überprüfen!!!
+        if(modell_neu[names_fixed.size()-2+i] == 0)      // noch mal ueberpruefen!!!
           {
-          //fullcond_alle[i]->reset_effect(0);   // Nicht nötig, wegen "fullcond_einzeln"-> fullcond_alle[i] nicht in fullcondp!!!
+          //fullcond_alle[i]->reset_effect(0);   // Nicht noetig, wegen "fullcond_einzeln"-> fullcond_alle[i] nicht in fullcondp!!!
           if(modell_alt[names_fixed.size()-2+i] != 0)
             {
-            if(hierarchical)                        // neu für VCM!  Versuch!!!
+            if(hierarchical)                        // neu fuer VCM!  Versuch!!!
               {
               ST::string possible = "alles";
               fullcond_alle[i]->hierarchical(possible);
@@ -3095,7 +3095,7 @@ void STEPWISErun::koordexact_nonp(vector<double> & kriteriumiteration2,
 
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Erstellung des Startmodels -----------------------
+// ------- Funktionen fuer die Erstellung des Startmodels -----------------------
 // -----------------------------------------------------------------------------
 
 bool STEPWISErun::vcm_doppelt(void)
@@ -3136,7 +3136,7 @@ void STEPWISErun::initialise_lambdas(vector<vector<ST::string> > & namen_nonp,
   namen_fix = fullcondp[0]->get_datanames();
   unsigned i;
 
-       // berechnet ein Modell, um Gewichte für Augabe usw. zu erhalten!!!
+       // berechnet ein Modell, um Gewichte fuer Augabe usw. zu erhalten!!!
   if(gewichte == true)
     {
     vector<double> modell_init;
@@ -3151,7 +3151,7 @@ void STEPWISErun::initialise_lambdas(vector<vector<ST::string> > & namen_nonp,
          }
       else if(fullcond_alle[i]->get_fctype() == MCMC::factor)
          {
-         fullcondp.erase(fullcondp.begin() + 1);   //löscht das Element an Pos.1 aus fullcondp-Vektor
+         fullcondp.erase(fullcondp.begin() + 1);   //loescht das Element an Pos.1 aus fullcondp-Vektor
          fullcondp[0]->include_effect(fullcond_alle[i]->get_datanames(),
                                    fullcond_alle[i]->get_data_forfixedeffects());
          fullcond_alle[i]->set_inthemodel(-1);
@@ -3204,7 +3204,7 @@ void STEPWISErun::initialise_weights(double prop)
     {
     datamatrix weight = likep_mult[0]->get_weight();
     bool gewicht = false;
-    if(weight.min(0) > 0)     // wenn Gewichtsmatrix 0er enthält, werden diese 0er für die Aufteilung verwendet.
+    if(weight.min(0) > 0)     // wenn Gewichtsmatrix 0er enthaelt, werden diese 0er fuer die Aufteilung verwendet.
       {                       // sonst: bestimmte Werte sollen im Testdatensatz enthalten sein (z.B. Min., Max. bei P-Splines)
       weight = datamatrix(weight.rows(),1,0);
       unsigned i;
@@ -3351,7 +3351,7 @@ void STEPWISErun::startwerte(const ST::string & startmodel,
 
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Berechnung neuer Modelle -------------------------
+// ------- Funktionen fuer die Berechnung neuer Modelle -------------------------
 // -----------------------------------------------------------------------------
 
 double STEPWISErun::compute_criterion(void)
@@ -3490,7 +3490,7 @@ bool STEPWISErun::modelcomparison(const vector<double> & m,
 
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Erstellung des fullcondp-Vektors -----------------
+// ------- Funktionen fuer die Erstellung des fullcondp-Vektors -----------------
 // -----------------------------------------------------------------------------
 
 void STEPWISErun::fullcond_einzeln(const vector<double> & modell1,
@@ -3653,7 +3653,7 @@ void STEPWISErun::reset_fix(const ST::string & name)
   while(j<fullcondp[0]->get_datanames().size() && raus==false)
      {
      if(fullcondp[0]->get_datanames()[j]==name)
-              // || fullcondp[0]->get_datanames()[j]== name+"_1")    // neu: Zusatz für VCM???
+              // || fullcondp[0]->get_datanames()[j]== name+"_1")    // neu: Zusatz fuer VCM???
         {
         raus = true;
         fullcondp[0]->reset_effect(j);
@@ -3692,7 +3692,7 @@ fullcond_alle[0]->posteriormode();
   }
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Ausgabe im Output-Fenster ------------------------
+// ------- Funktionen fuer die Ausgabe im Output-Fenster ------------------------
 // -----------------------------------------------------------------------------
 
 bool STEPWISErun::make_pause(void)
@@ -3847,7 +3847,7 @@ void STEPWISErun::options_text(const int & number,
 
 
 // -----------------------------------------------------------------------------
-// ------- Funktionen für die Ausgabe im Tex-File ------------------------------
+// ------- Funktionen fuer die Ausgabe im Tex-File ------------------------------
 // -----------------------------------------------------------------------------
 
 void STEPWISErun::make_graphics(const ST::string & name,
@@ -3975,14 +3975,14 @@ void STEPWISErun::make_predictor(void)
 
 void STEPWISErun::make_model(void)
   {
-  //Vert-Fam wird übergeben
+  //Vert-Fam wird uebergeben
   ST::string fam = likep_mult[0]->get_family();
   fam = fam.replaceallsigns('_', ' ');
 
-  //Anz. Beob. wird übergeben
+  //Anz. Beob. wird uebergeben
   unsigned obs = likep_mult[0]->get_nrobs();
 
-  //Name der Resp.-Var. übergeben
+  //Name der Resp.-Var. uebergeben
   ST::string resp = likep_mult[0]->get_responsename();
   char hcharu = '_';
   ST::string hstringu = "\\_";
@@ -4099,7 +4099,7 @@ void STEPWISErun::make_prior(vector<vector<unsigned> > & startindex)
 void STEPWISErun::make_fixed_table(const ST::string & CI)
   {
 
-  // falls andere Quantile gewünscht werden
+  // falls andere Quantile gewuenscht werden
   double u = fullcondp[begin[0]]->get_level1();
   double o = fullcondp[begin[0]]->get_level2();
   double u1 = fullcondp[begin[0]]->get_lower1();
@@ -4162,7 +4162,7 @@ void STEPWISErun::make_plots(ST::string & path_batch,
 
   bool stil = false;
 
-  // Schleife überprüft, ob es ein fullcond-Object
+  // Schleife ueberprueft, ob es ein fullcond-Object
   // gibt, bei dem Effekt gezeichnet werden kann
   MCMC::plotstyles plst;
   for(j=0;j<fullcondp.size();j++)
@@ -4174,10 +4174,10 @@ void STEPWISErun::make_plots(ST::string & path_batch,
 
   if(stil == true)
     {
-    //erzeugt File, das Plot-Befehle für Java-Version enthält
+    //erzeugt File, das Plot-Befehle fuer Java-Version enthaelt
     ofstream outbatch(path_batch.strtochar());
 
-    //erzeugt File, das SPlus-Befehle zum Plotten enthält
+    //erzeugt File, das SPlus-Befehle zum Plotten enthaelt
     ofstream outsplus(path_splus.strtochar());
 
     outtex << "\n\\newpage" << "\n\\noindent {\\bf \\large Plots:}" << endl;
@@ -4186,7 +4186,7 @@ void STEPWISErun::make_plots(ST::string & path_batch,
 /*    outsplus << "# NOTE: 'directory' must be substituted by the directory"
              << " where the sfunctions are stored \n"
              << endl
-    // einlesen der Source-Files für S-Plus
+    // einlesen der Source-Files fuer S-Plus
              << "source(\"'directory'\\\\sfunctions\\\\plotsample.s\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotnonp.s\")" << endl
              << "source(\"'directory'\\\\sfunctions\\\\plotsurf.s\")" << endl
@@ -4200,7 +4200,7 @@ void STEPWISErun::make_plots(ST::string & path_batch,
     genoptions_mult[0]->out("\n");
 
     bool stil2 = true;
-    for(j=begin[0];j<=end[0];j++)  //Schleife überprüft, ob es map-Objekt gibt
+    for(j=begin[0];j<=end[0];j++)  //Schleife ueberprueft, ob es map-Objekt gibt
       {
       plst = fullcondp[j]->get_plotstyle();
       if(plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
@@ -4233,7 +4233,7 @@ void STEPWISErun::make_plots(ST::string & path_batch,
 
     outbatch << "% usefile " << path_batch << endl;
 
-    // falls andere Quantile gewünscht werden
+    // falls andere Quantile gewuenscht werden
     double u = fullcondp[begin[0]]->get_level1();
     double o = fullcondp[begin[0]]->get_level2();
     double u1 = fullcondp[begin[0]]->get_lower1();
@@ -4258,7 +4258,7 @@ void STEPWISErun::make_plots(ST::string & path_batch,
 
       if (plst != MCMC::noplot)
         {
-        // Pfade für ps-, tex-, SPlus-files
+        // Pfade fuer ps-, tex-, SPlus-files
         ST::string pathps = pathresult.substr(0, pathresult.length()-4);
         ST::string pathgr = pathps.replaceallsigns('\\', '/');
 
@@ -4297,7 +4297,7 @@ void STEPWISErun::make_plots(ST::string & path_batch,
            outtex << "." << endl << "Shown are the posterior means.}" << endl
                   << "\\end{figure}" << endl;
            }
-          // für map-Funktionen
+          // fuer map-Funktionen
         else if (plst == MCMC::drawmap || plst == MCMC::drawmapgraph)
            {
            outbatch << "\n";                 // Befehle f. d. batch-file
@@ -4456,7 +4456,7 @@ bool STEPWISErun::confidence_MCMCselect(const vector<double> & modell_final,
     }
 
   //if(neuschaetzen == true)
-    schaetzen(0,kriterium_alt,true,"backfitting");  // nötig für Startwerte, wenn mind. ein lambda=-2
+    schaetzen(0,kriterium_alt,true,"backfitting");  // noetig fuer Startwerte, wenn mind. ein lambda=-2
 
   unsigned iterations = genoptions_mult[0]->get_iterations();
   unsigned start = 1;
@@ -4523,7 +4523,7 @@ bool STEPWISErun::confidence_bootstrap(const vector<double> & modell_final,
 
     if(criterion == "MSEP" || criterion == "AUC")
       {
-      likep_mult[0]->weight_for_all();   // macht hier das Gegenteil und setzt "weight" für MSEP ein!
+      likep_mult[0]->weight_for_all();   // macht hier das Gegenteil und setzt "weight" fuer MSEP ein!
       for(unsigned y=0;y<fullcond_alle.size();y++)
         fullcond_alle[y]->set_calculate_xwx();
       }
@@ -4641,8 +4641,8 @@ bool STEPWISErun::confidence_MCMCbootstrap(const vector<double> & modell_final,
       fullcond_alle[i]->set_lambdaconst(modell_alt[names_fixed.size()-2+i]);
     }
 
-  fix_ganz_komplett(modell_mcmc);        // stellt "fullcondp" neu auf (für Funktionen mit lambda=-1 -> lambda=10^8)
-  fullcond_komplett(modell_mcmc);        // fullcond-Objekte für leere Funktionen sind auch enthalten.
+  fix_ganz_komplett(modell_mcmc);        // stellt "fullcondp" neu auf (fuer Funktionen mit lambda=-1 -> lambda=10^8)
+  fullcond_komplett(modell_mcmc);        // fullcond-Objekte fuer leere Funktionen sind auch enthalten.
 
   for(i=1;i<fullcond_alle.size();i++)
     {
@@ -4662,8 +4662,8 @@ bool STEPWISErun::confidence_MCMCbootstrap(const vector<double> & modell_final,
   unsigned startit = 1;
   unsigned endit = double(iterations) / double(bootstrap+1);
   unsigned itpmod = endit;
-  schaetzen(0,kriterium_alt,true,"backfitting");  // nötig, da fixe Effekte in "fix_ganz_komplett" gleich Null gesetzt werden.
-  for(i=1;i<fullcond_alle.size();i++)             // speichert MA-Schätzer für Funktionen
+  schaetzen(0,kriterium_alt,true,"backfitting");  // noetig, da fixe Effekte in "fix_ganz_komplett" gleich Null gesetzt werden.
+  for(i=1;i<fullcond_alle.size();i++)             // speichert MA-Schaetzer fuer Funktionen
     fullcond_alle[i]->update_beta_average(zaehler);
   fullcond_alle[0]->update_beta_average(zaehler);
 
@@ -4710,7 +4710,7 @@ bool STEPWISErun::confidence_MCMCbootstrap(const vector<double> & modell_final,
 
     if(criterion == "MSEP" || criterion == "AUC")
       {
-      likep_mult[0]->weight_for_all();   // macht hier das Gegenteil und setzt "weight" für MSEP ein!
+      likep_mult[0]->weight_for_all();   // macht hier das Gegenteil und setzt "weight" fuer MSEP ein!
       for(unsigned y=0;y<fullcond_alle.size();y++)
         fullcond_alle[y]->set_calculate_xwx();
       }
@@ -4790,9 +4790,9 @@ genoptions_mult[0]->out("\n");*/
         }
       }
 
-    // neu schätzen, da fixe Effekte in "fix_ganz_komplett" gleich Null gesetzt werden.
+    // neu schaetzen, da fixe Effekte in "fix_ganz_komplett" gleich Null gesetzt werden.
     schaetzen(0,kriterium_alt,true,"backfitting");
-    for(i=1;i<fullcond_alle.size();i++)   // speichert MA-Schätzer für Funktionen
+    for(i=1;i<fullcond_alle.size();i++)   // speichert MA-Schaetzer fuer Funktionen
       fullcond_alle[i]->update_beta_average(zaehler);
     fullcond_alle[0]->update_beta_average(zaehler);
 
@@ -4800,7 +4800,7 @@ genoptions_mult[0]->out("\n");*/
     abbruch = simulate(posttitle,seed,startit,endit);
     if(abbruch==true)
       return true;
-    // rechnet die Zentrierungskonstanten zum linearen Prädiktor
+    // rechnet die Zentrierungskonstanten zum linearen Praediktor
     fullcond_alle[0]->update_linold();
     fullcond_alle[0]->update_linold_vc();
 

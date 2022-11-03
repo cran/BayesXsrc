@@ -466,7 +466,7 @@ void descriptiverun(dataobject & o)
       {
 //      o.m.makeModelMatrix_j(o.d,X,i);
       datamatrix Xi;
-      o.makematrix(vnames[i],Xi,ifexpression);      // für jede Variable eigene Matrix erzeugen?
+      o.makematrix(vnames[i],Xi,ifexpression);      // fuer jede Variable eigene Matrix erzeugen?
 
       unsigned int obs = Xi.rows();
       double mean = Xi.mean(0);
@@ -702,12 +702,12 @@ void marketingrun(dataobject & o)    //Reihenfolge zum Einlesen: outlet, wocheni
 
       //Herauslesen der Variablennamen
   vector<ST::string> vnames = o.m.getModelVarnamesAsVector();
-          //Überprüfen der Anzahl der übergebenen Variablen
+          //Ueberpruefen der Anzahl der uebergebenen Variablen
   if(vnames.size()>4)
     o.errormessages.push_back("ERROR: too many variables");
   else if(vnames.size()<4)
     o.errormessages.push_back("ERROR: not enough variables");
-  else     //Überprüfen, ob die Variablen existieren
+  else     //Ueberpruefen, ob die Variablen existieren
     {
     bool richtig = true;
     for(unsigned i=0; i<vnames.size();i++)

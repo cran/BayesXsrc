@@ -111,7 +111,7 @@ class __EXPORT_TYPE FULLCOND_pspline : public spline_basis
                     const double & lg, const double & ug,
                     const unsigned & c);
 
-  // CONSTRUCTOR 2 für variierende Koeffizienten
+  // CONSTRUCTOR 2 fuer variierende Koeffizienten
 
   FULLCOND_pspline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                    const datamatrix & effmod,const datamatrix & intact,
@@ -121,7 +121,7 @@ class __EXPORT_TYPE FULLCOND_pspline : public spline_basis
                     const ST::string & fp, const ST::string & pres, const bool & deriv,
                     const int & gs, const unsigned & c);
 
-  // CONSTRUCTOR 3 für Cox Modell (nur um spline_basis aufzurufen)
+  // CONSTRUCTOR 3 fuer Cox Modell (nur um spline_basis aufzurufen)
 
   FULLCOND_pspline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_const * fcc,
                     const fieldtype & ft,const ST::string & ti,

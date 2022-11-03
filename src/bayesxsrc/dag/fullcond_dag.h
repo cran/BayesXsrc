@@ -72,7 +72,7 @@ class __EXPORT_TYPE FULLCOND_dag : public FULLCOND
 
 	  double sigma_prop;			// variance of the proposal distribution
 
-	  double SQT_x;		//sum of squares in total:  sum_1^n (x-µ)^2
+	  double SQT_x;		//sum of squares in total:  sum_1^n (x-mu)^2
 	  double SQT_b;		//sum of squares in total:  sum_1^n (b_i-0)^2
 
 	  double SQT_x_n;		// the new SQT_x for the proposed model

@@ -58,8 +58,8 @@ class __EXPORT_TYPE FULLCOND_nonp_gaussian : public FULLCOND_nonp_basis
   vector< vector<unsigned> > neighbors;
 
 // For REML
-  datamatrix X_VCM;                     // für REML VCM
-  datamatrix Z_VCM;                     // für REML VCM
+  datamatrix X_VCM;                     // fuer REML VCM
+  datamatrix Z_VCM;                     // fuer REML VCM
 
   datamatrix remlspatialdesign;
 
@@ -254,16 +254,16 @@ class __EXPORT_TYPE FULLCOND_nonp_gaussian : public FULLCOND_nonp_basis
   // sl     : Starting value for smoothing parameter
   // per    : Period of seasonal effect
 
-  // Nach der Initalisierung stehen folgende Variablen zur Verfügung:
+  // Nach der Initalisierung stehen folgende Variablen zur Verfuegung:
 
-  // lambda: Glättungsparameter
-  // period: Periode eine möglichen Saisoneffekts
+  // lambda: Glaettungsparameter
+  // period: Periode eine moeglichen Saisoneffekts
   // title:  Titel der Full conditional
   // type: Type (z.B. RW1, RW2 etc.), vom Typ fieldtype, in mcmc_nonpbasis.h
   //       definiert.
   // plotstyle: Visualisierbar ja/nein. Werte sind plotnonp oder drawmap
   // index: Indexmatrix (Anzahl Beobachtungen x 1)
-  // posbeg: Vektor, der für die Kategorien
+  // posbeg: Vektor, der fuer die Kategorien
   // posend:
   // weight: Differenzen benachbarter Kovariablenwerte
   // effectvalues: Verschiedenen Kovariablenwerte (als vector von string)
