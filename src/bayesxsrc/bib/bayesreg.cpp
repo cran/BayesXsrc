@@ -3028,10 +3028,13 @@ bool bayesreg::create_nonprw1rw2(const unsigned & collinpred)
 
 
       if (proposal != "cp")
+        {
         iwls=true;
+        }
       else
+        {
         iwls=false;
-
+        }
 
         //-------------------- gaussian response, etc. -------------------------
         if ( (check_gaussian(collinpred)) || (check_iwls(iwls,collinpred)) )

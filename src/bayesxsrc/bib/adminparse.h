@@ -44,7 +44,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include"stepwisereg.h"
 //------------------------------------------------------------------------------
 
-using namespace std;
+//using namespace std;
 
 class __EXPORT_TYPE administrator
   {

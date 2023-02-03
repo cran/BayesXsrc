@@ -138,7 +138,7 @@ void DESIGN_kriging::read_knots_from_data(void)
   if (knotdatapath!="")
     {
     datamatrix help;
-    ifstream in(knotdatapath.strtochar());
+    std::ifstream in(knotdatapath.strtochar());
     if(!in.fail())
       {
       help.prettyScan(in);

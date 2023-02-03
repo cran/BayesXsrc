@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 #include"realobs.h"
 
 using std::vector;
-using namespace std;
+//using namespace std;
 //------------------------------------------------------------------------------
 //----------------------------- CLASS vectornum --------------------------------
 //------------------------------------------------------------------------------

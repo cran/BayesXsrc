@@ -346,8 +346,10 @@ double kssample(void)
           return(X);
         n = n+2;
         Q = P;
-      for(j=2; j<=(SQR(n)-1); j++)
-         Q *= P;
+        for(j=2; j<=(SQR(n)-1); j++)
+          {
+          Q *= P;
+          }
          W = W - SQR(n)*Q;
          }
       while(U2 >= W);
@@ -374,8 +376,10 @@ double kssample(void)
           dummy *= Z;
         W = W + SQR(n)*dummy;
         if (U3 >= W)
+          {
           return(X);
-          n++;
+          }
+        n++;
         dummy = Z;
         for(j=2; j<=(SQR(n)-1); j++)
           dummy *= Z;
@@ -1232,7 +1236,7 @@ double pbivnu(const double &  dh, const double &  dk, const double &  r)
         }
       if(r > 0)
         {
-        bvn +=  randnumbers::Phi2( -max( h, k ) );
+        bvn +=  randnumbers::Phi2( -std::max( h, k ) );
         }
       else if(h >= k)
         {

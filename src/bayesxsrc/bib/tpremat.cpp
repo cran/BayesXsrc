@@ -353,9 +353,14 @@ PreMatrix<T> PreMatrix<T>::operator*( const T v ) const
 		return PreMatrix<T>( 0 );
 
 	if ( v == T( 1 ) )
+        {
 		return PreMatrix<T>( *this );
-   else if ( v == T( 0 ) )
-		return PreMatrix<T>( this->rows( ), this->cols( ), T( 0 ) );
+        }
+    else
+        {
+        if ( v == T( 0 ) )
+            return PreMatrix<T>( this->rows( ), this->cols( ), T( 0 ) );
+        }
 
 	//	PreMatrix uninitialisiert anlgen und mit der PreMatrix, deren
 	//	Methode aufgerufen wurde und dem Argument der Methode

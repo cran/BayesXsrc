@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 
 #include "mcmc_const.h"
-using namespace std;
+//using namespace std;
 
 namespace MCMC
 {
@@ -1091,7 +1091,7 @@ void FULLCOND_const_gaussian::update(void)
   if (shrinkage == true && use_effectstart == true && optionsp->get_nriter() == 1)
   {
   ST::string pathstartdata = pathresult.substr(0,pathresult.length()-4) + "_startdata.raw";
-  ofstream outstartdata(pathstartdata.strtochar(), ios::out);
+  ofstream outstartdata(pathstartdata.strtochar(), std::ios::out);
   outstartdata << "varnam startvalue" << "\n";
   for(unsigned int j=0; j<nrconst; j++)
     {
@@ -1613,7 +1613,7 @@ void  FULLCOND_const_nongaussian::update(void)
   if (shrinkage == true && use_effectstart == true && optionsp->get_nriter() == 1)
   {
   ST::string pathstartdata = pathresult.substr(0,pathresult.length()-4) + "_startdata.raw";
-  ofstream outstartdata(pathstartdata.strtochar(), ios::out);
+  ofstream outstartdata(pathstartdata.strtochar(), std::ios::out);
   outstartdata << "varnam startvalue" << "\n";
   for(int j=0; j<nrconst; j++)
     {
@@ -1715,7 +1715,7 @@ void  FULLCOND_const_nongaussian::update_iwls(void)
   if (shrinkage == true && use_effectstart == true && optionsp->get_nriter() == 1)
   {
   ST::string pathstartdata = pathresult.substr(0,pathresult.length()-4) + "_startdata.raw";
-  ofstream outstartdata(pathstartdata.strtochar(), ios::out);
+  ofstream outstartdata(pathstartdata.strtochar(), std::ios::out);
   outstartdata << "varnam startvalue" << "\n";
   for(int j=0; j<nrconst; j++)
     {
@@ -1877,7 +1877,7 @@ void FULLCOND_const_nbinomial::update(void)
   if (shrinkage == true && use_effectstart == true && optionsp->get_nriter() == 1)
   {
   ST::string pathstartdata = pathresult.substr(0,pathresult.length()-4) + "_startdata.raw";
-  ofstream outstartdata(pathstartdata.strtochar(), ios::out);
+  ofstream outstartdata(pathstartdata.strtochar(), std::ios::out);
   outstartdata << "varnam startvalue" << "\n";
   for(int j=0; j<nrconst; j++)
     {

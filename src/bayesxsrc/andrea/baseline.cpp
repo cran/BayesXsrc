@@ -49,7 +49,7 @@ pspline_baseline::pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_co
 
   {
 
-  int i;
+  unsigned i;
   gauss_n=9;
   vc_dummy1 = false;
   baselinep = vector<pspline_baseline*>(0);
@@ -295,7 +295,7 @@ pspline_baseline::pspline_baseline(MCMCoptions * o,DISTRIBUTION * dp,FULLCOND_co
                     const bool & partlik)    // NEW FOR PARTIALLIKELIHOOD
   : FULLCOND_pspline(o,dp,fcc,ft,ti,nrk,degr,kp,fp,pres,false,gs,c)
   {
-  int i,j;
+  unsigned i,j;
   gauss_n = 9;
   vc_dummy1 = false;
   baseline = true;

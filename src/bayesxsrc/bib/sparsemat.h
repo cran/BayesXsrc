@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. 
 
 #include"map.h"
 
-using namespace std;
+//using namespace std;
 
 double __EXPORT_TYPE norm(const datamatrix & v);
 
