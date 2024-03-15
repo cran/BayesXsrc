@@ -1,4 +1,4 @@
-131915f58601bfbe27fa93203b9c2c4f *DESCRIPTION
+d9eea85906e74b42a3c36a44890f3e5d *DESCRIPTION
 1a04e3007170bf5a9af1e51a9060acc7 *NAMESPACE
 706aa5cfd8610ff94c1a386d77504d4d *NEWS
 e2dae713e2f56572d2f48f91a4d59b66 *R/run.bayesx.R
@@ -247,7 +247,7 @@ e13e5ffc748d2c98acc4f51972e1f59e *src/bayesxsrc/psplines/mcmc_pspline.cpp
 a6c0385875ba2aa23fb238da82e0bb40 *src/bayesxsrc/psplines/mcmc_pspline.h
 b3c71528cbc901aa280a4db2f895d214 *src/bayesxsrc/psplines/mcmc_pspline_surf.cpp
 f22cfb69f0047e49e52c4774ba5fd6fa *src/bayesxsrc/psplines/mcmc_pspline_surf.h
-69debd5ec48db4644cf0ed21ec3b8a67 *src/bayesxsrc/psplines/spline_basis.cpp
+26733569507aef51250b7e6db966d5e1 *src/bayesxsrc/psplines/spline_basis.cpp
 09ccacbdf2ee6d157c1afbce9ed43b96 *src/bayesxsrc/psplines/spline_basis.h
 d9fce0c3e7bc2e43e8741af52c7bb2aa *src/bayesxsrc/psplines/spline_basis_surf.cpp
 580d55c1cd2c5d2ca8a44ae783cbdbd5 *src/bayesxsrc/psplines/spline_basis_surf.h

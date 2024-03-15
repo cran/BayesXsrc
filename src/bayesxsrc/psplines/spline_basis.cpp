@@ -275,6 +275,7 @@ spline_basis::spline_basis(MCMCoptions * o, DISTRIBUTION * dp,
 
   //    /UBSAN checks
   refcheck=false;
+  approx = false;
   // end: ASAN/UBSAN checks
 
   fcconst = fcc;
@@ -463,6 +464,7 @@ spline_basis::spline_basis(MCMCoptions * o,const datamatrix & d1,
 
   lowerknot=0.0;
   upperknot=0.0;
+  approx = false;
 
   pseudocontourprob = false;
 
