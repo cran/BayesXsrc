@@ -1,4 +1,4 @@
-d9eea85906e74b42a3c36a44890f3e5d *DESCRIPTION
+d52c9b3f5448b7d3cbc52d384f0ccc7c *DESCRIPTION
 1a04e3007170bf5a9af1e51a9060acc7 *NAMESPACE
 706aa5cfd8610ff94c1a386d77504d4d *NEWS
 e2dae713e2f56572d2f48f91a4d59b66 *R/run.bayesx.R
@@ -159,7 +159,7 @@ e1c030345adc2d3dfe1ceb5af46a9300 *src/bayesxsrc/leyre/nbinomial.h
 79dffecbc252de69131db369986d103a *src/bayesxsrc/main.cpp
 cf9d322fa158a8df04a809b76b572244 *src/bayesxsrc/mcmc/baseline_reml.cpp
 198338dac4dff762aaf3fc3f82550410 *src/bayesxsrc/mcmc/baseline_reml.h
-b9531ec98ecd47f5a7016bcad7311cd5 *src/bayesxsrc/mcmc/distribution.cpp
+5d8a198140515176bb98c515e1780a56 *src/bayesxsrc/mcmc/distribution.cpp
 6642cafeb9d509ff8c1a995c78f5f65c *src/bayesxsrc/mcmc/distribution.h
 e1f1982cb0c4d9a8dcc3411c9176daf7 *src/bayesxsrc/mcmc/distribution_glasgow.cpp
 8c0b01b46986dcdb1677f77aa115b9e0 *src/bayesxsrc/mcmc/distribution_glasgow.h

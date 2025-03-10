@@ -471,6 +471,9 @@ DISTRIBUTION::DISTRIBUTION(MCMCoptions * o, const datamatrix & r,
   lassosum=0.0;   //new
   nrnigmix=0;     //new
   nigmixsum=0.0;  //new
+  predictresponse = false;  //new
+  changingweight = false;  //new
+
   create(o,r,w);
   }
 
@@ -491,6 +494,8 @@ DISTRIBUTION::DISTRIBUTION(const datamatrix & offset,MCMCoptions * o,
   lassosum=0.0;   //new
   nrnigmix=0;     //new
   nigmixsum=0.0;  //new
+  predictresponse = false;  //new
+  changingweight = false;  //new
 
   create(o,r,w);
   add_linearpred(offset);
