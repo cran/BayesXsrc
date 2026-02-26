@@ -287,7 +287,7 @@ class __EXPORT_TYPE realobs
 
   // OVERLOADED == OPERATORS
 
-  int operator==(realobs & o2) const
+  int operator==(const realobs & o2) const
 	 {
 	 return value == o2.value;
 	 }

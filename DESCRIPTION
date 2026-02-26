@@ -1,6 +1,6 @@
 Package: BayesXsrc
-Version: 3.0-7
-Date: 2026-01-09
+Version: 3.0-7.1
+Date: 2026-02-25
 Title: Distribution of the 'BayesX' C++ Sources
 Authors@R: c(person(given = "Nikolaus", family = "Umlauf", role = c("aut", "cre"), email = "Nikolaus.Umlauf@uibk.ac.at",
                comment = c(ORCID = "0000-0003-2160-9803")),
@@ -18,7 +18,7 @@ SystemRequirements: GNU make
 License: GPL-2 | GPL-3
 URL: https://www.uni-goettingen.de/de/bayesx/550513.html
 NeedsCompilation: yes
-Packaged: 2026-01-09 04:56:04 UTC; nik
+Packaged: 2026-02-26 06:27:44 UTC; ripley
 Author: Nikolaus Umlauf [aut, cre] (ORCID:
     <https://orcid.org/0000-0003-2160-9803>),
   Daniel Adler [aut],
@@ -27,4 +27,4 @@ Author: Nikolaus Umlauf [aut, cre] (ORCID:
   Achim Zeileis [aut] (ORCID: <https://orcid.org/0000-0003-0918-3766>)
 Maintainer: Nikolaus Umlauf <Nikolaus.Umlauf@uibk.ac.at>
 Repository: CRAN
-Date/Publication: 2026-01-10 07:52:59 UTC
+Date/Publication: 2026-02-26 07:22:37 UTC

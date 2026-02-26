@@ -229,7 +229,7 @@ template <class T> class Array2D
 
 	//	Vergleichsoperator
 
-	bool operator==(const Array2D<T> &to);
+	bool operator==(const Array2D<T> &to) const;
 
 	//	Zuweisungsoperator
 

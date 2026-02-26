@@ -658,7 +658,7 @@ putBlock(const Array2D<T> & m, unsigned int rl, unsigned int cl,
 template <class T>
 bool
 Array2D<T>::
-operator==(const Array2D<T> &to)
+operator==(const Array2D<T> &to) const
 {
    T *v, *w;
 

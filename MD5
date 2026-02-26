@@ -1,4 +1,4 @@
-b0f1cef30b0e028ce4b6762f0174d45b *DESCRIPTION
+bb2afd76c38fd2d3c0ea19948417ac01 *DESCRIPTION
 1a04e3007170bf5a9af1e51a9060acc7 *NAMESPACE
 706aa5cfd8610ff94c1a386d77504d4d *NEWS
 e2dae713e2f56572d2f48f91a4d59b66 *R/run.bayesx.R
@@ -87,7 +87,7 @@ c91218b8d4118420162b4485c20501ef *src/bayesxsrc/bib/model_stepwise.cpp
 5a4700889b3c5b894f8767b3d2fe248d *src/bayesxsrc/bib/real.h
 896b93989df15e589d2f70ffc48ff0c2 *src/bayesxsrc/bib/realmat.h
 7e6dcd82f1c791b9cf438500ec975a63 *src/bayesxsrc/bib/realobs.cpp
-4044330e46acd85c3c23520b99c77f80 *src/bayesxsrc/bib/realobs.h
+fb27e0b3e02f0bec922d7ee3b30d7448 *src/bayesxsrc/bib/realobs.h
 ebbb0b1c737dbcd36462e228cac61f88 *src/bayesxsrc/bib/realvar.cpp
 5198e25d6eade9c7a09060dbc0611745 *src/bayesxsrc/bib/realvar.h
 7ed5c264036537d7952e615abef55366 *src/bayesxsrc/bib/remlreg.cpp
@@ -104,8 +104,8 @@ b23896129515695290d9dc7dc1a3ef90 *src/bayesxsrc/bib/statmat.cpp
 53cba86fa1fb2fe093d85699e3aecb0f *src/bayesxsrc/bib/stepwisereg.h
 0cb17700983713fbe6d8257d6d1c8108 *src/bayesxsrc/bib/tarray.cpp
 03eb3d49ea406ce22f027d5fb4ec2b91 *src/bayesxsrc/bib/tarray.h
-f33dca23a09fe9ddad1da5f91f5d1215 *src/bayesxsrc/bib/tarray2d.cpp
-e837ea43bf578b6fd64a8ebc3c6e04fe *src/bayesxsrc/bib/tarray2d.h
+a36e46f61de6319fcb172c70f402390e *src/bayesxsrc/bib/tarray2d.cpp
+54ef463b8dfea33325c0ab1ebda62030 *src/bayesxsrc/bib/tarray2d.h
 fbf7b0c6183b3b9e76db9e053186eb19 *src/bayesxsrc/bib/testform.cpp
 4bdca1902e77a099c96c81d28619ba06 *src/bayesxsrc/bib/tlinklst.cpp
 d10da8f17a86ce8929f96bcc12247095 *src/bayesxsrc/bib/tlinklst.h
